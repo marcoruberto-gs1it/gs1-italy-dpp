@@ -58,7 +58,8 @@ const sectorIds = [...new Set(products.map((p) => p.sectorId))];
 const staticUrls = [
   { loc: '/' },
   { loc: '/validatore' },
-  { loc: '/assistente' },
+  // /assistente non è più una pagina prerenderizzata di questo sito: è il chat-client React
+  // (vedi docker-compose.yml), una SPA senza contenuto statico da indicizzare.
   ...sectorIds.map((id) => ({ loc: `/catalog/${id}` })),
 ];
 
@@ -151,8 +152,13 @@ const llmsTxt = `# GS1 Digital Link Catalog
 
 - [Home](${SITE_URL}/): sector overview and search
 - [GS1 Digital Link Validator](${SITE_URL}/validatore): parses a Digital Link or bracketed AI element string with the real GS1 Barcode Syntax Engine (WASM), with a CTA to validator.schema.org
-- [AI Catalog Assistant](${SITE_URL}/assistente): natural-language search over the catalog's structured data
+- [AI Shopping Assistant](${SITE_URL}/assistente): agentic chat (Google ADK + A2A + UCP) that searches the catalog, answers from the GS1 product sheets and can complete an order
 - [Sitemap](${SITE_URL}/sitemap.xml)
+
+## Machine-readable endpoints
+
+- \`GET ${SITE_URL}/catalog\` — lightweight JSON feed of every product (gtin, name, brand, price, category, image, description)
+- \`GET ${SITE_URL}/01/{gtin}\` with \`Accept: application/ld+json\` — the full GS1 JSON-LD product sheet, same document embedded in the HTML page; 404 when a product publishes no structured data
 
 ## Sectors
 

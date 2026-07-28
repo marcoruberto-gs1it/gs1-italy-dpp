@@ -10,10 +10,6 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'assistente',
-    renderMode: RenderMode.Prerender
-  },
-  {
     path: 'catalog/:sector',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {

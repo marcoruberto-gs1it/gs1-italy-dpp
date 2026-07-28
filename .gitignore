@@ -1,18 +1,17 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # Compiled output
-/dist
 /tmp
 /out-tsc
 /bazel-out
 
 # Node
 /node_modules
-npm-debug.log
-yarn-error.log
 
 # IDEs and editors
 .idea/
+.vscode/
+.history/
 .project
 .classpath
 .c9/
@@ -20,25 +19,74 @@ yarn-error.log
 .settings/
 *.sublime-workspace
 
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/mcp.json
-.history/*
-
 # Miscellaneous
 /.angular/cache
 .sass-cache/
 /connect.lock
 /coverage
 /libpeerconnection.log
-testem.log
 /typings
 __screenshots__/
 
 # System files
 .DS_Store
 Thumbs.db
+
+# ── Credenziali e segreti — MAI committare ────────────────────────────────────
+.env
+sftp-mcp/.env
+.mcp.json
+*.pem
+*.crt
+*.key
+*.p12
+*.pfx
+*.json.key
+
+# ── Override locale docker-compose (porte host, non condivise) ───────────────
+docker-compose.override.yml
+
+# Chiave service account Google Cloud (root) — solo il placeholder resta tracciato
+/*.json
+!/google-service-account.placeholder.json
+!/mcp.example.json
+test-model-garden/*.json
+
+# ── Cache SQLite — ricostruibile a runtime ────────────────────────────────────
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# ── File generati / scaricati ─────────────────────────────────────────────────
+sap-mcp/metadata/*.json
+sap-mcp/metadata/raw/
+sap-b1-mcp/discovery/openapi_full.json
+sap-b1-mcp/discovery/benchmark_baseline.json
+
+# ── Log ───────────────────────────────────────────────────────────────────────
+*.log
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── Segreti ──────────────────────────────────────────────────────────────────
+# Service account GCP montato dal business-agent (/creds/sa.json): va caricato a mano
+# sul droplet via scp, non passa mai dal repository.
+/secrets/
+
+# ── Claude Code (sessioni interne) ───────────────────────────────────────────
+.claude/
+sap-mcp/.claude/
+graphify-out
+.graphyfy*
