@@ -1,0 +1,22 @@
+# Il build context è la root del repo (il sorgente Angular sta lì): tutto ciò che
+# non serve alla build va escluso, sia per velocità sia per non invalidare la cache.
+.git
+.github
+.claude
+.vscode
+.vscode.zip
+node_modules
+dist
+.angular
+*.log
+.env
+.env.*
+!.env.example
+DEPLOY_CONTEXT.md
+README.md
+
+# Gli altri servizi hanno il proprio build context: non devono finire in quello del webshop
+# (i segreti men che mai).
+secrets
+business-agent
+chat-client

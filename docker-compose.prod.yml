@@ -1,0 +1,67 @@
+# Override di produzione (droplet DigitalOcean): aggiunge HTTPS con certificati
+# Let's Encrypt automatici e redirect 80 → 443.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Richiede un file .env con almeno WEBSHOP_HOST, ACME_EMAIL e SITE_URL (vedi .env.example),
+# e i record DNS del dominio già puntati all'IP del droplet: senza risoluzione DNS
+# corretta la challenge HTTP-01 di Let's Encrypt fallisce.
+
+services:
+  traefik:
+    # `command` viene sostituito interamente dall'override (non concatenato): qui va
+    # ripetuta anche la configurazione già presente nel file base.
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=gs1-web
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # Tutto il traffico in chiaro viene rediretto su HTTPS. La challenge ACME resta
+      # comunque servita: Traefik la gestisce prima del redirect.
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.redirections.entryPoint.permanent=true
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?ACME_EMAIL non impostata}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      # Decommentare per provare la configurazione senza consumare i rate limit di
+      # Let's Encrypt (i certificati staging non sono validi per i browser):
+      # - --certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --log.level=INFO
+      - --accesslog=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # acme.json deve sopravvivere ai redeploy, altrimenti a ogni `up` si riemettono
+      # i certificati e si finisce contro i rate limit di Let's Encrypt.
+      - traefik_letsencrypt:/letsencrypt
+
+  webshop:
+    build:
+      args:
+        SITE_URL: ${SITE_URL:?SITE_URL non impostata}
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.webshop.loadbalancer.server.port: "80"
+      traefik.http.routers.webshop-tls.rule: "Host(`${WEBSHOP_HOST:?WEBSHOP_HOST non impostata}`)"
+      traefik.http.routers.webshop-tls.entrypoints: "websecure"
+      traefik.http.routers.webshop-tls.tls: "true"
+      traefik.http.routers.webshop-tls.tls.certresolver: "le"
+
+  chat-client:
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.chat-client.loadbalancer.server.port: "3000"
+      traefik.http.routers.chat-client-tls.rule: "Host(`${WEBSHOP_HOST}`) && (PathPrefix(`/assistente`) || PathPrefix(`/api`))"
+      traefik.http.routers.chat-client-tls.entrypoints: "websecure"
+      traefik.http.routers.chat-client-tls.tls: "true"
+      traefik.http.routers.chat-client-tls.tls.certresolver: "le"
+      # Stesso redirect /assistente → /assistente/ del file base (vedi il commento lì).
+      traefik.http.routers.chat-client-tls.middlewares: "assistente-trailing-slash"
+
+volumes:
+  traefik_letsencrypt:

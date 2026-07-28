@@ -1,0 +1,124 @@
+# Stack base — è quello che gira in locale (solo HTTP, nessun certificato).
+# In produzione si aggiunge docker-compose.prod.yml, che attiva HTTPS/Let's Encrypt:
+#
+#   locale:      docker compose up -d --build
+#   produzione:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Quattro servizi dietro un unico Traefik, tutti sullo stesso dominio (niente CORS):
+#
+#   /            → webshop         nginx con l'Angular prerenderizzato
+#   /catalog     → webshop         feed JSON del catalogo, letto dal business-agent
+#   /assistente  → chat-client     la chat React (sample UCP di Google)
+#   /api         → chat-client     proxy Vite verso il business-agent
+#
+# Il business-agent non ha un router Traefik: vive solo sulla rete Docker.
+
+services:
+  traefik:
+    image: traefik:v3.7
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=gs1-web
+      - --entrypoints.web.address=:80
+      - --log.level=INFO
+      - --accesslog=true
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      # Traefik legge le label dei container per configurarsi da solo: gli serve il socket
+      # Docker in sola lettura.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - web
+
+  # Il sito GS1: pagine prodotto prerenderizzate con JSON-LD embeddato e, per gli agenti,
+  # il feed /catalog e la content negotiation su /01/{gtin} (vedi webshop/nginx.conf).
+  # È la sorgente dati del business-agent — nel sample di Google quel ruolo lo aveva un
+  # finto shop FastAPI, qui lo fa il sito vero.
+  webshop:
+    build:
+      # Il context è la root del repo perché il sorgente Angular sta lì.
+      context: .
+      dockerfile: webshop/Dockerfile
+      args:
+        SITE_URL: ${SITE_URL:-http://localhost}
+    restart: unless-stopped
+    networks:
+      - web
+    healthcheck:
+      # Il business-agent carica il catalogo all'avvio: deve partire a sito servito.
+      # 127.0.0.1 e non localhost: il wget di busybox prova prima ::1, dove nginx
+      # (listen 80, solo IPv4) non ascolta.
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.webshop.loadbalancer.server.port: "80"
+      # In locale nessun dominio: catch-all su qualsiasi Host (http://localhost).
+      # In produzione il router `webshop-tls` con regola Host ha priorità più alta.
+      traefik.http.routers.webshop.entrypoints: "web"
+      traefik.http.routers.webshop.rule: "PathPrefix(`/`)"
+
+  # Agente commerciale: Google ADK + A2A + UCP, modello Gemini su Vertex AI.
+  business-agent:
+    build:
+      context: ./business-agent
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      # I due punti di contatto col catalogo: GET /catalog all'avvio (store.py) e
+      # GET /01/{gtin} on-demand dal tool leggi_prodotto.
+      CATALOG_URL: "http://webshop"
+      # ── Vertex AI (usa il billing del progetto GCP, no API key) ──
+      GOOGLE_GENAI_USE_VERTEXAI: "true"
+      GOOGLE_CLOUD_PROJECT: "${GOOGLE_CLOUD_PROJECT:?GOOGLE_CLOUD_PROJECT non impostata}"
+      GOOGLE_CLOUD_LOCATION: "${GOOGLE_CLOUD_LOCATION:-global}"
+      GOOGLE_APPLICATION_CREDENTIALS: "/creds/sa.json"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.5-flash}"
+    volumes:
+      - "./secrets/gcp-sa.json:/creds/sa.json:ro"
+    depends_on:
+      webshop:
+        condition: service_healthy
+
+  # UI di chat del sample UCP: dev server Vite, servito sotto /assistente (vedi base in
+  # vite.config.ts) e proxy /api verso l'agente.
+  chat-client:
+    build:
+      context: ./chat-client
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      VITE_PROXY_TARGET: "http://business-agent:10999"
+      # Il profilo UCP è scaricato dal business-agent, non dal browser: deve essere un URL
+      # risolvibile dentro la rete Docker (per il container dell'agente `localhost` sarebbe
+      # sé stesso). Il path include il base di Vite.
+      VITE_PROFILE_URL: "http://chat-client:3000/assistente/profile/agent_profile.json"
+    depends_on:
+      - business-agent
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.chat-client.loadbalancer.server.port: "3000"
+      # Regole più lunghe del catch-all del webshop: Traefik dà loro priorità automatica.
+      traefik.http.routers.chat-client.entrypoints: "web"
+      traefik.http.routers.chat-client.rule: "PathPrefix(`/assistente`) || PathPrefix(`/api`)"
+      traefik.http.routers.chat-client.middlewares: "assistente-trailing-slash"
+      # Vite serve l'app solo su /assistente/ (con la barra finale) e non redirige da solo:
+      # senza questo, il link "Assistente" del sito finirebbe su un 404. $$ sfugge
+      # l'interpolazione di compose, a Traefik arriva ${1}.
+      traefik.http.middlewares.assistente-trailing-slash.redirectregex.regex: "^(https?://[^/]+)/assistente$$"
+      traefik.http.middlewares.assistente-trailing-slash.redirectregex.replacement: "$${1}/assistente/"
+
+networks:
+  web:
+    # Nome esplicito: Traefik risolve `--providers.docker.network` sul nome reale della
+    # rete Docker, che altrimenti sarebbe prefissato col nome del progetto compose.
+    name: gs1-web
