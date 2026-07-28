@@ -1,0 +1,248 @@
+.modern-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+/* --- Hero ---
+   Pannello sempre blu GS1 (indipendente dal tema chiaro/scuro): un momento di brand netto,
+   coerente con l'identità istituzionale GS1, con l'arancione riservato all'accento. */
+.modern-hero {
+  position: relative;
+  text-align: center;
+  padding: 96px 24px 84px;
+  margin: 0 -24px 32px;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  background: linear-gradient(160deg, #003a86 0%, var(--gs1-blue) 55%, #001c40 100%);
+}
+
+.hero-mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    repeating-radial-gradient(circle at 88% 20%, transparent 0, transparent 34px, rgba(255, 255, 255, 0.05) 35px, transparent 36px, transparent 70px, rgba(242, 99, 52, 0.1) 71px, transparent 72px),
+    radial-gradient(60% 70% at 10% 105%, rgba(242, 99, 52, 0.22), transparent 65%);
+}
+
+.modern-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.5) 40%, transparent 85%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.modern-hero h1 {
+  font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--gs1-orange) 0%, #ffb27a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.modern-hero p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 620px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.modern-hero .hero-search-btn.gs-btn--primary {
+  background: var(--gs1-orange);
+  color: #ffffff;
+  box-shadow: 0 10px 28px -8px rgba(242, 99, 52, 0.55);
+}
+
+.modern-hero .hero-search-btn.gs-btn--primary:hover {
+  background: #ff8f5c;
+}
+
+.hero-search-btn .gs-kbd {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.modern-hero .gs-btn--ghost {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.modern-hero .gs-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* --- Sectors --- */
+.sectors-grid {
+  padding-top: 24px;
+}
+
+.sectors-heading {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 36px;
+}
+
+.sectors-heading h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.sectors-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.sectors-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
+}
+
+.sector-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--border-subtle);
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  animation: gs-fade-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.sector-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -14px var(--sector-color, rgba(0, 44, 108, 0.25));
+  border-color: transparent;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.icon-wrapper {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+
+.icon-wrapper img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.sector-card:hover .icon-wrapper {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.sector-badge {
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.98rem;
+  margin-bottom: 28px;
+  flex-grow: 1;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 16px;
+}
+
+.explore-btn {
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.arrow-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: all var(--dur-base) var(--ease-out);
+}
+
+.sector-card:hover .arrow-icon {
+  transform: translateX(6px);
+}
+
+@media (max-width: 768px) {
+  .modern-hero {
+    padding: 72px 20px 56px;
+  }
+  .sectors-cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

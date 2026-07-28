@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx ng *)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(lsof -ti:4200 -sTCP:LISTEN)",
+      "Bash(xargs -r kill)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(curl -sf http://localhost:4200)",
+      "Bash(chromium-cli --help)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx --yes playwright install chromium --with-deps)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node verify.mjs)",
+      "Bash(node -e ' *)",
+      "Read(//tmp/**)",
+      "Bash(sips -g pixelWidth -g pixelHeight /tmp/barilla.webp)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -)",
+      "Bash(node -e 'JSON.parse\\(require\\(\"fs\"\\).readFileSync\\(\"src/app/data/products.json\",\"utf8\"\\)\\); console.log\\(\"valid JSON\"\\)')",
+      "Bash(break)",
+      "WebFetch(domain:www.gs1.org)",
+      "WebFetch(domain:ref.gs1.org)",
+      "Bash(node -e 'const d=require\\(\"./src/app/data/products.json\"\\); console.log\\(d.length\\); d.forEach\\(p=>console.log\\(p.gtin,\"|\",p.sectorId,\"|\",p.brand\\)\\)')",
+      "Bash(node add-products.mjs)",
+      "Bash(node -e 'const d=require\\(\"./src/app/data/products.json\"\\); console.log\\(d.length\\); d.forEach\\(p=>console.log\\(p.gtin,\"|\",p.sectorId,\"|\",p.brand,\"| rawGs1Data:\",!!p.rawGs1Data, p.rawGs1Data ? \\(JSON.stringify\\(p.rawGs1Data[\"@context\"]\\).includes\\(\"ref.gs1.org\"\\)? \\(JSON.stringify\\(p.rawGs1Data[\"@context\"]\\).includes\\(\"schema.org\"\\)?\"BOTH\":\"GS1\"\\):\"SCHEMA\"\\) : \"NONE\"\\)\\)')",
+      "Bash(node generate-routes.js)"
+    ]
+  }
+}

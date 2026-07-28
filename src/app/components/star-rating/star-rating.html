@@ -1,0 +1,16 @@
+<span class="star-rating" [class.sm]="size === 'sm'">
+  <span class="stars">
+    @for (fraction of stars(); track $index) {
+      <span class="star">
+        <svg class="star-bg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg>
+        <span class="star-fill" [style.width.%]="fraction * 100">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg>
+        </span>
+      </span>
+    }
+  </span>
+  <span class="rating-value">{{ displayValue() }}</span>
+  @if (displayCount() !== null) {
+    <span class="rating-count">({{ displayCount() }})</span>
+  }
+</span>

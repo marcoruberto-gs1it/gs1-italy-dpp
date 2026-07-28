@@ -1,0 +1,75 @@
+<header class="gs1-header">
+  <div class="header-container">
+    <div class="header-left">
+      <a routerLink="/" class="logo" [title]="t('nav.backToHome')" (click)="closeMobileNav()">
+        <img src="https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png" alt="GS1 Italy Logo">
+        <span class="demo-badge">{{ t('nav.demoBadge') }}</span>
+      </a>
+
+      <nav class="header-nav">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
+        <a routerLink="/validatore" routerLinkActive="active">{{ t('nav.validator') }}</a>
+        <a routerLink="/assistente" routerLinkActive="active">{{ t('nav.assistant') }}</a>
+        <button type="button" class="nav-search-trigger" (click)="uiState.openSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span>{{ t('nav.searchPlaceholder') }}</span>
+          <span class="gs-kbd">/</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-actions">
+      <div class="lang-switch desktop-only" role="group" [attr.aria-label]="t('nav.languageLabel')">
+        <button type="button" [class.active]="languageService.lang() === 'it'" (click)="languageService.setLang('it')" [attr.aria-label]="t('nav.switchToItalian')">IT</button>
+        <button type="button" [class.active]="languageService.lang() === 'en'" (click)="languageService.setLang('en')" [attr.aria-label]="t('nav.switchToEnglish')">EN</button>
+      </div>
+
+      <button type="button" class="icon-btn mobile-search-trigger" (click)="uiState.openSearch()" [attr.aria-label]="t('nav.searchAria')">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+
+      <button type="button" class="icon-btn mobile-nav-trigger" (click)="toggleMobileNav()" [attr.aria-label]="t('nav.menuAria')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+@if (mobileNavOpen()) {
+  <div class="mobile-nav-backdrop" (click)="closeMobileNav()">
+    <aside class="mobile-nav" (click)="$event.stopPropagation()">
+      <div class="mobile-nav-header">
+        <span>{{ t('nav.sectorsHeading') }}</span>
+        <button type="button" class="icon-btn" (click)="closeMobileNav()" [attr.aria-label]="t('nav.closeMenuAria')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <a routerLink="/" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.home') }}</a>
+      <a routerLink="/validatore" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.validator') }}</a>
+      <a routerLink="/assistente" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.assistant') }}</a>
+      @for (sector of sectors(); track sector.id) {
+        <a [routerLink]="['/catalog', sector.id]" class="mobile-nav-link sector" (click)="closeMobileNav()">
+          <span class="dot" [style.background]="sector.brandColor"></span>
+          {{ sector.name }}
+        </a>
+      }
+      <div class="lang-switch mobile-lang-switch" role="group" [attr.aria-label]="t('nav.languageLabel')">
+        <button type="button" [class.active]="languageService.lang() === 'it'" (click)="languageService.setLang('it')" [attr.aria-label]="t('nav.switchToItalian')">IT</button>
+        <button type="button" [class.active]="languageService.lang() === 'en'" (click)="languageService.setLang('en')" [attr.aria-label]="t('nav.switchToEnglish')">EN</button>
+      </div>
+    </aside>
+  </div>
+}
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="gs1-footer">
+  <div class="footer-container">
+    <p class="footer-legal">GS1 Italy - Via Paleocapa 7, 20121 Milano - {{ t('footer.taxCode') }}: 80140330152</p>
+  </div>
+</footer>
+
+<app-search-palette></app-search-palette>
+<app-json-ld-drawer></app-json-ld-drawer>

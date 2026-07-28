@@ -1,0 +1,113 @@
+<div class="catalog-page">
+  <nav class="breadcrumbs" aria-label="breadcrumb">
+    <ol>
+      <li><a routerLink="/">{{ t('nav.home') }}</a></li>
+      <li class="separator">/</li>
+      <li class="current" aria-current="page">{{ sectorName() }}</li>
+    </ol>
+  </nav>
+
+  <div class="catalog-header" [style.--sector-color]="sectorInfo()?.brandColor">
+    <div>
+      <h1>{{ sectorName() }}</h1>
+      <p class="results-count">{{ t('sector.resultsCount', { shown: filteredProducts().length, total: allProducts().length }) }}</p>
+    </div>
+    @if (sectorInfo(); as info) {
+      <p class="sector-desc">{{ info.description }}</p>
+    }
+  </div>
+
+  <div class="catalog-layout">
+    <aside class="catalog-sidebar">
+      <div class="sidebar-card">
+        <h3>{{ t('sector.filter') }}</h3>
+        <button type="button" class="filter-item" [class.active]="filter() === 'all'" (click)="setFilter('all')">
+          <span>{{ t('sector.allProducts') }}</span>
+          <span class="count">{{ allProducts().length }}</span>
+        </button>
+        <button type="button" class="filter-item" [class.active]="filter() === 'ai-ready'" (click)="setFilter('ai-ready')">
+          <span class="gs-badge gs-badge--ai filter-badge">{{ t('sector.aiReady') }}</span>
+          <span class="count">{{ aiReadyCount() }}</span>
+        </button>
+        <button type="button" class="filter-item" [class.active]="filter() === 'verified'" (click)="setFilter('verified')">
+          <span class="gs-badge gs-badge--verified filter-badge">{{ t('sector.verified') }}</span>
+          <span class="count">{{ verifiedCount() }}</span>
+        </button>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>{{ t('sector.sortBy') }}</h3>
+        <button type="button" class="filter-item" [class.active]="sort() === 'name'" (click)="setSort('name')">{{ t('sector.sortName') }}</button>
+        <button type="button" class="filter-item" [class.active]="sort() === 'gtin'" (click)="setSort('gtin')">GTIN</button>
+      </div>
+
+      <div class="sidebar-card sidebar-info">
+        <h3>{{ t('sector.structuredData') }}</h3>
+        <p>{{ t('sector.structuredDataIntro') }}</p>
+        <ul class="vocab-legend">
+          <li><span class="gs-badge gs-badge--vocab">{{ t('sector.gs1Vocabulary') }}</span><span class="count">{{ gs1VocabCount() }}</span></li>
+          <li><span class="gs-badge gs-badge--schema">{{ t('sector.schemaOrg') }}</span><span class="count">{{ schemaVocabCount() }}</span></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="catalog-grid">
+      @for (product of filteredProducts(); track product.gtin) {
+        <article class="product-card" [routerLink]="['/01', product.gtin]">
+          <div class="card-image-wrapper">
+            <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
+          </div>
+          <div class="card-body">
+            <div class="card-badges">
+              @if (isAiReady(product)) {
+                <span class="gs-badge gs-badge--ai">{{ t('sector.aiReady') }}</span>
+              }
+              @if (isVerified(product)) {
+                <span class="gs-badge gs-badge--verified">{{ t('sector.verified') }}</span>
+              }
+              @if (getVocabularies(product).includes('gs1')) {
+                <span class="gs-badge gs-badge--vocab" [title]="t('sector.gs1VocabularyTitle')">{{ t('sector.gs1VocabularyBadge') }}</span>
+              }
+              @if (getVocabularies(product).includes('schema')) {
+                <span class="gs-badge gs-badge--schema" [title]="t('sector.schemaOrgTitle')">{{ t('sector.schemaOrg') }}</span>
+              }
+            </div>
+            <span class="product-brand">{{ product.brand }}</span>
+            <h2 class="product-name">{{ product.name }}</h2>
+            <div class="card-rating">
+              @if (product.rating) {
+                <span>★ {{ product.rating.value }} <span class="card-rating-count">({{ product.rating.count }})</span></span>
+              }
+            </div>
+            <div class="card-price">
+              @if (product.price; as price) {
+                <span class="card-price-current">{{ formatEuro(price.amount) }}</span>
+                @if (price.unit) {
+                  <span class="card-price-unit">/{{ price.unit }}</span>
+                }
+                @if (price.listAmount && discountPercent(price); as pct) {
+                  <span class="card-price-original">{{ formatEuro(price.listAmount) }}</span>
+                  <span class="card-price-discount">-{{ pct }}%</span>
+                }
+              }
+            </div>
+            <p class="product-gtin">{{ t('sector.gtinLabel') }} <span>{{ product.gtin }}</span></p>
+          </div>
+          <div class="card-action">
+            <a [routerLink]="['/01', product.gtin]" class="btn-digital-link">{{ t('sector.view') }}</a>
+            @if (isAiReady(product)) {
+              <button type="button" class="btn-jsonld" (click)="viewJsonLd(product, $event)" [title]="t('sector.viewStructuredDataTitle')">
+                <app-icon name="braces" [size]="16"></app-icon>
+              </button>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <p>{{ t('sector.noProductsFound') }}</p>
+          <button type="button" class="gs-btn gs-btn--ghost" (click)="setFilter('all')">{{ t('sector.clearFilters') }}</button>
+        </div>
+      }
+    </main>
+  </div>
+</div>

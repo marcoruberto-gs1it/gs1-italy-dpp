@@ -1,0 +1,35 @@
+<div class="dl-visualizer">
+  <div class="dl-url-row">
+    <div class="dl-url">
+      @for (seg of segments(); track seg.ai; let last = $last) {
+        <span class="dl-chip" [style.--chip-color]="seg.color" [title]="seg.description">
+          <span class="dl-chip-ai">{{ seg.ai }}</span>{{ seg.value }}
+        </span>
+        @if (!last) {
+          <span class="dl-slash">/</span>
+        }
+      }
+    </div>
+    <button type="button" class="dl-copy" (click)="copyLink()">
+      @if (copied()) {
+        <span>{{ t('dlv.copied') }}</span>
+      } @else {
+        <span>{{ t('dlv.copyUrl') }}</span>
+      }
+    </button>
+  </div>
+
+  <div class="dl-legend">
+    @for (seg of segments(); track seg.ai) {
+      <div class="dl-legend-item">
+        <span class="icon-badge sm" [style.--icon-badge-color]="seg.color">
+          <app-icon [name]="seg.icon" [size]="14"></app-icon>
+        </span>
+        <div>
+          <span class="dl-legend-label">{{ seg.label }}</span>
+          <span class="dl-legend-desc">{{ seg.description }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>
