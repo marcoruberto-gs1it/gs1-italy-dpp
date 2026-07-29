@@ -78,6 +78,10 @@ class RetailStore:
     def __init__(self):
         """Initialize the retail store."""
         self._products = {}
+        # gtin -> JSON-LD della scheda, oppure None se il prodotto non ne pubblica (404).
+        # Una chiave assente significa "non ancora letta": vedi get_product_sheets.
+        self._sheets = {}
+        self._catalog_url = os.getenv("CATALOG_URL", "http://localhost:8080")
         self._checkouts = {}
         self._orders = {}
         self._initialize_ucp_metadata()
@@ -98,7 +102,7 @@ class RetailStore:
         della scheda ``/01/{gtin}``. Qui teniamo solo i campi necessari a
         ricerca e checkout.
         """
-        catalog_url = os.getenv("CATALOG_URL", "http://localhost:8080")
+        catalog_url = self._catalog_url
         for entry in self._fetch_catalog(catalog_url):
             gtin = entry.get("gtin")
             if not gtin:
@@ -141,27 +145,68 @@ class RetailStore:
         )
         return []
 
-    def search_products(self, query: str) -> ProductResults:
-        """Search the product catalog for products that match the given query.
+    def search_products(self, gtins: str = "") -> ProductResults:
+        """Restituisce i prodotti del catalogo, tutti o quelli indicati.
+
+        ADATTAMENTO rispetto al sample UCP di Google. Il sample filtrava per keyword su
+        nome e categoria: sul catalogo italiano quasi ogni ricerca falliva, perche' le
+        denominazioni commerciali non coincidono col linguaggio comune ("marmellata" non
+        trova "Confettura"). Qui non c'e' piu' alcun filtro in Python: la selezione la fa
+        il modello, leggendo le schede GS1 complete che accompagnano questi prodotti
+        (vedi ``get_product_sheets``). Il codice si limita a dire cosa esiste in negozio.
 
         Args:
-            query (str): shopping query
+            gtins: elenco di GTIN separati da virgola; vuoto = tutto il catalogo.
 
         Returns:
-            ProductResults: product items that match the criteria of the query
+            ProductResults: i prodotti richiesti, vuoto se nessun GTIN corrisponde.
 
         """
-        # ADATTAMENTO rispetto al sample UCP di Google: il sample filtrava per keyword su
-        # nome e categoria. Qui il catalogo e' in italiano e le denominazioni commerciali non
-        # coincidono con il linguaggio comune ("marmellata" non trova "Confettura"), quindi
-        # quel filtro faceva fallire quasi ogni ricerca. Il catalogo leggero pesa ~20 KB per
-        # 63 prodotti: lo restituiamo intero e lasciamo che sia il modello a scegliere i
-        # candidati pertinenti, che e' anche il modo in cui ragiona meglio.
-        product_list = list(self._products.values())
-        if not product_list:
+        wanted = {g.strip() for g in gtins.split(",") if g.strip()}
+        results = [
+            product
+            for gtin, product in self._products.items()
+            if not wanted or gtin in wanted
+        ]
+
+        if not results:
             return ProductResults(results=[], content="No products found")
 
-        return ProductResults(results=product_list)
+        return ProductResults(results=results)
+
+    def get_product_sheets(self, gtins: list[str]) -> dict:
+        """Le schede GS1 in JSON-LD dei prodotti indicati, per il ragionamento del modello.
+
+        Le legge dalla stessa URL Digital Link che pubblica la scheda al pubblico
+        (``GET /01/{gtin}`` con ``Accept: application/ld+json``): l'agente ragiona
+        esattamente sul documento che il sito pubblica, non su una copia rielaborata.
+
+        I prodotti che non pubblicano dati strutturati rispondono 404 e restano fuori dal
+        risultato: l'assenza e' essa stessa un'informazione, e il modello deve dichiararla
+        invece di colmarla.
+        """
+        missing = [g for g in gtins if g not in self._sheets]
+        if missing:
+            with httpx.Client(timeout=10.0) as client:
+                for gtin in missing:
+                    self._sheets[gtin] = self._fetch_sheet(client, gtin)
+
+        return {g: self._sheets[g] for g in gtins if self._sheets.get(g)}
+
+    def _fetch_sheet(self, client: httpx.Client, gtin: str) -> dict | None:
+        """Scarica una singola scheda JSON-LD; None se il prodotto non ne pubblica."""
+        try:
+            resp = client.get(
+                f"{self._catalog_url}/01/{gtin}",
+                headers={"Accept": "application/ld+json"},
+            )
+            if resp.status_code == 404:
+                return None
+            resp.raise_for_status()
+            return resp.json()
+        except Exception:  # noqa: BLE001
+            logging.exception("Impossibile leggere la scheda JSON-LD di %s", gtin)
+            return None
 
     def get_product(self, product_id: str) -> Product | None:
         """Retrieve a product by its SKU.

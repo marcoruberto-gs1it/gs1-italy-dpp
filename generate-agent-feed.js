@@ -35,8 +35,9 @@ const products = JSON.parse(fs.readFileSync(PRODUCTS_PATH, 'utf8'));
 // business_agent/store.py::_initialize_products (gtin, name, brand, price, priceCurrency,
 // category, image, description). Cambiarli qui significa rompere il mapping del sample.
 //
-// Volutamente NON contiene la ricchezza GS1 (ingredienti, allergeni, nutrienti, materiali):
-// quella arriva on-demand dal tool leggi_prodotto, che legge il JSON-LD della singola scheda.
+// Il feed resta volutamente leggero: è l'elenco di cosa esiste in negozio, con i dati
+// commerciali. La ricchezza GS1 non passa da qui — l'agente legge le schede JSON-LD
+// pubblicate, una per prodotto, dalla loro URL Digital Link (vedi §2 e store.py).
 // L'immagine è assoluta perché viene renderizzata dalla ProductCard del chat-client, che sta
 // su un'altra pagina (/assistente) e non condivide il base URL del sito.
 const catalog = products.map((p) => ({

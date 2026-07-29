@@ -83,14 +83,16 @@ Script postbuild (dopo `generate-seo-files.js`, vedi `package.json`), stessa for
 degli altri: legge `src/app/data/products.json`, scrive in `dist/gs1-catalog/browser`,
 usa `SITE_URL`. Produce:
 
-- **`catalog.json`** — vista leggera dei 63 prodotti, ~20 KB. I nomi dei campi non
+- **`catalog.json`** — vista leggera dei 63 prodotti, ~21 KB. I nomi dei campi non
   sono liberi: sono quelli letti da `store.py::_initialize_products` (`gtin`, `name`,
   `brand`, `price`, `priceCurrency`, `category`, `image`, `description`). L'immagine
   è un URL assoluto perché viene renderizzata dalla ProductCard, che sta su un'altra
-  pagina. Volutamente **senza** la ricchezza GS1: quella arriva scheda per scheda.
+  pagina. È l'elenco di *cosa esiste* in negozio: la ricchezza GS1 non passa da qui.
 - **`01/<gtin>/index.jsonld`** — il `rawGs1Data` del prodotto, stessa fonte del blocco
   `<script type="application/ld+json">` che la pagina già pubblica. Generato solo per
-  i **47 prodotti su 63** che hanno dati strutturati.
+  i **47 prodotti su 63** che hanno dati strutturati. È da qui che l'agente prende la
+  ricchezza su cui ragiona (§5): legge le stesse URL che pubblicano le schede al
+  pubblico, non una copia rielaborata per lui.
 
 ### nginx (`webshop/nginx.conf`)
 
@@ -111,26 +113,62 @@ agente in `agent.py`, store e checkout in `store.py`. Modello via `GEMINI_MODEL`
 
 | Tool | Cosa fa |
 |---|---|
-| `search_shopping_catalog(query)` | Restituisce il catalogo leggero |
-| `leggi_prodotto(gtin)` | Scarica il JSON-LD GS1 completo della scheda |
+| `search_shopping_catalog(gtins="")` | Restituisce il catalogo — tutto, o i GTIN indicati — **con la scheda GS1 JSON-LD completa di ogni prodotto** |
+| `leggi_prodotto(gtin)` | Scarica il JSON-LD GS1 completo di una singola scheda |
 | `add_to_checkout` / `remove_from_checkout` / `update_checkout` / `get_checkout` | Gestione carrello UCP |
 | `update_customer_details` / `start_payment` / `complete_checkout` | Dati cliente, pagamento (mock), conferma ordine |
 
 Checkout: valuta EUR, tassa forfettaria 10% e spedizione applicate quando c'è un
 indirizzo di consegna, pagamento simulato da `MockPaymentProcessor`.
 
-### Modifiche rispetto al sample (le uniche due)
+### Modifiche rispetto al sample (le uniche tre)
 
-1. **`store.py::search_products`** — il sample filtrava per keyword su nome e categoria.
-   Con un catalogo italiano le denominazioni commerciali non coincidono col linguaggio
-   comune ("marmellata" non trova "Confettura") e quasi ogni ricerca falliva. Ora
-   restituisce l'intero catalogo leggero (~20 KB, ~5,5k token) e lascia scegliere al
-   modello. Tutto il resto di `RetailStore` è invariato.
-2. **`agent.py::instruction`** — il testo era tarato solo su cibo (allergeni, nutrienti).
+1. **`store.py::search_products` + `get_product_sheets`** — il sample filtrava per keyword
+   su nome e categoria. Con un catalogo italiano le denominazioni commerciali non
+   coincidono col linguaggio comune ("marmellata" non trova "Confettura") e quasi ogni
+   ricerca falliva. Ora **in Python non c'è alcun filtro**: la ricerca restituisce il
+   catalogo (o i GTIN richiesti) e vi allega la **scheda GS1 JSON-LD completa** di ogni
+   prodotto; la selezione la fa il modello leggendo quelle schede.
+
+   Le schede sono lette dalla stessa URL che le pubblica al pubblico
+   (`GET /01/{gtin}` con `Accept: application/ld+json`) e tenute in cache in memoria
+   (`self._sheets`). Chiave assente = non ancora letta, `None` = confermato 404: il
+   prodotto non pubblica dati, e resta fuori dal risultato. Il resto di `RetailStore`
+   — mapping `Product`, checkout, totali, fulfillment, pagamento — è invariato.
+
+   | Chi | Cosa riceve | Peso |
+   |---|---|---|
+   | Il modello | vista leggera + `gs1_product_sheets` (47 schede) | ~184 KB, ~51k token per una ricerca senza `gtins` |
+   | Il modello, con `gtins` su un prodotto | vista leggera + 1 scheda | ~7 KB |
+   | Il browser | solo `a2a.product_results` (le schede prodotto) | ~2 KB |
+
+2. **`agent.py::after_tool_modifier`** — memorizza in stato **solo le chiavi tipizzate
+   UCP** (`a2a.ucp.checkout`, `a2a.product_results`) invece dell'intera risposta del
+   tool. Serve perché quell'oggetto viene rispedito al client come parte dati: senza il
+   filtro, i ~117 KB di schede JSON-LD destinate al modello finirebbero a ogni turno nel
+   browser, che non li usa.
+
+3. **`agent.py::instruction`** — il testo era tarato solo su cibo (allergeni, nutrienti).
    Esteso ai sei settori del catalogo (materiali tessili, certificazioni, sostenibilità,
-   tracciabilità) e, soprattutto, con la regola sui prodotti senza dati: se
-   `leggi_prodotto` fallisce, dichiararlo invece di colmare il vuoto con conoscenza
-   generale. Aggiunta la lingua di risposta (italiano di default).
+   tracciabilità) e, soprattutto, con la regola sui prodotti senza dati: se la scheda
+   manca, dichiararlo invece di colmare il vuoto con conoscenza generale. Aggiunte poi:
+   che la selezione va fatta leggendo le proprietà delle schede e non il nome del
+   prodotto; la semantica esatta dei livelli di contenimento (`CONTAINS` è presenza,
+   `MAY_CONTAIN` sono tracce, `FREE_FROM` è assenza dichiarata, e il silenzio non è
+   assenza); che le schede mostrate devono coincidere con i prodotti raccomandati nel
+   testo, fissandole con una chiamata finale su `gtins`; la lingua di risposta (italiano
+   di default) e il testo semplice senza LaTeX, che la UI non renderizza.
+
+   La docstring di `search_shopping_catalog` è parte dell'interfaccia verso il modello
+   (ADK la usa per generare lo schema del tool): è lì che vive la semantica dello
+   strumento, non solo nell'istruzione.
+
+**Le schede prodotto mostrate in chat** sono il risultato dell'ultima chiamata di ricerca
+del turno (`after_tool_modifier` → `modify_output_after_agent`). Con la ricerca senza
+filtri comparivano 63 schede accanto a una risposta su un solo prodotto; ora l'agente
+chiude con `search_shopping_catalog(gtins=…)` sui prodotti che sta raccomandando e le
+schede seguono il testo. È un vincolo governato dall'istruzione, non dal codice: se in
+demo si vedono disallineamenti, la strada solida è un parametro `display` esplicito.
 
 Tutto il resto — `agent_executor.py`, `ucp_profile_resolver.py`, `a2a_extensions/`,
 `models/`, `helpers/`, `payment_processor.py`, i tool di checkout — è copiato tale e quale.

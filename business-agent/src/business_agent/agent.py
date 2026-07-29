@@ -87,20 +87,47 @@ def leggi_prodotto(tool_context: ToolContext, gtin: str) -> dict:
         )
 
 
-def search_shopping_catalog(tool_context: ToolContext, query: str) -> dict:
-    """Search the product catalog for products that match the given query.
+def search_shopping_catalog(tool_context: ToolContext, gtins: str = "") -> dict:
+    """Read the shop catalog together with the full GS1 JSON-LD sheet of each product.
+
+    Call it with no arguments to obtain the whole catalog: every product's commercial
+    data plus, under "gs1_product_sheets", the complete GS1 Italy product sheet as
+    published on the web (schema.org + GS1 Web Vocabulary). THE SELECTION IS YOURS: read
+    the sheets and decide which products answer the user, reasoning on the actual
+    properties — gs1:allergen with its gs1:AllergenTypeCode-* and
+    gs1:LevelOfContainmentCode-* (FREE_FROM / CONTAINS / MAY_CONTAIN),
+    gs1:ingredientStatement, gs1:*PerNutrientBasis, gs1:textileMaterial,
+    gs1:certification, gs1:countryOfOrigin, @type, offers, and anything else the sheet
+    carries. Never filter on your own prior knowledge of a product.
+
+    A product that has no entry in "gs1_product_sheets" publishes no structured data at
+    all: say so plainly, and do not infer its ingredients, allergens or properties from
+    the name.
+
+    IMPORTANT — what the user sees: the products returned by your LAST call to this tool
+    in a turn are rendered as product cards next to your answer. Once you know which
+    products you are recommending, call this tool again with `gtins` set to exactly those
+    GTINs, so the cards match your text. Products you cite only as counter-examples do
+    not belong in that final call.
 
     Args:
         tool_context: The tool context for the current request.
-        query: Query for performing product search.
+        gtins: comma-separated GTINs to restrict the result to those products. Empty
+            (the default) returns the whole catalog.
 
     Returns:
         dict: Returns the response from the tool with success or error status.
 
     """
     try:
-        product_results = store.search_products(query)
-        return {"a2a.product_results": product_results.model_dump(mode="json")}
+        product_results = store.search_products(gtins)
+        sheets = store.get_product_sheets(
+            [p.product_id for p in product_results.results]
+        )
+        return {
+            "a2a.product_results": product_results.model_dump(mode="json"),
+            "gs1_product_sheets": sheets,
+        }
     except Exception:
         logging.exception("There was an error searching the product catalog.")
         return _create_error_response(
@@ -426,7 +453,15 @@ def after_tool_modifier(
     if UcpExtension.URI in extensions and any(
         key in tool_response for key in ucp_response_keys
     ):
-        tool_context.state[ADK_LATEST_TOOL_RESULT] = tool_response
+        # Solo le chiavi tipizzate UCP, non l'intera risposta del tool: quest'oggetto
+        # viene rispedito al client come parte dati (vedi modify_output_after_agent), e
+        # search_shopping_catalog vi allega ~117 KB di schede JSON-LD che servono al
+        # modello per ragionare ma che la UI non consuma.
+        tool_context.state[ADK_LATEST_TOOL_RESULT] = {
+            key: value
+            for key, value in tool_response.items()
+            if key in ucp_response_keys
+        }
 
     return None
 
@@ -513,8 +548,26 @@ root_agent = Agent(
         " it up. Never state an allergen or 'gluten-free'/'contains' claim that"
         " is not explicitly in gs1:allergenRelatedInformation. If no product"
         " matches the user's request, say so rather than inventing a product."
+        "\n\nSEARCHING: search_shopping_catalog gives you the whole catalog together"
+        " with the full GS1 JSON-LD sheet of every product that publishes one. Do the"
+        " selection yourself, on that data: to answer 'which gluten-free food do you"
+        " have', look for sheets whose gs1:allergen declares"
+        " gs1:AllergenTypeCode-GLUTEN with gs1:LevelOfContainmentCode-FREE_FROM, not for"
+        " products whose name sounds gluten-free. Be strict about what a declaration"
+        " means: CONTAINS is presence, MAY_CONTAIN is traces, FREE_FROM is declared"
+        " absence, and a sheet that says nothing about an allergen tells you nothing —"
+        " it is not evidence of absence, and you must say so when it matters. Products"
+        " missing from gs1_product_sheets publish no structured data: report that as a"
+        " fact about the data, never fill the gap."
+        "\n\nWHAT THE USER SEES: the products returned by your last search call are"
+        " rendered as product cards next to your answer. They must match what you are"
+        " recommending, so once you have decided, call search_shopping_catalog again with"
+        " gtins set to exactly those products — a single gluten-free pasta means one"
+        " GTIN, one card. Products you mention only as counter-examples ('these contain"
+        " gluten', 'these publish no data') belong in the text, not in the cards."
         "\n\nAlways reply in the user's language; the catalog and the store are"
-        " Italian, so default to Italian."
+        " Italian, so default to Italian. Write plain text: no LaTeX or math markup,"
+        " the chat UI does not render it."
     ),
     tools=[
         search_shopping_catalog,
