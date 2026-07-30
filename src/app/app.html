@@ -9,6 +9,7 @@
       <nav class="header-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
         <a routerLink="/validatore" routerLinkActive="active">{{ t('nav.validator') }}</a>
+        <a routerLink="/knowledge-graph" routerLinkActive="active">{{ t('nav.knowledgeGraph') }}</a>
         <!-- href e non routerLink: /assistente non è più una pagina Angular, è il chat-client
              React servito da Traefik sullo stesso dominio (vedi docker-compose.yml). Serve un
              page load vero, altrimenti il router Angular intercetterebbe il click. -->
@@ -49,6 +50,7 @@
       </div>
       <a routerLink="/" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.home') }}</a>
       <a routerLink="/validatore" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.validator') }}</a>
+      <a routerLink="/knowledge-graph" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.knowledgeGraph') }}</a>
       <a href="/assistente" class="mobile-nav-link">{{ t('nav.assistant') }}</a>
       @for (sector of sectors(); track sector.id) {
         <a [routerLink]="['/catalog', sector.id]" class="mobile-nav-link sector" (click)="closeMobileNav()">

@@ -1,0 +1,308 @@
+.kg-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+
+/* --- Breadcrumbs --- */
+.breadcrumbs {
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+.breadcrumbs ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.breadcrumbs a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-weight: 500;
+}
+.breadcrumbs a:hover {
+  color: var(--gs1-blue);
+}
+.separator {
+  margin: 0 8px;
+  color: var(--text-muted);
+}
+.current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* --- Header --- */
+.kg-header {
+  margin-bottom: 24px;
+}
+.kg-header h1 {
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+.kg-header p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+.kg-header code {
+  font-family: var(--font-mono);
+  background: var(--bg-surface-sunken);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+/* --- Result cards (stessa base di validator.css) --- */
+.result-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 20px;
+  min-width: 0;
+}
+.result-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.error-card {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.06);
+}
+.error-card p {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+.data-text {
+  margin: 0 0 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+/* --- Statistiche --- */
+.kg-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.kg-stat {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+}
+.kg-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.kg-stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.kg-stat--accent {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.kg-stat--accent .kg-stat-value {
+  color: var(--accent);
+}
+
+/* --- Hub chips --- */
+.kg-hub-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.kg-hub-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  padding: 7px 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.kg-hub-chip:hover {
+  border-color: var(--gs1-blue);
+}
+.kg-hub-chip.active {
+  border-color: var(--gs1-blue);
+  color: var(--gs1-blue);
+  background: var(--accent-soft);
+}
+:root[data-theme='dark'] .kg-hub-chip.active {
+  color: var(--accent-strong);
+}
+.kg-hub-chip-count {
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  padding: 1px 7px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.kg-hub-chip--cert {
+  border-style: dashed;
+}
+
+/* --- Diagramma SVG --- */
+.kg-diagram {
+  width: 100%;
+  max-width: 560px;
+  display: block;
+  margin: 0 auto;
+}
+.kg-edge {
+  stroke: var(--border-default);
+  stroke-width: 1.5;
+}
+.kg-hub-node {
+  fill: var(--accent-soft);
+  stroke: var(--gs1-blue);
+  stroke-width: 2;
+}
+.kg-hub-label {
+  fill: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+}
+.kg-product-node-link {
+  cursor: pointer;
+}
+.kg-product-node {
+  fill: var(--bg-surface);
+  stroke: var(--gs1-orange);
+  stroke-width: 2;
+  transition: r var(--dur-fast) var(--ease-out);
+}
+.kg-product-node-link:hover .kg-product-node {
+  r: 11;
+}
+.kg-product-label {
+  fill: var(--text-tertiary);
+  font-size: 10px;
+  font-family: var(--font-sans);
+}
+.kg-product-node-link:hover .kg-product-label {
+  fill: var(--gs1-blue);
+}
+.kg-diagram-hint {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+/* --- SPARQL --- */
+.kg-example-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.kg-sparql-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.kg-sparql-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.kg-engine-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.kg-query-error {
+  margin: 12px 0 0;
+  color: #dc2626;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+.kg-result-meta {
+  margin: 14px 0 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.kg-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+.kg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.kg-table th,
+.kg-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+.kg-table th {
+  background: var(--bg-surface-sunken);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+}
+.kg-table td {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+.kg-table tr:last-child td {
+  border-bottom: none;
+}
+
+.kg-source-link {
+  text-align: center;
+  font-size: 0.82rem;
+}
+.kg-source-link a {
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .kg-example-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
