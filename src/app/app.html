@@ -11,7 +11,6 @@
         <a routerLink="/validatore" routerLinkActive="active">{{ t('nav.validator') }}</a>
         <!-- Voce nascosta temporaneamente dal menu su richiesta esplicita — la route /knowledge-graph
              resta attiva e raggiungibile via URL diretto, solo il link di navigazione è rimosso. -->
-        <a routerLink="/chatbot" routerLinkActive="active">{{ t('nav.chatbot') }}</a>
         <!-- href e non routerLink: /assistente non è più una pagina Angular, è il chat-client
              React servito da Traefik sullo stesso dominio (vedi docker-compose.yml). Serve un
              page load vero, altrimenti il router Angular intercetterebbe il click. -->
@@ -52,7 +51,6 @@
       </div>
       <a routerLink="/" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.home') }}</a>
       <a routerLink="/validatore" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.validator') }}</a>
-      <a routerLink="/chatbot" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.chatbot') }}</a>
       <a href="/assistente" class="mobile-nav-link">{{ t('nav.assistant') }}</a>
       @for (sector of sectors(); track sector.id) {
         <a [routerLink]="['/catalog', sector.id]" class="mobile-nav-link sector" (click)="closeMobileNav()">

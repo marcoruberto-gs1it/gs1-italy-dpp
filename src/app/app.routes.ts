@@ -4,7 +4,6 @@ import { Sector } from './pages/sector/sector';
 import { ProductComponent } from './pages/product/product';
 import { ValidatorComponent } from './pages/validator/validator';
 import { KnowledgeGraphComponent } from './pages/knowledge-graph/knowledge-graph';
-import { ChatbotComponent } from './pages/chatbot/chatbot';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -15,10 +14,6 @@ export const routes: Routes = [
   // /assistente non è più servita da Angular: quel path è instradato al chat-client React
   // (business-agent UCP), vedi docker-compose.yml. Il componente ChatComponent resta nel repo
   // come simulazione di riferimento, ma non è più raggiungibile.
-  // ChatbotComponent invece parla con lo stesso business-agent via lo stesso protocollo A2A/UCP
-  // (POST /api, instradato da Traefik) — non una simulazione, un secondo client reale per lo
-  // stesso agente, in Angular invece che React.
-  { path: 'chatbot', component: ChatbotComponent },
 
   // Rotte GS1 Digital Link: un prodotto è raggiungibile a livello di prodotto (solo GTIN) o di
   // istanza specifica (GTIN + lotto e/o numero seriale, AI 10/21). Tutte le combinazioni portano

@@ -14,12 +14,6 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    // Guscio statico prerenderizzato: la conversazione (fetch verso /api) parte solo lato client,
-    // stesso schema di knowledge-graph.
-    path: 'chatbot',
-    renderMode: RenderMode.Prerender
-  },
-  {
     path: 'catalog/:sector',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {

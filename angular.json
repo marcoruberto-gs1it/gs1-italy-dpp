@@ -74,8 +74,7 @@
               "exclude": [
                 "gs1encoder"
               ]
-            },
-            "proxyConfig": "proxy.conf.json"
+            }
           },
           "configurations": {
             "production": {
