@@ -1,11 +1,27 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+export interface KgCertification {
+  agency: string;
+  standard?: string;
+  value?: string;
+  identification?: string;
+}
+
+export interface KgManufacturer {
+  name: string;
+  gln?: string;
+  address?: string;
+}
+
 export interface KgProductNode {
   id: string;
   gtin: string;
   name: string;
   brandId?: string;
+  brandName?: string;
+  manufacturer?: KgManufacturer;
+  certifications: KgCertification[];
   certifiedByIds: string[];
 }
 
@@ -71,7 +87,29 @@ export class KnowledgeGraphService {
     const doc = await this.fetchRawGraph();
     const nodes: any[] = doc['@graph'] ?? [];
 
-    const products: KgProductNode[] = [];
+    // Indicizzato prima di risolvere i prodotti: brand/organizzazioni compaiono dopo i prodotti
+    // nell'array (vedi generate-knowledge-graph.js), quindi un solo passaggio in ordine non
+    // basterebbe a risolvere i loro nomi mentre si costruisce il nodo prodotto.
+    const nodesById = new Map<string, any>();
+    for (const node of nodes) {
+      if (typeof node['@id'] === 'string') nodesById.set(node['@id'], node);
+    }
+
+    const pickIt = (values: Array<{ '@value': string; '@language'?: string }> | undefined): string | undefined =>
+      values?.find((v) => v['@language'] === 'it')?.['@value'] ?? values?.[0]?.['@value'];
+
+    // address è una stringa libera in alcuni prodotti, uno schema:PostalAddress strutturato in
+    // altri (streetAddress/postalCode/addressLocality/addressCountry) — entrambe le forme
+    // convivono nel dataset, va normalizzato prima di mostrarlo.
+    const formatAddress = (address: unknown): string | undefined => {
+      if (!address) return undefined;
+      if (typeof address === 'string') return address;
+      const a = address as Record<string, string>;
+      return [a['streetAddress'], [a['postalCode'], a['addressLocality']].filter(Boolean).join(' '), a['addressCountry']]
+        .filter(Boolean)
+        .join(', ');
+    };
+
     const hubMeta = new Map<string, { label: string; type: 'brand' | 'certificationBody' }>();
     let organizations = 0;
 
@@ -80,24 +118,51 @@ export class KnowledgeGraphService {
       if (types.includes('Brand')) {
         hubMeta.set(node['@id'], { label: node.name, type: 'brand' });
       } else if (types.includes('gs1it:CertificationBody')) {
-        const label = node['gs1:organizationName']?.[0]?.['@value'] ?? node['@id'];
+        const label = pickIt(node['gs1:organizationName']) ?? node['@id'];
         hubMeta.set(node['@id'], { label, type: 'certificationBody' });
       } else if (types.includes('Organization')) {
         organizations++;
-      } else if (typeof node['@id'] === 'string' && node['@id'].startsWith(PRODUCT_ID_PREFIX)) {
-        // Il GTIN si legge dall'@id (sempre impostato dal generatore), non da gs1:gtin: 22 dei
-        // 47 prodotti AI-ready pubblicano solo schema.org e non hanno affatto quella proprietà.
-        const certifiedByIds: string[] = (node['gs1:certification'] ?? [])
-          .map((c: any) => c['gs1it:certifiedBy']?.['@id'])
-          .filter((id: string | undefined): id is string => !!id);
-        products.push({
-          id: node['@id'],
-          gtin: node['@id'].slice(PRODUCT_ID_PREFIX.length),
-          name: node.name,
-          brandId: node.brand?.['@id'],
-          certifiedByIds,
-        });
       }
+    }
+
+    const products: KgProductNode[] = [];
+    for (const node of nodes) {
+      // Il GTIN si legge dall'@id (sempre impostato dal generatore), non da gs1:gtin: 22 dei
+      // 47 prodotti AI-ready pubblicano solo schema.org e non hanno affatto quella proprietà.
+      if (typeof node['@id'] !== 'string' || !node['@id'].startsWith(PRODUCT_ID_PREFIX)) continue;
+
+      const brandNode = node.brand?.['@id'] ? nodesById.get(node.brand['@id']) : undefined;
+      const manufacturerNode = node.manufacturer?.['@id'] ? nodesById.get(node.manufacturer['@id']) : undefined;
+
+      const rawCerts: any[] = node['gs1:certification'] ?? [];
+      const certifications: KgCertification[] = rawCerts
+        .map((c) => ({
+          agency: pickIt(c['gs1:certificationAgency']) ?? '',
+          standard: pickIt(c['gs1:certificationStandard']),
+          value: pickIt(c['gs1:certificationValue']),
+          identification: c['gs1:certificationIdentification'],
+        }))
+        .filter((c) => c.agency);
+      const certifiedByIds: string[] = rawCerts
+        .map((c) => c['gs1it:certifiedBy']?.['@id'])
+        .filter((id: string | undefined): id is string => !!id);
+
+      products.push({
+        id: node['@id'],
+        gtin: node['@id'].slice(PRODUCT_ID_PREFIX.length),
+        name: node.name,
+        brandId: node.brand?.['@id'],
+        brandName: brandNode?.name,
+        manufacturer: manufacturerNode
+          ? {
+              name: manufacturerNode.name,
+              gln: manufacturerNode['gs1:globalLocationNumber'],
+              address: formatAddress(manufacturerNode.address),
+            }
+          : undefined,
+        certifications,
+        certifiedByIds,
+      });
     }
 
     const hubs: KgHub[] = [...hubMeta.entries()].map(([id, meta]) => ({

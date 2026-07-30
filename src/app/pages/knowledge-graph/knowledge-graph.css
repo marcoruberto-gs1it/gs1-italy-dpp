@@ -193,6 +193,20 @@
 }
 .kg-product-node-link {
   cursor: pointer;
+  /* Il <g> non ha area dipinta propria: senza bounding-box, un clic nello spazio tra il cerchio
+     (r=8, piccolo) e l'etichetta (spostata di labelDx/labelDy) cadrebbe nel vuoto e passerebbe
+     all'<svg> sottostante — bounding-box rende cliccabile l'intera area del nodo, non solo i
+     pixel effettivamente dipinti. */
+  pointer-events: bounding-box;
+}
+/* Il cerchio/etichetta .selected già segnala la selezione: il riquadro di focus nativo del
+   browser è ridondante al clic, va tenuto solo per la navigazione da tastiera. */
+.kg-product-node-link:focus:not(:focus-visible) {
+  outline: none;
+}
+.kg-product-node-link:focus-visible {
+  outline: 2px solid var(--gs1-blue);
+  outline-offset: 3px;
 }
 .kg-product-node {
   fill: var(--bg-surface);
@@ -203,6 +217,11 @@
 .kg-product-node-link:hover .kg-product-node {
   r: 11;
 }
+.kg-product-node.selected {
+  fill: var(--gs1-blue);
+  stroke: var(--gs1-blue);
+  r: 11;
+}
 .kg-product-label {
   fill: var(--text-tertiary);
   font-size: 10px;
@@ -211,11 +230,66 @@
 .kg-product-node-link:hover .kg-product-label {
   fill: var(--gs1-blue);
 }
+.kg-product-label.selected {
+  fill: var(--gs1-blue);
+  font-weight: 700;
+}
 .kg-diagram-hint {
   text-align: center;
   font-size: 0.78rem;
   color: var(--text-muted);
   margin: 8px 0 0;
+}
+
+/* --- Scheda prodotto (relazioni in linguaggio naturale) --- */
+.kg-product-card {
+  margin: 16px auto 0;
+  max-width: 480px;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+.kg-product-card h4 {
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.kg-product-gtin {
+  margin: 0 0 12px;
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.kg-product-card p {
+  margin: 0 0 8px;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.kg-product-card p strong {
+  color: var(--text-primary);
+}
+.kg-cert-heading {
+  margin-bottom: 4px !important;
+}
+.kg-cert-list {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.kg-cert-id {
+  display: inline-block;
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.kg-card-link {
+  margin-top: 4px;
 }
 
 /* --- SPARQL --- */

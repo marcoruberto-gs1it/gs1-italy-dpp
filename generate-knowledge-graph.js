@@ -1,6 +1,9 @@
-// Script postbuild (dopo generate-agent-feed.js, vedi package.json): genera
-// dist/gs1-catalog/browser/knowledge-graph.jsonld — lo stesso catalogo, ma ristrutturato come
-// un vero grafo invece che come 47 documenti JSON-LD indipendenti.
+// Script eseguito prima di "ng build" e prima di "ng serve" (vedi package.json: "build" e
+// "prestart"): genera public/knowledge-graph.jsonld — lo stesso catalogo, ma ristrutturato come
+// un vero grafo invece che come 47 documenti JSON-LD indipendenti. Scrive in public/ (non in
+// dist/) perché è l'unica cartella servita sia da "ng serve" sia, via l'asset glob di
+// angular.json, copiata dentro dist/browser durante "ng build" — stesso meccanismo già usato per
+// public/web_bg.wasm.
 //
 // Cosa cambia rispetto a rawGs1Data (il JSON-LD già pubblicato per pagina, vedi product.ts):
 //   1. Ogni prodotto riceve un @id stabile e dereferenziabile: il suo Digital Link canonico
@@ -30,13 +33,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const BROWSER_DIR = path.join(__dirname, 'dist', 'gs1-catalog', 'browser');
+const OUTPUT_PATH = path.join(__dirname, 'public', 'knowledge-graph.jsonld');
 const PRODUCTS_PATH = path.join(__dirname, 'src', 'app', 'data', 'products.json');
-
-if (!fs.existsSync(BROWSER_DIR)) {
-  console.error(`generate-knowledge-graph: ${BROWSER_DIR} non trovato — esegui dopo "ng build".`);
-  process.exit(1);
-}
 
 const products = JSON.parse(fs.readFileSync(PRODUCTS_PATH, 'utf8'));
 
@@ -171,7 +169,7 @@ const graph = {
   '@graph': [...productNodes, ...organizations.values(), ...brands.values(), ...certificationBodies.values()],
 };
 
-fs.writeFileSync(path.join(BROWSER_DIR, 'knowledge-graph.jsonld'), JSON.stringify(graph, null, 2));
+fs.writeFileSync(OUTPUT_PATH, JSON.stringify(graph, null, 2));
 
 console.log(
   `generate-knowledge-graph: knowledge-graph.jsonld generato — ${productNodes.length} prodotti, ` +

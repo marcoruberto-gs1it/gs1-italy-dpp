@@ -58,17 +58,65 @@
           <text class="kg-hub-label" x="300" y="300" text-anchor="middle" dominant-baseline="middle">{{ hub.label }}</text>
 
           @for (spoke of spokeLayout(); track spoke.product.id) {
-            <a [routerLink]="['/01', spoke.product.gtin]" class="kg-product-node-link">
-              <circle class="kg-product-node" [attr.cx]="spoke.x" [attr.cy]="spoke.y" r="8"></circle>
+            <g
+              class="kg-product-node-link"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="spoke.product.name"
+              [attr.aria-pressed]="selectedProductId() === spoke.product.id"
+              (click)="selectProduct(spoke.product.id)"
+              (keydown.enter)="selectProduct(spoke.product.id)">
+              <circle
+                class="kg-product-node"
+                [class.selected]="selectedProductId() === spoke.product.id"
+                [attr.cx]="spoke.x"
+                [attr.cy]="spoke.y"
+                r="8"></circle>
               <text
                 class="kg-product-label"
+                [class.selected]="selectedProductId() === spoke.product.id"
                 [attr.x]="spoke.x + spoke.labelDx"
                 [attr.y]="spoke.y + spoke.labelDy"
                 [attr.text-anchor]="spoke.anchor">{{ spoke.label }}</text>
-            </a>
+            </g>
           }
         </svg>
         <p class="kg-diagram-hint">{{ t('kg.diagramHint') }}</p>
+
+        @if (selectedProduct(); as p) {
+          <div class="kg-product-card">
+            <h4>{{ p.name }}</h4>
+            <p class="kg-product-gtin">GTIN {{ p.gtin }}</p>
+
+            @if (p.brandName) {
+              <p><strong>{{ t('kg.card.brand') }}:</strong> {{ p.brandName }}</p>
+            }
+
+            @if (p.manufacturer; as m) {
+              <p>
+                <strong>{{ t('kg.card.manufacturer') }}:</strong> {{ m.name }}
+                @if (m.address) { — {{ m.address }} }
+                @if (m.gln) { ({{ t('kg.card.gln') }} {{ m.gln }}) }
+              </p>
+            }
+
+            @if (p.certifications.length) {
+              <p class="kg-cert-heading"><strong>{{ t('kg.card.certifications') }}:</strong></p>
+              <ul class="kg-cert-list">
+                @for (c of p.certifications; track c.agency + (c.identification ?? '')) {
+                  <li>
+                    {{ c.agency }}
+                    @if (c.standard) { — {{ c.standard }} }
+                    @if (c.value) { ({{ c.value }}) }
+                    @if (c.identification) { <span class="kg-cert-id">ID {{ c.identification }}</span> }
+                  </li>
+                }
+              </ul>
+            }
+
+            <a class="gs-btn gs-btn--ghost kg-card-link" [routerLink]="['/01', p.gtin]">{{ t('kg.card.viewFull') }} →</a>
+          </div>
+        }
       }
     </div>
 

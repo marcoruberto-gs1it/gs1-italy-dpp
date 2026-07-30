@@ -4,8 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "node generate-routes.js && ng build",
-    "postbuild": "node generate-seo-files.js && node generate-agent-feed.js && node generate-knowledge-graph.js",
+    "prestart": "node generate-knowledge-graph.js",
+    "build": "node generate-routes.js && node generate-knowledge-graph.js && ng build",
+    "postbuild": "node generate-seo-files.js && node generate-agent-feed.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:gs1-catalog": "node dist/gs1-catalog/server/server.mjs"

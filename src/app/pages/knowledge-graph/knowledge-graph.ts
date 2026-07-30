@@ -3,7 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { I18nService } from '../../services/i18n.service';
-import { KgGraph, KgHub, KnowledgeGraphService, SparqlResult } from '../../services/knowledge-graph.service';
+import { KgGraph, KgHub, KgProductNode, KnowledgeGraphService, SparqlResult } from '../../services/knowledge-graph.service';
 
 interface ExampleQuery {
   labelKey: string;
@@ -65,6 +65,7 @@ export class KnowledgeGraphComponent implements OnInit {
   loadError = signal<string | null>(null);
   graphData = signal<KgGraph | null>(null);
   selectedHubId = signal<string | null>(null);
+  selectedProductId = signal<string | null>(null);
 
   protected exampleQueries = EXAMPLE_QUERIES;
   sparqlInput = signal(EXAMPLE_QUERIES[0].sparql);
@@ -86,6 +87,11 @@ export class KnowledgeGraphComponent implements OnInit {
     return hub.productIds
       .map((id) => graph.products.find((p) => p.id === id))
       .filter((p): p is NonNullable<typeof p> => !!p);
+  });
+
+  selectedProduct = computed<KgProductNode | null>(() => {
+    const id = this.selectedProductId();
+    return this.selectedHubProducts().find((p) => p.id === id) ?? null;
   });
 
   // Layout radiale per il diagramma hub-and-spoke: hub al centro, prodotti disposti in cerchio
@@ -139,6 +145,11 @@ export class KnowledgeGraphComponent implements OnInit {
 
   selectHub(id: string): void {
     this.selectedHubId.set(id);
+    this.selectedProductId.set(null);
+  }
+
+  selectProduct(id: string): void {
+    this.selectedProductId.set(this.selectedProductId() === id ? null : id);
   }
 
   loadExampleQuery(query: ExampleQuery): void {
