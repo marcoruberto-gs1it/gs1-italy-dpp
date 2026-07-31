@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "node generate-routes.js && ng build",
+    "prestart": "node generate-knowledge-graph.js",
+    "build": "node generate-routes.js && node generate-knowledge-graph.js && ng build",
     "postbuild": "node generate-seo-files.js && node generate-agent-feed.js && node publish-theme.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -25,6 +26,8 @@
     "bwip-js": "^4.11.2",
     "express": "^5.1.0",
     "gs1encoder": "^1.4.1",
+    "jsonld": "^9.0.0",
+    "oxigraph": "^0.5.9",
     "qr-scanner": "^1.4.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -35,6 +38,7 @@
     "@angular/compiler-cli": "^22.0.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/express": "^5.0.1",
+    "@types/jsonld": "^1.5.15",
     "@types/node": "^20.17.19",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.3",

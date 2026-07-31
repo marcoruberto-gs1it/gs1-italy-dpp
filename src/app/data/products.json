@@ -293,8 +293,41 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-CELERY",
-            "rdfs:label": "Sedano"
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
@@ -304,8 +337,19 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-FISH",
-            "rdfs:label": "Pesce"
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
@@ -326,30 +370,74 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
-            "rdfs:label": "Molluschi"
-          },
-          "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
-            "rdfs:label": "Può contenere"
-          }
-        },
-        {
-          "@type": "gs1:AllergenDetails",
-          "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-SOY",
-            "rdfs:label": "Soia"
-          },
-          "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
-            "rdfs:label": "Può contenere"
-          }
-        },
-        {
-          "@type": "gs1:AllergenDetails",
-          "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-TREE_NUTS",
             "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
+            "rdfs:label": "Può contenere"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
+            "rdfs:label": "Può contenere"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
@@ -818,6 +906,149 @@
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-GLUTEN",
             "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
@@ -1559,12 +1790,144 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-SOY",
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
             "rdfs:label": "Soia"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
             "rdfs:label": "Può contenere"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
           }
         }
       ],
@@ -3342,12 +3705,155 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-MILK",
             "rdfs:label": "Latte"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN",
             "rdfs:label": "Può contenere"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
           }
         }
       ],
@@ -4285,6 +4791,149 @@
             "@id": "gs1:LevelOfContainmentCode-CONTAINS",
             "rdfs:label": "Contiene"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
         }
       ],
       "gs1:gpcCategoryCode": "10000163",
@@ -5038,7 +5687,163 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "gs1:allergen": [
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        }
+      ]
     }
   },
   {
@@ -5411,7 +6216,163 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "gs1:allergen": [
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        }
+      ]
     }
   },
   {
@@ -6044,12 +7005,155 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-SULPHITES",
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
             "rdfs:label": "Anidride solforosa e solfiti"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS",
             "rdfs:label": "Contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
           }
         }
       ],
@@ -9348,7 +10452,163 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "gs1:allergen": [
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        }
+      ]
     }
   },
   {
@@ -9580,12 +10840,155 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-MILK",
             "rdfs:label": "Latte"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS",
             "rdfs:label": "Contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
           }
         }
       ],
@@ -10011,12 +11414,155 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH",
+            "rdfs:label": "Pesce"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-MILK",
             "rdfs:label": "Latte"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS",
             "rdfs:label": "Contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
           }
         }
       ],
@@ -10761,12 +12307,155 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN",
+            "rdfs:label": "Glutine"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS",
+            "rdfs:label": "Crostacei"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS",
+            "rdfs:label": "Uova"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-FISH",
             "rdfs:label": "Pesce"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS",
             "rdfs:label": "Contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS",
+            "rdfs:label": "Arachidi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS",
+            "rdfs:label": "Soia"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK",
+            "rdfs:label": "Latte"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS",
+            "rdfs:label": "Frutta a guscio"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY",
+            "rdfs:label": "Sedano"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD",
+            "rdfs:label": "Senape"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS",
+            "rdfs:label": "Semi di sesamo"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE",
+            "rdfs:label": "Anidride solforosa e solfiti"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE",
+            "rdfs:label": "Lupini"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS",
+            "rdfs:label": "Molluschi"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM",
+            "rdfs:label": "Non contiene"
           }
         }
       ],

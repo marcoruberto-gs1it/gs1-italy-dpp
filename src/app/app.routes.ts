@@ -3,12 +3,14 @@ import { Home } from './pages/home/home';
 import { Sector } from './pages/sector/sector';
 import { ProductComponent } from './pages/product/product';
 import { ValidatorComponent } from './pages/validator/validator';
+import { KnowledgeGraphComponent } from './pages/knowledge-graph/knowledge-graph';
 
 export const routes: Routes = [
   { path: '', component: Home },
   // Rotta per il catalogo settori (es. /catalog/fashion)
   { path: 'catalog/:sector', component: Sector },
   { path: 'validatore', component: ValidatorComponent },
+  { path: 'knowledge-graph', component: KnowledgeGraphComponent },
   // /assistente non è più servita da Angular: quel path è instradato al chat-client React
   // (business-agent UCP), vedi docker-compose.yml. Il componente ChatComponent resta nel repo
   // come simulazione di riferimento, ma non è più raggiungibile.

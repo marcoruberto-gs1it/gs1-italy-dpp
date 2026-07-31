@@ -9,6 +9,8 @@
       <nav class="header-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
         <a routerLink="/validatore" routerLinkActive="active">{{ t('nav.validator') }}</a>
+        <!-- Voce nascosta temporaneamente dal menu su richiesta esplicita — la route /knowledge-graph
+             resta attiva e raggiungibile via URL diretto, solo il link di navigazione è rimosso. -->
         <!-- href e non routerLink: /assistente non è più una pagina Angular, è il chat-client
              React servito da Traefik sullo stesso dominio (vedi docker-compose.yml). Serve un
              page load vero, altrimenti il router Angular intercetterebbe il click. -->

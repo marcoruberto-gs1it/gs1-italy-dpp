@@ -75,6 +75,7 @@ __pycache__/
 .mypy_cache/
 *.egg-info/
 dist/
+/public/knowledge-graph.jsonld
 build/
 .venv/
 venv/
