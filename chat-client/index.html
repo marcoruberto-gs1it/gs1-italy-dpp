@@ -18,7 +18,44 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agent</title>
+    <title>Assistente AI · Catalogo GS1 Italy</title>
+
+    <!-- Stessi font del catalogo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--
+      Due cose, entrambe prima del render per non far lampeggiare la pagina.
+
+      1. Design system del sito, pubblicato dal webshop (vedi publish-theme.js) e servito
+         dallo stesso dominio: la chat non tiene una copia dei colori, li eredita.
+         I <link> sono creati qui e non scritti nell'HTML perché Vite riscrive gli href
+         assoluti anteponendo il proprio base (/tokens.css → /assistente/tokens.css, che
+         non esiste). Creandoli da JS l'URL resta quello vero.
+
+      2. Tema chiaro/scuro: stessa chiave di localStorage del catalogo (src/index.html),
+         così chi arriva qui dal sito ritrova il tema che aveva scelto.
+    -->
+    <script>
+      (() => {
+        for (const href of ['/tokens.css', '/chat.css']) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          document.head.appendChild(link);
+        }
+        try {
+          const saved = localStorage.getItem('gs1-theme');
+          const theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch {}
+      })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="importmap">
       {
@@ -30,9 +67,8 @@
         }
       }
     </script>
-    <link rel="stylesheet" href="/index.css" />
   </head>
-  <body class="bg-gray-50 antialiased">
+  <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

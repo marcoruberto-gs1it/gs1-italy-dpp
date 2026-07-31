@@ -13,19 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { appConfig } from "@/config";
 
+/**
+ * Header del catalogo, replicato qui.
+ *
+ * La chat vive su /assistente dello stesso dominio del sito: per l'utente deve essere una
+ * sezione del catalogo, non un'applicazione a parte. Logo, badge demo e voci di menu sono
+ * gli stessi di src/app/app.html, e i link riportano alle pagine Angular con un page load
+ * normale (sono due applicazioni diverse dietro lo stesso Traefik).
+ */
 function Header() {
   return (
-    <header className="bg-white shadow-sm p-4 border-b border-gray-200 flex-shrink-0">
-      <h1 className="text-xl font-bold text-gray-800 text-center flex justify-center items-center">
-        <img
-          src={appConfig.logoUrl}
-          alt={appConfig.name}
-          className="h-8 mr-3"
-        />
-        <span>{appConfig.titleText}</span>
-      </h1>
+    <header className="chat-header">
+      <div className="chat-header-inner">
+        <a className="logo" href="/" title="Torna alla home">
+          <img
+            src="https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png"
+            alt="GS1 Italy"
+          />
+          <span className="demo-badge">Demo</span>
+        </a>
+
+        <nav>
+          <a href="/">Home</a>
+          <a href="/validatore">Validatore</a>
+          <a href="/assistente/" className="active">
+            Assistente AI
+          </a>
+        </nav>
+      </div>
     </header>
   );
 }

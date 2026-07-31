@@ -23,44 +23,59 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const isAvailable = product.offers.availability.includes("InStock");
-  const handleAddToCartClick = () => onAddToCart?.(product);
+
+  // Formato italiano con due decimali sempre: nel catalogo il prezzo arriva come "19.9"
+  // e senza formattazione finirebbe a schermo come "19,9".
+  const amount = Number(product.offers.price);
+  const price = Number.isFinite(amount)
+    ? new Intl.NumberFormat("it-IT", {
+        style: "currency",
+        currency: product.offers.priceCurrency || "EUR",
+      }).format(amount)
+    : String(product.offers.price ?? "");
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden w-64 flex-shrink-0">
-      <img
-        src={product.image[0]}
-        alt={product.name}
-        className="w-full h-48 object-cover"
-      />
-      <div className="p-4">
-        <h3
-          className="text-lg font-semibold text-gray-800 truncate"
-          title={product.name}
-        >
+    <article className="product-card">
+      <div className="product-card-media">
+        <img src={product.image?.[0]} alt={product.name} loading="lazy" />
+        {/* Ogni prodotto che l'agente propone ha una scheda GS1: il badge lo dichiara,
+            con lo stesso stile del badge "AI Ready" delle pagine prodotto del sito. */}
+        <span className="gs-badge gs-badge--ai">AI Ready</span>
+      </div>
+
+      <div className="product-card-body">
+        <span className="product-card-brand">{product.brand?.name}</span>
+        <h3 className="product-card-title" title={product.name}>
           {product.name}
         </h3>
-        <p className="text-sm text-gray-600">{product.brand.name}</p>
-        <div className="flex justify-between items-center mt-3">
-          <p className="text-lg font-bold text-gray-900">
-            {product.offers.priceCurrency === "EUR" ? "€" : "$"}
-            {product.offers.price}
-          </p>
-          <span
-            className={`px-2 py-1 text-xs font-semibold rounded-full ${isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+        <span className="product-card-gtin">GTIN {product.gtin}</span>
+
+        <div className="product-card-foot">
+          <span className="product-card-price">{price}</span>
+          <button
+            type="button"
+            className="product-card-add"
+            onClick={() => onAddToCart?.(product)}
+            disabled={!isAvailable || !onAddToCart}
           >
-            {isAvailable ? "In Stock" : "Out of Stock"}
-          </span>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            {isAvailable ? "Aggiungi" : "Non disponibile"}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleAddToCartClick}
-          disabled={!isAvailable || !onAddToCart}
-          className="block w-full text-center bg-blue-500 text-white py-2 rounded-md mt-4 hover:bg-blue-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          Add to Checkout
-        </button>
       </div>
-    </div>
+    </article>
   );
 };
 

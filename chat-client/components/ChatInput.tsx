@@ -14,65 +14,90 @@
  * limitations under the License.
  */
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
 }
 
-function SendIcon(props: React.SVGProps<SVGSVGElement>) {
+const TEXTAREA_MAX_HEIGHT = 160;
+
+function SendIcon() {
   return (
     <svg
-      aria-label="Send"
-      role="img"
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
-      fill="currentColor"
-      className="w-6 h-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
     >
-      <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+      <path d="M22 2L11 13" />
+      <path d="M22 2l-7 20-4-9-9-4 20-7z" />
     </svg>
   );
 }
 
 function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   const [inputValue, setInputValue] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const submit = () => {
+    if (!inputValue.trim() || isLoading) return;
+    onSendMessage(inputValue.trim());
+    setInputValue("");
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (inputValue.trim() && !isLoading) {
-      onSendMessage(inputValue.trim());
-      setInputValue("");
+    submit();
+  };
+
+  // Invio manda il messaggio, Shift+Invio va a capo: stesso comportamento del sito.
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      submit();
     }
   };
 
+  // Il campo cresce con il testo fino a un tetto, poi scorre.
+  const autoGrow = (el: HTMLTextAreaElement) => {
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, TEXTAREA_MAX_HEIGHT)}px`;
+  };
+
   return (
-    <div className="bg-white p-3 border-t border-gray-200 shadow-t-sm flex-shrink-0">
-      <form
-        onSubmit={handleSubmit}
-        className="flex items-center space-x-3 max-w-4xl mx-auto"
-      >
-        <input
-          type="text"
+    <form className="chat-input-bar" onSubmit={handleSubmit}>
+      <div className="chat-input-shell">
+        <textarea
+          ref={textareaRef}
+          className="chat-input"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Type your message..."
-          className="flex-grow p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          rows={1}
+          placeholder="Chiedi di un prodotto, di allergeni, materiali, certificazioni…"
           disabled={isLoading}
-          autoComplete="off"
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            autoGrow(e.target);
+          }}
+          onKeyDown={handleKeyDown}
         />
         <button
           type="submit"
+          className="chat-send-btn"
           disabled={isLoading || !inputValue.trim()}
-          className="bg-blue-500 text-white p-3 rounded-full disabled:bg-blue-300 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-          aria-label="Send message"
+          aria-label="Invia messaggio"
         >
           <SendIcon />
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }
 

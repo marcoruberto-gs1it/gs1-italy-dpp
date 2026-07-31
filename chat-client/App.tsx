@@ -52,6 +52,14 @@ const initialMessage: ChatMessage = createChatMessage(
   { id: "initial" }
 );
 
+/** Domande di partenza: ognuna mostra un dato GS1 diverso su cui l'agente sa ragionare. */
+const EXAMPLE_PROMPTS = [
+  "Quali prodotti alimentari senza glutine avete?",
+  "Cerco un capo in cotone biologico certificato",
+  "La confettura di fragole contiene allergeni?",
+  "Quali prodotti non pubblicano dati strutturati?",
+];
+
 /**
  * An example A2A chat client that demonstrates consuming a business's A2A Agent with UCP Extension.
  * Only for demo purposes, not intended for production use.
@@ -330,16 +338,23 @@ function App() {
           // Simple text
           combinedBotMessage.text +=
             (combinedBotMessage.text ? "\n" : "") + part.text;
-        } else if (part.data?.["a2a.product_results"]) {
-          // Product results
-          combinedBotMessage.text +=
-            (combinedBotMessage.text ? "\n" : "") +
-            (part.data["a2a.product_results"].content || "");
-          combinedBotMessage.products =
-            part.data["a2a.product_results"].results;
-        } else if (part.data?.["a2a.ucp.checkout"]) {
-          // Checkout
-          combinedBotMessage.checkout = part.data["a2a.ucp.checkout"];
+        } else {
+          // Le due chiavi tipizzate possono arrivare nella STESSA parte dati: succede
+          // quando in un turno l'agente aggiunge al carrello e poi rilancia una ricerca
+          // per allineare le schede mostrate al testo. Con una catena else-if il
+          // checkout veniva scartato ogni volta che c'erano anche dei prodotti.
+          if (part.data?.["a2a.product_results"]) {
+            // Product results
+            combinedBotMessage.text +=
+              (combinedBotMessage.text ? "\n" : "") +
+              (part.data["a2a.product_results"].content || "");
+            combinedBotMessage.products =
+              part.data["a2a.product_results"].results;
+          }
+          if (part.data?.["a2a.ucp.checkout"]) {
+            // Checkout
+            combinedBotMessage.checkout = part.data["a2a.ucp.checkout"];
+          }
         }
       }
 
@@ -378,13 +393,31 @@ function App() {
   const lastCheckoutIndex = messages.map((m) => !!m.checkout).lastIndexOf(true);
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-white font-sans">
-      <Header logoUrl={appConfig.logoUrl} title={appConfig.name} />
-      <main
-        ref={chatContainerRef}
-        className="flex-grow overflow-y-auto p-4 md:p-6 space-y-2"
-      >
-        {messages.map((msg, index) => (
+    <div className="chat-viewport">
+      <Header />
+
+      {/* Struttura e classi della pagina di chat del catalogo (chat.css): stesso
+          contenitore, stessa shell, stessa griglia di messaggi. */}
+      <div className="chat-page">
+        <nav className="breadcrumbs" aria-label="breadcrumb">
+          <ol>
+            <li>
+              <a href="/">Home</a>
+            </li>
+            <li className="separator">/</li>
+            <li className="current" aria-current="page">
+              Assistente AI
+            </li>
+          </ol>
+        </nav>
+
+        <div className="chat-titlebar">
+          <h1>{appConfig.titleText}</h1>
+        </div>
+
+        <div className="chat-shell">
+          <main ref={chatContainerRef} className="chat-scroll">
+            {messages.map((msg, index) => (
           <ChatMessageComponent
             key={msg.id}
             message={msg}
@@ -401,11 +434,31 @@ function App() {
                 ? handlePaymentMethodSelection
                 : undefined
             }
-            isLastCheckout={index === lastCheckoutIndex}
-          ></ChatMessageComponent>
-        ))}
-      </main>
-      <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+                isLastCheckout={index === lastCheckoutIndex}
+              ></ChatMessageComponent>
+            ))}
+
+            {/* Suggerimenti di partenza: finché la conversazione è al primo messaggio,
+                mostrano cosa questo assistente sa fare che una ricerca non sa fare. */}
+            {messages.length === 1 && (
+              <div className="example-chips">
+                {EXAMPLE_PROMPTS.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    className="example-chip"
+                    onClick={() => handleSendMessage(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            )}
+          </main>
+
+          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        </div>
+      </div>
     </div>
   );
 }

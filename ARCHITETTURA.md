@@ -93,6 +93,18 @@ usa `SITE_URL`. Produce:
   i **47 prodotti su 63** che hanno dati strutturati. È da qui che l'agente prende la
   ricchezza su cui ragiona (§5): legge le stesse URL che pubblicano le schede al
   pubblico, non una copia rielaborata per lui.
+- **`01/<gtin-livello>/index.jsonld`** — le schede dei **livelli di imballo superiori**
+  (cartone, pallet): 34 risorse per 18 prodotti. Cartone e pallet hanno un GTIN proprio,
+  e per GS1 un GTIN identifica un articolo commerciale che deve poter essere risolto:
+  ora lo è. Contengono soli termini verificati (`gs1:packagingType`, `gs1:netWeight`,
+  `gs1:grossWeight`, `gs1:grossVolume`, `gs1:inPackage*`), più la quantità contenuta
+  come `gs1:netContent` in pezzi (`H87`).
+
+  La **relazione fra livelli non usa alcuna proprietà**, perché è già negli
+  identificativi: il primo carattere del GTIN-14 è l'*indicator digit* che per le GS1
+  General Specifications distingue i livelli di imballo dello stesso articolo. Il
+  Web Vocabulary non ha proprietà di gerarchia — verificato sui suoi 562 termini — e non
+  ne abbiamo inventata una.
 
 ### nginx (`webshop/nginx.conf`)
 
@@ -115,13 +127,39 @@ agente in `agent.py`, store e checkout in `store.py`. Modello via `GEMINI_MODEL`
 |---|---|
 | `search_shopping_catalog(gtins="")` | Restituisce il catalogo — tutto, o i GTIN indicati — **con la scheda GS1 JSON-LD completa di ogni prodotto** |
 | `leggi_prodotto(gtin)` | Scarica il JSON-LD GS1 completo di una singola scheda |
+| `calcola_stoccaggio(gtin, lunghezza, larghezza, altezza, unita_misura, livello_gtin)` | Quante unità di un livello di imballo entrano in uno spazio. Senza `livello_gtin` risponde `clarification_needed` con i livelli disponibili |
 | `add_to_checkout` / `remove_from_checkout` / `update_checkout` / `get_checkout` | Gestione carrello UCP |
 | `update_customer_details` / `start_payment` / `complete_checkout` | Dati cliente, pagamento (mock), conferma ordine |
 
 Checkout: valuta EUR, tassa forfettaria 10% e spedizione applicate quando c'è un
 indirizzo di consegna, pagamento simulato da `MockPaymentProcessor`.
 
-### Modifiche rispetto al sample (le uniche tre)
+### Stoccaggio: il calcolo non lo fa il modello
+
+`store.py::get_packaging_levels` scopre i livelli come li scoprirebbe un agente esterno:
+ricostruisce il GTIN di ogni indicator digit da 1 a 8, ne ricalcola il check digit e
+chiede al sito quali esistono. Chi risponde 404 non è pubblicato.
+
+`store.py::compute_storage` fa il conto: per ognuna delle sei orientazioni della scatola
+divide ogni dimensione dello spazio per quella corrispondente **arrotondando all'intero
+inferiore**, e tiene la più capiente. È il conto del magazziniere col metro, non un
+rapporto fra volumi — che dava 296.629 vasetti sfusi in 120 m³.
+
+Due regole che il codice impone e l'istruzione ribadisce:
+
+- **Le quantità dentro la gerarchia si leggono, non si ricalcolano.** Dalle dimensioni
+  risulterebbero ~144 cartoni per pallet, la scheda ne dichiara 80: vince la scheda,
+  altrimenti l'agente contraddice il dato che sta citando. Si calcola solo quanto entra
+  nello spazio descritto dall'utente.
+- **Il livello di imballo deve essere esplicito.** Senza `livello_gtin` il tool risponde
+  `clarification_needed` con i livelli disponibili: la domanda all'utente è imposta dallo
+  strumento, non affidata alla buona volontà del modello. Fra vasetti e pallet il
+  risultato cambia di ordini di grandezza.
+
+Verificato: magazzino 12×8×3 m → 200 pallet (10×10, impilati 2) = 192.000 vasetti e 82 t;
+scaffale 120×40×30 cm → 16 cartoni (192 vasetti) oppure 315 vasetti sciolti.
+
+### Modifiche rispetto al sample (le uniche tre, più il tool logistico)
 
 1. **`store.py::search_products` + `get_product_sheets`** — il sample filtrava per keyword
    su nome e categoria. Con un catalogo italiano le denominazioni commerciali non
@@ -183,8 +221,40 @@ Dev server Vite (come nel sample), servito sotto `/assistente/`.
   `VITE_PROFILE_URL` deve puntare al nome di servizio Docker
   (`http://chat-client:3000/assistente/profile/agent_profile.json`), non a `localhost`.
 - `config.ts`: logo risolto su `import.meta.env.BASE_URL`, testi in italiano.
-- `App.tsx` e i componenti UCP (`ProductCard`, `Checkout`, `PaymentMethodSelector`,
-  `PaymentConfirmation`) non sono stati toccati.
+
+### Aspetto: la chat eredita il design system del sito
+
+La chat non ha una palette propria. `publish-theme.js` (postbuild del webshop) copia
+`src/styles/tokens.css` e `src/app/pages/chat/chat.css` in `/tokens.css` e `/chat.css`;
+`chat-client/index.html` li carica dallo stesso dominio. Cambiare un token nel sito
+cambia anche la chat, senza copie da tenere allineate.
+
+`chat.css` è il foglio che era stato scritto per la finta chat Angular: shell, bolle,
+avatar, barra di input e chip di esempio arrivano da lì già disegnati. Anche il tema
+chiaro/scuro è condiviso — stessa chiave `localStorage['gs1-theme']` del catalogo, letta
+da uno script inline prima del render.
+
+I due `<link>` sono creati da JavaScript e non scritti nell'HTML: Vite riscrive gli href
+assoluti anteponendo il proprio `base`, e `/tokens.css` diventerebbe
+`/assistente/tokens.css`. `chat-client/styles.css` invece è importato da `index.tsx`,
+così Vite lo gestisce come modulo (con hot reload) e lo inietta dopo i fogli del sito.
+
+Aggiunte al sample:
+
+- **`markdown.ts`** — il modello risponde in Markdown, ma la bolla lo mostrava come testo
+  grezzo: da lì gli asterischi e i cancelletti a vista. Renderer minimale scritto a mano,
+  senza dipendenze: prima neutralizza ogni carattere HTML dell'input, poi introduce solo i
+  tag decisi da noi. L'ordine è la garanzia di sicurezza — nessun percorso permette al
+  testo del modello di iniettare markup, quindi non serve un sanitizer.
+- **`styles.css`** — header del catalogo replicato riga per riga da `app.css`, tipografia
+  del Markdown dentro le bolle, schede prodotto, e un blocco di override che riporta sui
+  token i componenti di checkout del sample (che usano classi Tailwind fisse come
+  `bg-white` e `text-gray-800`, illeggibili in tema scuro). Quel blocco è un ponte: sparisce
+  il giorno in cui `Checkout.tsx` e affini vengono riscritti.
+- **`App.tsx`** — due modifiche: il layout usa le classi del sito, e le chiavi tipizzate
+  `a2a.product_results` / `a2a.ucp.checkout` sono lette entrambe invece che in `else if`.
+  Servono: da quando `after_tool_modifier` accumula le chiavi, arrivano nella stessa parte
+  dati, e la catena `else if` scartava il checkout ogni volta che c'erano anche prodotti.
 
 ## 7. Angular: la pagina `/assistente`
 
@@ -238,9 +308,13 @@ curl -o /dev/null -w '%{http_code}\n' -H 'Accept: application/ld+json' \
 
 ## 10. Note operative
 
-- **429 `RESOURCE_EXHAUSTED` da Vertex.** Intermittenti su `gemini-3.5-flash` + region
-  `global`: al ritentativo passano. Dipendono dalla quota condivisa del progetto GCP,
-  non dal service account — cambiarlo non risolve.
+- **429 `RESOURCE_EXHAUSTED` da Vertex.** Dipendono dalla quota condivisa del progetto
+  GCP, non dal service account — cambiarlo non risolve. Sono assorbiti dai retry
+  configurati in `agent.py` (`RETRY_CONFIG`): senza `retry_options` l'SDK google-genai
+  **non ritenta affatto** e il 429 arriva dritto in chat. Con 5 tentativi e backoff
+  esponenziale, su sei richieste consecutive di prova non ne è fallita nessuna, ma la
+  latenza per turno sale (33–98 s misurati, contro ~33 s a quota libera). L'altra
+  mitigazione suggerita dalla documentazione ADK è chiedere più quota per il modello.
 - **Traefik v3.3 non funziona con Docker 29.x**: usa una versione di API rifiutata dal
   daemon e il provider Docker resta muto (404 su tutto). Da qui la v3.7.
 - **Healthcheck su `127.0.0.1`, non `localhost`**: il wget di busybox prova prima `::1`,

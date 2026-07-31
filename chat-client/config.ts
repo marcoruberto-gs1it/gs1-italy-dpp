@@ -42,5 +42,7 @@ export const appConfig = new AppProperties(
   // rispetto a quel base, altrimenti /images/logo.jpg finirebbe sul webshop.
   `${import.meta.env.BASE_URL}images/logo.jpg`,
   "Ciao! Posso cercare prodotti nel catalogo GS1 Italy e rispondere su ingredienti, allergeni, valori nutrizionali, materiali e tracciabilità leggendo i dati certificati delle schede. Posso anche completare l'ordine per te. Come posso aiutarti?",
-  "Catalogo GS1 Italy"
+  // Stesso titolo della pagina /assistente del catalogo (i18n it → chat.title): per
+  // l'utente è quella pagina, diventata conversazione vera.
+  "Assistente AI del catalogo"
 );

@@ -16,6 +16,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+// Stili propri della chat. Importati qui e non con un <link> nell'HTML: così Vite li
+// gestisce come modulo (con hot reload) e li inietta dopo i fogli del sito caricati da
+// index.html, che è l'ordine giusto perché le regole locali possano sovrascriverli.
+import "./styles.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

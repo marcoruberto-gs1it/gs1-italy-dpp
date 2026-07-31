@@ -15,6 +15,7 @@
 """UCP."""
 
 from decimal import Decimal
+from itertools import permutations
 import json
 import logging
 import os
@@ -81,6 +82,8 @@ class RetailStore:
         # gtin -> JSON-LD della scheda, oppure None se il prodotto non ne pubblica (404).
         # Una chiave assente significa "non ancora letta": vedi get_product_sheets.
         self._sheets = {}
+        # gtin unita' base -> livelli di imballo scoperti (vedi get_packaging_levels).
+        self._levels = {}
         self._catalog_url = os.getenv("CATALOG_URL", "http://localhost:8080")
         self._checkouts = {}
         self._orders = {}
@@ -192,6 +195,217 @@ class RetailStore:
                     self._sheets[gtin] = self._fetch_sheet(client, gtin)
 
         return {g: self._sheets[g] for g in gtins if self._sheets.get(g)}
+
+    # ------------------------------------------------------------------
+    # Livelli di imballo e calcolo di stoccaggio
+    # ------------------------------------------------------------------
+
+    def get_packaging_levels(self, gtin: str) -> list[dict]:
+        """I livelli di imballo del prodotto: unita' base, cartone, pallet.
+
+        Non esiste una proprieta' del GS1 Web Vocabulary che colleghi i livelli fra loro,
+        e non ne inventiamo una: il legame e' gia' nei GTIN. Il primo carattere di un
+        GTIN-14 e' l'*indicator digit* che per le GS1 General Specifications distingue i
+        livelli di imballo dello stesso articolo commerciale (0 = unita' base,
+        1..8 = livelli superiori), a parita' di item reference e con il check digit
+        ricalcolato.
+
+        Qui i livelli si scoprono percio' cosi' come li scoprirebbe un agente esterno:
+        si ricostruisce il GTIN di ogni indicator digit e si chiede al sito se esiste.
+        Chi risponde 404 semplicemente non e' pubblicato.
+
+        Returns:
+            list[dict]: un elemento per livello, dal piu' piccolo al piu' grande, con
+            dimensioni in millimetri, pesi in kg, quantita' contenuta e volume.
+
+        """
+        if gtin in self._levels:
+            return self._levels[gtin]
+
+        candidates = [gtin] + [
+            self._with_indicator_digit(gtin, digit) for digit in range(1, 9)
+        ]
+        sheets = self.get_product_sheets([g for g in candidates if g])
+
+        levels = []
+        for candidate in candidates:
+            sheet = sheets.get(candidate)
+            if not sheet:
+                continue
+            level = self._describe_level(candidate, sheet)
+            if level:
+                levels.append(level)
+
+        # Dal piu' piccolo al piu' grande: e' l'ordine in cui ha senso proporli a chi
+        # deve scegliere l'unita' di riferimento.
+        levels.sort(key=lambda lv: lv["volume_m3"] or 0)
+
+        # Quante unita' base contiene ciascun livello, moltiplicando lungo la catena:
+        # il pallet dichiara 80 (cartoni), il cartone 12 (vasetti), quindi il pallet vale
+        # 960 unita' base. Senza questa risalita si moltiplicherebbe il livello sbagliato.
+        #
+        # La catena si ricostruisce dall'ordine per volume crescente: gs1:netContent dice
+        # "80 pezzi" ma non di che cosa: quale sia il livello contenuto e' informazione
+        # GDSN, che il Web Vocabulary non esprime. L'assunzione — ogni livello contiene
+        # quello immediatamente piu' piccolo — e' quella che regge in una gerarchia di
+        # imballo reale.
+        cumulative = 1
+        for level in levels:
+            if level["contains_units"]:
+                cumulative *= level["contains_units"]
+            level["total_base_units"] = cumulative
+
+        self._levels[gtin] = levels
+        return levels
+
+    @staticmethod
+    def _with_indicator_digit(gtin: str, digit: int) -> str | None:
+        """Sostituisce l'indicator digit di un GTIN-14 e ricalcola il check digit."""
+        if len(gtin) != 14 or not gtin.isdigit():
+            return None
+        body = str(digit) + gtin[1:13]
+        # Check digit GS1: pesi 3 e 1 alternati da destra, complemento a 10.
+        total = sum(
+            int(char) * (3 if index % 2 == 0 else 1)
+            for index, char in enumerate(reversed(body))
+        )
+        return body + str((10 - total % 10) % 10)
+
+    @classmethod
+    def _describe_level(cls, gtin: str, sheet: dict) -> dict | None:
+        """Estrae dalla scheda JSON-LD i numeri che servono al calcolo di stoccaggio."""
+        dimensions = [
+            cls._quantity(sheet.get(prop))
+            for prop in (
+                "gs1:inPackageDepth",
+                "gs1:inPackageWidth",
+                "gs1:inPackageHeight",
+            )
+        ]
+        if not all(dimensions):
+            return None
+
+        net_content = cls._quantity(sheet.get("gs1:netContent"))
+        gross_weight = cls._quantity(sheet.get("gs1:grossWeight"))
+        volume = cls._quantity(sheet.get("gs1:grossVolume"))
+
+        name = sheet.get("name")
+        if isinstance(name, list):
+            name = name[0].get("@value") if isinstance(name[0], dict) else name[0]
+
+        # Sull'unita' base il tipo di imballo e' annidato in gs1:packaging
+        # (gs1:PackagingDetails), sui livelli superiori e' una proprieta' diretta.
+        packaging_type = sheet.get("gs1:packagingType")
+        if not packaging_type:
+            packaging = sheet.get("gs1:packaging")
+            if isinstance(packaging, list) and packaging:
+                packaging_type = packaging[0].get("gs1:packagingType")
+
+        return {
+            "gtin": gtin,
+            "name": name,
+            "packaging_type": packaging_type,
+            # In millimetri, senza pretendere di sapere quale asse sia l'altezza: il
+            # calcolo prova tutte le orientazioni.
+            "dimensions_mm": [d[0] for d in dimensions],
+            "volume_m3": volume[0]
+            if volume
+            else round(dimensions[0][0] * dimensions[1][0] * dimensions[2][0] / 1e9, 6),
+            "gross_weight_kg": cls._to_kilograms(gross_weight),
+            # Quantita' dichiarata del livello inferiore contenuto (netContent in pezzi).
+            "contains_units": int(net_content[0])
+            if net_content and net_content[1] == "H87"
+            else None,
+        }
+
+    @staticmethod
+    def _quantity(node) -> tuple[float, str] | None:
+        """Legge un gs1:QuantitativeValue → (valore, unitCode)."""
+        if not isinstance(node, dict):
+            return None
+        value = node.get("value")
+        if isinstance(value, dict):
+            value = value.get("@value")
+        try:
+            return float(value), node.get("unitCode") or ""
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _to_kilograms(quantity: tuple[float, str] | None) -> float | None:
+        if not quantity:
+            return None
+        value, unit = quantity
+        return round(value / 1000, 3) if unit == "GRM" else value
+
+    def compute_storage(
+        self,
+        gtin: str,
+        level_gtin: str,
+        length_mm: float,
+        width_mm: float,
+        height_mm: float,
+    ) -> dict:
+        """Quante unita' del livello indicato entrano in uno spazio dato.
+
+        Calcolo deterministico, non affidato al modello: per ogni orientazione possibile
+        della scatola (le 6 permutazioni degli assi) si divide ciascuna dimensione dello
+        spazio per la corrispondente dimensione della scatola arrotondando all'intero
+        inferiore, e si tiene l'orientazione che rende di piu'. E' il conto che farebbe un
+        magazziniere con il metro: nessun frazionamento, nessun riempimento teorico del
+        volume.
+
+        Il risultato dichiara sempre le assunzioni: e' una capienza geometrica lorda, senza
+        corridoi, senza limiti di impilamento e senza portata del piano.
+        """
+        levels = self.get_packaging_levels(gtin)
+        level = next((lv for lv in levels if lv["gtin"] == level_gtin), None)
+        if not level:
+            return {"status": "error", "message": f"Livello {level_gtin} non trovato."}
+
+        space = [length_mm, width_mm, height_mm]
+        if any(not value or value <= 0 for value in space):
+            return {"status": "error", "message": "Dimensioni dello spazio non valide."}
+
+        best_count = 0
+        best_layout = None
+        for orientation in permutations(level["dimensions_mm"]):
+            per_axis = [int(space[i] // orientation[i]) for i in range(3)]
+            count = per_axis[0] * per_axis[1] * per_axis[2]
+            if count > best_count:
+                best_count = count
+                best_layout = {
+                    "orientation_mm": list(orientation),
+                    "per_length": per_axis[0],
+                    "per_width": per_axis[1],
+                    "stacked_high": per_axis[2],
+                }
+
+        # total_base_units risale l'intera catena (un pallet = 80 cartoni x 12 vasetti),
+        # quindi qui si moltiplica per le unita' base vere, non per il livello contenuto.
+        base_units = best_count * level.get("total_base_units", 1)
+        total_weight = (
+            round(best_count * level["gross_weight_kg"], 1)
+            if level["gross_weight_kg"]
+            else None
+        )
+
+        return {
+            "status": "success",
+            "level": level,
+            "space_mm": {"length": length_mm, "width": width_mm, "height": height_mm},
+            "fits": best_count,
+            "layout": best_layout,
+            "contained_base_units": base_units,
+            "total_gross_weight_kg": total_weight,
+            "assumptions": [
+                "Capienza geometrica lorda: nessun corridoio, nessuno spazio di manovra.",
+                "Nessun limite di impilamento ne' portata del piano considerati.",
+                "Orientazione scelta come la piu' capiente fra le sei possibili.",
+                "Le quantita' per livello (unita' per cartone, cartoni per pallet) sono"
+                " quelle dichiarate nella scheda, non ricalcolate dalle dimensioni.",
+            ],
+        }
 
     def _fetch_sheet(self, client: httpx.Client, gtin: str) -> dict | None:
         """Scarica una singola scheda JSON-LD; None se il prodotto non ne pubblica."""

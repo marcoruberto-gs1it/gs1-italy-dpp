@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "node generate-routes.js && ng build",
-    "postbuild": "node generate-seo-files.js && node generate-agent-feed.js",
+    "postbuild": "node generate-seo-files.js && node generate-agent-feed.js && node publish-theme.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:gs1-catalog": "node dist/gs1-catalog/server/server.mjs"

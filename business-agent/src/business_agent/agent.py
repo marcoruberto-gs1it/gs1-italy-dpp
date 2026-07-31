@@ -136,6 +136,88 @@ def search_shopping_catalog(tool_context: ToolContext, gtins: str = "") -> dict:
         )
 
 
+_SPACE_UNITS = {"mm": 1.0, "cm": 10.0, "m": 1000.0}
+
+
+def calcola_stoccaggio(
+    tool_context: ToolContext,
+    gtin: str,
+    lunghezza: float,
+    larghezza: float,
+    altezza: float,
+    unita_misura: str = "m",
+    livello_gtin: str = "",
+) -> dict:
+    """Compute how many units of a product fit into a given space (shelf, room, truck).
+
+    ALWAYS use this tool for storage questions ("how many X fit in a warehouse of…",
+    "how many fit on a 120x40 cm shelf"). Never do the arithmetic yourself: the counts,
+    the orientation and the totals are computed here, deterministically.
+
+    THE PACKAGING LEVEL MUST BE EXPLICIT. A product exists at several levels — consumer
+    unit, case, pallet — each with its own GTIN, size and weight, and the answer changes
+    by orders of magnitude depending on which one is meant. Call this tool with an empty
+    `livello_gtin` first: it replies with the levels this product actually publishes. If
+    the user already said which one ("how many pallets"), pick the matching level and call
+    again. If they did not, ASK them which level they mean before answering — do not
+    guess, and do not silently assume the consumer unit.
+
+    The result reports the assumptions behind the number (no aisles, no stacking limits,
+    best of the six orientations): state them in your answer, and present the figure as a
+    theoretical geometric capacity, not as a warehouse plan.
+
+    Args:
+        tool_context: The tool context for the current request.
+        gtin: GTIN of the product, as found in the catalog.
+        lunghezza: length of the available space.
+        larghezza: width of the available space.
+        altezza: height of the available space.
+        unita_misura: unit of the three measurements: "m" (default), "cm" or "mm".
+        livello_gtin: GTIN of the packaging level to count. Leave empty to obtain the
+            list of available levels.
+
+    Returns:
+        dict: the levels to choose from, or the computed capacity with its assumptions.
+
+    """
+    try:
+        levels = store.get_packaging_levels(gtin)
+        if not levels:
+            return _create_error_response(
+                f"Il prodotto {gtin} non pubblica dimensioni di imballo: senza quei dati"
+                " non e' possibile calcolare quanto occupa."
+            )
+
+        if not livello_gtin:
+            return {
+                "status": "clarification_needed",
+                "message": (
+                    "Indica a quale livello di imballo si riferisce la domanda: il"
+                    " risultato cambia di ordini di grandezza."
+                ),
+                "livelli_disponibili": levels,
+            }
+
+        factor = _SPACE_UNITS.get(unita_misura.lower())
+        if not factor:
+            return _create_error_response(
+                f"Unita' di misura '{unita_misura}' non riconosciuta: usa m, cm o mm."
+            )
+
+        return store.compute_storage(
+            gtin=gtin,
+            level_gtin=livello_gtin,
+            length_mm=lunghezza * factor,
+            width_mm=larghezza * factor,
+            height_mm=altezza * factor,
+        )
+    except Exception:
+        logging.exception("Errore nel calcolo di stoccaggio per %s", gtin)
+        return _create_error_response(
+            "Non e' stato possibile calcolare la capienza per questo prodotto."
+        )
+
+
 def add_to_checkout(
     tool_context: ToolContext, product_id: str, quantity: int = 1
 ) -> dict:
@@ -457,11 +539,20 @@ def after_tool_modifier(
         # viene rispedito al client come parte dati (vedi modify_output_after_agent), e
         # search_shopping_catalog vi allega ~117 KB di schede JSON-LD che servono al
         # modello per ragionare ma che la UI non consuma.
-        tool_context.state[ADK_LATEST_TOOL_RESULT] = {
-            key: value
-            for key, value in tool_response.items()
-            if key in ucp_response_keys
-        }
+        #
+        # Le chiavi si accumulano invece di sostituirsi: in un turno l'agente puo'
+        # aggiungere al carrello e poi rifare una ricerca per allineare le schede
+        # mostrate al testo. Con la sostituzione, quella ricerca cancellava il checkout
+        # e il riepilogo dell'ordine spariva dalla chat.
+        latest = dict(tool_context.state.get(ADK_LATEST_TOOL_RESULT) or {})
+        latest.update(
+            {
+                key: value
+                for key, value in tool_response.items()
+                if key in ucp_response_keys
+            }
+        )
+        tool_context.state[ADK_LATEST_TOOL_RESULT] = latest
 
     return None
 
@@ -495,10 +586,33 @@ def modify_output_after_agent(
     return None
 
 
+# Ritenta le chiamate al modello quando Vertex risponde 429 RESOURCE_EXHAUSTED.
+#
+# Senza retry_options l'SDK google-genai NON ritenta affatto: il 429 arrivava dritto in
+# chat come "Sorry, something went wrong". I 429 di questa demo sono transitori — quota
+# condivisa del progetto GCP, non un limite del service account — e passano al tentativo
+# successivo, quindi vanno assorbiti qui invece che dall'utente.
+#
+# Backoff esponenziale sui default dell'SDK (exp_base 2, jitter 1): con questi valori i
+# tentativi cadono a ~2s, 4s, 8s, 16s. Nel caso peggiore aggiunge una trentina di secondi
+# a un turno, che e' comunque meglio di un errore. I codici ritentati di default
+# includono 408, 429 e i 5xx.
+# https://adk.dev/agents/models/google-gemini/#error-code-429-resource_exhausted
+RETRY_CONFIG = types.GenerateContentConfig(
+    http_options=types.HttpOptions(
+        retry_options=types.HttpRetryOptions(
+            attempts=5,
+            initial_delay=2,
+            max_delay=30,
+        )
+    )
+)
+
 root_agent = Agent(
     name="shopper_agent",
     model=os.getenv("GEMINI_MODEL", "gemini-3-flash-preview"),
     description="Agent to help with shopping",
+    generate_content_config=RETRY_CONFIG,
     instruction=(
         "You are a helpful agent who can help user with shopping actions such"
         " as searching the catalog, add to checkout session, complete checkout"
@@ -560,11 +674,33 @@ root_agent = Agent(
         " missing from gs1_product_sheets publish no structured data: report that as a"
         " fact about the data, never fill the gap."
         "\n\nWHAT THE USER SEES: the products returned by your last search call are"
-        " rendered as product cards next to your answer. They must match what you are"
-        " recommending, so once you have decided, call search_shopping_catalog again with"
-        " gtins set to exactly those products — a single gluten-free pasta means one"
-        " GTIN, one card. Products you mention only as counter-examples ('these contain"
-        " gluten', 'these publish no data') belong in the text, not in the cards."
+        " rendered as product cards next to your answer, each already showing the image,"
+        " the name, the brand, the GTIN, the price and an 'add to cart' button. They must"
+        " match what you are recommending, so once you have decided, call"
+        " search_shopping_catalog again with gtins set to exactly those products — a"
+        " single gluten-free pasta means one GTIN, one card. Products you mention only as"
+        " counter-examples ('these contain gluten', 'these publish no data') belong in the"
+        " text, not in the cards."
+        "\n\nSTORAGE AND LOGISTICS: when the user asks how much of a product fits"
+        " somewhere — a warehouse, a shelf, a van, a room — use calcola_stoccaggio and"
+        " never compute it yourself. First establish WHICH PACKAGING LEVEL they mean:"
+        " consumer units, cases or pallets. Each level is a distinct trade item with its"
+        " own GTIN, and the answer changes by orders of magnitude between them, so if the"
+        " user has not said it, ask — offering the levels that product actually"
+        " publishes. Quantities inside the hierarchy (units per case, cases per pallet)"
+        " are the ones declared in the sheets: report them, never recompute them from the"
+        " dimensions. Give the resulting figure for what it is — a theoretical geometric"
+        " capacity — and state the assumptions the tool returns (no aisles, no stacking"
+        " limits, best orientation). If a product publishes no packaging dimensions, say"
+        " that the calculation is not possible rather than estimating."
+        "\n\nHOW TO WRITE: you are talking in a chat, not filling in a datasheet. Do NOT"
+        " repeat in the text what the card already shows — no name/price/GTIN listings."
+        " Use the text for what a card cannot say: why this product answers the question,"
+        " what the GS1 data actually declares, and what it does not. Prefer short"
+        " paragraphs; use a short bullet list only when you are genuinely comparing"
+        " several things, at most one level deep, and never turn every attribute into its"
+        " own bold-labelled bullet. Use a heading only when the answer really splits into"
+        " distinct sections. Plain text: no LaTeX, no tables, no emoji."
         "\n\nAlways reply in the user's language; the catalog and the store are"
         " Italian, so default to Italian. Write plain text: no LaTeX or math markup,"
         " the chat UI does not render it."
@@ -572,6 +708,7 @@ root_agent = Agent(
     tools=[
         search_shopping_catalog,
         leggi_prodotto,
+        calcola_stoccaggio,
         add_to_checkout,
         remove_from_checkout,
         update_checkout,

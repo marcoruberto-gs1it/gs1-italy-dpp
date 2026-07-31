@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { appConfig } from "@/config";
+import { renderMarkdown } from "@/markdown";
 import {
   type ChatMessage,
   type Checkout,
@@ -25,7 +25,6 @@ import CheckoutComponent from "./Checkout";
 import PaymentConfirmationComponent from "./PaymentConfirmation";
 import PaymentMethodSelector from "./PaymentMethodSelector";
 import ProductCard from "./ProductCard";
-import UserLogo from "./UserLogo";
 
 interface ChatMessageProps {
   message: ChatMessage;
@@ -37,21 +36,25 @@ interface ChatMessageProps {
   isLastCheckout?: boolean;
 }
 
+/** Avatar dell'assistente: la scintilla arancione GS1 usata anche sul sito. */
+function AgentAvatar() {
+  return (
+    <span className="chat-avatar" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2.5l2.1 5.9 5.9 2.1-5.9 2.1-2.1 5.9-2.1-5.9-5.9-2.1 5.9-2.1z" />
+      </svg>
+    </span>
+  );
+}
+
 function TypingIndicator() {
   return (
-    <div className="w-full my-1 justify-start">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="flex-shrink-0">
-          <img alt="logo" src={appConfig.logoUrl} className="w-8 h-8" />
-        </div>
-        <span className="font-semibold text-gray-700">{appConfig.name}</span>
-      </div>
-      <div className="ml-10 px-4 py-3 rounded-2xl shadow-sm bg-gray-200 text-gray-800 self-start inline-block">
-        <div className="flex items-center space-x-2 h-5">
-          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce"></span>
-        </div>
+    <div className="chat-row">
+      <AgentAvatar />
+      <div className="chat-bubble chat-bubble--pending">
+        <span className="typing-dot" />
+        <span className="typing-dot" />
+        <span className="typing-dot" />
       </div>
     </div>
   );
@@ -72,39 +75,30 @@ function ChatMessageComponent({
     return <TypingIndicator />;
   }
 
-  // User messages are handled separately
+  // Il messaggio dell'utente resta testo semplice: nessun markdown da interpretare.
   if (isUser) {
     return (
-      <div className="flex w-full my-1 items-start gap-2 justify-end">
-        <div className="max-w-xs md:max-w-md lg:max-w-2xl px-4 py-2 rounded-2xl shadow-sm bg-blue-500 text-white self-end">
-          <div className="whitespace-pre-wrap break-words">{message.text}</div>
-        </div>
-        <div className="flex-shrink-0 pt-1">
-          <UserLogo className="w-8 h-8 text-gray-400" />
+      <div className="chat-row chat-row--user">
+        <div className="chat-bubble chat-bubble--user">
+          <p className="bubble-text" style={{ whiteSpace: "pre-wrap" }}>
+            {message.text}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full my-1 justify-start">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="flex-shrink-0">
-          <img
-            src={appConfig.logoUrl}
-            alt={appConfig.name}
-            className="w-8 h-8"
-          />
-        </div>
-        <span className="font-semibold text-gray-700">{appConfig.name}</span>
-      </div>
-      <div className="ml-10 flex-grow min-w-0">
+    <div className="chat-row">
+      <AgentAvatar />
+      <div className="chat-bubble">
         {message.text && (
-          <div className="max-w-xs md:max-w-md lg:max-w-2xl px-4 py-2 rounded-2xl shadow-sm bg-gray-200 text-gray-800 self-start inline-block">
-            <div className="break-words whitespace-pre-wrap">
-              {message.text}
-            </div>
-          </div>
+          // Il modello risponde in Markdown: renderMarkdown neutralizza l'HTML in
+          // ingresso e produce solo i tag che decidiamo noi (vedi markdown.ts).
+          <div
+            className="bubble-text"
+            dangerouslySetInnerHTML={{ __html: renderMarkdown(message.text) }}
+          />
         )}
 
         {message.paymentMethods && onSelectPaymentMethod && (
@@ -122,16 +116,14 @@ function ChatMessageComponent({
         )}
 
         {message.products && message.products.length > 0 && (
-          <div className="w-full my-1 overflow-x-auto">
-            <div className="flex space-x-4 p-2">
-              {message.products.map((product) => (
-                <ProductCard
-                  key={product.productID}
-                  product={product}
-                  onAddToCart={onAddToCart}
-                />
-              ))}
-            </div>
+          <div className="product-strip">
+            {message.products.map((product) => (
+              <ProductCard
+                key={product.productID}
+                product={product}
+                onAddToCart={onAddToCart}
+              />
+            ))}
           </div>
         )}
 

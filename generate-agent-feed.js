@@ -81,3 +81,119 @@ for (const p of products) {
 }
 
 console.log(`generate-agent-feed: ${written} schede JSON-LD generate (${products.length - written} prodotti senza dati strutturati, volutamente non esposti)`);
+
+// ---------------------------------------------------------------------------
+// 3. 01/<gtin>/index.jsonld dei livelli di imballo superiori (cartone, pallet…)
+// ---------------------------------------------------------------------------
+// Cartone e pallet hanno un GTIN proprio — nei dati ci sono — e per GS1 un GTIN che
+// esiste identifica un articolo commerciale che deve poter essere risolto. Quindi ogni
+// livello diventa una risorsa a sé al proprio Digital Link, descritta con SOLI termini
+// verificati sul GS1 Web Vocabulary: gs1:packagingType, gs1:netContent, gs1:netWeight,
+// gs1:grossWeight, gs1:grossVolume, gs1:inPackage*.
+//
+// La RELAZIONE fra i livelli non ha bisogno di alcuna proprietà: è già codificata negli
+// identificativi. Il primo carattere del GTIN-14 è l'*indicator digit*, che per le GS1
+// General Specifications distingue i livelli di imballo dello stesso articolo — qui
+// 0=unità base, 1=cartone, 2=pallet, con lo stesso item reference e il check digit
+// ricalcolato. Nel dataset la regola è rispettata da 18 prodotti su 18, ed è così che
+// store.py ritrova i livelli partendo dal GTIN dell'unità base.
+//
+// ORDINE DEGLI ASSI. Sull'unità base è certo: la stringa `dimensions` coincide con
+// gs1:inPackageHeight/Width/Depth di rawGs1Data (H × W × D). Sui livelli superiori il
+// dataset usa invece L × W × H: lo dimostra il pallet, dichiarato "Pallet EPAL" con
+// 1200 x 800 x 1450, dove 1200×800 è l'impronta EPAL e 1450 l'altezza. Il cartone è
+// compatibile con entrambe le letture, quindi non smentisce. Si applica L × W × H, e il
+// calcolo di stoccaggio prova comunque tutte le orientazioni: un "alto" sbagliato
+// cambierebbe l'assunzione dichiarata, non il conteggio.
+
+const UNIT_CODES = { g: 'GRM', kg: 'KGM', ml: 'MLT', l: 'LTR', pz: 'H87' };
+
+/** "2.82 kg" → { value: 2.82, unitCode: "KGM" }; null se non interpretabile. */
+function parseQuantity(text) {
+  const match = String(text || '').match(/^\s*([\d.,]+)\s*([a-zA-Z]+)\s*$/);
+  if (!match) return null;
+  const unitCode = UNIT_CODES[match[2].toLowerCase()];
+  if (!unitCode) return null;
+  return { value: Number(match[1].replace(',', '.')), unitCode };
+}
+
+/** "1200 x 800 x 1450 mm" → [1200, 800, 1450] in millimetri. */
+function parseDimensions(text) {
+  const match = String(text || '').match(
+    /^\s*([\d.,]+)\s*[x×]\s*([\d.,]+)\s*[x×]\s*([\d.,]+)\s*mm\s*$/i
+  );
+  if (!match) return null;
+  return match.slice(1, 4).map((n) => Number(n.replace(',', '.')));
+}
+
+/** Nodo gs1:QuantitativeValue nella stessa forma usata dalle schede del dataset. */
+function quantitativeValue(value, unitCode) {
+  return {
+    '@type': 'gs1:QuantitativeValue',
+    value: { '@value': String(value), '@type': 'xsd:float' },
+    unitCode,
+  };
+}
+
+let levelsWritten = 0;
+let productsWithLevels = 0;
+
+for (const p of products) {
+  const hierarchy = p.gdsn?.hierarchy;
+  if (!p.rawGs1Data || !hierarchy?.length) continue;
+
+  let produced = 0;
+  for (const level of hierarchy) {
+    // L'unità base ha già la sua scheda completa: qui solo i livelli superiori.
+    if (!level.gtin || level.gtin === p.gtin || level.isBaseUnit) continue;
+
+    const doc = {
+      '@context': JSON.parse(JSON.stringify(p.rawGs1Data['@context'])),
+      '@type': JSON.parse(JSON.stringify(p.rawGs1Data['@type'])),
+      '@id': `https://id.gs1.org/01/${level.gtin}`,
+      'gs1:gtin': level.gtin,
+      name: `${p.name} — ${level.packagingTypeLabel || level.level}`,
+    };
+
+    if (p.rawGs1Data.brand) doc.brand = JSON.parse(JSON.stringify(p.rawGs1Data.brand));
+    if (level.packagingTypeCode) doc['gs1:packagingType'] = level.packagingTypeCode;
+
+    // Quantità contenuta come contenuto netto in pezzi (H87 = piece, UN/ECE Rec 20):
+    // "contenuto netto: 12 pezzi". È l'unico modo di esprimere il conteggio restando
+    // dentro il vocabolario, che non ha una proprietà per la quantità del livello
+    // inferiore (quella vive in GDSN).
+    if (level.quantityContained) {
+      doc['gs1:netContent'] = quantitativeValue(level.quantityContained, 'H87');
+    }
+
+    for (const [field, property] of [
+      ['netWeight', 'gs1:netWeight'],
+      ['grossWeight', 'gs1:grossWeight'],
+    ]) {
+      const parsed = parseQuantity(level[field]);
+      if (parsed) doc[property] = quantitativeValue(parsed.value, parsed.unitCode);
+    }
+
+    const dimensions = parseDimensions(level.dimensions);
+    if (dimensions) {
+      const [length, width, height] = dimensions;
+      doc['gs1:inPackageHeight'] = quantitativeValue(height, 'MMT');
+      doc['gs1:inPackageWidth'] = quantitativeValue(width, 'MMT');
+      doc['gs1:inPackageDepth'] = quantitativeValue(length, 'MMT');
+      // Volume lordo: indipendente dall'ordine degli assi, ed è il numero che serve a
+      // una stima di occupazione. mm³ → m³.
+      const cubicMetres = (length * width * height) / 1e9;
+      doc['gs1:grossVolume'] = quantitativeValue(Number(cubicMetres.toFixed(6)), 'MTQ');
+    }
+
+    const dir = path.join(BROWSER_DIR, '01', level.gtin);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.jsonld'), JSON.stringify(doc));
+    levelsWritten++;
+    produced++;
+  }
+
+  if (produced) productsWithLevels++;
+}
+
+console.log(`generate-agent-feed: ${levelsWritten} schede di livelli logistici generate per ${productsWithLevels} prodotti (cartoni, pallet…)`);

@@ -1,0 +1,437 @@
+/* ==========================================================================
+   Chat agentica — stili specifici.
+
+   Il grosso del linguaggio visivo NON sta qui: arriva da /tokens.css e /chat.css,
+   pubblicati dal sito (vedi publish-theme.js) e caricati da index.html. Qui c'è solo
+   ciò che la chat React ha in più rispetto alla chat statica del sito: l'header, la
+   tipografia del Markdown dentro le bolle, le schede prodotto interattive e il
+   riquadro di checkout.
+   ========================================================================== */
+
+body {
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Header, allineato a quello del catalogo --- */
+.chat-header {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-xs);
+  padding: 14px 0;
+  flex-shrink: 0;
+}
+
+.chat-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Le regole che seguono ricalcano una per una quelle di src/app/app.css: l'header deve
+   essere indistinguibile da quello del catalogo, non "somigliargli". */
+.chat-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.chat-header .logo:hover {
+  transform: scale(1.02);
+}
+
+.chat-header .logo img {
+  height: 36px;
+  width: auto;
+}
+
+.demo-badge {
+  color: var(--gs1-orange);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.chat-header nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: 8px;
+}
+
+.chat-header nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.chat-header nav a:hover,
+.chat-header nav a.active {
+  color: var(--gs1-blue);
+}
+
+:root[data-theme='dark'] .chat-header nav a:hover,
+:root[data-theme='dark'] .chat-header nav a.active {
+  color: var(--accent-strong);
+}
+
+/* --- Layout di pagina --- */
+.chat-viewport {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-page {
+  /* .chat-page arriva da chat.css: qui si adatta all'altezza reale dell'header */
+  height: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* --- Tipografia del Markdown dentro la bolla --- */
+.bubble-text {
+  white-space: normal; /* il markdown gestisce i blocchi: niente pre-wrap */
+}
+
+.bubble-text > *:first-child { margin-top: 0; }
+.bubble-text > *:last-child { margin-bottom: 0; }
+
+.bubble-text p {
+  margin: 0 0 10px;
+}
+
+.bubble-text h3,
+.bubble-text h4 {
+  margin: 16px 0 8px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.bubble-text h3 {
+  font-size: 1rem;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.bubble-text h4 {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.bubble-text ul,
+.bubble-text ol {
+  margin: 0 0 10px;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bubble-text li {
+  position: relative;
+  padding-left: 18px;
+  line-height: 1.55;
+}
+
+/* Pallino nei colori GS1 invece del bullet di sistema */
+.bubble-text ul > li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gs1-orange);
+}
+
+.bubble-text ol {
+  counter-reset: md-item;
+}
+
+.bubble-text ol > li {
+  padding-left: 26px;
+  counter-increment: md-item;
+}
+
+.bubble-text ol > li::before {
+  content: counter(md-item);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Il grassetto è quasi sempre un'etichetta di campo ("Prezzo:", "Origine:"):
+   pesa meno del nero pieno e resta leggibile in una lista lunga. */
+.bubble-text strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.bubble-text em {
+  color: var(--text-tertiary);
+  font-style: normal;
+  font-size: 0.9em;
+}
+
+.bubble-text a {
+  color: var(--text-link);
+  font-weight: 600;
+  text-underline-offset: 2px;
+}
+
+.md-code {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 1px 5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.chat-bubble--user .md-code {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.bubble-text blockquote {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--gs1-orange);
+  background: var(--accent-2-soft);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.bubble-text hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 14px 0;
+}
+
+/* --- Schede prodotto in conversazione ---
+   Stessa griglia orizzontale del sito, ma con l'azione di acquisto: qui il prodotto
+   non si visita, si mette nel carrello senza uscire dalla conversazione. */
+.product-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  scrollbar-width: thin;
+}
+
+.product-card {
+  width: 232px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-default);
+  transform: translateY(-2px);
+}
+
+.product-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--bg-surface-sunken);
+  overflow: hidden;
+}
+
+.product-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-card-media .gs-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+.product-card-body {
+  padding: 12px 13px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.product-card-brand {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.product-card-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card-gtin {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.product-card-foot {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.product-card-price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.product-card-add {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  background: var(--gs1-blue);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 700;
+  transition: transform var(--dur-fast) var(--ease-spring), background-color var(--dur-base) var(--ease-out);
+}
+
+.product-card-add:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.product-card-add:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.product-card-add:disabled {
+  background: var(--bg-surface-sunken);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* --- Riquadri di checkout e pagamento ---
+   Checkout.tsx, PaymentMethodSelector.tsx e PaymentConfirmation.tsx sono presi tali e
+   quali dal sample di Google e vestiti con classi Tailwind fisse (bg-white, text-gray-*,
+   bg-blue-500). Riscriverli sarebbe il lavoro pulito; finché restano com'è, queste regole
+   li riportano sui token del sito — e soprattutto li rendono leggibili in tema scuro,
+   dove un pannello bianco fisso stonerebbe. Da rimuovere se i componenti verranno
+   riscritti. */
+.chat-bubble .bg-white {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-xs) !important;
+}
+
+.chat-bubble .text-gray-800,
+.chat-bubble .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+.chat-bubble .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+.chat-bubble .text-gray-600,
+.chat-bubble .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+.chat-bubble .border-gray-200,
+.chat-bubble .border-b,
+.chat-bubble .border-t {
+  border-color: var(--border-subtle) !important;
+}
+
+.chat-bubble .bg-blue-500,
+.chat-bubble .bg-blue-600 {
+  background: var(--gs1-blue) !important;
+}
+
+.chat-bubble .hover\:bg-gray-100:hover {
+  background: var(--bg-surface-sunken) !important;
+}
+
+.chat-bubble .rounded-lg,
+.chat-bubble .rounded-md {
+  border-radius: var(--radius-md) !important;
+}
+
+/* --- Barra di input: il textarea cresce, il bottone resta ancorato --- */
+.chat-input {
+  font-family: var(--font-sans);
+  resize: none;
+}
+
+@media (max-width: 640px) {
+  .chat-header nav { display: none; }
+  .chat-header-inner { padding: 0 16px; }
+}
