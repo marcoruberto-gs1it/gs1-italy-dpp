@@ -25,7 +25,12 @@
 
     <div class="sectors-cards">
       @for (sector of sectors(); track sector.id; let i = $index) {
-        <article
+        <!-- <a> e non <article>: routerLink su un elemento che non è un'ancora non
+             produce alcun href, attacca solo un gestore di click. La home restava così
+             senza un solo link navigabile, e chi legge l'HTML senza eseguire JavaScript
+             — motori di ricerca e agenti AI, cioè il pubblico di questa demo — non aveva
+             alcun modo di raggiungere settori e prodotti. -->
+        <a
           class="sector-card"
           [routerLink]="['/catalog', sector.id]"
           [style.--sector-color]="sector.brandColor"
@@ -48,7 +53,7 @@
               </div>
             </div>
           </div>
-        </article>
+        </a>
       }
     </div>
   </section>
