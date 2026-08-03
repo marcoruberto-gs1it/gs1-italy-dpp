@@ -16,6 +16,7 @@
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { defineConfig } from "vite";
+import { authGate } from "./auth-gate";
 
 export default defineConfig(() => {
   return {
@@ -37,7 +38,18 @@ export default defineConfig(() => {
         },
       },
     },
-    plugins: [react()],
+    plugins: [
+      {
+        // Sbarramento con password (vedi auth-gate.ts). Registrato in configureServer,
+        // che Vite chiama PRIMA di installare i propri middleware: quindi intercetta
+        // anche il proxy /api verso il business-agent, non solo le pagine.
+        name: "gs1-auth-gate",
+        configureServer(server) {
+          server.middlewares.use(authGate());
+        },
+      },
+      react(),
+    ],
     define: {},
     resolve: {
       alias: {

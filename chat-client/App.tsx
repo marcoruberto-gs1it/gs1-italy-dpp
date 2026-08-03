@@ -313,18 +313,15 @@ function App() {
 
       const data = await response.json();
 
-      // Update context and task IDs from the response for subsequent requests
       if (data.result?.contextId) {
         setContextId(data.result.contextId);
       }
-      //if there is a task and it's in one of the active states
       if (
         data.result?.id &&
         data.result?.status?.state in ["working", "submitted", "input-required"]
       ) {
         setTaskId(data.result.id);
       } else {
-        //if not reset taskId
         setTaskId(undefined);
       }
 
@@ -335,7 +332,6 @@ function App() {
 
       for (const part of responseParts) {
         if (part.text) {
-          // Simple text
           combinedBotMessage.text +=
             (combinedBotMessage.text ? "\n" : "") + part.text;
         } else {
@@ -344,7 +340,6 @@ function App() {
           // per allineare le schede mostrate al testo. Con una catena else-if il
           // checkout veniva scartato ogni volta che c'erano anche dei prodotti.
           if (part.data?.["a2a.product_results"]) {
-            // Product results
             combinedBotMessage.text +=
               (combinedBotMessage.text ? "\n" : "") +
               (part.data["a2a.product_results"].content || "");
@@ -352,29 +347,25 @@ function App() {
               part.data["a2a.product_results"].results;
           }
           if (part.data?.["a2a.ucp.checkout"]) {
-            // Checkout
             combinedBotMessage.checkout = part.data["a2a.ucp.checkout"];
           }
         }
       }
 
-      const newMessages: ChatMessage[] = [];
       const hasContent =
         combinedBotMessage.text ||
         combinedBotMessage.products ||
         combinedBotMessage.checkout;
-      if (hasContent) {
-        newMessages.push(combinedBotMessage);
-      }
 
-      if (newMessages.length > 0) {
-        setMessages((prev) => [...prev.slice(0, -1), ...newMessages]);
+      if (hasContent) {
+        setMessages((prev) => [...prev.slice(0, -1), combinedBotMessage]);
       } else {
-        const fallbackResponse =
-          "Sorry, I received a response I couldn't understand.";
         setMessages((prev) => [
           ...prev.slice(0, -1),
-          createChatMessage(Sender.MODEL, fallbackResponse),
+          createChatMessage(
+            Sender.MODEL,
+            "Sorry, I received a response I couldn't understand."
+          ),
         ]);
       }
     } catch (error) {

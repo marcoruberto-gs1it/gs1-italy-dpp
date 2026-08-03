@@ -81,6 +81,10 @@ services:
       GOOGLE_CLOUD_LOCATION: "${GOOGLE_CLOUD_LOCATION:-global}"
       GOOGLE_APPLICATION_CREDENTIALS: "/creds/sa.json"
       GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.5-flash}"
+      # Diagnostica del context caching (vedi main.py): 1 per vedere hit/miss nei log.
+      CACHE_DEBUG: "${CACHE_DEBUG:-0}"
+      # 0 disattiva il context caching (vedi agent_executor.py).
+      CONTEXT_CACHE: "${CONTEXT_CACHE:-1}"
     volumes:
       - "./secrets/gcp-sa.json:/creds/sa.json:ro"
     depends_on:
@@ -102,6 +106,10 @@ services:
       # risolvibile dentro la rete Docker (per il container dell'agente `localhost` sarebbe
       # sé stesso). Il path include il base di Vite.
       VITE_PROFILE_URL: "http://chat-client:3000/assistente/profile/agent_profile.json"
+      # Sbarramento a password davanti a /assistente e /api (vedi chat-client/auth-gate.ts).
+      # Vuota = accesso libero: in locale si lavora senza login, in produzione si valorizza.
+      CHAT_PASSWORD: "${CHAT_PASSWORD:-}"
+      CHAT_AUTH_SECRET: "${CHAT_AUTH_SECRET:-}"
     depends_on:
       - business-agent
     labels:

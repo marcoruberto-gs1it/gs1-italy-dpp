@@ -42,6 +42,18 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
 
+# Con CACHE_DEBUG=1 il gestore di context caching di ADK racconta cosa fa: se crea la
+# cache, se la riusa, se la invalida. Serve a verificare che il caching sia davvero
+# attivo — senza, un turno lento e uno veloce si assomigliano e si finisce per dedurre
+# invece che misurare. Spento di default: sono log per riga di richiesta.
+if os.getenv("CACHE_DEBUG") == "1":
+    logging.getLogger(
+        "google_adk.google.adk.models.gemini_context_cache_manager"
+    ).setLevel(logging.DEBUG)
+    logging.getLogger(
+        "google_adk.google.adk.flows.llm_flows.context_cache_processor"
+    ).setLevel(logging.DEBUG)
+
 
 def make_sync(func):
     """Wrap an async function to run synchronously.

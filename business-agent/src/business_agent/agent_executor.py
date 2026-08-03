@@ -15,6 +15,8 @@
 """UCP."""
 
 import json
+import logging
+import os
 import re
 from typing import Any
 from a2a.server.agent_execution import AgentExecutor, RequestContext
@@ -25,6 +27,8 @@ from a2a.utils import (
     new_agent_parts_message,
     new_agent_text_message,
 )
+from google.adk.agents.context_cache_config import ContextCacheConfig
+from google.adk.apps.app import App
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
@@ -110,11 +114,44 @@ class ADKAgentExecutor(AgentExecutor):
 
         """
         self.agent = agent
-        self.runner = Runner(
-            app_name=agent.name,
-            agent=agent,
-            session_service=InMemorySessionService(),
+        # Context caching nativo di ADK (>= 1.30). Ogni ricerca versa nel contesto ~51k
+        # token — i 63 prodotti con le 47 schede JSON-LD complete — e un turno fa due o
+        # tre chiamate al modello, ognuna delle quali si riporta dietro tutto il contesto
+        # accumulato. Il caching fa pagare quel prefisso una volta sola: ADK crea la
+        # cache, la valida per fingerprint del contenuto e sostituisce i contents gia'
+        # cachati con un riferimento (vedi gemini_context_cache_manager.py).
+        #
+        # L'invalidazione e' per contenuto, non a tempo: se cambiano istruzione, tools o
+        # il prefisso della conversazione la cache cade da sola. Il TTL governa solo il
+        # ricambio, quindi un catalogo aggiornato non puo' restare "appeso" in cache.
+        #
+        # Nota: la cache vive nella sessione (cioe' nella singola conversazione), non e'
+        # condivisa fra utenti. La prima chiamata di ogni nuova chat paga comunque il
+        # payload intero.
+        # CONTEXT_CACHE=0 lo disattiva: serve a confrontare i tempi con e senza, e a
+        # spegnerlo al volo se in demo dovesse comportarsi male.
+        cache_config = None
+        if os.getenv("CONTEXT_CACHE", "1") == "1":
+            cache_config = ContextCacheConfig(
+                # I dati cambiano solo al deploy: non serve un TTL corto.
+                ttl_seconds=1800,
+                # Quante invocazioni riusare la stessa cache prima di rifarla. Il blocco
+                # da 51k entra in conversazione DOPO la prima chiamata, quindi finisce in
+                # cache solo al primo ricambio: col default (10) resterebbe fuori troppo
+                # a lungo, con 1 si pagherebbe una creazione a ogni giro. Da tarare sui
+                # numeri reali.
+                cache_intervals=3,
+                # Sotto questa soglia il costo di creare la cache supera il beneficio:
+                # un turno che non tocca il catalogo pesa ~3k token.
+                min_tokens=10000,
+            )
+
+        app = App(
+            name=agent.name,
+            root_agent=agent,
+            context_cache_config=cache_config,
         )
+        self.runner = Runner(app=app, session_service=InMemorySessionService())
         self.extensions = extensions or []
         self.profile_resolver = ProfileResolver()
         self.ucp_processor = UcpRequestProcessor(self.profile_resolver)
