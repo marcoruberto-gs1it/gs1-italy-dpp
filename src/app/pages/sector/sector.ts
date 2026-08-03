@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Product, ProductService, isAiReady, isVerified, getVocabularies, discountPercent, formatEuro } from '../../services/product.service';
@@ -9,6 +9,10 @@ import { onImageError } from '../../utils/image-fallback';
 import { IconComponent } from '../../components/icon/icon';
 import { LanguageService } from '../../services/language.service';
 import { I18nService } from '../../services/i18n.service';
+import { SiteOriginService } from '../../services/site-origin.service';
+import { StructuredDataService } from '../../services/structured-data.service';
+
+const JSON_LD_ID = 'sector-structured-data';
 
 type FilterMode = 'all' | 'ai-ready' | 'verified';
 type SortMode = 'name' | 'gtin';
@@ -19,12 +23,14 @@ type SortMode = 'name' | 'gtin';
   templateUrl: './sector.html',
   styleUrl: './sector.css',
 })
-export class Sector {
+export class Sector implements OnDestroy {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
   protected uiState = inject(UiStateService);
   private languageService = inject(LanguageService);
   protected t = inject(I18nService).t;
+  private structuredData = inject(StructuredDataService);
+  private siteOrigin = inject(SiteOriginService);
 
   protected isAiReady = isAiReady;
   protected isVerified = isVerified;
@@ -78,5 +84,54 @@ export class Sector {
     event.preventDefault();
     event.stopPropagation();
     this.uiState.openJsonLd(product);
+  }
+
+  /**
+   * Dati strutturati della pagina settore: le briciole di navigazione già visibili in alto
+   * e l'indice dei prodotti del settore, ciascuno col proprio GS1 Digital Link.
+   *
+   * Le voci portano solo nome e URL — sono un indice, non schede prodotto. La scheda la
+   * pubblica la pagina del prodotto, e solo se quel prodotto ha davvero dati strutturati.
+   */
+  private sectorJsonLd = computed(() => {
+    const origin = this.siteOrigin.value.replace(/\/$/, '');
+    const products = this.allProducts();
+    if (!products.length) return null;
+
+    const sectorUrl = `${origin}/catalog/${this.sectorId()}`;
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      '@id': sectorUrl,
+      url: sectorUrl,
+      name: this.sectorName(),
+      inLanguage: this.languageService.lang(),
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: this.t('nav.home'), item: `${origin}/` },
+          { '@type': 'ListItem', position: 2, name: this.sectorName(), item: sectorUrl },
+        ],
+      },
+      mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: products.length,
+        itemListElement: products.map((product, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: product.name,
+          url: `${origin}/01/${product.gtin}`,
+        })),
+      },
+    };
+  });
+
+  constructor() {
+    effect(() => this.structuredData.apply(JSON_LD_ID, this.sectorJsonLd()));
+  }
+
+  ngOnDestroy(): void {
+    this.structuredData.remove(JSON_LD_ID);
   }
 }
