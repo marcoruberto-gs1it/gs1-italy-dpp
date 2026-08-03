@@ -7,6 +7,7 @@ import { SearchPaletteComponent } from './components/search-palette/search-palet
 import { JsonLdDrawerComponent } from './components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, localizeSector } from './data/sectors';
 import { UiStateService } from './services/ui-state.service';
+import { ThemeService } from './services/theme.service';
 import { LanguageService } from './services/language.service';
 import { I18nService } from './services/i18n.service';
 import { SeoLinkService } from './services/seo-link.service';
@@ -22,6 +23,7 @@ export class App {
   protected readonly title = signal('gs1-catalog');
   protected uiState = inject(UiStateService);
   protected languageService = inject(LanguageService);
+  protected themeService = inject(ThemeService);
   protected t = inject(I18nService).t;
   private platformId = inject(PLATFORM_ID);
   private document = inject(DOCUMENT);

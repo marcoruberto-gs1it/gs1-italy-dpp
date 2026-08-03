@@ -92,6 +92,29 @@ body {
   color: var(--accent-strong);
 }
 
+/* Selettore tema, stesso aspetto della .icon-btn del catalogo. */
+.theme-toggle {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.theme-toggle:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
 /* --- Layout di pagina --- */
 .chat-viewport {
   height: 100dvh;

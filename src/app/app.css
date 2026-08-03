@@ -87,6 +87,12 @@
   color: var(--accent-strong);
 }
 
+/* Il selettore tema resta visibile a ogni larghezza: le altre icon-btn del header
+   compaiono solo su mobile, questa no. */
+.theme-toggle {
+  display: flex;
+}
+
 .nav-search-trigger {
   display: flex;
   align-items: center;

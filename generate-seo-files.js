@@ -153,18 +153,23 @@ const llmsTxt = `# GS1 Digital Link Catalog
 - [Home](${SITE_URL}/): sector overview and search
 - [GS1 Digital Link Validator](${SITE_URL}/validatore): parses a Digital Link or bracketed AI element string with the real GS1 Barcode Syntax Engine (WASM), with a CTA to validator.schema.org
 - [AI Shopping Assistant](${SITE_URL}/assistente): agentic chat (Google ADK + A2A + UCP) that searches the catalog, answers from the GS1 product sheets and can complete an order
+- [Knowledge graph](${SITE_URL}/knowledge-graph): the whole catalog as an RDF graph, browsable and queryable with SPARQL
 - [Sitemap](${SITE_URL}/sitemap.xml)
 
 ## Machine-readable endpoints
 
-- \`GET ${SITE_URL}/catalog\` — lightweight JSON feed of every product (gtin, name, brand, price, category, image, description)
-- \`GET ${SITE_URL}/01/{gtin}\` with \`Accept: application/ld+json\` — the full GS1 JSON-LD product sheet, same document embedded in the HTML page; 404 when a product publishes no structured data
+- [Knowledge graph dataset](${SITE_URL}/knowledge-graph.jsonld): the entire catalog as one JSON-LD document (@context + @graph, ~250 KB). The densest single entry point: it carries what the per-product list below carries, already structured
+- [Catalog feed](${SITE_URL}/catalog): lightweight JSON list of every product — gtin, name, brand, price, category, image, description. ~21 KB, for when the full graph is more than you need
+- [GS1 product sheet](${SITE_URL}/01/${products[0].gtin}): request any \`/01/{gtin}\` with \`Accept: application/ld+json\` to get the full GS1 Web Vocabulary sheet — the same document embedded in the HTML page. Returns 404 when a product publishes no structured data, which is itself the answer
 
 ## Sectors
 
 ${sectorSection}
 
-## Products
+## Optional
+
+Every product page, one by one — the verbose path to what the knowledge graph above already
+carries in a single document. Safe to skip when working with a shorter context.
 
 ${productSection}
 `;
