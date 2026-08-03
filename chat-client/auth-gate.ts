@@ -151,6 +151,16 @@ export function authGate(): Connect.NextHandleFunction {
   return async (req, res, next) => {
     const url = req.url || "";
 
+    // Il profilo UCP resta pubblico, e non è una svista: è il documento di discovery che
+    // il business-agent scarica LUI STESSO a ogni richiesta, leggendo l'header UCP-Agent
+    // (vedi ucp_profile_resolver.py). Se lo trova dietro il cancello riceve l'HTML della
+    // pagina di login al posto del JSON e va in errore di parsing — la chat smette di
+    // funzionare pur avendo l'utente autenticato. Non contiene segreti: dichiara solo le
+    // capability UCP supportate, ed è pensato per essere letto da altri agenti.
+    if (url.startsWith("/assistente/profile/")) {
+      return next();
+    }
+
     if (isTokenValid(readCookie(req.headers.cookie, COOKIE_NAME), secret)) {
       return next();
     }
