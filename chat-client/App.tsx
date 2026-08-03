@@ -52,12 +52,25 @@ const initialMessage: ChatMessage = createChatMessage(
   { id: "initial" }
 );
 
-/** Domande di partenza: ognuna mostra un dato GS1 diverso su cui l'agente sa ragionare. */
+/**
+ * Domande di partenza. Non sono esempi generici: ognuna è scelta perché la risposta
+ * **non è deducibile** senza il dato strutturato — né dalla conoscenza generale del
+ * modello, né dal testo commerciale della scheda. È lì che si vede la differenza fra un
+ * catalogo che pubblica GS1 Web Vocabulary e uno che non lo fa.
+ *
+ * Tutte e quattro verificate contro il catalogo reale:
+ *  - glutine        → 10 prodotti dichiarano FREE_FROM; distingue "non contiene" da "non lo dice"
+ *  - guanti         → tre prodotti, uno solo con scheda: il contrasto sta in una sola risposta
+ *  - mascherine     → numero di certificato e organismo notificato: non si indovinano
+ *  - pollo/salmone  → confronto fra due schede, con la base di riferimento dichiarata
+ *  - magazzino      → gerarchia di imballo (pallet, cartoni) e calcolo deterministico
+ */
 const EXAMPLE_PROMPTS = [
-  "Quali prodotti alimentari senza glutine avete?",
-  "Cerco un capo in cotone biologico certificato",
-  "La confettura di fragole contiene allergeni?",
-  "Quali prodotti non pubblicano dati strutturati?",
+  "Quali alimenti dichiarano l'assenza di glutine?",
+  "Che guanti avete e di che materiale sono esattamente?",
+  "Le mascherine chirurgiche che certificazioni hanno e chi le ha rilasciate?",
+  "Confronta pollo e salmone dal punto di vista nutrizionale",
+  "Quanti pallet di confettura di fragole entrano in un magazzino di 12 x 8 metri alto 3?",
 ];
 
 /**
