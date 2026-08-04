@@ -120,6 +120,11 @@ class RetailStore:
                 "description": entry.get("description"),
                 "gtin": gtin,
                 "category": entry.get("category"),
+                # Passa al client: la chat mostra il badge "AI Ready" solo sui prodotti
+                # che pubblicano davvero una scheda GS1. Il modello Product del sample ha
+                # extra="allow", quindi il campo attraversa la serializzazione senza
+                # bisogno di modificarne lo schema.
+                "aiReady": bool(entry.get("aiReady")),
                 "offers": {
                     "@type": "Offer",
                     "price": entry.get("price"),

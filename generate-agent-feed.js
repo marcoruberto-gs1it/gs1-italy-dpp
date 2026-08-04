@@ -49,6 +49,11 @@ const catalog = products.map((p) => ({
   category: p.sectorName || '',
   image: p.image ? `${SITE_URL}/${p.image.replace(/^\//, '')}` : '',
   description: p.description || '',
+  // Se il prodotto pubblica una scheda GS1 o no. Serve alla chat per mostrare il badge
+  // "AI Ready" solo a chi lo è davvero: senza questo dato il client non ha modo di
+  // saperlo, perché la vista leggera non porta le proprietà gs1:. È la stessa condizione
+  // che decide la generazione del sidecar .jsonld qui sotto.
+  aiReady: !!p.rawGs1Data,
 }));
 
 fs.writeFileSync(path.join(BROWSER_DIR, 'catalog.json'), JSON.stringify(catalog));

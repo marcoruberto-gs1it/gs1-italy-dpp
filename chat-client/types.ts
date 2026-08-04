@@ -33,6 +33,10 @@ export interface Product {
   size: {
     name: string;
   };
+  /** GTIN del prodotto, usato in card e checkout. */
+  gtin?: string;
+  /** Se il prodotto pubblica una scheda GS1 in JSON-LD (vedi generate-agent-feed.js). */
+  aiReady?: boolean;
 }
 
 export interface Credential {
