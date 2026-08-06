@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Meta, Title } from '@angular/platform-browser';
 import { Product, ProductService, isAiReady, isVerified, getVocabularies, discountPercent, formatEuro } from '../../services/product.service';
 import { UiStateService } from '../../services/ui-state.service';
 import { SECTORS, localizeSector } from '../../data/sectors';
@@ -13,6 +14,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
 
 const JSON_LD_ID = 'sector-structured-data';
+const GS1_ITALY_LOGO = 'https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png';
 
 type FilterMode = 'all' | 'ai-ready' | 'verified';
 type SortMode = 'name' | 'gtin';
@@ -31,6 +33,8 @@ export class Sector implements OnDestroy {
   protected t = inject(I18nService).t;
   private structuredData = inject(StructuredDataService);
   private siteOrigin = inject(SiteOriginService);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
 
   protected isAiReady = isAiReady;
   protected isVerified = isVerified;
@@ -106,7 +110,15 @@ export class Sector implements OnDestroy {
       '@id': sectorUrl,
       url: sectorUrl,
       name: this.sectorName(),
+      description: this.sectorInfo()?.description,
       inLanguage: this.languageService.lang(),
+      image: GS1_ITALY_LOGO,
+      publisher: {
+        '@type': 'Organization',
+        name: 'GS1 Italy',
+        url: 'https://www.gs1it.org/',
+        logo: GS1_ITALY_LOGO,
+      },
       breadcrumb: {
         '@type': 'BreadcrumbList',
         itemListElement: [
@@ -129,6 +141,17 @@ export class Sector implements OnDestroy {
 
   constructor() {
     effect(() => this.structuredData.apply(JSON_LD_ID, this.sectorJsonLd()));
+
+    // Reattivo: la rotta /catalog/:sector resta la stessa cambiando parametro (da un settore
+    // all'altro via link), quindi Angular riusa l'istanza del componente e ngOnInit non viene
+    // richiamato — senza un effect, titolo e description resterebbero quelli del primo settore
+    // visitato.
+    effect(() => {
+      const info = this.sectorInfo();
+      if (!info) return;
+      this.titleService.setTitle(`${info.name} | GS1 Digital Link Catalog`);
+      this.metaService.updateTag({ name: 'description', content: info.description });
+    });
   }
 
   ngOnDestroy(): void {

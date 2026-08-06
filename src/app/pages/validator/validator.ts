@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, ElementRef, Injector, OnDestroy, OnInit, PLATFORM_ID, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import type QrScanner from 'qr-scanner';
 import { I18nService } from '../../services/i18n.service';
 import { SiteOriginService } from '../../services/site-origin.service';
@@ -56,6 +56,7 @@ function normalizeScanForEngine(raw: string): string {
 export class ValidatorComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private titleService = inject(Title);
+  private metaService = inject(Meta);
   private siteOrigin = inject(SiteOriginService);
   private productService = inject(ProductService);
   private injector = inject(Injector);
@@ -121,6 +122,7 @@ export class ValidatorComponent implements OnInit, OnDestroy {
       this.input.set(this.exampleInstance);
     }
     this.titleService.setTitle(this.t('validator.pageTitle'));
+    this.metaService.updateTag({ name: 'description', content: this.t('validator.metaDescription') });
   }
 
   setInput(value: string): void {

@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import { I18nService } from '../../services/i18n.service';
 import { KgGraph, KgHub, KgProductNode, KnowledgeGraphService, SparqlResult } from '../../services/knowledge-graph.service';
 
@@ -58,6 +58,7 @@ SELECT ?brandName (COUNT(?product) AS ?count) WHERE {
 export class KnowledgeGraphComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private titleService = inject(Title);
+  private metaService = inject(Meta);
   private kg = inject(KnowledgeGraphService);
   protected t = inject(I18nService).t;
 
@@ -128,6 +129,7 @@ export class KnowledgeGraphComponent implements OnInit {
   ngOnInit(): void {
     this.isBrowser.set(isPlatformBrowser(this.platformId));
     this.titleService.setTitle(this.t('kg.pageTitle'));
+    this.metaService.updateTag({ name: 'description', content: this.t('kg.metaDescription') });
     if (this.isBrowser()) {
       void this.loadGraph();
     }

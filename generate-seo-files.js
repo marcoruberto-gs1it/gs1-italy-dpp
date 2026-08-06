@@ -176,3 +176,67 @@ ${productSection}
 
 fs.writeFileSync(path.join(BROWSER_DIR, 'llms.txt'), llmsTxt);
 console.log(`generate-seo-files: llms.txt generato (${(Buffer.byteLength(llmsTxt) / 1024).toFixed(1)} KB, ${products.length} prodotti)`);
+
+// ---------------------------------------------------------------------------
+// 5. .well-known/agent-skills/index.json — elenco machine-readable delle capacità reali del
+//    sito, in un formato pensato per la discovery automatica (a differenza di llms.txt, che è
+//    prosa per un LLM). Nessuno standard consolidato definisce ancora questo file: qui si
+//    descrivono solo endpoint che esistono davvero e si comportano come descritto — nello
+//    stesso spirito del resto del progetto, niente promesse su dati che non ci sono.
+// ---------------------------------------------------------------------------
+const agentSkills = {
+  name: 'GS1 Digital Link Catalog',
+  description:
+    'Demo catalog: GS1 Digital Link URIs resolve to product pages that publish structured data (GS1 Web Vocabulary / schema.org) via content negotiation.',
+  url: SITE_URL,
+  skills: [
+    {
+      id: 'product-lookup',
+      name: 'Look up a product’s structured GS1 data',
+      description:
+        'Resolve a GS1 Digital Link with Accept: application/ld+json to get the full GS1 Web Vocabulary / schema.org record for that product — allergens (with containment level), certifications, nutrition, materials, GDSN packaging hierarchy. Returns 404 when the product publishes no structured data: that absence is itself the answer, not an error to work around.',
+      endpoint: `${SITE_URL}/01/{gtin}`,
+      method: 'GET',
+      requestHeaders: { Accept: 'application/ld+json' },
+    },
+    {
+      id: 'catalog-feed',
+      name: 'List every product in the catalog',
+      description: `Lightweight JSON list of all ${products.length} products (gtin, name, brand, price, category, image, description) — what exists, before fetching individual sheets.`,
+      endpoint: `${SITE_URL}/catalog`,
+      method: 'GET',
+    },
+    {
+      id: 'knowledge-graph-query',
+      name: 'Query the catalog as an RDF graph',
+      description:
+        'The whole catalog as one JSON-LD document (@context + @graph): products, brands and certification bodies as deduplicated nodes with stable @id, ready to load into any RDF/SPARQL engine.',
+      endpoint: `${SITE_URL}/knowledge-graph.jsonld`,
+      method: 'GET',
+    },
+    {
+      id: 'digital-link-validation',
+      name: 'Validate a GS1 Digital Link or AI element string',
+      description:
+        'Parses a GS1 Digital Link URI or a bracketed AI element string with the real GS1 Barcode Syntax Engine (the same library used by official GS1 tools) and returns the extracted identifiers.',
+      endpoint: `${SITE_URL}/validatore`,
+      method: 'GET',
+    },
+    {
+      id: 'shopping-assistant',
+      name: 'Conversational shopping assistant',
+      description:
+        'An A2A/UCP commerce agent (Gemini) that searches the catalog, answers grounded only in the GS1 product sheets it can read — it states when a product has no structured data instead of guessing — and can complete a checkout. May require a password in this deployment; see the page for details.',
+      endpoint: `${SITE_URL}/assistente`,
+      protocol: 'A2A',
+      protocolVersion: '0.3.0',
+    },
+  ],
+};
+
+fs.mkdirSync(path.join(BROWSER_DIR, '.well-known', 'agent-skills'), { recursive: true });
+fs.writeFileSync(
+  path.join(BROWSER_DIR, '.well-known', 'agent-skills', 'index.json'),
+  JSON.stringify(agentSkills, null, 2)
+);
+console.log(`generate-seo-files: .well-known/agent-skills/index.json generato (${agentSkills.skills.length} skill)`);

@@ -270,6 +270,8 @@ export const TRANSLATIONS = {
       schemaCtaButton: 'Valida su validator.schema.org ↗',
       engineCredit: 'Motore: GS1 Barcode Syntax Engine {version} —',
       pageTitle: 'Validatore GS1 Digital Link | Digital Link Catalog',
+      metaDescription:
+        "Analizza e valida un GS1 Digital Link o una stringa AI usando il vero GS1 Barcode Syntax Engine, la stessa libreria degli strumenti ufficiali GS1.",
       unknownError: 'Errore di analisi sconosciuto.',
       scanButton: '📷 Scansiona QR code',
       scanDialogTitle: 'Inquadra un QR code GS1',
@@ -286,6 +288,8 @@ export const TRANSLATIONS = {
       breadcrumb: 'Knowledge Graph',
       title: 'Knowledge Graph',
       pageTitle: 'Knowledge Graph | Digital Link Catalog',
+      metaDescription:
+        'Il catalogo GS1 ristrutturato come un vero grafo RDF interrogabile: nodi con @id stabili, deduplicazione di brand e organismi di certificazione, motore SPARQL reale nel browser.',
       intro:
         'Lo stesso catalogo pubblicato per pagina, ristrutturato come un vero grafo: ogni prodotto, organizzazione, brand e organismo di certificazione ha un <code>@id</code> stabile, e chi è condiviso da più prodotti — brand ed enti certificatori — è un unico nodo referenziato, non una copia duplicata. Vocabolario invariato: <code>gs1:</code> (GS1 Web Vocabulary) e schema.org.',
       loading: 'Caricamento del grafo…',
@@ -687,6 +691,8 @@ export const TRANSLATIONS = {
       schemaCtaButton: 'Validate on validator.schema.org ↗',
       engineCredit: 'Engine: GS1 Barcode Syntax Engine {version} —',
       pageTitle: 'GS1 Digital Link Validator | Digital Link Catalog',
+      metaDescription:
+        'Analyse and validate a GS1 Digital Link or AI string using the real GS1 Barcode Syntax Engine, the same library used by official GS1 tools.',
       unknownError: 'Unknown analysis error.',
       scanButton: '📷 Scan QR code',
       scanDialogTitle: 'Point at a GS1 QR code',
@@ -703,6 +709,8 @@ export const TRANSLATIONS = {
       breadcrumb: 'Knowledge Graph',
       title: 'Knowledge Graph',
       pageTitle: 'Knowledge Graph | Digital Link Catalog',
+      metaDescription:
+        'The GS1 catalogue restructured as an actual queryable RDF graph: nodes with stable @id, deduplicated brands and certification bodies, a real SPARQL engine in the browser.',
       intro:
         'The same catalogue already published per page, restructured as an actual graph: every product, organization, brand and certification body has a stable <code>@id</code>, and whatever is shared by multiple products — brands and certifying bodies — is one referenced node, not a duplicated copy. Vocabulary unchanged: <code>gs1:</code> (GS1 Web Vocabulary) and schema.org.',
       loading: 'Loading the graph…',
