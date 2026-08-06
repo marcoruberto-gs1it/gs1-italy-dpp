@@ -512,7 +512,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000017"
+      "@id": "https://id.gs1.org/01/08032089000017",
+      "category": "Food/Beverage > Prepared/Preserved Foods > Sweet Spreads > Jams/Marmalades (Shelf Stable)"
     },
     "environmentalImpact": {
       "co2e": "0.8 kg CO₂e / kg prodotto",
@@ -1126,7 +1127,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000024"
+      "@id": "https://id.gs1.org/01/08032089000024",
+      "category": "Food/Beverage > Prepared/Preserved Foods > Pasta/Noodles > Pasta/Noodles - Not Ready to Eat (Shelf Stable)"
     },
     "environmentalImpact": {
       "co2e": "1.1 kg CO₂e / kg prodotto",
@@ -1401,7 +1403,7 @@
         "ratingValue": 4.8,
         "reviewCount": 214
       },
-      "gs1:gpcCategoryCode": "53190000",
+      "gs1:gpcCategoryCode": "10001352",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -1449,7 +1451,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000031"
+      "@id": "https://id.gs1.org/01/08032089000031",
+      "category": "Clothing > Clothing > Upper Body Wear/Tops > Shirts/Blouses/Polo Shirts/T-shirts"
     },
     "environmentalImpact": {
       "co2e": "4.2 kg CO₂e / unità",
@@ -1941,7 +1944,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000234",
+      "gs1:gpcCategoryCode": "10000203",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -2007,7 +2010,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000055"
+      "@id": "https://id.gs1.org/01/08032089000055",
+      "category": "Food/Beverage > Cereal/Grain/Pulse Products > Grains/Flour > Flour - Cereal/Pulse (Shelf Stable)"
     },
     "environmentalImpact": {
       "co2e": "0.6 kg CO₂e / kg prodotto",
@@ -2180,7 +2184,9 @@
           "value": "GS1"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000062"
+      "@id": "https://id.gs1.org/01/08032089000062",
+      "gs1:gpcCategoryCode": "10000452",
+      "category": "Healthcare > Home Diagnostics > Diagnostic Tests > Thermometers"
     },
     "environmentalImpact": {
       "co2e": "2.8 kg CO₂e / unità",
@@ -2369,7 +2375,7 @@
           "value": "GS1"
         }
       ],
-      "gs1:gpcCategoryCode": "53150000",
+      "gs1:gpcCategoryCode": "10005106",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -2497,7 +2503,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000079"
+      "@id": "https://id.gs1.org/01/08032089000079",
+      "category": "Clothing > Protective Wear > Protective Wear > Environmental Respiratory Protection - Non Powered"
     },
     "environmentalImpact": {
       "co2e": "0.9 kg CO₂e / confezione",
@@ -2776,7 +2783,9 @@
         },
         "unitCode": "GRM"
       },
-      "@id": "https://id.gs1.org/01/08032089000093"
+      "@id": "https://id.gs1.org/01/08032089000093",
+      "gs1:gpcCategoryCode": "10008218",
+      "category": "Food/Beverage > Fruits/Vegetables Fresh Cut > Vegetables - Fresh Cut > Leaf Vegetables - (Fresh Cut) Variety Packs (Mixed)"
     },
     "environmentalImpact": {
       "co2e": "0.4 kg CO₂e / kg prodotto",
@@ -3044,7 +3053,7 @@
           }
         ]
       },
-      "gs1:gpcCategoryCode": "11000000",
+      "gs1:gpcCategoryCode": "10002443",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -3120,7 +3129,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000116"
+      "@id": "https://id.gs1.org/01/08032089000116",
+      "category": "Building Products > Building Products > Wall/Ceiling/Flooring Coverings > Flooring - Ceramic/Porcelain Tiles"
     },
     "environmentalImpact": {
       "co2e": "9.5 kg CO₂e / m²",
@@ -3279,7 +3289,9 @@
         "ratingValue": 4,
         "reviewCount": 212
       },
-      "@id": "https://id.gs1.org/01/08032089000123"
+      "@id": "https://id.gs1.org/01/08032089000123",
+      "gs1:gpcCategoryCode": "10000232",
+      "category": "Food/Beverage > Beverages > Non Alcoholic Beverages - Ready to Drink > Packaged Water - Unflavoured"
     },
     "environmentalImpact": {
       "co2e": "0.15 kg CO₂e / unità",
@@ -3882,7 +3894,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000355",
+      "gs1:gpcCategoryCode": "10000177",
       "gs1:energyPerNutrientBasis": {
         "@type": "gs1:NutritionMeasurementType",
         "value": {
@@ -3972,7 +3984,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000147"
+      "@id": "https://id.gs1.org/01/08032089000147",
+      "category": "Food/Beverage > Prepared/Preserved Foods > Snacks > Chips/Crisps/Snack Mixes - Natural/Extruded (Shelf Stable)"
     }
   },
   {
@@ -4092,7 +4105,9 @@
         "gs1:globalLocationNumber": "8032089000154",
         "@id": "https://id.gs1.org/417/8032089000154"
       },
-      "@id": "https://id.gs1.org/01/08032089000154"
+      "@id": "https://id.gs1.org/01/08032089000154",
+      "gs1:gpcCategoryCode": "10000118",
+      "category": "Food/Beverage > Beverages > Tea and Infusions/Tisanes > Tea - Liquid/Ready to Drink"
     }
   },
   {
@@ -4298,7 +4313,7 @@
         "ratingValue": 4.5,
         "reviewCount": 203
       },
-      "gs1:gpcCategoryCode": "47130000",
+      "gs1:gpcCategoryCode": "10000424",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -4325,7 +4340,8 @@
           "@language": "en"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000161"
+      "@id": "https://id.gs1.org/01/08032089000161",
+      "category": "Cleaning/Hygiene Products > Cleaning Products > Laundry > Laundry Detergents"
     }
   },
   {
@@ -4431,7 +4447,9 @@
         "gs1:globalLocationNumber": "8032089000178",
         "@id": "https://id.gs1.org/417/8032089000178"
       },
-      "@id": "https://id.gs1.org/01/08032089000178"
+      "@id": "https://id.gs1.org/01/08032089000178",
+      "gs1:gpcCategoryCode": "10000368",
+      "category": "Beauty/Personal Care/Hygiene > Hair Products > Hair Care Products > Hair - Shampoo"
     }
   },
   {
@@ -4973,7 +4991,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000163",
+      "gs1:gpcCategoryCode": "10000159",
       "gs1:energyPerNutrientBasis": {
         "@type": "gs1:NutritionMeasurementType",
         "value": {
@@ -5055,7 +5073,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000192"
+      "@id": "https://id.gs1.org/01/08032089000192",
+      "category": "Food/Beverage > Beverages > Alcoholic Beverages (Includes De-Alcoholised Variants) > Beer"
     }
   },
   {
@@ -5176,7 +5195,9 @@
         "gs1:globalLocationNumber": "8032089000208",
         "@id": "https://id.gs1.org/417/8032089000208"
       },
-      "@id": "https://id.gs1.org/01/08032089000208"
+      "@id": "https://id.gs1.org/01/08032089000208",
+      "gs1:gpcCategoryCode": "10000522",
+      "category": "Pet Care/Food > Pet Food/Drinks > Pet Food > Pet Food (Shelf Stable)"
     }
   },
   {
@@ -5355,7 +5376,9 @@
         "gs1:globalLocationNumber": "8032089000222",
         "@id": "https://id.gs1.org/417/8032089000222"
       },
-      "@id": "https://id.gs1.org/01/08032089000222"
+      "@id": "https://id.gs1.org/01/08032089000222",
+      "gs1:gpcCategoryCode": "10000115",
+      "category": "Food/Beverage > Beverages > Coffee/Coffee Substitutes > Coffee - Soluble Instant"
     }
   },
   {
@@ -5642,7 +5665,7 @@
           ]
         }
       ],
-      "gs1:gpcCategoryCode": "10000185",
+      "gs1:gpcCategoryCode": "10000040",
       "gs1:regulatedProductName": [
         {
           "@value": "Olio extravergine di oliva",
@@ -5890,7 +5913,8 @@
           }
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000239"
+      "@id": "https://id.gs1.org/01/08032089000239",
+      "category": "Food/Beverage > Oils/Fats Edible > Oils Edible > Oils Edible - Vegetable or Plant (Shelf Stable)"
     }
   },
   {
@@ -6176,7 +6200,7 @@
           ]
         }
       ],
-      "gs1:gpcCategoryCode": "10000209",
+      "gs1:gpcCategoryCode": "10000057",
       "gs1:energyPerNutrientBasis": {
         "@type": "gs1:NutritionMeasurementType",
         "value": {
@@ -6422,7 +6446,8 @@
           }
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000246"
+      "@id": "https://id.gs1.org/01/08032089000246",
+      "category": "Food/Beverage > Seasonings/Preservatives/Extracts > Sauces/Spreads/Dips/Condiments > Sauces - Cooking (Shelf Stable)"
     }
   },
   {
@@ -6543,7 +6568,9 @@
         "gs1:globalLocationNumber": "8032089000253",
         "@id": "https://id.gs1.org/417/8032089000253"
       },
-      "@id": "https://id.gs1.org/01/08032089000253"
+      "@id": "https://id.gs1.org/01/08032089000253",
+      "gs1:gpcCategoryCode": "10008180",
+      "category": "Food/Beverage > Beverages > Coffee/Coffee Substitutes > Coffee - Capsules/Pods"
     }
   },
   {
@@ -6664,7 +6691,9 @@
         "gs1:globalLocationNumber": "8032089000260",
         "@id": "https://id.gs1.org/417/8032089000260"
       },
-      "@id": "https://id.gs1.org/01/08032089000260"
+      "@id": "https://id.gs1.org/01/08032089000260",
+      "gs1:gpcCategoryCode": "10000291",
+      "category": "Food/Beverage > Prepared/Preserved Foods > Vegetable Based Products / Meals > Vegetable Based Products / Meals - Not Ready to Eat (Frozen)"
     }
   },
   {
@@ -7215,7 +7244,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000278",
+      "gs1:gpcCategoryCode": "10000051",
       "gs1:regulatedProductName": [
         {
           "@value": "Aceto Balsamico di Modena IGP",
@@ -7274,7 +7303,8 @@
         },
         "unitCode": "GRM"
       },
-      "@id": "https://id.gs1.org/01/08032089000291"
+      "@id": "https://id.gs1.org/01/08032089000291",
+      "category": "Food/Beverage > Seasonings/Preservatives/Extracts > Vinegars/Cooking Wines > Vinegars"
     }
   },
   {
@@ -7395,7 +7425,9 @@
         "gs1:globalLocationNumber": "8032089000307",
         "@id": "https://id.gs1.org/417/8032089000307"
       },
-      "@id": "https://id.gs1.org/01/08032089000307"
+      "@id": "https://id.gs1.org/01/08032089000307",
+      "gs1:gpcCategoryCode": "10000203",
+      "category": "Food/Beverage > Cereal/Grain/Pulse Products > Grains/Flour > Flour - Cereal/Pulse (Shelf Stable)"
     }
   },
   {
@@ -7665,7 +7697,7 @@
           "value": "GS1"
         }
       ],
-      "gs1:gpcCategoryCode": "53150500",
+      "gs1:gpcCategoryCode": "10000448",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -7723,7 +7755,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000314"
+      "@id": "https://id.gs1.org/01/08032089000314",
+      "category": "Healthcare > Health Treatments/Aids > First Aid > First Aid - Dressings/Bandages/Plaster"
     }
   },
   {
@@ -7843,7 +7876,9 @@
           "value": "GS1"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000321"
+      "@id": "https://id.gs1.org/01/08032089000321",
+      "gs1:gpcCategoryCode": "10000885",
+      "category": "Healthcare > Health Treatments/Aids > Skin/Scalp Aid Products > Hand Sanitizers / Antiseptics"
     }
   },
   {
@@ -8113,7 +8148,7 @@
           "value": "GS1"
         }
       ],
-      "gs1:gpcCategoryCode": "47121700",
+      "gs1:gpcCategoryCode": "10000455",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -8179,7 +8214,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000338"
+      "@id": "https://id.gs1.org/01/08032089000338",
+      "category": "Healthcare > Home Diagnostics > Diagnostic Monitors > Home Diagnostic Monitors"
     }
   },
   {
@@ -8379,7 +8415,7 @@
           "value": "GS1"
         }
       ],
-      "gs1:gpcCategoryCode": "53131600",
+      "gs1:gpcCategoryCode": "10005894",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -8422,7 +8458,8 @@
           "gs1:textileMaterialPercentage": 100
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000345"
+      "@id": "https://id.gs1.org/01/08032089000345",
+      "category": "Clothing > Protective Wear > Protective Wear > Gloves"
     }
   },
   {
@@ -8542,7 +8579,9 @@
           "value": "GS1"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000352"
+      "@id": "https://id.gs1.org/01/08032089000352",
+      "gs1:gpcCategoryCode": "10000843",
+      "category": "Healthcare > Home Diagnostics > Diagnostic Monitors > Diagnostic Monitors Other"
     }
   },
   {
@@ -8780,7 +8819,9 @@
           "value": "GS1"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000383"
+      "@id": "https://id.gs1.org/01/08032089000383",
+      "gs1:gpcCategoryCode": "10000452",
+      "category": "Healthcare > Home Diagnostics > Diagnostic Tests > Thermometers"
     }
   },
   {
@@ -8915,7 +8956,9 @@
           "value": "GS1"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000390"
+      "@id": "https://id.gs1.org/01/08032089000390",
+      "gs1:gpcCategoryCode": "10008512",
+      "category": "Home Appliances > Small Domestic Appliances > Personal Appliances > Personal Body Scales (Powered)"
     }
   },
   {
@@ -9168,7 +9211,7 @@
         "ratingValue": 4.6,
         "reviewCount": 121
       },
-      "gs1:gpcCategoryCode": "53100000",
+      "gs1:gpcCategoryCode": "10001351",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -9224,7 +9267,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000406"
+      "@id": "https://id.gs1.org/01/08032089000406",
+      "category": "Clothing > Clothing > Upper Body Wear/Tops > Sweaters/Pullovers"
     }
   },
   {
@@ -9422,14 +9466,15 @@
         "ratingValue": 4.5,
         "reviewCount": 203
       },
-      "gs1:gpcCategoryCode": "53101500",
+      "gs1:gpcCategoryCode": "10001335",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
           "gs1:countryCode": "IT"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000413"
+      "@id": "https://id.gs1.org/01/08032089000413",
+      "category": "Clothing > Clothing > Lower Body Wear/Bottoms > Trousers/Shorts"
     }
   },
   {
@@ -9537,7 +9582,9 @@
         "gs1:globalLocationNumber": "8032089000420",
         "@id": "https://id.gs1.org/417/8032089000420"
       },
-      "@id": "https://id.gs1.org/01/08032089000420"
+      "@id": "https://id.gs1.org/01/08032089000420",
+      "gs1:gpcCategoryCode": "10001348",
+      "category": "Clothing > Underwear > Underwear > Socks"
     }
   },
   {
@@ -9645,7 +9692,9 @@
         "gs1:globalLocationNumber": "8032089000437",
         "@id": "https://id.gs1.org/417/8032089000437"
       },
-      "@id": "https://id.gs1.org/01/08032089000437"
+      "@id": "https://id.gs1.org/01/08032089000437",
+      "gs1:gpcCategoryCode": "10001350",
+      "category": "Clothing > Clothing > Upper Body Wear/Tops > Jackets/Blazers/Cardigans/Waistcoats"
     }
   },
   {
@@ -9959,7 +10008,7 @@
         "ratingValue": 4.7,
         "reviewCount": 289
       },
-      "gs1:gpcCategoryCode": "53131900",
+      "gs1:gpcCategoryCode": "10001070",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -10015,7 +10064,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000451"
+      "@id": "https://id.gs1.org/01/08032089000451",
+      "category": "Footwear > Footwear > Athletic Footwear > Athletic Footwear - General Purpose"
     }
   },
   {
@@ -10123,7 +10173,9 @@
         "gs1:globalLocationNumber": "8032089000468",
         "@id": "https://id.gs1.org/417/8032089000468"
       },
-      "@id": "https://id.gs1.org/01/08032089000468"
+      "@id": "https://id.gs1.org/01/08032089000468",
+      "gs1:gpcCategoryCode": "10001326",
+      "category": "Clothing > Clothing > Clothing Accessories > Belts/Braces/Cummerbunds"
     }
   },
   {
@@ -10456,7 +10508,7 @@
           ]
         }
       ],
-      "gs1:gpcCategoryCode": "10000410",
+      "gs1:gpcCategoryCode": "10005788",
       "gs1:regulatedProductName": [
         {
           "@value": "Petto di pollo fresco",
@@ -10712,7 +10764,8 @@
           }
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000482"
+      "@id": "https://id.gs1.org/01/08032089000482",
+      "category": "Food/Beverage > Meat/Poultry/Other Animals > Meat/Poultry/Other Animals - Unprepared/Unprocessed > Chicken - Unprepared/Unprocessed"
     }
   },
   {
@@ -11098,7 +11151,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000452",
+      "gs1:gpcCategoryCode": "10000278",
       "gs1:energyPerNutrientBasis": {
         "@type": "gs1:NutritionMeasurementType",
         "value": {
@@ -11147,7 +11200,8 @@
         },
         "unitCode": "GRM"
       },
-      "@id": "https://id.gs1.org/01/08032089000499"
+      "@id": "https://id.gs1.org/01/08032089000499",
+      "category": "Food/Beverage > Milk/Butter/Cream/Yogurts/Cheese/Eggs/Substitutes > Yogurt/Yogurt Substitutes > Yogurt (Perishable)"
     }
   },
   {
@@ -11675,7 +11729,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000476",
+      "gs1:gpcCategoryCode": "10000028",
       "gs1:regulatedProductName": [
         {
           "@value": "Mozzarella di Bufala Campana DOP",
@@ -11775,7 +11829,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000505"
+      "@id": "https://id.gs1.org/01/08032089000505",
+      "category": "Food/Beverage > Milk/Butter/Cream/Yogurts/Cheese/Eggs/Substitutes > Cheese/Cheese Substitutes > Cheese (Perishable)"
     }
   },
   {
@@ -11895,7 +11950,9 @@
         "gs1:globalLocationNumber": "8032089000512",
         "@id": "https://id.gs1.org/417/8032089000512"
       },
-      "@id": "https://id.gs1.org/01/08032089000512"
+      "@id": "https://id.gs1.org/01/08032089000512",
+      "gs1:gpcCategoryCode": "10006210",
+      "category": "Food/Beverage > Milk/Butter/Cream/Yogurts/Cheese/Eggs/Substitutes > Eggs/Eggs Substitutes > In Shell Table Eggs"
     }
   },
   {
@@ -12015,7 +12072,9 @@
         "gs1:globalLocationNumber": "8032089000529",
         "@id": "https://id.gs1.org/417/8032089000529"
       },
-      "@id": "https://id.gs1.org/01/08032089000529"
+      "@id": "https://id.gs1.org/01/08032089000529",
+      "gs1:gpcCategoryCode": "10005781",
+      "category": "Food/Beverage > Meat/Poultry/Other Animals > Meat/Poultry/Other Animals - Prepared/Processed > Pork - Prepared/Processed"
     }
   },
   {
@@ -12577,7 +12636,7 @@
           }
         }
       ],
-      "gs1:gpcCategoryCode": "10000493",
+      "gs1:gpcCategoryCode": "10000016",
       "gs1:energyPerNutrientBasis": {
         "@type": "gs1:NutritionMeasurementType",
         "value": {
@@ -12626,7 +12685,8 @@
         },
         "unitCode": "GRM"
       },
-      "@id": "https://id.gs1.org/01/08032089000550"
+      "@id": "https://id.gs1.org/01/08032089000550",
+      "category": "Food/Beverage > Fish and Seafood > Fish - Prepared/Processed > Fish - Prepared/Processed (Perishable)"
     }
   },
   {
@@ -12899,7 +12959,7 @@
         "ratingValue": 4.5,
         "reviewCount": 88
       },
-      "gs1:gpcCategoryCode": "48000000",
+      "gs1:gpcCategoryCode": "10003874",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -12967,7 +13027,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000567"
+      "@id": "https://id.gs1.org/01/08032089000567",
+      "category": "Building Products > Building Products > Painting > Household Paints"
     }
   },
   {
@@ -13074,7 +13135,9 @@
         "gs1:globalLocationNumber": "8032089000574",
         "@id": "https://id.gs1.org/417/8032089000574"
       },
-      "@id": "https://id.gs1.org/01/08032089000574"
+      "@id": "https://id.gs1.org/01/08032089000574",
+      "gs1:gpcCategoryCode": "10002454",
+      "category": "Building Products > Building Products > Insulation > Insulation - Boards/Rolls/Blankets"
     }
   },
   {
@@ -13291,7 +13354,7 @@
         "ratingValue": 4.7,
         "reviewCount": 214
       },
-      "gs1:gpcCategoryCode": "27110000",
+      "gs1:gpcCategoryCode": "10003653",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -13308,7 +13371,8 @@
           "@language": "en"
         }
       ],
-      "@id": "https://id.gs1.org/01/08032089000581"
+      "@id": "https://id.gs1.org/01/08032089000581",
+      "category": "Tools/Equipment > Tools/Equipment > Drills > Drill/Drivers (Powered)"
     }
   },
   {
@@ -13415,7 +13479,9 @@
         "gs1:globalLocationNumber": "8032089000598",
         "@id": "https://id.gs1.org/417/8032089000598"
       },
-      "@id": "https://id.gs1.org/01/08032089000598"
+      "@id": "https://id.gs1.org/01/08032089000598",
+      "gs1:gpcCategoryCode": "10003902",
+      "category": "Building Products > Building Products > Asphalt/Concrete/Masonry > Mortar Mixes"
     }
   },
   {
@@ -13640,7 +13706,9 @@
         "gs1:globalLocationNumber": "8032089000628",
         "@id": "https://id.gs1.org/417/8032089000628"
       },
-      "@id": "https://id.gs1.org/01/08032089000628"
+      "@id": "https://id.gs1.org/01/08032089000628",
+      "gs1:gpcCategoryCode": "10008281",
+      "category": "Building Products > Building Products > Structural Components/Assemblies > Metal Components (Dimension/Structural)"
     }
   },
   {
@@ -13897,7 +13965,7 @@
         "ratingValue": 4.6,
         "reviewCount": 102
       },
-      "gs1:gpcCategoryCode": "53040000",
+      "gs1:gpcCategoryCode": "10005111",
       "gs1:countryOfOrigin": [
         {
           "@type": "gs1:Country",
@@ -13965,7 +14033,8 @@
           }
         ]
       },
-      "@id": "https://id.gs1.org/01/08032089000635"
+      "@id": "https://id.gs1.org/01/08032089000635",
+      "category": "Clothing > Protective Wear > Protective Wear > Hard Hats/Caps"
     }
   }
 ]

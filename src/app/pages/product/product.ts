@@ -322,6 +322,12 @@ export class ProductComponent implements OnInit, OnDestroy {
     // Clonato per non mutare l'originale condiviso da tutte le istanze del componente.
     let jsonLdData: any = JSON.parse(JSON.stringify(prod.rawGs1Data));
 
+    // schema:hasGS1DigitalLink (proprietà schema.org reale, dominio Product/Organization/
+    // Offer/Place — verificata su schema.org) autodichiara l'URI Digital Link della pagina
+    // stessa: qui coincide con currentDigitalLink perché questo sito è il resolver, non un
+    // sistema separato dalla pagina umana.
+    jsonLdData['hasGS1DigitalLink'] = this.currentDigitalLink();
+
     // I campi schema.org semplici (non language-tagged array come le proprietà gs1:) seguono
     // la lingua attiva della UI — a differenza degli array `{ "@value", "@language" }` di
     // gs1:productName/ingredientStatement/ecc., già strutturati in origine con entrambe le

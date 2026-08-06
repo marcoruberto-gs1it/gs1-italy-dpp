@@ -78,6 +78,9 @@ for (const p of products) {
   const doc = JSON.parse(JSON.stringify(p.rawGs1Data));
   if (doc.name) doc.name = p.name;
   if (doc.description) doc.description = p.description;
+  // schema:hasGS1DigitalLink — stessa proprietà iniettata da product.ts::jsonLdJson, qui con
+  // SITE_URL invece di SiteOriginService perché questo script gira a build time, non a runtime.
+  doc['hasGS1DigitalLink'] = `${SITE_URL}/01/${p.gtin}`;
 
   const dir = path.join(BROWSER_DIR, '01', p.gtin);
   fs.mkdirSync(dir, { recursive: true });
