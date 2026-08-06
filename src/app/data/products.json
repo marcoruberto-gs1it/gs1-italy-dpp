@@ -182,7 +182,8 @@
             "@value": "GS1 Italy Sapori",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -194,7 +195,8 @@
           "postalCode": "43126",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000017"
+        "gs1:globalLocationNumber": "8032089000017",
+        "@id": "https://id.gs1.org/417/8032089000017"
       },
       "image": "images/08032089000017.jpg",
       "offers": {
@@ -509,7 +511,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000017"
     },
     "environmentalImpact": {
       "co2e": "0.8 kg CO₂e / kg prodotto",
@@ -793,7 +796,8 @@
             "@value": "GS1 Italy Sapori",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -805,7 +809,8 @@
           "postalCode": "43122",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000024"
+        "gs1:globalLocationNumber": "8032089000024",
+        "@id": "https://id.gs1.org/417/8032089000024"
       },
       "image": "images/08032089000024.jpg",
       "offers": {
@@ -1120,7 +1125,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000024"
     },
     "environmentalImpact": {
       "co2e": "1.1 kg CO₂e / kg prodotto",
@@ -1343,7 +1349,8 @@
             "@value": "GS1 Italy Wear",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -1355,7 +1362,8 @@
           "postalCode": "00200",
           "addressCountry": "LK"
         },
-        "gs1:globalLocationNumber": "8032089000031"
+        "gs1:globalLocationNumber": "8032089000031",
+        "@id": "https://id.gs1.org/417/8032089000031"
       },
       "image": "images/08032089000031.jpg",
       "color": "Bianco (White)",
@@ -1440,7 +1448,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000031"
     },
     "environmentalImpact": {
       "co2e": "4.2 kg CO₂e / unità",
@@ -1736,7 +1745,8 @@
             "@language": "it"
           }
         ],
-        "gs1:globalLocationNumber": "8032089000055"
+        "gs1:globalLocationNumber": "8032089000055",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000055.jpg",
       "offers": {
@@ -1996,7 +2006,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000055"
     },
     "environmentalImpact": {
       "co2e": "0.6 kg CO₂e / kg prodotto",
@@ -2111,7 +2122,8 @@
       "gtin13": "8032089000062",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy MedCare"
+        "name": "GS1 Italy MedCare",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000062.jpg",
       "offers": {
@@ -2151,7 +2163,8 @@
           "postalCode": "20125",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000062"
+        "gs1:globalLocationNumber": "8032089000062",
+        "@id": "https://id.gs1.org/417/8032089000062"
       },
       "additionalProperty": [
         {
@@ -2166,7 +2179,8 @@
           "name": "UDI Issuing Agency",
           "value": "GS1"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000062"
     },
     "environmentalImpact": {
       "co2e": "2.8 kg CO₂e / unità",
@@ -2310,14 +2324,16 @@
             "@value": "GS1 Italy MedCare",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000079.jpg",
       "manufacturer": {
         "@type": "Organization",
         "name": "GS1 Italy MedCare S.r.l.",
         "address": "Via Igiene 3, 40100 Bologna (BO), Italia",
-        "gs1:globalLocationNumber": "8032089000079"
+        "gs1:globalLocationNumber": "8032089000079",
+        "@id": "https://id.gs1.org/417/8032089000079"
       },
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -2480,7 +2496,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000079"
     },
     "environmentalImpact": {
       "co2e": "0.9 kg CO₂e / confezione",
@@ -2695,7 +2712,8 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Fresh",
-        "gs1:globalLocationNumber": "8032089000093"
+        "gs1:globalLocationNumber": "8032089000093",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "image": "images/08032089000093.jpg",
       "offers": {
@@ -2757,7 +2775,8 @@
           "@type": "xsd:float"
         },
         "unitCode": "GRM"
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000093"
     },
     "environmentalImpact": {
       "co2e": "0.4 kg CO₂e / kg prodotto",
@@ -2987,7 +3006,8 @@
             "@language": "it"
           }
         ],
-        "gs1:globalLocationNumber": "8032089000116"
+        "gs1:globalLocationNumber": "8032089000116",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000116.jpg",
       "aggregateRating": {
@@ -3099,7 +3119,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000116"
     },
     "environmentalImpact": {
       "co2e": "9.5 kg CO₂e / m²",
@@ -3237,7 +3258,8 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Sapori",
-        "gs1:globalLocationNumber": "8032089000123"
+        "gs1:globalLocationNumber": "8032089000123",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000123.jpg",
       "offers": {
@@ -3256,7 +3278,8 @@
         "@type": "AggregateRating",
         "ratingValue": 4,
         "reviewCount": 212
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000123"
     },
     "environmentalImpact": {
       "co2e": "0.15 kg CO₂e / unità",
@@ -3595,7 +3618,8 @@
             "@value": "GS1 Italy Sapori",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -3607,7 +3631,8 @@
           "postalCode": "43100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000147"
+        "gs1:globalLocationNumber": "8032089000147",
+        "@id": "https://id.gs1.org/417/8032089000147"
       },
       "image": "images/08032089000147.jpg",
       "offers": {
@@ -3946,7 +3971,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000147"
     }
   },
   {
@@ -4029,7 +4055,8 @@
       "gtin13": "8032089000154",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Sapori"
+        "name": "GS1 Italy Sapori",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000154.jpg",
       "offers": {
@@ -4062,8 +4089,10 @@
           "postalCode": "37100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000154"
-      }
+        "gs1:globalLocationNumber": "8032089000154",
+        "@id": "https://id.gs1.org/417/8032089000154"
+      },
+      "@id": "https://id.gs1.org/01/08032089000154"
     }
   },
   {
@@ -4219,7 +4248,8 @@
             "@value": "GS1 Italy Sapori",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -4231,7 +4261,8 @@
           "postalCode": "28100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000161"
+        "gs1:globalLocationNumber": "8032089000161",
+        "@id": "https://id.gs1.org/417/8032089000161"
       },
       "image": "images/08032089000161.jpg",
       "offers": {
@@ -4293,7 +4324,8 @@
           "@value": "Dose 25 ml for normal loads, 40 ml for heavily soiled loads; pour directly into the drum or the detergent drawer.",
           "@language": "en"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000161"
     }
   },
   {
@@ -4362,7 +4394,8 @@
       "gtin13": "8032089000178",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Sapori"
+        "name": "GS1 Italy Sapori",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000178.jpg",
       "offers": {
@@ -4395,8 +4428,10 @@
           "postalCode": "50100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000178"
-      }
+        "gs1:globalLocationNumber": "8032089000178",
+        "@id": "https://id.gs1.org/417/8032089000178"
+      },
+      "@id": "https://id.gs1.org/01/08032089000178"
     }
   },
   {
@@ -4687,7 +4722,8 @@
             "@value": "GS1 Italy Sapori",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -4699,7 +4735,8 @@
           "postalCode": "38100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000192"
+        "gs1:globalLocationNumber": "8032089000192",
+        "@id": "https://id.gs1.org/417/8032089000192"
       },
       "image": "images/08032089000192.jpg",
       "offers": {
@@ -5017,7 +5054,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000192"
     }
   },
   {
@@ -5088,7 +5126,8 @@
       "gtin13": "8032089000208",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Sapori"
+        "name": "GS1 Italy Sapori",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000208.jpg",
       "offers": {
@@ -5134,8 +5173,10 @@
           "postalCode": "26100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000208"
-      }
+        "gs1:globalLocationNumber": "8032089000208",
+        "@id": "https://id.gs1.org/417/8032089000208"
+      },
+      "@id": "https://id.gs1.org/01/08032089000208"
     }
   },
   {
@@ -5277,7 +5318,8 @@
       "gtin13": "8032089000222",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Sapori"
+        "name": "GS1 Italy Sapori",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000222.jpg",
       "offers": {
@@ -5310,8 +5352,10 @@
           "postalCode": "34100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000222"
-      }
+        "gs1:globalLocationNumber": "8032089000222",
+        "@id": "https://id.gs1.org/417/8032089000222"
+      },
+      "@id": "https://id.gs1.org/01/08032089000222"
     }
   },
   {
@@ -5532,7 +5576,8 @@
             "@value": "GS1 Italy Professional",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -5544,7 +5589,8 @@
           "postalCode": "53100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000239"
+        "gs1:globalLocationNumber": "8032089000239",
+        "@id": "https://id.gs1.org/417/8032089000239"
       },
       "image": "images/08032089000239.jpg",
       "offers": {
@@ -5843,7 +5889,8 @@
             "rdfs:label": "Non contiene"
           }
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000239"
     }
   },
   {
@@ -6062,7 +6109,8 @@
             "@value": "GS1 Italy Professional",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -6074,7 +6122,8 @@
           "postalCode": "84100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000246"
+        "gs1:globalLocationNumber": "8032089000246",
+        "@id": "https://id.gs1.org/417/8032089000246"
       },
       "image": "images/08032089000246.jpg",
       "offers": {
@@ -6372,7 +6421,8 @@
             "rdfs:label": "Non contiene"
           }
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000246"
     }
   },
   {
@@ -6456,7 +6506,8 @@
       "gtin13": "8032089000253",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Professional"
+        "name": "GS1 Italy Professional",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000253.jpg",
       "offers": {
@@ -6489,8 +6540,10 @@
           "postalCode": "34100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000253"
-      }
+        "gs1:globalLocationNumber": "8032089000253",
+        "@id": "https://id.gs1.org/417/8032089000253"
+      },
+      "@id": "https://id.gs1.org/01/08032089000253"
     }
   },
   {
@@ -6574,7 +6627,8 @@
       "gtin13": "8032089000260",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Professional"
+        "name": "GS1 Italy Professional",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000260.jpg",
       "offers": {
@@ -6607,8 +6661,10 @@
           "postalCode": "39100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000260"
-      }
+        "gs1:globalLocationNumber": "8032089000260",
+        "@id": "https://id.gs1.org/417/8032089000260"
+      },
+      "@id": "https://id.gs1.org/01/08032089000260"
     }
   },
   {
@@ -6936,7 +6992,8 @@
             "@value": "GS1 Italy Professional",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -6948,7 +7005,8 @@
           "postalCode": "41100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000291"
+        "gs1:globalLocationNumber": "8032089000291",
+        "@id": "https://id.gs1.org/417/8032089000291"
       },
       "image": "images/08032089000291.jpg",
       "offers": {
@@ -7215,7 +7273,8 @@
           "@type": "xsd:float"
         },
         "unitCode": "GRM"
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000291"
     }
   },
   {
@@ -7299,7 +7358,8 @@
       "gtin13": "8032089000307",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Professional"
+        "name": "GS1 Italy Professional",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000307.jpg",
       "offers": {
@@ -7332,8 +7392,10 @@
           "postalCode": "37100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000307"
-      }
+        "gs1:globalLocationNumber": "8032089000307",
+        "@id": "https://id.gs1.org/417/8032089000307"
+      },
+      "@id": "https://id.gs1.org/01/08032089000307"
     }
   },
   {
@@ -7539,7 +7601,8 @@
             "@value": "GS1 Italy MedCare",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -7551,7 +7614,8 @@
           "postalCode": "40100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000314"
+        "gs1:globalLocationNumber": "8032089000314",
+        "@id": "https://id.gs1.org/417/8032089000314"
       },
       "image": "images/08032089000314.jpg",
       "offers": {
@@ -7658,7 +7722,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000314"
     }
   },
   {
@@ -7727,7 +7792,8 @@
       "gtin13": "8032089000321",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy MedCare"
+        "name": "GS1 Italy MedCare",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000321.jpg",
       "offers": {
@@ -7760,7 +7826,8 @@
           "postalCode": "20125",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000321"
+        "gs1:globalLocationNumber": "8032089000321",
+        "@id": "https://id.gs1.org/417/8032089000321"
       },
       "additionalProperty": [
         {
@@ -7775,7 +7842,8 @@
           "name": "UDI Issuing Agency",
           "value": "GS1"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000321"
     }
   },
   {
@@ -7981,7 +8049,8 @@
             "@value": "GS1 Italy MedCare",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -7993,7 +8062,8 @@
           "postalCode": "20125",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000338"
+        "gs1:globalLocationNumber": "8032089000338",
+        "@id": "https://id.gs1.org/417/8032089000338"
       },
       "image": "images/08032089000338.jpg",
       "offers": {
@@ -8108,7 +8178,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000338"
     }
   },
   {
@@ -8257,7 +8328,8 @@
             "@value": "GS1 Italy MedCare",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -8269,7 +8341,8 @@
           "postalCode": "40100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000345"
+        "gs1:globalLocationNumber": "8032089000345",
+        "@id": "https://id.gs1.org/417/8032089000345"
       },
       "image": "images/08032089000345.jpg",
       "offers": {
@@ -8348,7 +8421,8 @@
           ],
           "gs1:textileMaterialPercentage": 100
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000345"
     }
   },
   {
@@ -8417,7 +8491,8 @@
       "gtin13": "8032089000352",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy MedCare"
+        "name": "GS1 Italy MedCare",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000352.jpg",
       "offers": {
@@ -8450,7 +8525,8 @@
           "postalCode": "20125",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000352"
+        "gs1:globalLocationNumber": "8032089000352",
+        "@id": "https://id.gs1.org/417/8032089000352"
       },
       "additionalProperty": [
         {
@@ -8465,7 +8541,8 @@
           "name": "UDI Issuing Agency",
           "value": "GS1"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000352"
     }
   },
   {
@@ -8652,7 +8729,8 @@
       "gtin13": "8032089000383",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy MedCare"
+        "name": "GS1 Italy MedCare",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000383.jpg",
       "offers": {
@@ -8685,7 +8763,8 @@
           "postalCode": "20125",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000383"
+        "gs1:globalLocationNumber": "8032089000383",
+        "@id": "https://id.gs1.org/417/8032089000383"
       },
       "additionalProperty": [
         {
@@ -8700,7 +8779,8 @@
           "name": "UDI Issuing Agency",
           "value": "GS1"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000383"
     }
   },
   {
@@ -8771,7 +8851,8 @@
       "gtin13": "8032089000390",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy MedCare"
+        "name": "GS1 Italy MedCare",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000390.jpg",
       "offers": {
@@ -8817,7 +8898,8 @@
           "postalCode": "20125",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000390"
+        "gs1:globalLocationNumber": "8032089000390",
+        "@id": "https://id.gs1.org/417/8032089000390"
       },
       "additionalProperty": [
         {
@@ -8832,7 +8914,8 @@
           "name": "UDI Issuing Agency",
           "value": "GS1"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000390"
     }
   },
   {
@@ -9035,7 +9118,8 @@
             "@value": "GS1 Italy Wear",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -9047,7 +9131,8 @@
           "postalCode": "39100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000406"
+        "gs1:globalLocationNumber": "8032089000406",
+        "@id": "https://id.gs1.org/417/8032089000406"
       },
       "image": "images/08032089000406.jpg",
       "offers": {
@@ -9138,7 +9223,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000406"
     }
   },
   {
@@ -9286,7 +9372,8 @@
             "@value": "GS1 Italy Wear",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -9298,7 +9385,8 @@
           "postalCode": "20121",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000413"
+        "gs1:globalLocationNumber": "8032089000413",
+        "@id": "https://id.gs1.org/417/8032089000413"
       },
       "image": "images/08032089000413.jpg",
       "offers": {
@@ -9340,7 +9428,8 @@
           "@type": "gs1:Country",
           "gs1:countryCode": "IT"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000413"
     }
   },
   {
@@ -9411,7 +9500,8 @@
       "gtin13": "8032089000420",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Wear"
+        "name": "GS1 Italy Wear",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "image": "images/08032089000420.jpg",
       "offers": {
@@ -9444,8 +9534,10 @@
           "postalCode": "36100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000420"
-      }
+        "gs1:globalLocationNumber": "8032089000420",
+        "@id": "https://id.gs1.org/417/8032089000420"
+      },
+      "@id": "https://id.gs1.org/01/08032089000420"
     }
   },
   {
@@ -9516,7 +9608,8 @@
       "gtin13": "8032089000437",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Wear"
+        "name": "GS1 Italy Wear",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "image": "images/08032089000437.jpg",
       "offers": {
@@ -9549,8 +9642,10 @@
           "postalCode": "39100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000437"
-      }
+        "gs1:globalLocationNumber": "8032089000437",
+        "@id": "https://id.gs1.org/417/8032089000437"
+      },
+      "@id": "https://id.gs1.org/01/08032089000437"
     }
   },
   {
@@ -9814,7 +9909,8 @@
             "@value": "GS1 Italy Wear",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -9826,7 +9922,8 @@
           "postalCode": "60100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000451"
+        "gs1:globalLocationNumber": "8032089000451",
+        "@id": "https://id.gs1.org/417/8032089000451"
       },
       "image": "images/08032089000451.jpg",
       "offers": {
@@ -9917,7 +10014,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000451"
     }
   },
   {
@@ -9988,7 +10086,8 @@
       "gtin13": "8032089000468",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Wear"
+        "name": "GS1 Italy Wear",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
       },
       "image": "images/08032089000468.jpg",
       "offers": {
@@ -10021,8 +10120,10 @@
           "postalCode": "56100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000468"
-      }
+        "gs1:globalLocationNumber": "8032089000468",
+        "@id": "https://id.gs1.org/417/8032089000468"
+      },
+      "@id": "https://id.gs1.org/01/08032089000468"
     }
   },
   {
@@ -10302,7 +10403,8 @@
             "@value": "GS1 Italy Fresh",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -10314,7 +10416,8 @@
           "postalCode": "47100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000482"
+        "gs1:globalLocationNumber": "8032089000482",
+        "@id": "https://id.gs1.org/417/8032089000482"
       },
       "image": "images/08032089000482.jpg",
       "offers": {
@@ -10608,7 +10711,8 @@
             "rdfs:label": "Non contiene"
           }
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000482"
     }
   },
   {
@@ -10771,7 +10875,8 @@
             "@value": "GS1 Italy Fresh",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -10783,7 +10888,8 @@
           "postalCode": "24100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000499"
+        "gs1:globalLocationNumber": "8032089000499",
+        "@id": "https://id.gs1.org/417/8032089000499"
       },
       "image": "images/08032089000499.jpg",
       "offers": {
@@ -11040,7 +11146,8 @@
           "@type": "xsd:float"
         },
         "unitCode": "GRM"
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000499"
     }
   },
   {
@@ -11304,7 +11411,8 @@
             "@value": "GS1 Italy Fresh",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -11316,7 +11424,8 @@
           "postalCode": "81100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000505"
+        "gs1:globalLocationNumber": "8032089000505",
+        "@id": "https://id.gs1.org/417/8032089000505"
       },
       "image": "images/08032089000505.jpg",
       "offers": {
@@ -11665,7 +11774,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000505"
     }
   },
   {
@@ -11748,7 +11858,8 @@
       "gtin13": "8032089000512",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Fresh"
+        "name": "GS1 Italy Fresh",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "image": "images/08032089000512.jpg",
       "offers": {
@@ -11781,8 +11892,10 @@
           "postalCode": "46100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000512"
-      }
+        "gs1:globalLocationNumber": "8032089000512",
+        "@id": "https://id.gs1.org/417/8032089000512"
+      },
+      "@id": "https://id.gs1.org/01/08032089000512"
     }
   },
   {
@@ -11865,7 +11978,8 @@
       "gtin13": "8032089000529",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Fresh"
+        "name": "GS1 Italy Fresh",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "image": "images/08032089000529.jpg",
       "offers": {
@@ -11898,8 +12012,10 @@
           "postalCode": "43100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000529"
-      }
+        "gs1:globalLocationNumber": "8032089000529",
+        "@id": "https://id.gs1.org/417/8032089000529"
+      },
+      "@id": "https://id.gs1.org/01/08032089000529"
     }
   },
   {
@@ -12211,7 +12327,8 @@
             "@value": "GS1 Italy Fresh",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -12223,7 +12340,8 @@
           "postalCode": "34100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000550"
+        "gs1:globalLocationNumber": "8032089000550",
+        "@id": "https://id.gs1.org/417/8032089000550"
       },
       "image": "images/08032089000550.jpg",
       "offers": {
@@ -12507,7 +12625,8 @@
           "@type": "xsd:float"
         },
         "unitCode": "GRM"
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000550"
     }
   },
   {
@@ -12730,7 +12849,8 @@
             "@value": "GS1 Italy Build",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -12742,7 +12862,8 @@
           "postalCode": "25100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000567"
+        "gs1:globalLocationNumber": "8032089000567",
+        "@id": "https://id.gs1.org/417/8032089000567"
       },
       "image": "images/08032089000567.jpg",
       "offers": {
@@ -12845,7 +12966,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000567"
     }
   },
   {
@@ -12915,7 +13037,8 @@
       "gtin13": "8032089000574",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Build"
+        "name": "GS1 Italy Build",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000574.jpg",
       "offers": {
@@ -12948,8 +13071,10 @@
           "postalCode": "24100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000574"
-      }
+        "gs1:globalLocationNumber": "8032089000574",
+        "@id": "https://id.gs1.org/417/8032089000574"
+      },
+      "@id": "https://id.gs1.org/01/08032089000574"
     }
   },
   {
@@ -13116,7 +13241,8 @@
             "@value": "GS1 Italy Build",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -13128,7 +13254,8 @@
           "postalCode": "25100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000581"
+        "gs1:globalLocationNumber": "8032089000581",
+        "@id": "https://id.gs1.org/417/8032089000581"
       },
       "image": "images/08032089000581.jpg",
       "offers": {
@@ -13180,7 +13307,8 @@
           "@value": "Fully charge the battery before first use, wear eye protection during use, do not expose to rain.",
           "@language": "en"
         }
-      ]
+      ],
+      "@id": "https://id.gs1.org/01/08032089000581"
     }
   },
   {
@@ -13250,7 +13378,8 @@
       "gtin13": "8032089000598",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Build"
+        "name": "GS1 Italy Build",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000598.jpg",
       "offers": {
@@ -13283,8 +13412,10 @@
           "postalCode": "24100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000598"
-      }
+        "gs1:globalLocationNumber": "8032089000598",
+        "@id": "https://id.gs1.org/417/8032089000598"
+      },
+      "@id": "https://id.gs1.org/01/08032089000598"
     }
   },
   {
@@ -13472,7 +13603,8 @@
       "gtin13": "8032089000628",
       "brand": {
         "@type": "Brand",
-        "name": "GS1 Italy Build"
+        "name": "GS1 Italy Build",
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000628.jpg",
       "offers": {
@@ -13505,8 +13637,10 @@
           "postalCode": "25100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000628"
-      }
+        "gs1:globalLocationNumber": "8032089000628",
+        "@id": "https://id.gs1.org/417/8032089000628"
+      },
+      "@id": "https://id.gs1.org/01/08032089000628"
     }
   },
   {
@@ -13726,7 +13860,8 @@
             "@value": "GS1 Italy Build",
             "@language": "it"
           }
-        ]
+        ],
+        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -13738,7 +13873,8 @@
           "postalCode": "10100",
           "addressCountry": "IT"
         },
-        "gs1:globalLocationNumber": "8032089000635"
+        "gs1:globalLocationNumber": "8032089000635",
+        "@id": "https://id.gs1.org/417/8032089000635"
       },
       "image": "images/08032089000635.jpg",
       "offers": {
@@ -13828,7 +13964,8 @@
             "gs1:countryCode": "IT"
           }
         ]
-      }
+      },
+      "@id": "https://id.gs1.org/01/08032089000635"
     }
   }
 ]

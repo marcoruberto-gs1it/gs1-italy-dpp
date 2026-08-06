@@ -6,8 +6,9 @@
 // public/web_bg.wasm.
 //
 // Cosa cambia rispetto a rawGs1Data (il JSON-LD già pubblicato per pagina, vedi product.ts):
-//   1. Ogni prodotto riceve un @id stabile e dereferenziabile: il suo Digital Link canonico
-//      (https://id.gs1.org/01/{gtin}), non solo il valore letterale gtin.
+//   1. Prodotto, brand e manufacturer arrivano già con un @id proprio in rawGs1Data (vedi
+//      products.json): questo script lo LEGGE, non lo inventa — le stesse identità pubblicate
+//      nella pagina canonica del prodotto, non una struttura parallela con ID propri.
 //   2. Le organizzazioni (gs1:manufacturer, identificate da GLN) e i brand (gs1:Brand) non sono
 //      più oggetti duplicati inline in ogni prodotto: diventano nodi canonici con un proprio
 //      @id, referenziati con {"@id": ...} da chi li usa. In questo dataset ogni GLN produttore è
@@ -17,7 +18,9 @@
 //   3. gs1:certificationAgency resta come da vocabolario (proprietà testuale, non va forzata a
 //      riferimento): dove presente si aggiunge però un arco gs1it:certifiedBy verso un nodo
 //      Organismo di Certificazione dedicato, che è dove la deduplicazione reale emerge di nuovo
-//      (es. "Organismo Notificato 0123" certifica 4 prodotti sanitari diversi).
+//      (es. "Organismo Notificato 0123" certifica 4 prodotti sanitari diversi). Gli organismi di
+//      certificazione non hanno una chiave GS1 propria né un @id in rawGs1Data: qui restano
+//      l'unica identità coniata da questo script, non letta dalla fonte.
 //
 // Il vocabolario resta esattamente quello già in uso nel resto del progetto: gs1: (GS1 Web
 // Vocabulary, https://ref.gs1.org/voc/, verificato termine per termine contro la v1.16) e
@@ -62,8 +65,10 @@ const organizations = new Map(); // @id -> node
 const brands = new Map();
 const certificationBodies = new Map();
 
-function registerOrganization(gln, { name, address }) {
-  const id = organizationId(gln);
+// id passato esplicitamente (letto da rawGs1Data quando presente) invece di ricavato qui: la
+// fonte di verità per l'identità di un'organizzazione è la pagina prodotto che la pubblica, non
+// questo script — vedi la migrazione in products.json.
+function registerOrganization(id, { name, address, gln }) {
   if (!organizations.has(id)) {
     const node = {
       '@id': id,
@@ -78,8 +83,7 @@ function registerOrganization(gln, { name, address }) {
   return id;
 }
 
-function registerBrand(name) {
-  const id = brandId(name);
+function registerBrand(id, name) {
   if (!brands.has(id)) {
     brands.set(id, {
       '@id': id,
@@ -110,7 +114,9 @@ for (const p of products) {
   if (!p.rawGs1Data) continue; // stessa regola del resto del progetto: niente dati sintetici per i prodotti non AI-ready
 
   const doc = JSON.parse(JSON.stringify(p.rawGs1Data));
-  doc['@id'] = productId(p.gtin);
+  // Preferisce l'@id già pubblicato in rawGs1Data (vedi migrazione in products.json); il
+  // fallback resta per robustezza, non dovrebbe scattare sui 47 prodotti AI-ready attuali.
+  doc['@id'] = doc['@id'] || productId(p.gtin);
   if (doc.name) doc.name = p.name;
   if (doc.description) doc.description = p.description;
   delete doc['@context']; // sostituito dal contesto unico del grafo, vedi in fondo
@@ -121,26 +127,29 @@ for (const p of products) {
     // 4 prodotti non hanno un gs1:manufacturer separato: l'indirizzo e il GLN del produttore
     // sono (impropriamente) annidati dentro il brand stesso. Li recuperiamo come vera
     // organizzazione prima di ridurre il brand al solo nome — altrimenti quel dato andrebbe
-    // perso, non solo deduplicato.
+    // perso, non solo deduplicato. Nessun @id da leggere per questo nodo: non esiste come
+    // oggetto manufacturer separato in rawGs1Data, va coniato qui come prima.
     if (!doc.manufacturer && doc.brand['gs1:globalLocationNumber']) {
       const gln = doc.brand['gs1:globalLocationNumber'];
-      const orgId = registerOrganization(gln, { name: brandName, address: doc.brand.address });
+      const orgId = registerOrganization(organizationId(gln), { name: brandName, address: doc.brand.address, gln });
       doc.manufacturer = { '@id': orgId };
       manufacturerLinksAdded++;
     }
     if (brandName) {
-      registerBrand(brandName);
-      doc.brand = { '@id': brandId(brandName) };
+      const id = doc.brand['@id'] || brandId(brandName);
+      registerBrand(id, brandName);
+      doc.brand = { '@id': id };
     }
   }
 
-  // Organizzazione produttrice (gs1:manufacturer / schema:manufacturer).
-  if (doc.manufacturer && !doc.manufacturer['@id']) {
+  // Organizzazione produttrice (gs1:manufacturer / schema:manufacturer). Se il ramo precedente
+  // ha già ridotto doc.manufacturer a un riferimento {"@id": ...} (caso GLN-nel-brand), qui non
+  // resta più gs1:globalLocationNumber da leggere e il blocco non fa nulla — è già risolto.
+  if (doc.manufacturer && doc.manufacturer['gs1:globalLocationNumber']) {
     const gln = doc.manufacturer['gs1:globalLocationNumber'];
-    if (gln) {
-      const orgId = registerOrganization(gln, { name: doc.manufacturer.name, address: doc.manufacturer.address });
-      doc.manufacturer = { '@id': orgId };
-    }
+    const id = doc.manufacturer['@id'] || organizationId(gln);
+    registerOrganization(id, { name: doc.manufacturer.name, address: doc.manufacturer.address, gln });
+    doc.manufacturer = { '@id': id };
   }
 
   // Organismo di certificazione: gs1:certificationAgency resta testo (è il suo range dichiarato
