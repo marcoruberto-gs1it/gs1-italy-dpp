@@ -183,7 +183,7 @@ export const TRANSLATIONS = {
       },
       edi: {
         intro:
-          'Il <strong>GS1 EDI</strong> (electronic data interchange, in GS1 chiamato anche "GS1 eCom") è lo standard con cui le aziende si scambiano documenti commerciali — ordini, conferme, bolle, fatture — in formato strutturato invece che su carta o PDF. Usa le stesse chiavi di identificazione GS1 già viste in questa pagina (GTIN, GLN, SSCC) per collegare senza ambiguità ogni messaggio al prodotto, alle controparti e alle unità logistiche coinvolte.',
+          "Il <strong>GS1 EDI</strong> (Electronic Data Interchange) è lo standard con cui le aziende si scambiano documenti commerciali — ordini, conferme, bolle, fatture — in formato strutturato invece che su carta o PDF, tipicamente nella sintassi <strong>GS1 EANCOM</strong> (il subset GS1 dello standard internazionale UN/EDIFACT). Usa le stesse chiavi di identificazione GS1 già viste in questa pagina (GTIN, GLN, SSCC) per collegare senza ambiguità ogni messaggio al prodotto, alle controparti e alle unità logistiche coinvolte.",
         seller: 'Venditore',
         buyer: 'Acquirente',
         flowHeading: 'Ciclo Order-to-Cash',
@@ -617,7 +617,7 @@ export const TRANSLATIONS = {
       },
       edi: {
         intro:
-          '<strong>GS1 EDI</strong> (electronic data interchange, also called "GS1 eCom" within GS1) is the standard companies use to exchange business documents — orders, confirmations, delivery notes, invoices — as structured data instead of paper or PDF. It uses the same GS1 identification keys already seen on this page (GTIN, GLN, SSCC) to unambiguously link every message to the product, the trading partners, and the logistics units involved.',
+          "<strong>GS1 EDI</strong> (Electronic Data Interchange) is the standard companies use to exchange business documents — orders, confirmations, delivery notes, invoices — as structured data instead of paper or PDF, typically in <strong>GS1 EANCOM</strong> syntax (the GS1 subset of the international UN/EDIFACT standard). It uses the same GS1 identification keys already seen on this page (GTIN, GLN, SSCC) to unambiguously link every message to the product, the trading partners, and the logistics units involved.",
         seller: 'Seller',
         buyer: 'Buyer',
         flowHeading: 'Order-to-Cash cycle',
