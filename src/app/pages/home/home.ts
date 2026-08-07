@@ -8,9 +8,9 @@ import { LanguageService } from '../../services/language.service';
 import { I18nService } from '../../services/i18n.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
+import { GS1_ITALY_LOGO, organizationId } from '../organization/organization';
 
 const JSON_LD_ID = 'home-structured-data';
-const GS1_ITALY_LOGO = 'https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png';
 
 @Component({
   selector: 'app-home',
@@ -54,12 +54,13 @@ export class Home implements OnDestroy {
       description: this.t('hero.subtitle'),
       inLanguage: this.languageService.lang(),
       image: GS1_ITALY_LOGO,
-      publisher: {
-        '@type': 'Organization',
-        name: 'GS1 Italy',
-        url: 'https://www.gs1it.org/',
-        logo: GS1_ITALY_LOGO,
-      },
+      // Stesso @id del nodo Organization canonico pubblicato su /organizzazione (vedi
+      // organization.ts) — un consumer Linked-Data lo riconosce come lo stesso nodo, stessa
+      // deduplicazione già applicata a brand e organismi di certificazione nel knowledge graph.
+      // name/url restano inline (non solo {"@id": ...}) perché un validator schema.org che non
+      // dereferenzia l'@id (la norma per i tool SEO, a differenza di un motore RDF) deve poter
+      // leggere comunque chi è il publisher da questo solo documento.
+      publisher: { '@id': organizationId(origin), '@type': 'Organization', name: 'GS1 Italy', url: 'https://www.gs1it.org/' },
       mainEntity: {
         '@type': 'ItemList',
         numberOfItems: this.sectors().length,

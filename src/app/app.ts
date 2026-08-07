@@ -57,6 +57,7 @@ export class App {
     // volta (percorsi relativi: risolvono correttamente sotto <base href>, quindi anche sotto
     // il sottopercorso di un project site GitHub Pages).
     this.seoLinks.set('link-llms-txt', { rel: 'llms-txt', href: 'llms.txt', type: 'text/plain' });
+    this.seoLinks.set('link-llms-full-txt', { rel: 'llms-full-txt', href: 'llms-full.txt', type: 'text/plain' });
     this.seoLinks.set('link-sitemap', { rel: 'sitemap', href: 'sitemap.xml', type: 'application/xml' });
 
     // Canonical: riflette la rotta corrente, ma per le istanze di prodotto (lotto/seriale,

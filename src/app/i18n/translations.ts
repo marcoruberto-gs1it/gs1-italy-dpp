@@ -369,6 +369,22 @@ export const TRANSLATIONS = {
       notFoundBody: 'Nessuna entità corrisponde a questo indirizzo.',
       backToGraph: 'Torna al knowledge graph',
     },
+    org: {
+      breadcrumb: 'GS1 Italy',
+      title: 'GS1 Italy',
+      pageTitle: 'GS1 Italy | Digital Link Catalog',
+      metaDescription: "GS1 Italy: l'associazione senza scopo di lucro che sviluppa e gestisce gli standard GS1 in Italia — sede, dati e sito ufficiale.",
+      badge: 'Organizzazione',
+      intro:
+        "GS1 Italy è l'associazione senza scopo di lucro che sviluppa e gestisce gli standard GS1 in Italia — il più noto dei quali è il codice a barre. Fa parte della rete GS1 globale, presente con 120 organizzazioni nazionali che servono circa due milioni di aziende nel mondo; in Italia rappresenta oltre 42.000 imprese, in settori che vanno dal largo consumo alla sanità.",
+      factsAddress: 'Sede',
+      factsWebsite: 'Sito ufficiale',
+      missionHeading: 'Cosa fa GS1',
+      missionBody:
+        "Gli standard GS1 danno a ogni prodotto un'identità unica e verificabile, permettendo lo scambio di informazioni tra aziende senza ambiguità e garantendo tracciabilità lungo tutta la filiera. Oltre al codice a barre, GS1 Italy offre servizi digitali, consulenza per l'ottimizzazione dei processi, osservatori di mercato e formazione tramite la propria Academy.",
+      disclaimer:
+        'Questo catalogo è una demo che illustra gli standard GS1 Digital Link e GS1 Web Vocabulary: marchi, prodotti e dati mostrati nel resto del sito sono fittizi. I dati di questa pagina — nome, sede, sito ufficiale — descrivono invece la vera organizzazione GS1 Italy.',
+    },
     chat: {
       breadcrumb: 'Assistente AI',
       title: 'Assistente AI del catalogo',
@@ -835,6 +851,22 @@ export const TRANSLATIONS = {
       notFoundTitle: 'Not found',
       notFoundBody: 'No entity matches this address.',
       backToGraph: 'Back to the knowledge graph',
+    },
+    org: {
+      breadcrumb: 'GS1 Italy',
+      title: 'GS1 Italy',
+      pageTitle: 'GS1 Italy | Digital Link Catalog',
+      metaDescription: 'GS1 Italy: the non-profit organisation that develops and manages GS1 standards in Italy — address, facts and official website.',
+      badge: 'Organization',
+      intro:
+        "GS1 Italy is the non-profit organisation that develops and manages GS1 standards in Italy — the best known of which is the barcode. It's part of the global GS1 network of 120 national organisations serving roughly two million companies worldwide; in Italy it represents over 42,000 businesses across sectors from consumer goods to healthcare.",
+      factsAddress: 'Headquarters',
+      factsWebsite: 'Official website',
+      missionHeading: 'What GS1 does',
+      missionBody:
+        'GS1 standards give every product a unique, verifiable identity, letting businesses exchange information without ambiguity and ensuring traceability across the whole supply chain. Beyond the barcode, GS1 Italy offers digital services, process-optimisation consulting, market observatories and training through its Academy.',
+      disclaimer:
+        'This catalogue is a demo illustrating the GS1 Digital Link and GS1 Web Vocabulary standards: the brands, products and data shown elsewhere on the site are fictional. The facts on this page — name, address, official website — describe the real GS1 Italy organisation instead.',
     },
     chat: {
       breadcrumb: 'AI Assistant',

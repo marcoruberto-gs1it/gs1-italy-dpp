@@ -1,5 +1,5 @@
 // Script postbuild (eseguito dopo `ng build`, vedi package.json): genera sitemap.xml,
-// robots.txt e llms.txt dentro dist/gs1-catalog/browser, e corregge nell'HTML
+// robots.txt, llms.txt e llms-full.txt dentro dist/gs1-catalog/browser, e corregge nell'HTML
 // prerenderizzato il dominio segnaposto usato lato server (vedi SiteOriginService) — questo
 // è l'unico passaggio realmente necessario per la discoverability: molti crawler AI (GPTBot,
 // ClaudeBot, PerplexityBot...) leggono l'HTML statico senza eseguire JavaScript, quindi il
@@ -58,6 +58,8 @@ const sectorIds = [...new Set(products.map((p) => p.sectorId))];
 const staticUrls = [
   { loc: '/' },
   { loc: '/validatore' },
+  { loc: '/voc' },
+  { loc: '/organizzazione' },
   // /assistente non è più una pagina prerenderizzata di questo sito: è il chat-client React
   // (vedi docker-compose.yml), una SPA senza contenuto statico da indicizzare.
   ...sectorIds.map((id) => ({ loc: `/catalog/${id}` })),
@@ -154,6 +156,8 @@ const llmsTxt = `# GS1 Digital Link Catalog
 - [GS1 Digital Link Validator](${SITE_URL}/validatore): parses a Digital Link or bracketed AI element string with the real GS1 Barcode Syntax Engine (WASM), with a CTA to validator.schema.org
 - [AI Shopping Assistant](${SITE_URL}/assistente): agentic chat (Google ADK + A2A + UCP) that searches the catalog, answers from the GS1 product sheets and can complete an order
 - [Knowledge graph](${SITE_URL}/knowledge-graph): the whole catalog as an RDF graph, browsable and queryable with SPARQL
+- [gs1it: vocabulary](${SITE_URL}/voc): definitions of the small extension used alongside the official GS1 Web Vocabulary (GDSN packaging hierarchy, certification bodies) — one page per term, each dereferenceable and machine-readable
+- [GS1 Italy](${SITE_URL}/organizzazione): the real-world Organization this catalog's standards belong to — not a fictional entity like the brands/products below
 - [Sitemap](${SITE_URL}/sitemap.xml)
 
 ## Machine-readable endpoints
@@ -176,6 +180,76 @@ ${productSection}
 
 fs.writeFileSync(path.join(BROWSER_DIR, 'llms.txt'), llmsTxt);
 console.log(`generate-seo-files: llms.txt generato (${(Buffer.byteLength(llmsTxt) / 1024).toFixed(1)} KB, ${products.length} prodotti)`);
+
+// ---------------------------------------------------------------------------
+// 4b. llms-full.txt — stessa convenzione llms.txt, ma la versione "exhaustive" prevista dallo
+//    stesso standard (https://llmstxt.org/#llms-full.txt): non un indice di link, il contenuto
+//    per intero in un solo documento, cosí un agente non deve seguire 63 link separati per
+//    avere l'intero catalogo. Stessa fonte dati di llms.txt (products.json, letto qui sopra),
+//    solo con descrizione integrale invece che troncata a 140 caratteri e i campi realmente
+//    disponibili (brand, categoria GPC, prezzo) invece del solo nome — niente di nuovo
+//    inventato, solo meno tagliato.
+// ---------------------------------------------------------------------------
+function formatPrice(p) {
+  if (!p.price?.amount) return null;
+  const unit = p.price.unit ? `/${p.price.unit}` : '';
+  return `${p.price.amount} ${p.price.currency || 'EUR'}${unit}`;
+}
+
+const productFullSection = products
+  .map((p) => {
+    const facts = [`GTIN ${p.gtin}`, `brand ${p.brand || 'GS1'}`];
+    if (p.category) facts.push(p.category);
+    const price = formatPrice(p);
+    if (price) facts.push(price);
+    if (p.rawGs1Data) {
+      const certCount = p.rawGs1Data['gs1:certification']?.length;
+      facts.push(p.gdsn ? 'AI-ready, GDSN packaging hierarchy' : 'AI-ready');
+      if (certCount) facts.push(`${certCount} certification${certCount > 1 ? 's' : ''}`);
+    } else {
+      facts.push('no structured data published (demo contrast case)');
+    }
+    return `### ${p.name}\n${facts.join(' — ')}\n${p.description.replace(/\s+/g, ' ').trim()}\n[${SITE_URL}/01/${p.gtin}](${SITE_URL}/01/${p.gtin})`;
+  })
+  .join('\n\n');
+
+const llmsFullTxt = `# GS1 Digital Link Catalog — full content
+
+> Same demo described in llms.txt, expanded: every product's full description and known facts
+> inline, not just a link to follow. ${products.length} fictional products across ${sectorIds.length} sectors, brand "GS1 Italy" (company prefix 8032089). Real, non-fictional facts (the
+> GS1 Italy organization, the gs1: and gs1it: vocabularies) are marked as such below and on
+> their own pages — everything else (brands, companies, GLNs, certifications) is invented for
+> this demo.
+
+## What this site is
+
+A working demonstration of GS1 Digital Link: a GTIN resolves to a page publishing structured
+data (GS1 Web Vocabulary and/or schema.org, content-negotiated via \`Accept: application/ld+json\`)
+instead of just a picture and a price. ${sectorSection.split('\n').length} sectors, a GS1 Web
+Vocabulary knowledge graph with real deduplicated brand/certification-body nodes, a GDSN
+packaging-hierarchy example, and an agentic shopping assistant that reads the same structured
+data a crawler would.
+
+## Real-world entities (not fictional)
+
+- [GS1 Italy](${SITE_URL}/organizzazione): the real non-profit organisation whose GS1 Digital
+  Link and GS1 Web Vocabulary standards this catalog demonstrates. Address, tax code and
+  official website on that page, not invented.
+- [gs1it: vocabulary](${SITE_URL}/voc): the small extension this project defines and hosts
+  itself (GDSN packaging hierarchy, certification-body class) for the concepts the official
+  GS1 Web Vocabulary doesn't cover — one dereferenceable page per term.
+
+## Sectors
+
+${sectorSection}
+
+## Every product, in full
+
+${productFullSection}
+`;
+
+fs.writeFileSync(path.join(BROWSER_DIR, 'llms-full.txt'), llmsFullTxt);
+console.log(`generate-seo-files: llms-full.txt generato (${(Buffer.byteLength(llmsFullTxt) / 1024).toFixed(1)} KB, ${products.length} prodotti)`);
 
 // ---------------------------------------------------------------------------
 // 5. .well-known/agent-skills/index.json — elenco machine-readable delle capacità reali del

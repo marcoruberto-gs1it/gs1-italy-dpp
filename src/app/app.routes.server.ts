@@ -23,6 +23,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
+    path: 'organizzazione',
+    renderMode: RenderMode.Prerender
+  },
+  {
     path: 'voc',
     renderMode: RenderMode.Prerender
   },

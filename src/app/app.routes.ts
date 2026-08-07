@@ -7,6 +7,7 @@ import { KnowledgeGraphComponent } from './pages/knowledge-graph/knowledge-graph
 import { VocabularyIndexComponent } from './pages/vocabulary/vocabulary-index';
 import { VocabularyTermComponent } from './pages/vocabulary/vocabulary-term';
 import { EntityComponent } from './pages/entity/entity';
+import { OrganizationComponent } from './pages/organization/organization';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -23,6 +24,9 @@ export const routes: Routes = [
   // dominio del progetto invece di un URI su un dominio terzo che non risponde nulla di coerente.
   { path: 'id/brand/:slug', component: EntityComponent, data: { kind: 'brand' } },
   { path: 'id/certification-body/:slug', component: EntityComponent, data: { kind: 'certificationBody' } },
+  // Nodo Organization canonico per GS1 Italy (vedi organization.ts), referenziato con @id da
+  // "publisher" in home e settori invece di ripetere l'oggetto inline in ogni pagina.
+  { path: 'organizzazione', component: OrganizationComponent },
   // /assistente non è più servita da Angular: quel path è instradato al chat-client React
   // (business-agent UCP), vedi docker-compose.yml. Il componente ChatComponent resta nel repo
   // come simulazione di riferimento, ma non è più raggiungibile.

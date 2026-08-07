@@ -12,9 +12,9 @@ import { LanguageService } from '../../services/language.service';
 import { I18nService } from '../../services/i18n.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
+import { GS1_ITALY_LOGO, organizationId } from '../organization/organization';
 
 const JSON_LD_ID = 'sector-structured-data';
-const GS1_ITALY_LOGO = 'https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png';
 
 type FilterMode = 'all' | 'ai-ready' | 'verified';
 type SortMode = 'name' | 'gtin';
@@ -113,12 +113,9 @@ export class Sector implements OnDestroy {
       description: this.sectorInfo()?.description,
       inLanguage: this.languageService.lang(),
       image: GS1_ITALY_LOGO,
-      publisher: {
-        '@type': 'Organization',
-        name: 'GS1 Italy',
-        url: 'https://www.gs1it.org/',
-        logo: GS1_ITALY_LOGO,
-      },
+      // Stesso principio di home.ts::homeJsonLd: @id del nodo Organization canonico più
+      // name/url inline per restare leggibile anche da un validator che non dereferenzia.
+      publisher: { '@id': organizationId(origin), '@type': 'Organization', name: 'GS1 Italy', url: 'https://www.gs1it.org/' },
       breadcrumb: {
         '@type': 'BreadcrumbList',
         itemListElement: [
