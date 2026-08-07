@@ -35,6 +35,18 @@ export const TRANSLATIONS = {
       sectionSubtitle:
         "Il GS1 Digital Link e il GS1 Web Vocabulary coprono ogni settore merceologico. Seleziona un'area per esplorare i casi d'uso e la struttura dei dati.",
       exploreProducts: 'Scopri i prodotti',
+      trustHeading: 'Perché un codice può raccontarti così tanto',
+      trustIntro:
+        'Da sempre un codice a barre serve a far scorrere un prodotto in cassa. Oggi lo stesso codice può fare molto di più: aprire una porta su tutto ciò che c\'è da sapere su quel prodotto, in modo affidabile.',
+      trustPoint1Title: 'Un linguaggio comune, in tutto il mondo',
+      trustPoint1Body:
+        'GS1 è lo standard che aziende di ogni settore e paese usano per identificare i propri prodotti allo stesso modo — un codice ha lo stesso significato ovunque venga letto.',
+      trustPoint2Title: 'Dati verificati, non solo promesse',
+      trustPoint2Body:
+        'Dietro un codice possono esserci informazioni reali e verificabili — provenienza, ingredienti, certificazioni — pubblicate da chi il prodotto lo produce, non un\'etichetta scritta da qualcun altro.',
+      trustPoint3Title: 'La stessa idea, per ogni prodotto',
+      trustPoint3Body:
+        'Dal cibo in tavola ai materiali da costruzione, dall\'abbigliamento ai dispositivi sanitari: lo stesso standard si adatta per raccontare la storia giusta per ogni tipo di prodotto.',
     },
     sector: {
       notFound: 'Settore non trovato',
@@ -457,6 +469,18 @@ export const TRANSLATIONS = {
       sectionSubtitle:
         'GS1 Digital Link and GS1 Web Vocabulary support every industry sector. Select an area to explore use cases and data structure.',
       exploreProducts: 'Discover the products',
+      trustHeading: 'Why a code can tell you so much',
+      trustIntro:
+        'A barcode has always been there to move a product through the checkout. Today the same code can do much more: open a door to everything worth knowing about that product, reliably.',
+      trustPoint1Title: 'A shared language, worldwide',
+      trustPoint1Body:
+        'GS1 is the standard businesses of every sector and country use to identify their products the same way — a code means the same thing wherever it\'s read.',
+      trustPoint2Title: 'Verified data, not just promises',
+      trustPoint2Body:
+        'Behind a code there can be real, verifiable information — origin, ingredients, certifications — published by whoever makes the product, not a label written by someone else.',
+      trustPoint3Title: 'The same idea, for every product',
+      trustPoint3Body:
+        'From the food on your table to building materials, from clothing to medical devices: the same standard adapts to tell the right story for every kind of product.',
     },
     sector: {
       notFound: 'Sector not found',

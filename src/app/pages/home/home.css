@@ -107,9 +107,73 @@
   border-color: rgba(255, 255, 255, 0.55);
 }
 
+/* --- Trust / perché conta ---
+   Contenuto informativo non tecnico fra hero e griglia settori: risponde a "perché un codice
+   dovrebbe interessarmi", non a "come funziona questo sito" — pubblico generico, non tecnico. */
+.trust-section {
+  padding: 8px 0 40px;
+}
+
+.trust-heading {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 32px;
+}
+
+.trust-heading h2 {
+  font-size: clamp(1.5rem, 2.8vw, 1.9rem);
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.trust-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.trust-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+}
+
+.trust-point {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.trust-point h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.trust-point p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 /* --- Sectors --- */
 .sectors-grid {
   padding-top: 24px;
+}
+
+.sectors-cards,
+.sectors-cards li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .sectors-heading {
@@ -145,6 +209,8 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
   position: relative;
   box-shadow: var(--shadow-xs);
   border: 1px solid var(--border-subtle);

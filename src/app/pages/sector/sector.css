@@ -183,6 +183,14 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
   align-content: start;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-grid > li {
+  margin: 0;
+  padding: 0;
 }
 
 .product-card {
@@ -192,6 +200,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
   cursor: pointer;
   box-shadow: var(--shadow-xs);
   transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-spring), border-color var(--dur-base) var(--ease-out);
