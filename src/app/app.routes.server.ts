@@ -1,8 +1,17 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import productsData from './data/products.json';
+import { VOCABULARY_TERMS } from './data/vocabulary';
+import { getBrandEntities, getCertificationBodyEntities } from './data/entities';
+import type { Product } from './services/product.service';
 
 const products = productsData as { gtin: string; sectorId: string; traceabilityExample?: { lot: string; serial: string } }[];
 const sectorIds = [...new Set(products.map((p) => p.sectorId))];
+
+// getBrandEntities/getCertificationBodyEntities si aspettano il tipo Product completo (leggono
+// rawGs1Data): productsData è già in quella forma, il cast serve solo perché sopra è tipizzato
+// più stretto per l'uso di sectorIds.
+const brandSlugs = getBrandEntities(productsData as unknown as Product[]).map((b) => b.slug);
+const certificationBodySlugs = getCertificationBodyEntities(productsData as unknown as Product[]).map((c) => c.slug);
 
 export const serverRoutes: ServerRoute[] = [
   {
@@ -12,6 +21,31 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: 'knowledge-graph',
     renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'voc',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'voc/:term',
+    renderMode: RenderMode.Prerender,
+    async getPrerenderParams() {
+      return VOCABULARY_TERMS.map((v) => ({ term: v.term }));
+    }
+  },
+  {
+    path: 'id/brand/:slug',
+    renderMode: RenderMode.Prerender,
+    async getPrerenderParams() {
+      return brandSlugs.map((slug) => ({ slug }));
+    }
+  },
+  {
+    path: 'id/certification-body/:slug',
+    renderMode: RenderMode.Prerender,
+    async getPrerenderParams() {
+      return certificationBodySlugs.map((slug) => ({ slug }));
+    }
   },
   {
     path: 'catalog/:sector',

@@ -24,10 +24,11 @@
 //
 // Il vocabolario resta esattamente quello già in uso nel resto del progetto: gs1: (GS1 Web
 // Vocabulary, https://ref.gs1.org/voc/, verificato termine per termine contro la v1.16) e
-// schema.org via @vocab, la stessa convenzione di rawGs1Data. gs1it: (https://gs1it.org/voc/) è
-// l'estensione italiana già introdotta per la gerarchia GDSN (vedi buildGdsnWebVocabJson in
-// product.service.ts): qui si aggiunge solo la singola proprietà certifiedBy, per lo stesso
-// motivo — un concetto che il Web Vocabulary non copre.
+// schema.org via @vocab, la stessa convenzione di rawGs1Data. gs1it: (SITE_URL/voc/, vedi
+// VOCABULARY_TERMS in src/app/data/vocabulary.ts) è l'estensione italiana già introdotta per la
+// gerarchia GDSN (vedi buildGdsnWebVocabJson in product.service.ts): qui si aggiunge solo la
+// singola proprietà certifiedBy, per lo stesso motivo — un concetto che il Web Vocabulary non
+// copre.
 //
 // Perché JSON-LD e non subito Turtle/N-Quads: qualunque motore SPARQL reale (Jena/Fuseki,
 // GraphDB, Oxigraph, RDFLib) importa JSON-LD valido direttamente. La conversione ad altre
@@ -38,6 +39,17 @@ const path = require('path');
 
 const OUTPUT_PATH = path.join(__dirname, 'public', 'knowledge-graph.jsonld');
 const PRODUCTS_PATH = path.join(__dirname, 'src', 'app', 'data', 'products.json');
+
+// Stessa convenzione di generate-seo-files.js/generate-agent-feed.js: nessun dominio hardcoded,
+// in produzione SITE_URL arriva dall'ambiente di build (vedi webshop/Dockerfile, ARG impostato
+// prima di "npm run build" — quindi disponibile anche qui, che gira prima di "ng build").
+const SITE_URL = (process.env.SITE_URL || 'http://localhost:4200').replace(/\/$/, '');
+// Stesso placeholder di SiteOriginService (src/app/services/site-origin.service.ts,
+// SSR_FALLBACK_ORIGIN): è il dominio salvato in products.json per rawGs1Data.brand['@id'] finché
+// non si conosce l'origine reale — va sostituito qui, non fidandosi del dominio salvato nel dato
+// sorgente.
+const PLACEHOLDER_ORIGIN = 'https://tuodominio-produzione.it';
+const resolveOrigin = (id) => (id.startsWith(PLACEHOLDER_ORIGIN) ? SITE_URL + id.slice(PLACEHOLDER_ORIGIN.length) : id);
 
 const products = JSON.parse(fs.readFileSync(PRODUCTS_PATH, 'utf8'));
 
@@ -55,11 +67,14 @@ const slugify = (s) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-// gs1it: — namespace dati (istanze), distinto da https://gs1it.org/voc/ (namespace ontologia,
-// vedi buildGdsnWebVocabJson): brand e organismi di certificazione non hanno una chiave di
+// gs1it: — namespace dati (istanze), distinto da SITE_URL/voc/ (namespace ontologia, vedi
+// buildGdsnWebVocabJson): brand e organismi di certificazione non hanno una chiave di
 // identificazione GS1, quindi qui si conia un identificatore stabile invece di lasciarli anonimi.
-const brandId = (name) => `https://gs1it.org/id/brand/${slugify(name)}`;
-const certificationBodyId = (name) => `https://gs1it.org/id/certification-body/${slugify(name)}`;
+// Sul dominio del progetto (vedi SITE_URL sopra), non più su gs1it.org — quello è il sito reale
+// di GS1 Italy, non qualcosa che questo progetto controlla o può far dereferenziare a qualcosa di
+// coerente.
+const brandId = (name) => `${SITE_URL}/id/brand/${slugify(name)}`;
+const certificationBodyId = (name) => `${SITE_URL}/id/certification-body/${slugify(name)}`;
 
 const organizations = new Map(); // @id -> node
 const brands = new Map();
@@ -136,7 +151,7 @@ for (const p of products) {
       manufacturerLinksAdded++;
     }
     if (brandName) {
-      const id = doc.brand['@id'] || brandId(brandName);
+      const id = doc.brand['@id'] ? resolveOrigin(doc.brand['@id']) : brandId(brandName);
       registerBrand(id, brandName);
       doc.brand = { '@id': id };
     }
@@ -170,7 +185,7 @@ const graph = {
   '@context': {
     schema: 'https://schema.org/',
     gs1: 'https://ref.gs1.org/voc/',
-    gs1it: 'https://gs1it.org/voc/',
+    gs1it: `${SITE_URL}/voc/`,
     xsd: 'http://www.w3.org/2001/XMLSchema#',
     rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
     '@vocab': 'https://schema.org/',

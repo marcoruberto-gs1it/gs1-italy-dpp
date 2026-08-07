@@ -3,6 +3,7 @@ import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angul
 import { RouterLink } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { I18nService } from '../../services/i18n.service';
+import { SiteOriginService } from '../../services/site-origin.service';
 import { KgGraph, KgHub, KgProductNode, KnowledgeGraphService, SparqlResult } from '../../services/knowledge-graph.service';
 
 interface ExampleQuery {
@@ -14,21 +15,26 @@ function truncate(text: string, maxLen: number): string {
   return text.length > maxLen ? text.slice(0, maxLen - 1).trimEnd() + '…' : text;
 }
 
-const EXAMPLE_QUERIES: ExampleQuery[] = [
-  {
-    labelKey: 'sameBrand',
-    sparql: `PREFIX schema: <https://schema.org/>
+// gs1it: vive sul dominio del progetto (vedi src/app/data/vocabulary.ts, pagina /voc), non più
+// su gs1it.org: la query di esempio va costruita con l'origine corrente invece di un dominio
+// fisso, stesso principio di SiteOriginService.
+function buildExampleQueries(origin: string): ExampleQuery[] {
+  const gs1itNs = `${origin.replace(/\/$/, '')}/voc/`;
+  return [
+    {
+      labelKey: 'sameBrand',
+      sparql: `PREFIX schema: <https://schema.org/>
 SELECT ?product WHERE {
   ?brand schema:name "GS1 Italy Sapori" .
   ?p schema:brand ?brand ;
      schema:name ?product .
 } ORDER BY ?product`,
-  },
-  {
-    labelKey: 'sameCertifier',
-    sparql: `PREFIX schema: <https://schema.org/>
+    },
+    {
+      labelKey: 'sameCertifier',
+      sparql: `PREFIX schema: <https://schema.org/>
 PREFIX gs1: <https://ref.gs1.org/voc/>
-PREFIX gs1it: <https://gs1it.org/voc/>
+PREFIX gs1it: <${gs1itNs}>
 SELECT ?product WHERE {
   <https://id.gs1.org/01/08032089000079> gs1:certification ?cert .
   ?cert gs1it:certifiedBy ?body .
@@ -37,16 +43,17 @@ SELECT ?product WHERE {
                 schema:name ?product .
   FILTER(?otherProduct != <https://id.gs1.org/01/08032089000079>)
 }`,
-  },
-  {
-    labelKey: 'countByBrand',
-    sparql: `PREFIX schema: <https://schema.org/>
+    },
+    {
+      labelKey: 'countByBrand',
+      sparql: `PREFIX schema: <https://schema.org/>
 SELECT ?brandName (COUNT(?product) AS ?count) WHERE {
   ?product schema:brand ?brand .
   ?brand schema:name ?brandName .
 } GROUP BY ?brandName ORDER BY DESC(?count)`,
-  },
-];
+    },
+  ];
+}
 
 @Component({
   selector: 'app-knowledge-graph',
@@ -59,6 +66,7 @@ export class KnowledgeGraphComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private titleService = inject(Title);
   private metaService = inject(Meta);
+  private siteOrigin = inject(SiteOriginService);
   private kg = inject(KnowledgeGraphService);
   protected t = inject(I18nService).t;
 
@@ -68,8 +76,8 @@ export class KnowledgeGraphComponent implements OnInit {
   selectedHubId = signal<string | null>(null);
   selectedProductId = signal<string | null>(null);
 
-  protected exampleQueries = EXAMPLE_QUERIES;
-  sparqlInput = signal(EXAMPLE_QUERIES[0].sparql);
+  protected exampleQueries = buildExampleQueries(this.siteOrigin.value);
+  sparqlInput = signal(this.exampleQueries[0].sparql);
   queryLoading = signal(false);
   queryError = signal<string | null>(null);
   queryResult = signal<SparqlResult | null>(null);
@@ -142,6 +150,19 @@ export class KnowledgeGraphComponent implements OnInit {
       if (graph.hubs.length) this.selectedHubId.set(graph.hubs[0].id);
     } catch (err) {
       this.loadError.set(err instanceof Error ? err.message : this.t('kg.loadErrorGeneric'));
+    }
+  }
+
+  // hub.id / p.brandId sono già l'URL assoluto della pagina entità corrispondente (stesso @id
+  // pubblicato in knowledge-graph.jsonld, vedi src/app/data/entities.ts): il path relativo basta
+  // per un routerLink, senza assumere che l'origine salvata nel grafo coincida sempre con quella
+  // corrente (fetch di knowledge-graph.jsonld è same-origin nella pratica, ma il parsing dell'URL
+  // resta corretto anche se non lo fosse).
+  entityPath(id: string): string {
+    try {
+      return new URL(id).pathname;
+    } catch {
+      return '/knowledge-graph';
     }
   }
 

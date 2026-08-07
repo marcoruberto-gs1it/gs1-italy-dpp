@@ -1,0 +1,127 @@
+.entity-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+
+/* --- Breadcrumbs --- */
+.breadcrumbs {
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+.breadcrumbs ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.breadcrumbs a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-weight: 500;
+}
+.breadcrumbs a:hover {
+  color: var(--gs1-blue);
+}
+.separator {
+  margin: 0 8px;
+  color: var(--text-muted);
+}
+.current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* --- Header --- */
+.entity-header {
+  margin-bottom: 28px;
+}
+
+.entity-header h1 {
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 10px 0 6px;
+}
+
+.entity-count {
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* --- Product list --- */
+.entity-product-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.entity-product-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-spring);
+}
+
+.entity-product-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.entity-product-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.entity-product-image-wrapper {
+  height: 140px;
+  background: var(--bg-surface-sunken);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.entity-product-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.entity-product-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entity-product-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.entity-product-standard {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+/* --- Not found --- */
+.entity-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-xs);
+}

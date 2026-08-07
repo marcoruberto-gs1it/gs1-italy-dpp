@@ -1,8 +1,14 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 
-/** Usato solo lato server (prerendering): non compare mai in una pagina servita a un browser. */
-const SSR_FALLBACK_ORIGIN = 'https://tuodominio-produzione.it';
+/**
+ * Usato solo lato server (prerendering): non compare mai in una pagina servita a un browser.
+ * Esportato perché è anche il placeholder di dominio salvato in products.json per gli @id che il
+ * progetto conia (es. rawGs1Data.brand['@id']) — chi li legge (product.ts, generate-agent-feed.js,
+ * generate-knowledge-graph.js) lo sostituisce con l'origine reale al momento del consumo, con lo
+ * stesso principio di questo servizio: mai un dominio fisso salvato una volta per tutte.
+ */
+export const SSR_FALLBACK_ORIGIN = 'https://tuodominio-produzione.it';
 
 /**
  * Origine assoluta del sito — dominio più l'eventuale sottopercorso di pubblicazione (es. il

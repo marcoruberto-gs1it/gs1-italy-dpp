@@ -527,10 +527,14 @@ function parseDimensions(raw: string | undefined): { height?: object; width?: ob
  * Web Vocabulary — pensato per la pubblicazione di singole pagine prodotto, non per l'intero
  * scambio B2B GDSN — non copre affatto: nessun termine gs1:isTradeItem*, gs1:quantityContained
  * o equivalente esiste nel vocabolario ufficiale. Per questi attributi si propone qui
- * un'estensione italiana con prefisso gs1it: (namespace fittizio ma coerente, sotto il dominio
- * reale di GS1 Italy), chiaramente distinta dai termini gs1: ufficiali.
+ * un'estensione con prefisso gs1it: (definita in src/app/data/vocabulary.ts, con una pagina
+ * reale per termine su /voc/:term), chiaramente distinta dai termini gs1: ufficiali.
+ *
+ * `origin` è l'origine assoluta del sito corrente (vedi SiteOriginService, passata dal chiamante
+ * invece di iniettata qui: questa è una funzione pura, non un metodo di componente) — il
+ * namespace gs1it: vive sul dominio del progetto stesso, mai su un dominio di terzi.
  */
-export function buildGdsnWebVocabJson(gdsn: GdsnInfo): object {
+export function buildGdsnWebVocabJson(gdsn: GdsnInfo, origin: string): object {
   const targetMarket = {
     '@type': 'gs1:TargetMarketDetails',
     'gs1:targetMarketCountries': [{ '@type': 'gs1:Country', 'gs1:countryCode': gdsn.targetMarket }],
@@ -570,7 +574,7 @@ export function buildGdsnWebVocabJson(gdsn: GdsnInfo): object {
   return {
     '@context': {
       gs1: 'https://ref.gs1.org/voc/',
-      gs1it: 'https://gs1it.org/voc/',
+      gs1it: `${origin.replace(/\/$/, '')}/voc/`,
       xsd: 'http://www.w3.org/2001/XMLSchema#',
       '@vocab': 'https://ref.gs1.org/voc/',
     },

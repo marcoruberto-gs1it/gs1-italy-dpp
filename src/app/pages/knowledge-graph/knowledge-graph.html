@@ -50,6 +50,9 @@
       </div>
 
       @if (selectedHub(); as hub) {
+        <p class="kg-hub-link">
+          <a [routerLink]="entityPath(hub.id)">{{ t('kg.card.viewEntity') }} →</a>
+        </p>
         <svg class="kg-diagram" viewBox="0 0 600 600" role="img" [attr.aria-label]="hub.label">
           @for (spoke of spokeLayout(); track spoke.product.id) {
             <line class="kg-edge" x1="300" y1="300" [attr.x2]="spoke.x" [attr.y2]="spoke.y"></line>
@@ -89,7 +92,10 @@
             <p class="kg-product-gtin">GTIN {{ p.gtin }}</p>
 
             @if (p.brandName) {
-              <p><strong>{{ t('kg.card.brand') }}:</strong> {{ p.brandName }}</p>
+              <p>
+                <strong>{{ t('kg.card.brand') }}:</strong>
+                @if (p.brandId) { <a [routerLink]="entityPath(p.brandId)">{{ p.brandName }}</a> } @else { {{ p.brandName }} }
+              </p>
             }
 
             @if (p.manufacturer; as m) {
@@ -124,6 +130,7 @@
     <div class="result-card">
       <h3>{{ t('kg.sparqlHeading') }}</h3>
       <p class="data-text">{{ t('kg.sparqlIntro') }}</p>
+      <p class="data-text"><a routerLink="/voc">{{ t('kg.vocLink') }} →</a></p>
 
       <div class="kg-example-row">
         @for (q of exampleQueries; track q.labelKey) {

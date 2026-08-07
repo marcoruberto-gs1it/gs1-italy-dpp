@@ -183,7 +183,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -798,7 +798,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -1352,7 +1352,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -1749,7 +1749,7 @@
           }
         ],
         "gs1:globalLocationNumber": "8032089000055",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000055.jpg",
       "offers": {
@@ -2127,7 +2127,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy MedCare",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000062.jpg",
       "offers": {
@@ -2331,7 +2331,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000079.jpg",
       "manufacturer": {
@@ -2720,7 +2720,7 @@
         "@type": "Brand",
         "name": "GS1 Italy Fresh",
         "gs1:globalLocationNumber": "8032089000093",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "image": "images/08032089000093.jpg",
       "offers": {
@@ -3016,7 +3016,7 @@
           }
         ],
         "gs1:globalLocationNumber": "8032089000116",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000116.jpg",
       "aggregateRating": {
@@ -3269,7 +3269,7 @@
         "@type": "Brand",
         "name": "GS1 Italy Sapori",
         "gs1:globalLocationNumber": "8032089000123",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000123.jpg",
       "offers": {
@@ -3631,7 +3631,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -4069,7 +4069,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Sapori",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000154.jpg",
       "offers": {
@@ -4264,7 +4264,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -4411,7 +4411,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Sapori",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000178.jpg",
       "offers": {
@@ -4741,7 +4741,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -5146,7 +5146,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Sapori",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000208.jpg",
       "offers": {
@@ -5340,7 +5340,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Sapori",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-sapori"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-sapori"
       },
       "image": "images/08032089000222.jpg",
       "offers": {
@@ -5600,7 +5600,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -6134,7 +6134,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -6532,7 +6532,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Professional",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000253.jpg",
       "offers": {
@@ -6655,7 +6655,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Professional",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000260.jpg",
       "offers": {
@@ -7022,7 +7022,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -7389,7 +7389,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Professional",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-professional"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-professional"
       },
       "image": "images/08032089000307.jpg",
       "offers": {
@@ -7634,7 +7634,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -7826,7 +7826,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy MedCare",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000321.jpg",
       "offers": {
@@ -8085,7 +8085,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -8365,7 +8365,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -8529,7 +8529,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy MedCare",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000352.jpg",
       "offers": {
@@ -8769,7 +8769,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy MedCare",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000383.jpg",
       "offers": {
@@ -8893,7 +8893,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy MedCare",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-medcare"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-medcare"
       },
       "image": "images/08032089000390.jpg",
       "offers": {
@@ -9162,7 +9162,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -9417,7 +9417,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -9546,7 +9546,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Wear",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "image": "images/08032089000420.jpg",
       "offers": {
@@ -9656,7 +9656,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Wear",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "image": "images/08032089000437.jpg",
       "offers": {
@@ -9959,7 +9959,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -10137,7 +10137,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Wear",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-wear"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-wear"
       },
       "image": "images/08032089000468.jpg",
       "offers": {
@@ -10456,7 +10456,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -10929,7 +10929,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -11466,7 +11466,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -11914,7 +11914,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Fresh",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "image": "images/08032089000512.jpg",
       "offers": {
@@ -12036,7 +12036,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Fresh",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "image": "images/08032089000529.jpg",
       "offers": {
@@ -12387,7 +12387,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-fresh"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-fresh"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -12910,7 +12910,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -13099,7 +13099,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Build",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000574.jpg",
       "offers": {
@@ -13305,7 +13305,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "manufacturer": {
         "@type": "Organization",
@@ -13443,7 +13443,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Build",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000598.jpg",
       "offers": {
@@ -13670,7 +13670,7 @@
       "brand": {
         "@type": "Brand",
         "name": "GS1 Italy Build",
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "image": "images/08032089000628.jpg",
       "offers": {
@@ -13929,7 +13929,7 @@
             "@language": "it"
           }
         ],
-        "@id": "https://gs1it.org/id/brand/gs1-italy-build"
+        "@id": "https://tuodominio-produzione.it/id/brand/gs1-italy-build"
       },
       "manufacturer": {
         "@type": "Organization",

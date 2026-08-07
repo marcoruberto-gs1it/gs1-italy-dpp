@@ -1,0 +1,43 @@
+<div class="voc-term-page">
+  <nav class="breadcrumbs" aria-label="breadcrumb">
+    <ol>
+      <li><a routerLink="/">{{ t('nav.home') }}</a></li>
+      <li class="separator">/</li>
+      <li><a routerLink="/voc">{{ t('voc.breadcrumb') }}</a></li>
+      <li class="separator">/</li>
+      <li class="current" aria-current="page">gs1it:{{ termParam() }}</li>
+    </ol>
+  </nav>
+
+  @if (term(); as term) {
+    <header class="voc-term-header">
+      <span class="gs-badge gs-badge--neutral">{{ term.kind === 'Class' ? t('voc.kindClass') : t('voc.kindProperty') }}</span>
+      <h1>gs1it:{{ term.term }}</h1>
+      <p class="voc-term-label">{{ label() }}</p>
+    </header>
+
+    <div class="voc-term-card">
+      <p class="voc-term-comment">{{ comment() }}</p>
+
+      @if (term.domain || term.range) {
+        <dl class="voc-term-meta">
+          @if (term.domain) {
+            <dt>{{ t('voc.domainLabel') }}</dt>
+            <dd><code>{{ term.domain }}</code></dd>
+          }
+          @if (term.range) {
+            <dt>{{ t('voc.rangeLabel') }}</dt>
+            <dd><code>{{ term.range }}</code></dd>
+          }
+        </dl>
+      }
+
+      <p class="voc-term-usage"><strong>{{ t('voc.usedByLabel') }}</strong> {{ usage() }}</p>
+    </div>
+  } @else {
+    <div class="voc-term-card">
+      <p>{{ t('voc.notFoundBody') }}</p>
+      <a routerLink="/voc" class="gs-btn gs-btn--ghost">{{ t('voc.backToIndex') }}</a>
+    </div>
+  }
+</div>

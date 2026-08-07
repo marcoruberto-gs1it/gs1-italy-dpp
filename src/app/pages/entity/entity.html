@@ -1,0 +1,44 @@
+<div class="entity-page">
+  <nav class="breadcrumbs" aria-label="breadcrumb">
+    <ol>
+      <li><a routerLink="/">{{ t('nav.home') }}</a></li>
+      <li class="separator">/</li>
+      <li><a routerLink="/knowledge-graph">{{ t('kg.breadcrumb') }}</a></li>
+      <li class="separator">/</li>
+      <li class="current" aria-current="page">{{ breadcrumbLabel() }}</li>
+    </ol>
+  </nav>
+
+  @if (entity(); as entity) {
+    <header class="entity-header">
+      <span class="gs-badge gs-badge--neutral">{{ typeBadge() }}</span>
+      <h1>{{ entity.name }}</h1>
+      <p class="entity-count">
+        {{ t(entity.kind === 'brand' ? 'entity.brandProductsCount' : 'entity.certificationBodyProductsCount', { count: entity.products.length }) }}
+      </p>
+    </header>
+
+    <ul class="entity-product-list">
+      @for (product of entity.products; track product.gtin) {
+        <li class="entity-product-card">
+          <a [routerLink]="['/01', product.gtin]" class="entity-product-link">
+            <div class="entity-product-image-wrapper">
+              <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
+            </div>
+            <div class="entity-product-body">
+              <span class="entity-product-name">{{ product.name }}</span>
+              @if ($any(product).standard) {
+                <span class="entity-product-standard">{{ $any(product).standard }}</span>
+              }
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="entity-card">
+      <p>{{ t('entity.notFoundBody') }}</p>
+      <a routerLink="/knowledge-graph" class="gs-btn gs-btn--ghost">{{ t('entity.backToGraph') }}</a>
+    </div>
+  }
+</div>

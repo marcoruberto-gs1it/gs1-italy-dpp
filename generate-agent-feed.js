@@ -20,6 +20,11 @@ const PRODUCTS_PATH = path.join(__dirname, 'src', 'app', 'data', 'products.json'
 // Stessa convenzione di generate-seo-files.js: nessun dominio hardcoded, in produzione
 // SITE_URL arriva dall'ambiente di build (vedi webshop/Dockerfile).
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:4200').replace(/\/$/, '');
+// Stesso placeholder di SiteOriginService (src/app/services/site-origin.service.ts,
+// SSR_FALLBACK_ORIGIN) e di generate-knowledge-graph.js: il dominio salvato in products.json per
+// rawGs1Data.brand['@id'] finché non si conosce l'origine reale.
+const PLACEHOLDER_ORIGIN = 'https://tuodominio-produzione.it';
+const resolveOrigin = (id) => (id.startsWith(PLACEHOLDER_ORIGIN) ? SITE_URL + id.slice(PLACEHOLDER_ORIGIN.length) : id);
 
 if (!fs.existsSync(BROWSER_DIR)) {
   console.error(`generate-agent-feed: ${BROWSER_DIR} non trovato — esegui dopo "ng build".`);
@@ -81,6 +86,9 @@ for (const p of products) {
   // schema:hasGS1DigitalLink — stessa proprietà iniettata da product.ts::jsonLdJson, qui con
   // SITE_URL invece di SiteOriginService perché questo script gira a build time, non a runtime.
   doc['hasGS1DigitalLink'] = `${SITE_URL}/01/${p.gtin}`;
+  // brand['@id'] è salvato in products.json col placeholder di dominio (vedi PLACEHOLDER_ORIGIN
+  // sopra): risolto qui con lo stesso principio di hasGS1DigitalLink, non copiato così com'è.
+  if (doc.brand?.['@id']) doc.brand['@id'] = resolveOrigin(doc.brand['@id']);
 
   const dir = path.join(BROWSER_DIR, '01', p.gtin);
   fs.mkdirSync(dir, { recursive: true });
@@ -163,7 +171,10 @@ for (const p of products) {
       name: `${p.name} — ${level.packagingTypeLabel || level.level}`,
     };
 
-    if (p.rawGs1Data.brand) doc.brand = JSON.parse(JSON.stringify(p.rawGs1Data.brand));
+    if (p.rawGs1Data.brand) {
+      doc.brand = JSON.parse(JSON.stringify(p.rawGs1Data.brand));
+      if (doc.brand['@id']) doc.brand['@id'] = resolveOrigin(doc.brand['@id']);
+    }
     if (level.packagingTypeCode) doc['gs1:packagingType'] = level.packagingTypeCode;
 
     // Quantità contenuta come contenuto netto in pezzi (H87 = piece, UN/ECE Rec 20):

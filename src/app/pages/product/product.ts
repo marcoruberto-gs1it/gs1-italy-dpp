@@ -14,7 +14,7 @@ import { onImageError } from '../../utils/image-fallback';
 import { highlightJson } from '../../utils/json-highlight';
 import { downloadBarcodePng, downloadBarcodeSvg } from '../../utils/barcode-download';
 import { I18nService } from '../../services/i18n.service';
-import { SiteOriginService } from '../../services/site-origin.service';
+import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
 
 type ProductTab = 'details' | 'sustainability' | 'supply-chain' | 'gdsn' | 'edi' | 'structured-data';
 
@@ -178,7 +178,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   gdsnJson = computed<SafeHtml>(() => {
     const gdsn = this.product()?.gdsn;
     if (!gdsn) return this.sanitizer.bypassSecurityTrustHtml('');
-    const json = JSON.stringify(buildGdsnWebVocabJson(gdsn), null, 2);
+    const json = JSON.stringify(buildGdsnWebVocabJson(gdsn, this.siteOrigin.value), null, 2);
     return this.sanitizer.bypassSecurityTrustHtml(highlightJson(json));
   });
 
@@ -327,6 +327,16 @@ export class ProductComponent implements OnInit, OnDestroy {
     // stessa: qui coincide con currentDigitalLink perché questo sito è il resolver, non un
     // sistema separato dalla pagina umana.
     jsonLdData['hasGS1DigitalLink'] = this.currentDigitalLink();
+
+    // brand['@id'] è salvato in products.json col placeholder di dominio SSR_FALLBACK_ORIGIN
+    // (stesso principio di SiteOriginService: mai un dominio fisso salvato nel dato sorgente).
+    // Va risolto qui, non copiato così com'è — a differenza dell'HTML prerenderizzato (dove lo
+    // stesso placeholder viene corretto da generate-seo-files.js in un passaggio successivo),
+    // questo JSON-LD può anche essere generato interamente lato browser (rotte lotto/seriale
+    // arbitrarie, RenderMode.Client), dove quel passaggio non esiste.
+    if (jsonLdData.brand?.['@id']?.startsWith(SSR_FALLBACK_ORIGIN)) {
+      jsonLdData.brand['@id'] = this.siteOrigin.value.replace(/\/$/, '') + jsonLdData.brand['@id'].slice(SSR_FALLBACK_ORIGIN.length);
+    }
 
     // I campi schema.org semplici (non language-tagged array come le proprietà gs1:) seguono
     // la lingua attiva della UI — a differenza degli array `{ "@value", "@language" }` di

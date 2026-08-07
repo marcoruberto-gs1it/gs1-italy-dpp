@@ -240,6 +240,19 @@
   color: var(--text-muted);
   margin: 8px 0 0;
 }
+.kg-hub-link {
+  text-align: right;
+  margin: 0 0 4px;
+}
+.kg-hub-link a {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gs1-blue);
+  text-decoration: none;
+}
+.kg-hub-link a:hover {
+  text-decoration: underline;
+}
 
 /* --- Scheda prodotto (relazioni in linguaggio naturale) --- */
 .kg-product-card {

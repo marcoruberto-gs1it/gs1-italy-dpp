@@ -4,6 +4,9 @@ import { Sector } from './pages/sector/sector';
 import { ProductComponent } from './pages/product/product';
 import { ValidatorComponent } from './pages/validator/validator';
 import { KnowledgeGraphComponent } from './pages/knowledge-graph/knowledge-graph';
+import { VocabularyIndexComponent } from './pages/vocabulary/vocabulary-index';
+import { VocabularyTermComponent } from './pages/vocabulary/vocabulary-term';
+import { EntityComponent } from './pages/entity/entity';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -11,6 +14,15 @@ export const routes: Routes = [
   { path: 'catalog/:sector', component: Sector },
   { path: 'validatore', component: ValidatorComponent },
   { path: 'knowledge-graph', component: KnowledgeGraphComponent },
+  // Namespace dell'estensione gs1it: (vedi src/app/data/vocabulary.ts) — sul dominio del
+  // progetto, non più su gs1it.org (sito reale di GS1 Italy, non controllato da questo progetto).
+  { path: 'voc', component: VocabularyIndexComponent },
+  { path: 'voc/:term', component: VocabularyTermComponent },
+  // Identificatori coniati per brand e organismi di certificazione (vedi
+  // src/app/data/entities.ts e generate-knowledge-graph.js), stesso principio: pagina reale sul
+  // dominio del progetto invece di un URI su un dominio terzo che non risponde nulla di coerente.
+  { path: 'id/brand/:slug', component: EntityComponent, data: { kind: 'brand' } },
+  { path: 'id/certification-body/:slug', component: EntityComponent, data: { kind: 'certificationBody' } },
   // /assistente non è più servita da Angular: quel path è instradato al chat-client React
   // (business-agent UCP), vedi docker-compose.yml. Il componente ChatComponent resta nel repo
   // come simulazione di riferimento, ma non è più raggiungibile.
