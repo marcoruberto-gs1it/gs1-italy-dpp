@@ -37,16 +37,41 @@ function walkHtmlFiles(dir) {
   return out;
 }
 
+/**
+ * Percorso del file prerenderizzato → rotta pubblica servita da nginx.
+ * `catalog/fmcg/index.html` → `/catalog/fmcg`, `index.html` → `/`.
+ * Restituisce null per index.csr.html, che non è una pagina ma la shell client-side.
+ */
+function routeFromHtmlPath(file) {
+  const rel = path.relative(BROWSER_DIR, file).split(path.sep).join('/');
+  if (rel === 'index.csr.html') return null;
+  const route = rel.replace(/\/index\.html$/, '').replace(/\.html$/, '');
+  return route === 'index' ? '/' : `/${route}`;
+}
+
 const htmlFiles = walkHtmlFiles(BROWSER_DIR);
 let fixedFiles = 0;
+const missingCanonical = [];
 for (const file of htmlFiles) {
   const text = fs.readFileSync(file, 'utf8');
   if (text.includes(SSR_FALLBACK_ORIGIN)) {
     fs.writeFileSync(file, text.split(SSR_FALLBACK_ORIGIN).join(SITE_URL));
     fixedFiles++;
   }
+
+  // Il canonical lo mette già app.ts (effect su navigationEnd → <link id="link-canonical">,
+  // con le istanze lotto/seriale ricondotte alla pagina prodotto), quindi qui non si inietta
+  // nulla: si verifica soltanto. Una pagina prerenderizzata che ne è priva segnala che quella
+  // rotta non è passata dall'effect — un caso che si nota solo leggendo l'HTML costruito,
+  // quindi tanto vale dirlo a build time invece di scoprirlo mesi dopo in un audit SEO.
+  if (routeFromHtmlPath(file) && !/rel=["']canonical["']/i.test(text)) {
+    missingCanonical.push(path.relative(BROWSER_DIR, file));
+  }
 }
 console.log(`generate-seo-files: dominio corretto in ${fixedFiles}/${htmlFiles.length} pagine prerenderizzate`);
+if (missingCanonical.length) {
+  console.warn(`generate-seo-files: ATTENZIONE — ${missingCanonical.length} pagine senza rel=canonical: ${missingCanonical.join(', ')}`);
+}
 
 // ---------------------------------------------------------------------------
 // 2. sitemap.xml — pagine statiche + una entry per prodotto (solo rotte prerenderizzate:
@@ -55,14 +80,34 @@ console.log(`generate-seo-files: dominio corretto in ${fixedFiles}/${htmlFiles.l
 // ---------------------------------------------------------------------------
 const sectorIds = [...new Set(products.map((p) => p.sectorId))];
 
+/**
+ * Rotte prerenderizzate sotto una directory, lette dal build invece che ridichiarate qui.
+ * I termini del vocabolario e gli identificatori di brand/organismi nascono da
+ * getPrerenderParams (vedi app.routes.server.ts): elencarli di nuovo a mano significherebbe
+ * tenere allineate due liste, ed è esattamente il motivo per cui erano finiti fuori dalla
+ * sitemap — una trentina di pagine pubblicate e mai dichiarate.
+ */
+function prerenderedRoutes(relDir) {
+  const dir = path.join(BROWSER_DIR, ...relDir.split('/'));
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && fs.existsSync(path.join(dir, e.name, 'index.html')))
+    .map((e) => ({ loc: `/${relDir}/${e.name}` }));
+}
+
 const staticUrls = [
   { loc: '/' },
   { loc: '/validatore' },
+  { loc: '/knowledge-graph' },
   { loc: '/voc' },
   { loc: '/organizzazione' },
   // /assistente non è più una pagina prerenderizzata di questo sito: è il chat-client React
   // (vedi docker-compose.yml), una SPA senza contenuto statico da indicizzare.
   ...sectorIds.map((id) => ({ loc: `/catalog/${id}` })),
+  ...prerenderedRoutes('voc'),
+  ...prerenderedRoutes('id/brand'),
+  ...prerenderedRoutes('id/certification-body'),
 ];
 
 const productUrls = products.map((p) => ({

@@ -306,6 +306,12 @@ export class ProductComponent implements OnInit, OnDestroy {
     return url;
   });
 
+  /** "images/x.jpg" → "https://dominio/images/x.jpg"; un URL già assoluto resta com'è. */
+  private absoluteUrl(url: string): string {
+    if (!url || /^https?:\/\//i.test(url)) return url;
+    return `${this.siteOrigin.value.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+  }
+
   // Generazione del JSON-LD conforme al GS1 Web Vocabulary, pubblicato tramite applyJsonLd()
   // (vedi il costruttore): restituisce solo la stringa JSON, non più il tag <script> completo —
   // vedi il commento su applyJsonLd per il perché.
@@ -345,6 +351,14 @@ export class ProductComponent implements OnInit, OnDestroy {
     if (jsonLdData.name) jsonLdData.name = prod.name;
     if (jsonLdData.description) jsonLdData.description = prod.description;
 
+    // In products.json l'immagine è relativa: va bene per l'<img> della pagina, non per il
+    // JSON-LD, che viene consumato anche staccato dall'HTML (sidecar .jsonld servito in content
+    // negotiation, knowledge graph, validator esterni) senza nessun base URL su cui risolverla.
+    // Stessa correzione applicata a build time da generate-agent-feed.js e
+    // generate-knowledge-graph.js: qui serve perché questo blocco può nascere anche interamente
+    // nel browser (rotte lotto/seriale arbitrarie, RenderMode.Client).
+    if (typeof jsonLdData.image === 'string') jsonLdData.image = this.absoluteUrl(jsonLdData.image);
+
     // Le iniezioni seguenti riguardano solo il payload nello "shape" GS1 (gs1:Offer > itemOffered).
     // I prodotti demo che pubblicano solo schema.org (o un mix) hanno una struttura diversa e
     // vengono pubblicati così come sono, senza queste arricchimenti specifici GS1.
@@ -362,7 +376,7 @@ export class ProductComponent implements OnInit, OnDestroy {
             "@type": "xsd:integer"
           },
           "referencedFileURL": {
-            "@id": prod.image
+            "@id": this.absoluteUrl(prod.image)
           }
         };
       }
@@ -414,7 +428,9 @@ export class ProductComponent implements OnInit, OnDestroy {
       this.titleService.setTitle(`${prod.name} | Digital Link`);
       this.metaService.updateTag({ name: 'description', content: prod.description });
       this.metaService.updateTag({ property: 'og:title', content: prod.name });
-      this.metaService.updateTag({ property: 'og:image', content: prod.image });
+      // og:image richiede per specifica un URL assoluto: chi lo consuma (anteprime social,
+      // crawler) legge il tag fuori dal contesto della pagina.
+      this.metaService.updateTag({ property: 'og:image', content: this.absoluteUrl(prod.image) });
     });
   }
 

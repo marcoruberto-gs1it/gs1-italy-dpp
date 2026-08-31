@@ -134,6 +134,12 @@ for (const p of products) {
   doc['@id'] = doc['@id'] || productId(p.gtin);
   if (doc.name) doc.name = p.name;
   if (doc.description) doc.description = p.description;
+  // Stessa correzione di generate-agent-feed.js: in products.json l'immagine è relativa alla
+  // pagina, ma questo grafo viaggia come documento a sé (knowledge-graph.jsonld, caricato in un
+  // triple store) dove non esiste nessun base URL su cui risolverla.
+  if (typeof doc.image === 'string' && !/^https?:\/\//i.test(doc.image)) {
+    doc.image = `${SITE_URL}/${doc.image.replace(/^\//, '')}`;
+  }
   delete doc['@context']; // sostituito dal contesto unico del grafo, vedi in fondo
 
   // Brand: nome estratto da gs1:brandName se presente, altrimenti dal name schema.org.

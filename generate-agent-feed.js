@@ -25,6 +25,8 @@ const SITE_URL = (process.env.SITE_URL || 'http://localhost:4200').replace(/\/$/
 // rawGs1Data.brand['@id'] finché non si conosce l'origine reale.
 const PLACEHOLDER_ORIGIN = 'https://tuodominio-produzione.it';
 const resolveOrigin = (id) => (id.startsWith(PLACEHOLDER_ORIGIN) ? SITE_URL + id.slice(PLACEHOLDER_ORIGIN.length) : id);
+/** "images/x.jpg" → "https://dominio/images/x.jpg"; un URL già assoluto resta com'è. */
+const absoluteUrl = (u) => (/^https?:\/\//i.test(u) ? u : `${SITE_URL}/${u.replace(/^\//, '')}`);
 
 if (!fs.existsSync(BROWSER_DIR)) {
   console.error(`generate-agent-feed: ${BROWSER_DIR} non trovato — esegui dopo "ng build".`);
@@ -89,6 +91,11 @@ for (const p of products) {
   // brand['@id'] è salvato in products.json col placeholder di dominio (vedi PLACEHOLDER_ORIGIN
   // sopra): risolto qui con lo stesso principio di hasGS1DigitalLink, non copiato così com'è.
   if (doc.brand?.['@id']) doc.brand['@id'] = resolveOrigin(doc.brand['@id']);
+  // image è salvata relativa in products.json ("images/<gtin>.jpg"), che va bene per un <img>
+  // in pagina ma non dentro un documento JSON-LD: chi lo consuma lo riceve staccato dalla
+  // pagina (Accept: application/ld+json, o dal knowledge graph) e non ha nessun base URL su cui
+  // risolverla. Assoluta come già lo sono catalog.json e hasGS1DigitalLink.
+  if (typeof doc.image === 'string') doc.image = absoluteUrl(doc.image);
 
   const dir = path.join(BROWSER_DIR, '01', p.gtin);
   fs.mkdirSync(dir, { recursive: true });
