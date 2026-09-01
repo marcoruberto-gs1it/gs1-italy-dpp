@@ -65,6 +65,16 @@ export const TRANSLATIONS = {
       allergenCrustaceans: 'Crostacei',
       allergenMolluscs: 'Molluschi',
       allergenSulphurDioxide: 'Anidride solforosa e solfiti',
+      inStock: 'Disponibile',
+      addToCart: 'Aggiungi al carrello',
+      tab: {
+        description: 'Descrizione',
+        nutrition: 'Ingredienti e nutrizione',
+        apparel: 'Dettagli',
+        certifications: 'Certificazioni',
+        environment: 'Impatto ambientale',
+        structured: 'Dati strutturati',
+      },
     },
     jsonld: {
       heading: 'Dati strutturati',
@@ -150,6 +160,16 @@ export const TRANSLATIONS = {
       allergenCrustaceans: 'Crustaceans',
       allergenMolluscs: 'Molluscs',
       allergenSulphurDioxide: 'Sulphur dioxide and sulphites',
+      inStock: 'In stock',
+      addToCart: 'Add to cart',
+      tab: {
+        description: 'Description',
+        nutrition: 'Ingredients & nutrition',
+        apparel: 'Details',
+        certifications: 'Certifications',
+        environment: 'Environmental impact',
+        structured: 'Structured data',
+      },
     },
     jsonld: {
       heading: 'Structured data',

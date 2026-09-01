@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
-import { ProductService, productImages, discountPercent, formatEuro } from '../../services/product.service';
+import { ProductService, productImages, discountPercent, formatEuro, pricePerKg, formatNetContent } from '../../services/product.service';
 import { StarRatingComponent } from '../../components/star-rating/star-rating';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { onImageError } from '../../utils/image-fallback';
@@ -67,6 +67,8 @@ export class ProductComponent implements OnDestroy {
   protected onImageError = onImageError;
   protected discountPercent = discountPercent;
   protected formatEuro = formatEuro;
+  protected pricePerKg = pricePerKg;
+  protected formatNetContent = formatNetContent;
 
   // toSignal (non uno snapshot letto una volta): Angular riusa la stessa istanza di
   // ProductComponent quando si naviga da un prodotto a un altro (stessa rotta, parametro
@@ -115,6 +117,11 @@ export class ProductComponent implements OnDestroy {
     if (doc.name) doc.name = prod.name;
     if (doc.description) doc.description = prod.description;
     doc['hasGS1DigitalLink'] = `${this.siteOrigin.value}/01/${prod.gtin}`;
+    // @id è l'identificatore del prodotto stesso: deve coincidere con il GS1 Digital Link
+    // risolvibile su questo sito, non con il placeholder salvato in products.json (né,
+    // tantomeno, con id.gs1.org — non è il nostro dominio, non risolverebbe questo dato).
+    doc['@id'] = doc['hasGS1DigitalLink'];
+    if (doc.offers) doc.offers['schema:url'] = doc['hasGS1DigitalLink'];
     if (doc.brand?.['@id']) doc.brand['@id'] = this.resolveOrigin(doc.brand['@id']);
     if (typeof doc.image === 'string') doc.image = this.absoluteUrl(doc.image);
     return doc;
@@ -135,6 +142,23 @@ export class ProductComponent implements OnDestroy {
       .filter((b: AllergenBadge | null): b is AllergenBadge => b !== null);
   });
 
+  // Sezioni informative "a fisarmonica" (ispirate a coopshop.it): chiuse di default, si aprono
+  // in autonomia una dall'altra. Niente sticky sulla galleria (vedi .gallery in product.css):
+  // aprire/chiudere una sezione cambia l'altezza della colonna info, e uno sticky l'avrebbe
+  // fatta "risucchiare" in su esattamente come succedeva con le vecchie tab.
+  private openSections = signal<ReadonlySet<string>>(new Set());
+
+  isSectionOpen(key: string): boolean {
+    return this.openSections().has(key);
+  }
+
+  toggleSection(key: string): void {
+    const next = new Set(this.openSections());
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    this.openSections.set(next);
+  }
+
   jsonLdDrawerOpen = signal(false);
 
   openJsonLd(): void {
@@ -151,6 +175,7 @@ export class ProductComponent implements OnDestroy {
     effect(() => {
       const prod = this.product();
       this.activeImageIndex.set(0);
+      this.openSections.set(new Set());
       if (!prod) return;
       this.titleService.setTitle(`${prod.name} | ${this.t('hero.pageTitle')}`);
       this.metaService.updateTag({ name: 'description', content: prod.description });

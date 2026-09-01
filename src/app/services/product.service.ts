@@ -95,6 +95,13 @@ export interface PriceInfo {
   listAmount?: number; // prezzo di listino, se in offerta
   discountLabel?: string;
   unit?: string; // es. "kg", "m²" per i prodotti a peso/misura variabile
+  validUntil?: string; // ISO 8601 — schema:priceValidUntil
+}
+
+/** Contenuto netto della confezione, stessa forma di gs1:netContent (value + unitCode UN/ECE Rec 20). */
+export interface NetContent {
+  value: number;
+  unitCode: 'GRM' | 'KGM' | 'MLT' | 'LTR';
 }
 
 /**
@@ -155,6 +162,7 @@ export interface Product {
   traceability?: TraceEvent[];
   traceabilityExample?: TraceabilityExample;
   price?: PriceInfo;
+  netContent?: NetContent;
   gdsn?: GdsnInfo;
 
   // Il payload JSON-LD nativo per i bot (Google, Resolver GS1, ecc.)
@@ -267,6 +275,25 @@ export function formatEuro(amount: number): string {
   return `${amount.toFixed(2).replace('.', ',')} €`;
 }
 
+/** Prezzo al kg — l'indicazione del "prezzo per unità di misura" richiesta in etichetta/scaffale. */
+export function pricePerKg(price: PriceInfo, netContent?: NetContent): number | null {
+  if (!netContent) return null;
+  const grams = netContent.unitCode === 'KGM' ? netContent.value * 1000 : netContent.unitCode === 'GRM' ? netContent.value : null;
+  if (!grams) return null;
+  return (price.amount / grams) * 1000;
+}
+
+/** "500 GRM" -> "500 g" ; "1500 GRM" -> "1,5 kg" — il formato leggibile del contenuto netto. */
+export function formatNetContent(netContent?: NetContent): string | null {
+  if (!netContent) return null;
+  const { value, unitCode } = netContent;
+  if (unitCode === 'GRM') return value >= 1000 ? `${(value / 1000).toLocaleString('it-IT')} kg` : `${value} g`;
+  if (unitCode === 'KGM') return `${value} kg`;
+  if (unitCode === 'MLT') return value >= 1000 ? `${(value / 1000).toLocaleString('it-IT')} l` : `${value} ml`;
+  if (unitCode === 'LTR') return `${value} l`;
+  return null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -285,7 +312,10 @@ export class ProductService {
   }
 
   getProductByGtin(gtin: string): Product | undefined {
-    const product = this.products.find(p => p.gtin === gtin);
+    // Il GTIN canonico (GS1 Digital Link, gs1:gtin) è sempre a 14 cifre: un link più corto
+    // (GTIN-8/12/13 non completato con zeri, es. un vecchio segnalibro) resta risolvibile.
+    const padded = /^\d{1,13}$/.test(gtin) ? gtin.padStart(14, '0') : gtin;
+    const product = this.products.find(p => p.gtin === gtin || p.gtin === padded);
     return product ? this.localize(product) : undefined;
   }
 

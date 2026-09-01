@@ -1,5 +1,5 @@
 .product-page {
-  max-width: 1100px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 24px 24px 80px;
 }
@@ -51,8 +51,6 @@
 /* --- Gallery --- */
 .gallery {
   margin: 0;
-  position: sticky;
-  top: 96px;
 }
 
 .main-image {
@@ -123,24 +121,70 @@
   margin: 8px 0 12px;
 }
 
-.price-block {
+/* --- Peso/formato + GTIN, come il codice prodotto sotto il marchio su coopshop.it --- */
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.meta-chip {
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 3px 9px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.meta-gtin {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.product-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 14px 0 0;
+  font-size: 0.96rem;
+}
+
+/* --- Purchase card (prezzo + disponibilità + CTA), ispirata alle e-commerce card di gastronomia:
+   niente bordo, solo un rilievo leggero — deve leggersi come parte della pagina, non come un
+   riquadro a sé. --- */
+.purchase-card {
+  margin: 24px 0;
+  padding: 20px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.purchase-price-row {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.purchase-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
 .price-current {
-  font-size: 1.7rem;
+  font-size: 1.9rem;
   font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.01em;
-}
-
-.price-unit {
-  font-size: 0.9rem;
-  color: var(--text-tertiary);
-  font-weight: 600;
 }
 
 .price-original {
@@ -159,29 +203,73 @@
   border-radius: var(--radius-full);
 }
 
-.product-description {
-  color: var(--text-secondary);
-  line-height: 1.65;
-  margin: 16px 0;
+.price-unit-ref {
+  font-size: 0.84rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
 }
 
-.info-block {
-  margin-top: 24px;
-  padding-top: 20px;
+.availability-badge svg {
+  color: var(--success);
+}
+
+.purchase-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* --- Sezioni "a fisarmonica" (ispirate a coopshop.it): chiuse di default, una riga per
+   sezione — l'utente apre solo quello che gli interessa invece di scorrere un unico blocco
+   con tutto sempre visibile. --- */
+.accordion {
+  margin-top: 28px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.info-block h2 {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  font-weight: 700;
-  margin: 0 0 10px;
+.accordion-item {
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.info-block p {
-  margin: 0 0 12px;
+.accordion-header {
+  appearance: none;
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 2px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.94rem;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.accordion-header span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  padding: 0 2px 18px;
+}
+
+.accordion-body p {
+  margin: 0;
   color: var(--text-secondary);
   line-height: 1.6;
   font-size: 0.94rem;
@@ -235,22 +323,6 @@
 }
 
 /* --- Structured data (GS1 Web Vocabulary) --- */
-.structured-data-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.structured-data-header h2 {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .gs-btn--sm {
   padding: 7px 14px;
   font-size: 0.8rem;
@@ -258,7 +330,7 @@
 
 .allergen-badges {
   list-style: none;
-  margin: 0;
+  margin: 12px 0 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;

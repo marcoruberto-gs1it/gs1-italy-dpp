@@ -1,22 +1,34 @@
 [
   {
-    "gtin": "8076809519960",
+    "gtin": "08076809519960",
     "name": "Casarecce n. 87",
     "brand": "Barilla",
-    "image": "https://images.openfoodfacts.org/images/products/807/680/951/9960/front_fr.76.400.jpg",
+    "image": "images/products/8076809519960.jpg",
     "description": "Barilla — confezione da 500 g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Durum wheat semolina pasta, water.",
-      "allergens": "Può contenere: glutine.",
+      "ingredients": "Semola di grano duro, acqua.",
+      "allergens": "Contiene: glutine. Può contenere tracce di: soia, senape.",
       "nutrition": {
         "calories": "359 kcal /100g",
         "fat": "2 g /100g",
-        "carbohydrates": "71.2 g /100g",
+        "carbohydrates": "71 g /100g",
         "sugars": "3.5 g /100g",
-        "protein": "12.5 g /100g"
+        "protein": "12.5 g /100g",
+        "salt": "0.01 g /100g"
       }
+    },
+    "price": {
+      "amount": 1.79,
+      "currency": "EUR",
+      "vatRate": 4,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 500,
+      "unitCode": "GRM"
     },
     "rawGs1Data": {
       "@context": {
@@ -26,29 +38,69 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8076809519960",
+      "@id": "https://tuodominio-produzione.it/01/08076809519960",
       "name": "Casarecce n. 87",
       "description": "Barilla — confezione da 500 g.",
-      "image": "https://images.openfoodfacts.org/images/products/807/680/951/9960/front_fr.76.400.jpg",
-      "gtin": "8076809519960",
+      "image": "images/products/8076809519960.jpg",
+      "gtin": "08076809519960",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/barilla",
         "gs1:brandName": "Barilla"
       },
-      "gs1:ingredientStatement": "Durum wheat semolina pasta, water.",
-      "gs1:allergenStatement": "Può contenere: glutine.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 500,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 1.79,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Semola di grano duro, acqua.",
+      "gs1:allergenStatement": "Contiene: glutine. Può contenere tracce di: soia, senape.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
@@ -75,7 +127,7 @@
       },
       "gs1:carbohydratesPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 71.2,
+        "gs1:value": 71,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
@@ -87,28 +139,44 @@
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 12.5,
         "gs1:unitCode": "GRM"
+      },
+      "gs1:saltPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 0.01,
+        "gs1:unitCode": "GRM"
       }
     }
   },
   {
-    "gtin": "8076809512114",
+    "gtin": "08076809512114",
     "name": "Fette Biscottate Integrali",
     "brand": "Mulino Bianco",
-    "image": "https://images.openfoodfacts.org/images/products/807/680/951/2114/front_it.53.400.jpg",
-    "description": "Fette biscottate integrali",
+    "image": "images/products/8076809512114.webp",
+    "description": "Mulino Bianco — confezione da 630 g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Farina integrale di grano tenero 98g*, lievito, olio di girasole, destrosio, sale, estratto di malto d'orzo e mais *Per 100 grammi di prodotto finito Può contenere tracce di frutta a guscio, latte, senape, sesamo, soia e uova.",
-      "allergens": "Può contenere: glutine.",
+      "ingredients": "Farina integrale di grano tenero (98 g per 100 g di prodotto finito), lievito, olio di girasole, destrosio, sale, estratto di malto d'orzo e mais.",
+      "allergens": "Contiene: glutine. Può contenere tracce di: frutta a guscio, latte, senape, semi di sesamo, soia, uova.",
       "nutrition": {
-        "calories": "387 kcal /100g",
-        "fat": "7.4 g /100g",
-        "carbohydrates": "60 g /100g",
-        "sugars": "4.6 g /100g",
-        "protein": "14 g /100g",
+        "calories": "384 kcal /100g",
+        "fat": "6 g /100g",
+        "carbohydrates": "63 g /100g",
+        "sugars": "6 g /100g",
+        "protein": "13.5 g /100g",
         "salt": "1.3 g /100g"
       }
+    },
+    "price": {
+      "amount": 3.49,
+      "currency": "EUR",
+      "vatRate": 4,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 630,
+      "unitCode": "GRM"
     },
     "rawGs1Data": {
       "@context": {
@@ -118,29 +186,105 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8076809512114",
+      "@id": "https://tuodominio-produzione.it/01/08076809512114",
       "name": "Fette Biscottate Integrali",
-      "description": "Fette biscottate integrali",
-      "image": "https://images.openfoodfacts.org/images/products/807/680/951/2114/front_it.53.400.jpg",
-      "gtin": "8076809512114",
+      "description": "Mulino Bianco — confezione da 630 g.",
+      "image": "images/products/8076809512114.webp",
+      "gtin": "08076809512114",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/mulino-bianco",
         "gs1:brandName": "Mulino Bianco"
       },
-      "gs1:ingredientStatement": "Farina integrale di grano tenero 98g*, lievito, olio di girasole, destrosio, sale, estratto di malto d'orzo e mais *Per 100 grammi di prodotto finito Può contenere tracce di frutta a guscio, latte, senape, sesamo, soia e uova.",
-      "gs1:allergenStatement": "Può contenere: glutine.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 630,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 3.49,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Farina integrale di grano tenero (98 g per 100 g di prodotto finito), lievito, olio di girasole, destrosio, sale, estratto di malto d'orzo e mais.",
+      "gs1:allergenStatement": "Contiene: glutine. Può contenere tracce di: frutta a guscio, latte, senape, semi di sesamo, soia, uova.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
@@ -157,27 +301,27 @@
       },
       "gs1:energyPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 387,
+        "gs1:value": 384,
         "gs1:unitCode": "E14"
       },
       "gs1:fatPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 7.4,
+        "gs1:value": 6,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 60,
+        "gs1:value": 63,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 4.6,
+        "gs1:value": 6,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 14,
+        "gs1:value": 13.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
@@ -188,24 +332,36 @@
     }
   },
   {
-    "gtin": "3017620422003",
+    "gtin": "03017620422003",
     "name": "Nutella",
     "brand": "Ferrero",
-    "image": "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_en.879.400.jpg",
-    "description": "Crema spalmabile alla nocciola",
+    "image": "images/products/3017620422003.jpg",
+    "description": "Ferrero — vasetto da 400 g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Zucchero, olio di palma, nocciole 13%, latte scremato in polvere 8,7%, cacao magro 7,4%, emulsionanti: lecitina di soia, vanillina",
-      "allergens": "Può contenere: latte, frutta a guscio, soia.",
+      "ingredients": "Zucchero, olio di palma, nocciole 13%, latte scremato in polvere 8,7%, cacao magro 7,4%, emulsionanti: lecitina di soia, vanillina.",
+      "allergens": "Contiene: frutta a guscio, latte, soia. Senza: glutine.",
       "nutrition": {
         "calories": "539 kcal /100g",
         "fat": "30.9 g /100g",
         "carbohydrates": "57.5 g /100g",
         "sugars": "56.3 g /100g",
         "protein": "6.3 g /100g",
-        "salt": "0.1 g /100g"
+        "salt": "0.11 g /100g"
       }
+    },
+    "price": {
+      "amount": 4.49,
+      "currency": "EUR",
+      "vatRate": 22,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31",
+      "listAmount": 4.99
+    },
+    "netContent": {
+      "value": 400,
+      "unitCode": "GRM"
     },
     "rawGs1Data": {
       "@context": {
@@ -215,41 +371,63 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/3017620422003",
+      "@id": "https://tuodominio-produzione.it/01/03017620422003",
       "name": "Nutella",
-      "description": "Crema spalmabile alla nocciola",
-      "image": "https://images.openfoodfacts.org/images/products/301/762/042/2003/front_en.879.400.jpg",
-      "gtin": "3017620422003",
+      "description": "Ferrero — vasetto da 400 g.",
+      "image": "images/products/3017620422003.jpg",
+      "gtin": "03017620422003",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/ferrero",
         "gs1:brandName": "Ferrero"
       },
-      "gs1:ingredientStatement": "Zucchero, olio di palma, nocciole 13%, latte scremato in polvere 8,7%, cacao magro 7,4%, emulsionanti: lecitina di soia, vanillina",
-      "gs1:allergenStatement": "Può contenere: latte, frutta a guscio, soia.",
-      "gs1:hasAllergen": [
-        {
-          "@type": "gs1:AllergenDetails",
-          "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-MILK"
-          },
-          "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
-          }
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 400,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 4.49,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
         },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Zucchero, olio di palma, nocciole 13%, latte scremato in polvere 8,7%, cacao magro 7,4%, emulsionanti: lecitina di soia, vanillina.",
+      "gs1:allergenStatement": "Contiene: frutta a guscio, latte, soia. Senza: glutine.",
+      "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-TREE_NUTS"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         },
         {
@@ -258,7 +436,16 @@
             "@id": "gs1:AllergenTypeCode-SOYBEANS"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
           }
         }
       ],
@@ -297,23 +484,41 @@
       },
       "gs1:saltPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 0.1,
+        "gs1:value": 0.11,
         "gs1:unitCode": "GRM"
       }
     }
   },
   {
-    "gtin": "8000500037560",
+    "gtin": "08000500037560",
     "name": "Kinder Bueno",
     "brand": "Kinder",
-    "image": "https://images.openfoodfacts.org/images/products/800/050/003/7560/front_en.298.400.jpg",
+    "image": "images/products/8000500037560.jpg",
     "description": "Kinder — confezione da 43g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "milk chocolate 31,5 % (sugar, cocoa butter, cocoa mass, skimmed milk powder, concentrated butter, emulsifiers: lecithins [soya], vanillin), sugar, palm oil, wheat flour, ground hazelnuts 10,8%, skimmed milk powder, milk powder, dark chocolate (sugar, cocoa mass, cocoa butter, emulsifiers: lecithins [soya], vanillin), lean cocoa, emulsifiers: lecithins [soya], raising agents (sodium acid carbonate, ammonium acid carbonate), salt, vanillin,",
-      "allergens": "Può contenere: glutine, latte, frutta a guscio, soia.",
-      "nutrition": {}
+      "ingredients": "Cioccolato al latte 31,5% (zucchero, burro di cacao, pasta di cacao, latte scremato in polvere, burro anidro, emulsionanti: lecitine (soia), vanillina), zucchero, olio di palma, farina di frumento, nocciole 10,8%, latte scremato in polvere, latte intero in polvere, cioccolato extra (zucchero, pasta di cacao, burro di cacao, emulsionanti: lecitine (soia), vanillina), cacao magro, emulsionanti: lecitine (soia), agenti lievitanti (carbonato acido di sodio), sale, vanillina.",
+      "allergens": "Contiene: glutine, frutta a guscio, latte, soia.",
+      "nutrition": {
+        "calories": "572 kcal /100g",
+        "fat": "37.3 g /100g",
+        "carbohydrates": "49.5 g /100g",
+        "sugars": "41.2 g /100g",
+        "protein": "8.6 g /100g",
+        "salt": "0.27 g /100g"
+      }
+    },
+    "price": {
+      "amount": 0.89,
+      "currency": "EUR",
+      "vatRate": 22,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 43,
+      "unitCode": "GRM"
     },
     "rawGs1Data": {
       "@context": {
@@ -323,24 +528,46 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8000500037560",
+      "@id": "https://tuodominio-produzione.it/01/08000500037560",
       "name": "Kinder Bueno",
       "description": "Kinder — confezione da 43g.",
-      "image": "https://images.openfoodfacts.org/images/products/800/050/003/7560/front_en.298.400.jpg",
-      "gtin": "8000500037560",
+      "image": "images/products/8000500037560.jpg",
+      "gtin": "08000500037560",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/kinder",
         "gs1:brandName": "Kinder"
       },
-      "gs1:ingredientStatement": "milk chocolate 31,5 % (sugar, cocoa butter, cocoa mass, skimmed milk powder, concentrated butter, emulsifiers: lecithins [soya], vanillin), sugar, palm oil, wheat flour, ground hazelnuts 10,8%, skimmed milk powder, milk powder, dark chocolate (sugar, cocoa mass, cocoa butter, emulsifiers: lecithins [soya], vanillin), lean cocoa, emulsifiers: lecithins [soya], raising agents (sodium acid carbonate, ammonium acid carbonate), salt, vanillin,",
-      "gs1:allergenStatement": "Può contenere: glutine, latte, frutta a guscio, soia.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 43,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 0.89,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Cioccolato al latte 31,5% (zucchero, burro di cacao, pasta di cacao, latte scremato in polvere, burro anidro, emulsionanti: lecitine (soia), vanillina), zucchero, olio di palma, farina di frumento, nocciole 10,8%, latte scremato in polvere, latte intero in polvere, cioccolato extra (zucchero, pasta di cacao, burro di cacao, emulsionanti: lecitine (soia), vanillina), cacao magro, emulsionanti: lecitine (soia), agenti lievitanti (carbonato acido di sodio), sale, vanillina.",
+      "gs1:allergenStatement": "Contiene: glutine, frutta a guscio, latte, soia.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
@@ -348,16 +575,7 @@
             "@id": "gs1:AllergenTypeCode-GLUTEN"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
-          }
-        },
-        {
-          "@type": "gs1:AllergenDetails",
-          "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-MILK"
-          },
-          "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         },
         {
@@ -366,7 +584,16 @@
             "@id": "gs1:AllergenTypeCode-TREE_NUTS"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         },
         {
@@ -375,31 +602,81 @@
             "@id": "gs1:AllergenTypeCode-SOYBEANS"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         }
-      ]
+      ],
+      "gs1:nutrientBasisQuantity": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 100,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:nutrientBasisQuantityType": {
+        "@id": "gs1:NutrientBasisQuantityCode-BY_MEASURE"
+      },
+      "gs1:energyPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 572,
+        "gs1:unitCode": "E14"
+      },
+      "gs1:fatPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 37.3,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:carbohydratesPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 49.5,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:sugarsPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 41.2,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:proteinPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 8.6,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:saltPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 0.27,
+        "gs1:unitCode": "GRM"
+      }
     }
   },
   {
-    "gtin": "7622210625243",
+    "gtin": "07622210625243",
     "name": "Oreo Golden",
     "brand": "Oreo",
-    "image": "https://images.openfoodfacts.org/images/products/762/221/062/5243/front_en.89.400.jpg",
-    "description": "Biscotti gusto vaniglia.",
+    "image": "images/products/7622210625243.webp",
+    "description": "Oreo — confezione da 220 g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Unbleached Enriched Flour (Wheat Flour, Niacin, Reduced Iron, Thiamine Mononitrate {Vitamin B1}, Riboflavin {Vitamin B2}, Folic Acid), Sugar, Canola And/Or Palm Oil, High Fructose Corn Syrup, Salt, Baking Soda, Soy Lecithin, Artificial Flavor, Natural Flavor",
-      "allergens": "Può contenere: glutine, soia.",
+      "ingredients": "Farina di frumento, zucchero, olio di colza, olio di palma, sciroppo di glucosio-fruttosio, amido di frumento, agenti lievitanti (carbonati di sodio, carbonati di ammonio), sale, emulsionante: lecitine di soia, aromi.",
+      "allergens": "Contiene: glutine, soia. Può contenere tracce di: latte.",
       "nutrition": {
         "calories": "484 kcal /100g",
         "fat": "20 g /100g",
         "carbohydrates": "69 g /100g",
         "sugars": "35 g /100g",
         "protein": "5.3 g /100g",
-        "salt": "0.8 g /100g"
+        "salt": "0.79 g /100g"
       }
+    },
+    "price": {
+      "amount": 2.29,
+      "currency": "EUR",
+      "vatRate": 22,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31",
+      "listAmount": 2.59
+    },
+    "netContent": {
+      "value": 220,
+      "unitCode": "GRM"
     },
     "rawGs1Data": {
       "@context": {
@@ -409,24 +686,46 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/7622210625243",
+      "@id": "https://tuodominio-produzione.it/01/07622210625243",
       "name": "Oreo Golden",
-      "description": "Biscotti gusto vaniglia.",
-      "image": "https://images.openfoodfacts.org/images/products/762/221/062/5243/front_en.89.400.jpg",
-      "gtin": "7622210625243",
+      "description": "Oreo — confezione da 220 g.",
+      "image": "images/products/7622210625243.webp",
+      "gtin": "07622210625243",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/oreo",
         "gs1:brandName": "Oreo"
       },
-      "gs1:ingredientStatement": "Unbleached Enriched Flour (Wheat Flour, Niacin, Reduced Iron, Thiamine Mononitrate {Vitamin B1}, Riboflavin {Vitamin B2}, Folic Acid), Sugar, Canola And/Or Palm Oil, High Fructose Corn Syrup, Salt, Baking Soda, Soy Lecithin, Artificial Flavor, Natural Flavor",
-      "gs1:allergenStatement": "Può contenere: glutine, soia.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 220,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 2.29,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Farina di frumento, zucchero, olio di colza, olio di palma, sciroppo di glucosio-fruttosio, amido di frumento, agenti lievitanti (carbonati di sodio, carbonati di ammonio), sale, emulsionante: lecitine di soia, aromi.",
+      "gs1:allergenStatement": "Contiene: glutine, soia. Può contenere tracce di: latte.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
@@ -434,13 +733,22 @@
             "@id": "gs1:AllergenTypeCode-GLUTEN"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         },
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
@@ -482,135 +790,40 @@
       },
       "gs1:saltPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 0.8,
+        "gs1:value": 0.79,
         "gs1:unitCode": "GRM"
       }
     }
   },
   {
-    "gtin": "7622201125813",
-    "name": "Milka con Mandorle",
-    "brand": "Milka",
-    "image": "https://images.openfoodfacts.org/images/products/762/220/112/5813/front_en.21.400.jpg",
-    "description": "Milka — confezione da 300g.",
-    "sectorId": "fmcg",
-    "sectorName": "Largo consumo",
-    "food": {
-      "ingredients": "sugar, palm oil, hazelnuts, skimmed milk powder, cocoa butter, cocoa mass, whey products, milk fat, emulsifiers (lecithins, E476), flavorings",
-      "allergens": "Può contenere: latte, frutta a guscio.",
-      "nutrition": {
-        "calories": "580 kcal /100g",
-        "fat": "39 g /100g",
-        "carbohydrates": "48 g /100g",
-        "sugars": "46 g /100g",
-        "protein": "6.6 g /100g",
-        "salt": "0.1 g /100g"
-      }
-    },
-    "rawGs1Data": {
-      "@context": {
-        "gs1": "https://ref.gs1.org/voc/",
-        "schema": "http://schema.org/",
-        "name": "schema:name",
-        "description": "schema:description",
-        "image": "schema:image",
-        "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
-      },
-      "@type": [
-        "schema:Product",
-        "gs1:FoodBeverageTobaccoProduct"
-      ],
-      "@id": "https://id.gs1.org/01/7622201125813",
-      "name": "Milka con Mandorle",
-      "description": "Milka — confezione da 300g.",
-      "image": "https://images.openfoodfacts.org/images/products/762/220/112/5813/front_en.21.400.jpg",
-      "gtin": "7622201125813",
-      "brand": {
-        "@type": "gs1:Brand",
-        "@id": "https://tuodominio-produzione.it/id/brand/milka",
-        "gs1:brandName": "Milka"
-      },
-      "gs1:ingredientStatement": "sugar, palm oil, hazelnuts, skimmed milk powder, cocoa butter, cocoa mass, whey products, milk fat, emulsifiers (lecithins, E476), flavorings",
-      "gs1:allergenStatement": "Può contenere: latte, frutta a guscio.",
-      "gs1:hasAllergen": [
-        {
-          "@type": "gs1:AllergenDetails",
-          "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-MILK"
-          },
-          "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
-          }
-        },
-        {
-          "@type": "gs1:AllergenDetails",
-          "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
-          },
-          "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
-          }
-        }
-      ],
-      "gs1:nutrientBasisQuantity": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 100,
-        "gs1:unitCode": "GRM"
-      },
-      "gs1:nutrientBasisQuantityType": {
-        "@id": "gs1:NutrientBasisQuantityCode-BY_MEASURE"
-      },
-      "gs1:energyPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 580,
-        "gs1:unitCode": "E14"
-      },
-      "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 39,
-        "gs1:unitCode": "GRM"
-      },
-      "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 48,
-        "gs1:unitCode": "GRM"
-      },
-      "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 46,
-        "gs1:unitCode": "GRM"
-      },
-      "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 6.6,
-        "gs1:unitCode": "GRM"
-      },
-      "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
-        "gs1:value": 0.1,
-        "gs1:unitCode": "GRM"
-      }
-    }
-  },
-  {
-    "gtin": "8002330091897",
+    "gtin": "08002330091897",
     "name": "Lenticchie Verdi",
     "brand": "Esselunga",
-    "image": "https://images.openfoodfacts.org/images/products/800/233/009/1897/front_en.3.400.jpg",
+    "image": "images/products/8002330091897.jpg",
     "description": "Esselunga — confezione da 500 g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Lenticchie verdi mignon secche",
+      "ingredients": "Lenticchie verdi mignon secche.",
       "nutrition": {
         "calories": "333 kcal /100g",
         "fat": "1.6 g /100g",
         "carbohydrates": "48.7 g /100g",
         "sugars": "1.1 g /100g",
         "protein": "25.1 g /100g",
-        "salt": "0 g /100g"
+        "salt": "0.03 g /100g"
       }
+    },
+    "price": {
+      "amount": 1.89,
+      "currency": "EUR",
+      "vatRate": 4,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 500,
+      "unitCode": "GRM"
     },
     "rawGs1Data": {
       "@context": {
@@ -620,23 +833,45 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8002330091897",
+      "@id": "https://tuodominio-produzione.it/01/08002330091897",
       "name": "Lenticchie Verdi",
       "description": "Esselunga — confezione da 500 g.",
-      "image": "https://images.openfoodfacts.org/images/products/800/233/009/1897/front_en.3.400.jpg",
-      "gtin": "8002330091897",
+      "image": "images/products/8002330091897.jpg",
+      "gtin": "08002330091897",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/esselunga",
         "gs1:brandName": "Esselunga"
       },
-      "gs1:ingredientStatement": "Lenticchie verdi mignon secche",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 500,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 1.89,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Lenticchie verdi mignon secche.",
       "gs1:nutrientBasisQuantity": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 100,
@@ -672,22 +907,22 @@
       },
       "gs1:saltPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
-        "gs1:value": 0,
+        "gs1:value": 0.03,
         "gs1:unitCode": "GRM"
       }
     }
   },
   {
-    "gtin": "8003170093157",
+    "gtin": "08003170093157",
     "name": "Crema 100% Arachidi",
     "brand": "Conad",
-    "image": "https://images.openfoodfacts.org/images/products/800/317/009/3157/front_it.3.400.jpg",
-    "description": "Crema spalmabile 100% arachidi, Conad.",
+    "image": "images/products/8003170093157.jpg",
+    "description": "Conad — vasetto da 350 g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Arachidi 100%, Può contenere frutta a guscio,",
-      "allergens": "Può contenere: arachidi.",
+      "ingredients": "Arachidi 100%.",
+      "allergens": "Contiene: arachidi. Può contenere tracce di: frutta a guscio.",
       "nutrition": {
         "calories": "601 kcal /100g",
         "fat": "46 g /100g",
@@ -697,6 +932,17 @@
         "salt": "0 g /100g"
       }
     },
+    "price": {
+      "amount": 3.99,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 350,
+      "unitCode": "GRM"
+    },
     "rawGs1Data": {
       "@context": {
         "gs1": "https://ref.gs1.org/voc/",
@@ -705,29 +951,60 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8003170093157",
+      "@id": "https://tuodominio-produzione.it/01/08003170093157",
       "name": "Crema 100% Arachidi",
-      "description": "Crema spalmabile 100% arachidi, Conad.",
-      "image": "https://images.openfoodfacts.org/images/products/800/317/009/3157/front_it.3.400.jpg",
-      "gtin": "8003170093157",
+      "description": "Conad — vasetto da 350 g.",
+      "image": "images/products/8003170093157.jpg",
+      "gtin": "08003170093157",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/conad",
         "gs1:brandName": "Conad"
       },
-      "gs1:ingredientStatement": "Arachidi 100%, Può contenere frutta a guscio,",
-      "gs1:allergenStatement": "Può contenere: arachidi.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 350,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 3.99,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Arachidi 100%.",
+      "gs1:allergenStatement": "Contiene: arachidi. Può contenere tracce di: frutta a guscio.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
@@ -775,16 +1052,16 @@
     }
   },
   {
-    "gtin": "8003100801913",
+    "gtin": "08003100801913",
     "name": "Tonno al Naturale",
     "brand": "Selex",
-    "image": "https://images.openfoodfacts.org/images/products/800/310/080/1913/front_en.4.400.jpg",
+    "image": "images/products/8003100801913.jpg",
     "description": "Selex — confezione da 2x160g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "TONNO AL NATURALE ingredienti: Tonno a pinne gialle (Thunnus albacares), acqua, sale dom l. Da consumarsi preferibilmente entro fine: Dicembre 2023 CONSERVAZIOONE",
-      "allergens": "Può contenere: pesce.",
+      "ingredients": "Tonno a pinne gialle (Thunnus albacares), acqua, sale, aromi naturali.",
+      "allergens": "Contiene: pesce.",
       "nutrition": {
         "calories": "95 kcal /100g",
         "fat": "0.8 g /100g",
@@ -794,6 +1071,18 @@
         "salt": "1.3 g /100g"
       }
     },
+    "price": {
+      "amount": 2.49,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31",
+      "listAmount": 2.89
+    },
+    "netContent": {
+      "value": 320,
+      "unitCode": "GRM"
+    },
     "rawGs1Data": {
       "@context": {
         "gs1": "https://ref.gs1.org/voc/",
@@ -802,24 +1091,46 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8003100801913",
+      "@id": "https://tuodominio-produzione.it/01/08003100801913",
       "name": "Tonno al Naturale",
       "description": "Selex — confezione da 2x160g.",
-      "image": "https://images.openfoodfacts.org/images/products/800/310/080/1913/front_en.4.400.jpg",
-      "gtin": "8003100801913",
+      "image": "images/products/8003100801913.jpg",
+      "gtin": "08003100801913",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/selex",
         "gs1:brandName": "Selex"
       },
-      "gs1:ingredientStatement": "TONNO AL NATURALE ingredienti: Tonno a pinne gialle (Thunnus albacares), acqua, sale dom l. Da consumarsi preferibilmente entro fine: Dicembre 2023 CONSERVAZIOONE",
-      "gs1:allergenStatement": "Può contenere: pesce.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 320,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 2.49,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Tonno a pinne gialle (Thunnus albacares), acqua, sale, aromi naturali.",
+      "gs1:allergenStatement": "Contiene: pesce.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
@@ -827,7 +1138,7 @@
             "@id": "gs1:AllergenTypeCode-FISH"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         }
       ],
@@ -872,16 +1183,16 @@
     }
   },
   {
-    "gtin": "8001120835888",
-    "name": "Pizza al Kamut Bio",
+    "gtin": "08001120835888",
+    "name": "Pizza Margherita al Kamut Bio",
     "brand": "Coop Vivi Verde",
-    "image": "https://images.openfoodfacts.org/images/products/800/112/083/5888/front_it.12.400.jpg",
+    "image": "images/products/8001120835888.jpg",
     "description": "Coop Vivi Verde — confezione da 340g.",
     "sectorId": "fmcg",
     "sectorName": "Largo consumo",
     "food": {
-      "ingredients": "Farina di grano khorasan a marchio KAMUT®* 43%, mozzarella* 20,6% (latte*, sale, caglio, correttore di acidità: acido lattico), passata di pomodoro* 15,6%, acqua, olio di semi di girasole*, lievito*, sale iodato (sale, iodato di potassio 0,07%), origano*, sale. Può contenere tracce di soia e senape. *Biologici.",
-      "allergens": "Può contenere: glutine, latte.",
+      "ingredients": "Farina di grano khorasan Kamut 43%, mozzarella 20,6% (latte, sale, caglio, correttore di acidità: acido lattico), passata di pomodoro 15,6%, acqua, oli e grassi vegetali (girasole, extravergine di oliva, colza), lievito, sale iodato, origano, sale.",
+      "allergens": "Contiene: glutine, latte. Può contenere tracce di: senape, soia.",
       "nutrition": {
         "calories": "241 kcal /100g",
         "fat": "9.5 g /100g",
@@ -891,6 +1202,17 @@
         "salt": "1.3 g /100g"
       }
     },
+    "price": {
+      "amount": 3.29,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 340,
+      "unitCode": "GRM"
+    },
     "rawGs1Data": {
       "@context": {
         "gs1": "https://ref.gs1.org/voc/",
@@ -899,29 +1221,69 @@
         "description": "schema:description",
         "image": "schema:image",
         "brand": "gs1:brand",
-        "gtin": "gs1:gtin"
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
       },
       "@type": [
         "schema:Product",
         "gs1:FoodBeverageTobaccoProduct"
       ],
-      "@id": "https://id.gs1.org/01/8001120835888",
-      "name": "Pizza al Kamut Bio",
+      "@id": "https://tuodominio-produzione.it/01/08001120835888",
+      "name": "Pizza Margherita al Kamut Bio",
       "description": "Coop Vivi Verde — confezione da 340g.",
-      "image": "https://images.openfoodfacts.org/images/products/800/112/083/5888/front_it.12.400.jpg",
-      "gtin": "8001120835888",
+      "image": "images/products/8001120835888.jpg",
+      "gtin": "08001120835888",
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/coop-vivi-verde",
         "gs1:brandName": "Coop Vivi Verde"
       },
-      "gs1:ingredientStatement": "Farina di grano khorasan a marchio KAMUT®* 43%, mozzarella* 20,6% (latte*, sale, caglio, correttore di acidità: acido lattico), passata di pomodoro* 15,6%, acqua, olio di semi di girasole*, lievito*, sale iodato (sale, iodato di potassio 0,07%), origano*, sale. Può contenere tracce di soia e senape. *Biologici.",
-      "gs1:allergenStatement": "Può contenere: glutine, latte.",
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 340,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 3.29,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Farina di grano khorasan Kamut 43%, mozzarella 20,6% (latte, sale, caglio, correttore di acidità: acido lattico), passata di pomodoro 15,6%, acqua, oli e grassi vegetali (girasole, extravergine di oliva, colza), lievito, sale iodato, origano, sale.",
+      "gs1:allergenStatement": "Contiene: glutine, latte. Può contenere tracce di: senape, soia.",
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
@@ -930,7 +1292,7 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-MILK"
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
@@ -973,6 +1335,145 @@
       "gs1:saltPerNutrientBasis": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 1.3,
+        "gs1:unitCode": "GRM"
+      }
+    }
+  },
+  {
+    "gtin": "08001590640258",
+    "name": "Philadelphia Originale",
+    "brand": "Philadelphia",
+    "image": "images/products/8001590640258.jpg",
+    "description": "Philadelphia — confezione da 250 g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "Latte pastorizzato, crema di latte, sale, stabilizzanti: gomma di guar, alginato di sodio, carragenina.",
+      "allergens": "Contiene: latte. Senza: glutine.",
+      "nutrition": {
+        "calories": "249 kcal /100g",
+        "fat": "25 g /100g",
+        "carbohydrates": "2.9 g /100g",
+        "sugars": "2.9 g /100g",
+        "protein": "3.7 g /100g",
+        "salt": "0.74 g /100g"
+      }
+    },
+    "price": {
+      "amount": 2.79,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true,
+      "validUntil": "2026-12-31"
+    },
+    "netContent": {
+      "value": 250,
+      "unitCode": "GRM"
+    },
+    "rawGs1Data": {
+      "@context": {
+        "gs1": "https://ref.gs1.org/voc/",
+        "schema": "http://schema.org/",
+        "name": "schema:name",
+        "description": "schema:description",
+        "image": "schema:image",
+        "brand": "gs1:brand",
+        "gtin": "gs1:gtin",
+        "offers": "schema:offers"
+      },
+      "@type": [
+        "schema:Product",
+        "gs1:FoodBeverageTobaccoProduct"
+      ],
+      "@id": "https://tuodominio-produzione.it/01/08001590640258",
+      "name": "Philadelphia Originale",
+      "description": "Philadelphia — confezione da 250 g.",
+      "image": "images/products/8001590640258.jpg",
+      "gtin": "08001590640258",
+      "brand": {
+        "@type": "gs1:Brand",
+        "@id": "https://tuodominio-produzione.it/id/brand/philadelphia",
+        "gs1:brandName": "Philadelphia"
+      },
+      "gs1:netContent": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 250,
+        "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 2.79,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:priceValidUntil": "2026-12-31",
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        }
+      },
+      "gs1:ingredientStatement": "Latte pastorizzato, crema di latte, sale, stabilizzanti: gomma di guar, alginato di sodio, carragenina.",
+      "gs1:allergenStatement": "Contiene: latte. Senza: glutine.",
+      "gs1:hasAllergen": [
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        }
+      ],
+      "gs1:nutrientBasisQuantity": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 100,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:nutrientBasisQuantityType": {
+        "@id": "gs1:NutrientBasisQuantityCode-BY_MEASURE"
+      },
+      "gs1:energyPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 249,
+        "gs1:unitCode": "E14"
+      },
+      "gs1:fatPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 25,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:carbohydratesPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 2.9,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:sugarsPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 2.9,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:proteinPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 3.7,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:saltPerNutrientBasis": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 0.74,
         "gs1:unitCode": "GRM"
       }
     }

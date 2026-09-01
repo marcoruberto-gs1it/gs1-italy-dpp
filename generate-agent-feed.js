@@ -87,6 +87,10 @@ for (const p of products) {
   // schema:hasGS1DigitalLink — stessa proprietà iniettata da product.ts::jsonLdJson, qui con
   // SITE_URL invece di SiteOriginService perché questo script gira a build time, non a runtime.
   doc['hasGS1DigitalLink'] = `${SITE_URL}/01/${p.gtin}`;
+  // @id è l'identificatore del prodotto stesso: deve essere il GS1 Digital Link risolvibile su
+  // questo sito (non il placeholder di products.json, né id.gs1.org — non è il nostro dominio).
+  doc['@id'] = doc['hasGS1DigitalLink'];
+  if (doc.offers) doc.offers['schema:url'] = doc['hasGS1DigitalLink'];
   // brand['@id'] è salvato in products.json col placeholder di dominio (vedi PLACEHOLDER_ORIGIN
   // sopra): risolto qui con lo stesso principio di hasGS1DigitalLink, non copiato così com'è.
   if (doc.brand?.['@id']) doc.brand['@id'] = resolveOrigin(doc.brand['@id']);
@@ -172,7 +176,9 @@ for (const p of products) {
     const doc = {
       '@context': JSON.parse(JSON.stringify(p.rawGs1Data['@context'])),
       '@type': JSON.parse(JSON.stringify(p.rawGs1Data['@type'])),
-      '@id': `https://id.gs1.org/01/${level.gtin}`,
+      // Stesso principio del prodotto base: il Digital Link vive su questo sito, non su
+      // id.gs1.org (il resolver di GS1, che non risolverebbe comunque questo dato).
+      '@id': `${SITE_URL}/01/${level.gtin}`,
       'gs1:gtin': level.gtin,
       name: `${p.name} — ${level.packagingTypeLabel || level.level}`,
     };
