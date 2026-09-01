@@ -440,9 +440,26 @@ body {
   border-color: var(--border-subtle) !important;
 }
 
+/* I tre bottoni di checkout/pagamento (Start Payment, View Order, Continue) e il pallino del
+   radio: tutte le varianti "bg-blue" e "text-blue" realmente usate in Checkout.tsx e
+   PaymentMethodSelector.tsx, non solo bg-blue-500/600 — altrimenti gli stati hover e il testo
+   restano sul blu di default di Tailwind invece del brand del sito. */
 .chat-bubble .bg-blue-500,
 .chat-bubble .bg-blue-600 {
   background: var(--brand) !important;
+}
+
+.chat-bubble .hover\:bg-blue-600:hover,
+.chat-bubble .hover\:bg-blue-700:hover {
+  background: var(--accent-strong) !important;
+}
+
+.chat-bubble .text-blue-600 {
+  color: var(--brand) !important;
+}
+
+.chat-bubble .text-blue-600.form-radio {
+  accent-color: var(--brand);
 }
 
 .chat-bubble .hover\:bg-gray-100:hover {
