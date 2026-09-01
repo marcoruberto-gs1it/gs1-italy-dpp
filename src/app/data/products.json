@@ -300,5 +300,195 @@
         "salt": "2.4 g /100g"
       }
     }
+  },
+  {
+    "gtin": "8002330112967",
+    "name": "Ditaloni",
+    "brand": "Esselunga",
+    "image": "https://images.openfoodfacts.org/images/products/800/233/011/2967/front_en.3.400.jpg",
+    "description": "Prodotto Esselunga.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo"
+  },
+  {
+    "gtin": "8002330091897",
+    "name": "Lenticchie Verdi",
+    "brand": "Esselunga",
+    "image": "https://images.openfoodfacts.org/images/products/800/233/009/1897/front_en.3.400.jpg",
+    "description": "Esselunga — confezione da 500 g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "Lenticchie verdi mignon secche",
+      "nutrition": {
+        "calories": "333 kcal /100g",
+        "fat": "1.6 g /100g",
+        "carbohydrates": "48.7 g /100g",
+        "sugars": "1.1 g /100g",
+        "protein": "25.1 g /100g",
+        "salt": "0 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "80425311",
+    "name": "Mandorle Tostate e Salate",
+    "brand": "Esselunga",
+    "image": "https://images.openfoodfacts.org/images/products/000/008/042/5311/front_fr.4.400.jpg",
+    "description": "Prodotto Esselunga.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "nutrition": {
+        "calories": "633 kcal /100g",
+        "fat": "54.8 g /100g",
+        "carbohydrates": "5.8 g /100g",
+        "sugars": "3.8 g /100g",
+        "protein": "25.1 g /100g",
+        "salt": "1 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8003170093157",
+    "name": "Crema 100% Arachidi",
+    "brand": "Conad",
+    "image": "https://images.openfoodfacts.org/images/products/800/317/009/3157/front_it.3.400.jpg",
+    "description": "Crema spalmabile 100% arachidi, Conad.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "Arachidi 100%, Può contenere frutta a guscio,",
+      "allergens": "Può contenere: arachidi.",
+      "nutrition": {
+        "calories": "601 kcal /100g",
+        "fat": "46 g /100g",
+        "carbohydrates": "17 g /100g",
+        "sugars": "4.9 g /100g",
+        "protein": "28 g /100g",
+        "salt": "0 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8003170007918",
+    "name": "Corn Flakes Classici",
+    "brand": "Conad",
+    "image": "https://images.openfoodfacts.org/images/products/800/317/000/7918/front_it.15.400.jpg",
+    "description": "Conad — confezione da 375 g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "Mais (105g per 100g di prodotto finito), zucchero, sale, vitamine (tiamina, riboflavina, acido pantotenico, vitamina B6, acido folico, vitamina B12, niacina), ferro, Può contenere tracce di glutine,",
+      "nutrition": {
+        "calories": "372 kcal /100g",
+        "fat": "0.9 g /100g",
+        "carbohydrates": "82 g /100g",
+        "sugars": "6.5 g /100g",
+        "protein": "7 g /100g",
+        "salt": "0.5 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8003170059429",
+    "name": "Frollini al Farro con Gocce di Cioccolato",
+    "brand": "Conad",
+    "image": "https://images.openfoodfacts.org/images/products/800/317/005/9429/front_fr.13.400.jpg",
+    "description": "Conad — confezione da 10 x 33 g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "nutrition": {
+        "calories": "457 kcal /100g",
+        "fat": "17 g /100g",
+        "carbohydrates": "67 g /100g",
+        "sugars": "18 g /100g",
+        "protein": "8 g /100g",
+        "salt": "0.6 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8003100800008",
+    "name": "Tè Classico",
+    "brand": "Selex",
+    "image": "https://images.openfoodfacts.org/images/products/800/310/080/0008/front_it.5.400.jpg",
+    "description": "Tè nero classico in foglia, Selex.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "nutrition": {
+        "calories": "1 kcal /100g",
+        "fat": "0 g /100g",
+        "carbohydrates": "0.2 g /100g",
+        "sugars": "0 g /100g",
+        "protein": "0.1 g /100g",
+        "salt": "0 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8003100801913",
+    "name": "Tonno al Naturale",
+    "brand": "Selex",
+    "image": "https://images.openfoodfacts.org/images/products/800/310/080/1913/front_en.4.400.jpg",
+    "description": "Selex — confezione da 2x160g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "TONNO AL NATURALE ingredienti: Tonno a pinne gialle (Thunnus albacares), acqua, sale dom l. Da consumarsi preferibilmente entro fine: Dicembre 2023 CONSERVAZIOONE",
+      "allergens": "Può contenere: pesce.",
+      "nutrition": {
+        "calories": "95 kcal /100g",
+        "fat": "0.8 g /100g",
+        "carbohydrates": "0 g /100g",
+        "sugars": "0 g /100g",
+        "protein": "22 g /100g",
+        "salt": "1.3 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8001120835888",
+    "name": "Pizza al Kamut Bio",
+    "brand": "Coop Vivi Verde",
+    "image": "https://images.openfoodfacts.org/images/products/800/112/083/5888/front_it.12.400.jpg",
+    "description": "Coop Vivi Verde — confezione da 340g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "Farina di grano khorasan a marchio KAMUT®* 43%, mozzarella* 20,6% (latte*, sale, caglio, correttore di acidità: acido lattico), passata di pomodoro* 15,6%, acqua, olio di semi di girasole*, lievito*, sale iodato (sale, iodato di potassio 0,07%), origano*, sale. Può contenere tracce di soia e senape. *Biologici.",
+      "allergens": "Può contenere: glutine, latte.",
+      "nutrition": {
+        "calories": "241 kcal /100g",
+        "fat": "9.5 g /100g",
+        "carbohydrates": "29 g /100g",
+        "sugars": "2.6 g /100g",
+        "protein": "11 g /100g",
+        "salt": "1.3 g /100g"
+      }
+    }
+  },
+  {
+    "gtin": "8001120891433",
+    "name": "Taralli",
+    "brand": "Coop Fiorfiore",
+    "image": "https://images.openfoodfacts.org/images/products/800/112/089/1433/front_it.14.400.jpg",
+    "description": "Coop Fiorfiore — confezione da 420 g.",
+    "sectorId": "fmcg",
+    "sectorName": "Largo consumo",
+    "food": {
+      "ingredients": "farina di frumento (grano), olio d'oliva, olio extra vergine d'oliva 4%, vino bianco, sale, antiossidante: estratto di rosmarino.",
+      "allergens": "Può contenere: glutine.",
+      "nutrition": {
+        "calories": "459 kcal /100g",
+        "fat": "17 g /100g",
+        "carbohydrates": "64 g /100g",
+        "sugars": "1.6 g /100g",
+        "protein": "10 g /100g",
+        "salt": "2.7 g /100g"
+      }
+    }
   }
 ]
