@@ -56,11 +56,12 @@ def leggi_prodotto(tool_context: ToolContext, gtin: str) -> dict:
     """Read the full GS1 product sheet (JSON-LD) for a product by its GTIN.
 
     Use this AFTER search_shopping_catalog to obtain the detailed, certified
-    GS1 Italy data for a product: ingredients (gs1:ingredient /
-    gs1:ingredientStatement), allergens (gs1:allergenRelatedInformation with
-    levelOfContainmentCode CONTAINS / FREE_FROM / MAY_CONTAIN), nutritional
-    values (gs1:*PerNutrientBasis, referred to gs1:nutrientBasisQuantity),
-    dimensions/weights, brand owner and the commercial offer (offers.price).
+    GS1 Italy data for a product: ingredients (gs1:ingredientStatement),
+    allergens (gs1:hasAllergen / gs1:AllergenDetails, with gs1:allergenType
+    and gs1:allergenLevelOfContainmentCode: CONTAINS / FREE_FROM /
+    MAY_CONTAIN), nutritional values (gs1:*PerNutrientBasis, referred to
+    gs1:nutrientBasisQuantity), dimensions/weights, brand owner and the
+    commercial offer (offers.price).
     Answer allergen and nutrition questions ONLY from this data and cite the
     source as "GS1 Italy".
 
@@ -94,8 +95,9 @@ def search_shopping_catalog(tool_context: ToolContext, gtins: str = "") -> dict:
     data plus, under "gs1_product_sheets", the complete GS1 Italy product sheet as
     published on the web (schema.org + GS1 Web Vocabulary). THE SELECTION IS YOURS: read
     the sheets and decide which products answer the user, reasoning on the actual
-    properties — gs1:allergen with its gs1:AllergenTypeCode-* and
-    gs1:LevelOfContainmentCode-* (FREE_FROM / CONTAINS / MAY_CONTAIN),
+    properties — gs1:hasAllergen (gs1:AllergenDetails) with its gs1:allergenType
+    (gs1:AllergenTypeCode-*) and gs1:allergenLevelOfContainmentCode
+    (gs1:LevelOfContainmentCode-*: FREE_FROM / CONTAINS / MAY_CONTAIN),
     gs1:ingredientStatement, gs1:*PerNutrientBasis, gs1:textileMaterial,
     gs1:certification, gs1:countryOfOrigin, @type, offers, and anything else the sheet
     carries. Never filter on your own prior knowledge of a product.
@@ -635,11 +637,12 @@ root_agent = Agent(
         " sustainability or traceability — first search the catalog to find the"
         " product's GTIN, then call leggi_prodotto(gtin) to read its full GS1"
         " JSON-LD sheet, and answer strictly from that data. Relevant properties"
-        " include gs1:ingredientStatement, gs1:allergen / gs1:allergenStatement,"
+        " include gs1:ingredientStatement, gs1:allergenStatement / gs1:hasAllergen,"
         " gs1:*PerNutrientBasis, gs1:textileMaterial, gs1:netContent,"
         " gs1:countryOfOrigin and gs1:packaging. For allergens rely on the"
-        " gs1:allergen data (levelOfContainmentCode: CONTAINS / FREE_FROM /"
-        " MAY_CONTAIN) and never guess. Nutritional values are expressed per"
+        " gs1:hasAllergen data (gs1:allergenType + gs1:allergenLevelOfContainmentCode:"
+        " CONTAINS / FREE_FROM / MAY_CONTAIN) and never guess. Nutritional values are"
+        " expressed per"
         " gs1:nutrientBasisQuantity (e.g. per 100 g or 100 ml): always state the"
         " reference basis. Decimal values may use a comma as separator."
         "\n\nNOT ALL PRODUCTS PUBLISH GS1 DATA. Some products in this catalog"
@@ -658,13 +661,14 @@ root_agent = Agent(
         " that the information is not available in the product sheet (and, if"
         " useful, call leggi_prodotto for that product first) instead of making"
         " it up. Never state an allergen or 'gluten-free'/'contains' claim that"
-        " is not explicitly in gs1:allergenRelatedInformation. If no product"
+        " is not explicitly in gs1:hasAllergen. If no product"
         " matches the user's request, say so rather than inventing a product."
         "\n\nSEARCHING: search_shopping_catalog gives you the whole catalog together"
         " with the full GS1 JSON-LD sheet of every product that publishes one. Do the"
         " selection yourself, on that data: to answer 'which gluten-free food do you"
-        " have', look for sheets whose gs1:allergen declares"
-        " gs1:AllergenTypeCode-GLUTEN with gs1:LevelOfContainmentCode-FREE_FROM, not for"
+        " have', look for sheets whose gs1:hasAllergen declares gs1:allergenType"
+        " gs1:AllergenTypeCode-GLUTEN with gs1:allergenLevelOfContainmentCode"
+        " gs1:LevelOfContainmentCode-FREE_FROM, not for"
         " products whose name sounds gluten-free. Be strict about what a declaration"
         " means: CONTAINS is presence, MAY_CONTAIN is traces, FREE_FROM is declared"
         " absence, and a sheet that says nothing about an allergen tells you nothing —"

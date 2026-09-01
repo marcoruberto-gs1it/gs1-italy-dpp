@@ -1,27 +1,67 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ProductService, productImages, discountPercent, formatEuro } from '../../services/product.service';
 import { StarRatingComponent } from '../../components/star-rating/star-rating';
+import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { onImageError } from '../../utils/image-fallback';
 import { I18nService } from '../../services/i18n.service';
-import { SiteOriginService } from '../../services/site-origin.service';
+import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
+import { StructuredDataService } from '../../services/structured-data.service';
+
+// Stesso placeholder salvato in products.json per gli @id coniati (rawGs1Data.brand['@id']),
+// vedi generate-agent-feed.js: risolto qui verso l'origine reale con lo stesso principio.
+const PLACEHOLDER_ORIGIN = SSR_FALLBACK_ORIGIN;
+
+// gs1:AllergenTypeCode-* / gs1:LevelOfContainmentCode-* → chiave di traduzione in product.*
+// (vedi src/app/i18n/translations.ts). Copre solo i codici realmente usati da add-gs1-jsonld.js
+// per i 25 prodotti del catalogo.
+const ALLERGEN_CODE_KEYS: Record<string, string> = {
+  GLUTEN: 'allergenGluten',
+  MILK: 'allergenMilk',
+  EGGS: 'allergenEggs',
+  TREE_NUTS: 'allergenTreeNuts',
+  PEANUTS: 'allergenPeanuts',
+  SOYBEANS: 'allergenSoybeans',
+  SESAME_SEEDS: 'allergenSesameSeeds',
+  CELERY: 'allergenCelery',
+  MUSTARD: 'allergenMustard',
+  LUPINE: 'allergenLupine',
+  FISH: 'allergenFish',
+  CRUSTACEANS: 'allergenCrustaceans',
+  MOLLUSCS: 'allergenMolluscs',
+  SULPHUR_DIOXIDE: 'allergenSulphurDioxide',
+};
+
+const CONTAINMENT_KEYS: Record<string, string> = {
+  CONTAINS: 'allergenContains',
+  MAY_CONTAIN: 'allergenMayContain',
+  FREE_FROM: 'allergenFreeFrom',
+};
+
+interface AllergenBadge {
+  code: string;
+  containment: string;
+  labelKey: string;
+  containmentKey: string;
+}
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, RouterLink, StarRatingComponent],
+  imports: [CommonModule, RouterLink, StarRatingComponent, JsonLdDrawerComponent],
   templateUrl: './product.html',
   styleUrl: './product.css',
 })
-export class ProductComponent {
+export class ProductComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private siteOrigin = inject(SiteOriginService);
+  private structuredData = inject(StructuredDataService);
   protected t = inject(I18nService).t;
 
   protected onImageError = onImageError;
@@ -58,9 +98,56 @@ export class ProductComponent {
     return `${this.siteOrigin.value.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
   }
 
+  /** Sostituisce il placeholder di dominio coniato in products.json con l'origine reale. */
+  private resolveOrigin(id: string): string {
+    return id.startsWith(PLACEHOLDER_ORIGIN)
+      ? this.siteOrigin.value + id.slice(PLACEHOLDER_ORIGIN.length)
+      : id;
+  }
+
+  // Stessa fonte del sidecar generato a build time da generate-agent-feed.js (§2): qui gira a
+  // runtime, quindi risolve image/brand['@id'] con SiteOriginService invece che con SITE_URL.
+  jsonLdJson = computed(() => {
+    const prod = this.product();
+    if (!prod?.rawGs1Data) return null;
+
+    const doc = JSON.parse(JSON.stringify(prod.rawGs1Data));
+    if (doc.name) doc.name = prod.name;
+    if (doc.description) doc.description = prod.description;
+    doc['hasGS1DigitalLink'] = `${this.siteOrigin.value}/01/${prod.gtin}`;
+    if (doc.brand?.['@id']) doc.brand['@id'] = this.resolveOrigin(doc.brand['@id']);
+    if (typeof doc.image === 'string') doc.image = this.absoluteUrl(doc.image);
+    return doc;
+  });
+
+  // Controparte leggibile di gs1:hasAllergen — stessa fonte del JSON-LD, non testo separato.
+  allergenBadges = computed<AllergenBadge[]>(() => {
+    const details = this.product()?.rawGs1Data?.['gs1:hasAllergen'];
+    if (!Array.isArray(details)) return [];
+    return details
+      .map((d: any): AllergenBadge | null => {
+        const code = String(d?.['gs1:allergenType']?.['@id'] ?? '').replace('gs1:AllergenTypeCode-', '');
+        const containment = String(d?.['gs1:allergenLevelOfContainmentCode']?.['@id'] ?? '').replace('gs1:LevelOfContainmentCode-', '');
+        const labelKey = ALLERGEN_CODE_KEYS[code];
+        const containmentKey = CONTAINMENT_KEYS[containment];
+        return labelKey && containmentKey ? { code, containment, labelKey, containmentKey } : null;
+      })
+      .filter((b: AllergenBadge | null): b is AllergenBadge => b !== null);
+  });
+
+  jsonLdDrawerOpen = signal(false);
+
+  openJsonLd(): void {
+    this.jsonLdDrawerOpen.set(true);
+  }
+
+  closeJsonLd(): void {
+    this.jsonLdDrawerOpen.set(false);
+  }
+
   constructor() {
     // Rotta riusata cambiando :gtin (navigazione da un prodotto all'altro): serve un effect,
-    // non ngOnInit, altrimenti titolo/meta resterebbero quelli del prodotto precedente.
+    // non ngOnInit, altrimenti titolo/meta/JSON-LD resterebbero quelli del prodotto precedente.
     effect(() => {
       const prod = this.product();
       this.activeImageIndex.set(0);
@@ -72,5 +159,13 @@ export class ProductComponent {
       // crawler) legge il tag fuori dal contesto della pagina.
       this.metaService.updateTag({ property: 'og:image', content: this.absoluteUrl(prod.image) });
     });
+
+    effect(() => {
+      this.structuredData.apply('product-jsonld', this.jsonLdJson());
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.structuredData.remove('product-jsonld');
   }
 }

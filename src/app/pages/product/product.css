@@ -234,6 +234,67 @@
   font-weight: 600;
 }
 
+/* --- Structured data (GS1 Web Vocabulary) --- */
+.structured-data-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.structured-data-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gs-btn--sm {
+  padding: 7px 14px;
+  font-size: 0.8rem;
+}
+
+.allergen-badges {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.allergen-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+}
+
+.allergen-badge-name {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.allergen-badge-level {
+  color: var(--text-tertiary);
+}
+
+.allergen-badge--contains {
+  background: var(--warning-soft);
+  border-color: transparent;
+}
+
+.allergen-badge--contains .allergen-badge-name,
+.allergen-badge--contains .allergen-badge-level {
+  color: var(--warning);
+}
+
 /* --- Not found --- */
 .not-found {
   text-align: center;

@@ -71,6 +71,31 @@
           </div>
         }
 
+        @if (prod.rawGs1Data) {
+          <div class="info-block structured-data-block">
+            <div class="structured-data-header">
+              <h2>
+                <span class="gs-badge gs-badge--vocab">GS1 Web Vocabulary</span>
+                {{ t('product.structuredData') }}
+              </h2>
+              <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                {{ t('product.viewJsonLd') }}
+              </button>
+            </div>
+            @if (allergenBadges().length) {
+              <ul class="allergen-badges">
+                @for (badge of allergenBadges(); track badge.code) {
+                  <li class="allergen-badge" [class.allergen-badge--contains]="badge.containment === 'CONTAINS'">
+                    <span class="allergen-badge-name">{{ t('product.' + badge.labelKey) }}</span>
+                    <span class="allergen-badge-level">{{ t('product.' + badge.containmentKey) }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+
         @if (prod.apparel; as apparel) {
           <div class="info-block">
             <h2>{{ t('product.apparelDetails') }}</h2>
@@ -106,6 +131,8 @@
         }
       </div>
     </article>
+
+    <app-json-ld-drawer [open]="jsonLdDrawerOpen()" [jsonLd]="jsonLdJson()" (closed)="closeJsonLd()"></app-json-ld-drawer>
   } @else {
     <div class="not-found">
       <p>{{ t('product.notFound') }}</p>
