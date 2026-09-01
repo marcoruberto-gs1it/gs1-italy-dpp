@@ -15,7 +15,6 @@ export const TRANSLATIONS = {
       switchToDark: 'Passa al tema scuro',
       switchToItalian: 'Passa all\'italiano',
       switchToEnglish: 'Passa all\'inglese',
-      demoBadge: 'Demo',
     },
     hero: {
       titleLine1: 'Il catalogo,',
@@ -75,7 +74,6 @@ export const TRANSLATIONS = {
       switchToDark: 'Switch to dark theme',
       switchToItalian: 'Switch to Italian',
       switchToEnglish: 'Switch to English',
-      demoBadge: 'Demo',
     },
     hero: {
       titleLine1: 'The catalogue,',

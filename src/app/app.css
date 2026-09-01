@@ -54,14 +54,6 @@
   color: var(--text-primary);
 }
 
-.demo-badge {
-  color: var(--gs1-orange);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 .header-nav {
   display: flex;
   align-items: center;

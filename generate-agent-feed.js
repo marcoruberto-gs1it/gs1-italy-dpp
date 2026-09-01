@@ -72,10 +72,9 @@ console.log(`generate-agent-feed: catalog.json generato (${catalog.length} prodo
 // Stessa identica fonte del blocco <script type="application/ld+json"> che la pagina
 // prerenderizzata già pubblica (vedi product.ts::jsonLdJson): cambia solo l'involucro.
 //
-// I prodotti senza rawGs1Data NON ottengono il sidecar, di proposito: rappresentano il caso
-// demo "non ancora AI Ready" (vedi il commento in product.ts). Per loro /01/{gtin} con
-// Accept: application/ld+json risponde 404, l'agente non riceve dati e deve dichiarare che la
-// scheda non pubblica dati strutturati — che è esattamente il contrasto che la demo mostra.
+// I prodotti senza rawGs1Data NON ottengono il sidecar, di proposito: non pubblicano dati
+// strutturati. Per loro /01/{gtin} con Accept: application/ld+json risponde 404, l'agente non
+// riceve dati e deve dichiarare che la scheda non pubblica dati strutturati.
 let written = 0;
 for (const p of products) {
   if (!p.rawGs1Data) continue;
