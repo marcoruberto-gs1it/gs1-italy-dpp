@@ -1,6 +1,6 @@
 {
   "name": "simple-chat",
-  "description": "A simple chat application for demo purposes. Not intended for any kind of production use.",
+  "description": "Chat UI for the Smart Catalogue's AI shopping assistant.",
   "private": true,
   "version": "0.0.1",
   "type": "module",

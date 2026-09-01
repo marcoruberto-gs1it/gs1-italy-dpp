@@ -72,25 +72,35 @@ function ThemeToggle() {
  * Header del catalogo, replicato qui.
  *
  * La chat vive su /assistente dello stesso dominio del sito: per l'utente deve essere una
- * sezione del catalogo, non un'applicazione a parte. Logo, badge demo e voci di menu sono
- * gli stessi di src/app/app.html, e i link riportano alle pagine Angular con un page load
- * normale (sono due applicazioni diverse dietro lo stesso Traefik).
+ * sezione del catalogo, non un'applicazione a parte. Logo e voci di menu sono gli stessi di
+ * src/app/app.html (tenerli allineati a mano quando cambiano lì), e i link riportano alle
+ * pagine Angular con un page load normale (sono due applicazioni diverse dietro lo stesso
+ * Traefik).
  */
 function Header() {
   return (
     <header className="chat-header">
       <div className="chat-header-inner">
         <a className="logo" href="/" title="Torna alla home">
-          <img
-            src="https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png"
-            alt="GS1 Italy"
-          />
-          <span className="demo-badge">Demo</span>
+          <span className="logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 2.5l1.85 6.15L20 10.5l-6.15 1.85L12 18.5l-1.85-6.15L4 10.5l6.15-1.85L12 2.5z"
+                fill="url(#logoSpark)"
+              />
+              <defs>
+                <linearGradient id="logoSpark" x1="4" y1="2.5" x2="20" y2="18.5" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="var(--brand)" />
+                  <stop offset="1" stopColor="var(--brand-accent)" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span className="logo-text">Catalogo Smart</span>
         </a>
 
         <nav>
           <a href="/">Home</a>
-          <a href="/validatore">Validatore</a>
           <a href="/assistente/" className="active">
             Assistente AI
           </a>

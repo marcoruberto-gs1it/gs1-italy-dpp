@@ -36,12 +36,12 @@ export class AppProperties {
 }
 
 export const appConfig = new AppProperties(
-  "GS1 Shopping Agent",
-  "Assistente per lo shopping con dati prodotto certificati GS1 Italy.",
+  "Smart Catalogue Assistant",
+  "Assistente per lo shopping nel Catalogo Smart.",
   // L'app e' servita sotto /assistente/ (vedi base in vite.config.ts): il logo va risolto
   // rispetto a quel base, altrimenti /images/logo.jpg finirebbe sul webshop.
   `${import.meta.env.BASE_URL}images/logo.jpg`,
-  "Ciao! Posso cercare prodotti nel catalogo GS1 Italy e rispondere su ingredienti, allergeni, valori nutrizionali, materiali e tracciabilità leggendo i dati certificati delle schede. Posso anche completare l'ordine per te. Come posso aiutarti?",
+  "Ciao! Posso cercare prodotti nel catalogo e rispondere su ingredienti, allergeni, valori nutrizionali e materiali leggendo le schede prodotto. Posso anche completare l'ordine per te. Come posso aiutarti?",
   // Stesso titolo della pagina /assistente del catalogo (i18n it → chat.title): per
   // l'utente è quella pagina, diventata conversazione vera.
   "Assistente AI del catalogo"

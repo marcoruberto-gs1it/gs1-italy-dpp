@@ -120,7 +120,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--brand-accent), #ff8f5c);
+  background: linear-gradient(135deg, var(--brand-accent), #4be0c8);
   color: #fff;
   box-shadow: 0 8px 24px -8px rgba(242, 99, 52, 0.5);
   margin-bottom: 16px;
@@ -189,7 +189,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--brand-accent), #ff8f5c);
+  background: linear-gradient(135deg, var(--brand-accent), #4be0c8);
   color: #fff;
   margin-top: 2px;
 }

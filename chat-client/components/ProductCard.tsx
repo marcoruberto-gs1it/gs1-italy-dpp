@@ -38,16 +38,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
     <article className="product-card">
       <div className="product-card-media">
         <img src={product.image?.[0]} alt={product.name} loading="lazy" />
-        {/* Il badge dice se quel prodotto pubblica davvero una scheda GS1 — non è
-            decorativo. L'agente può proporre anche prodotti che non ne hanno (sono 16 in
-            catalogo, di proposito), e mostrarli tutti come "AI Ready" contraddiceva
-            proprio la distinzione che la demo esiste per far vedere. Stessi badge delle
-            pagine prodotto del sito. */}
+        {/* Il badge dice se quel prodotto pubblica davvero una scheda dati strutturata —
+            non è decorativo. L'agente può proporre anche prodotti che non ne hanno (sono
+            16 in catalogo, di proposito), e mostrarli tutti come "Dati verificati"
+            nasconderebbe proprio quella differenza. */}
         {product.aiReady ? (
-          <span className="gs-badge gs-badge--ai">AI Ready</span>
+          <span className="gs-badge gs-badge--ai">Dati verificati</span>
         ) : (
-          <span className="gs-badge gs-badge--neutral" title="Questo prodotto non pubblica dati strutturati GS1">
-            Senza dati GS1
+          <span className="gs-badge gs-badge--neutral" title="Questo prodotto non pubblica una scheda dati strutturata">
+            Info di base
           </span>
         )}
       </div>

@@ -74,8 +74,7 @@ const EXAMPLE_PROMPTS = [
 ];
 
 /**
- * An example A2A chat client that demonstrates consuming a business's A2A Agent with UCP Extension.
- * Only for demo purposes, not intended for production use.
+ * A2A chat client, built on the UCP Extension, for the shopping assistant.
  */
 function App() {
   const [user_email, _setUserEmail] = useState<string | null>(

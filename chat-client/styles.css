@@ -41,7 +41,7 @@ body {
 .chat-header .logo {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   text-decoration: none;
   flex-shrink: 0;
   transition: transform var(--dur-base) var(--ease-spring);
@@ -51,17 +51,23 @@ body {
   transform: scale(1.02);
 }
 
-.chat-header .logo img {
-  height: 36px;
-  width: auto;
+.chat-header .logo-mark {
+  display: flex;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
 }
 
-.demo-badge {
-  color: var(--gs1-orange);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.chat-header .logo-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chat-header .logo-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
 }
 
 .chat-header nav {
@@ -84,7 +90,7 @@ body {
 
 .chat-header nav a:hover,
 .chat-header nav a.active {
-  color: var(--gs1-blue);
+  color: var(--brand);
 }
 
 :root[data-theme='dark'] .chat-header nav a:hover,
@@ -178,7 +184,7 @@ body {
   line-height: 1.55;
 }
 
-/* Pallino nei colori GS1 invece del bullet di sistema */
+/* Pallino nei colori del brand invece del bullet di sistema */
 .bubble-text ul > li::before {
   content: "";
   position: absolute;
@@ -187,7 +193,7 @@ body {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--gs1-orange);
+  background: var(--brand-accent);
 }
 
 .bubble-text ol {
@@ -256,7 +262,7 @@ body {
 .bubble-text blockquote {
   margin: 0 0 10px;
   padding: 8px 12px;
-  border-left: 3px solid var(--gs1-orange);
+  border-left: 3px solid var(--brand-accent);
   background: var(--accent-2-soft);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   color: var(--text-secondary);
@@ -378,7 +384,7 @@ body {
   gap: 5px;
   padding: 7px 12px;
   border-radius: var(--radius-full);
-  background: var(--gs1-blue);
+  background: var(--brand);
   color: #fff;
   font-family: var(--font-sans);
   font-size: 0.76rem;
@@ -436,7 +442,7 @@ body {
 
 .chat-bubble .bg-blue-500,
 .chat-bubble .bg-blue-600 {
-  background: var(--gs1-blue) !important;
+  background: var(--brand) !important;
 }
 
 .chat-bubble .hover\:bg-gray-100:hover {

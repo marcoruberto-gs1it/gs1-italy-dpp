@@ -79,7 +79,7 @@ function loginPage(error: string | null): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Area riservata · Assistente AI GS1 Italy</title>
+<title>Area riservata · Assistente AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -90,9 +90,10 @@ function loginPage(error: string | null): string {
          background:var(--bg-canvas); color:var(--text-primary); font-family:var(--font-sans); padding:24px; }
   .card { width:100%; max-width:400px; background:var(--bg-surface); border:1px solid var(--border-subtle);
           border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:32px; }
-  .logo { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
-  .logo img { height:34px; }
-  .badge { font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--gs1-orange); }
+  .logo { display:flex; align-items:center; gap:10px; margin-bottom:24px; }
+  .logo-mark { display:flex; width:26px; height:26px; flex-shrink:0; }
+  .logo-mark svg { width:100%; height:100%; }
+  .logo-text { font-size:1.15rem; font-weight:800; letter-spacing:-.01em; color:var(--text-primary); }
   h1 { font-size:1.3rem; font-weight:800; letter-spacing:-.02em; margin:0 0 8px; }
   p  { margin:0 0 22px; color:var(--text-tertiary); font-size:.92rem; line-height:1.5; }
   label { display:block; font-size:.8rem; font-weight:700; margin-bottom:8px; color:var(--text-secondary); }
@@ -102,10 +103,10 @@ function loginPage(error: string | null): string {
   input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
   button { width:100%; margin-top:16px; padding:13px; border:none; cursor:pointer; font-family:inherit;
            font-size:.95rem; font-weight:700; border-radius:var(--radius-md);
-           background:var(--gs1-blue); color:#fff; }
+           background:var(--brand); color:#fff; }
   button:hover { background:var(--accent-strong); }
   .error { margin:0 0 16px; padding:10px 12px; border-radius:var(--radius-sm); font-size:.86rem;
-           background:var(--accent-2-soft); color:var(--gs1-orange); font-weight:600; }
+           background:var(--accent-2-soft); color:var(--accent-2); font-weight:600; }
   .back { display:block; margin-top:20px; text-align:center; font-size:.85rem;
           color:var(--text-tertiary); text-decoration:none; }
   .back:hover { color:var(--text-link); }
@@ -114,11 +115,21 @@ function loginPage(error: string | null): string {
 <body>
   <main class="card">
     <div class="logo">
-      <img src="https://static.gs1it.org/static/images/logo/gs1it.1ea986161973.png" alt="GS1 Italy">
-      <span class="badge">Demo</span>
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2.5l1.85 6.15L20 10.5l-6.15 1.85L12 18.5l-1.85-6.15L4 10.5l6.15-1.85L12 2.5z" fill="url(#logoSpark)"/>
+          <defs>
+            <linearGradient id="logoSpark" x1="4" y1="2.5" x2="20" y2="18.5" gradientUnits="userSpaceOnUse">
+              <stop stop-color="var(--brand)"/>
+              <stop offset="1" stop-color="var(--brand-accent)"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <span class="logo-text">Catalogo Smart</span>
     </div>
     <h1>Area riservata</h1>
-    <p>L'assistente AI di questa demo è ad accesso limitato. Inserisci la password per continuare.</p>
+    <p>L'assistente AI è ad accesso limitato. Inserisci la password per continuare.</p>
     ${error ? `<p class="error">${error}</p>` : ""}
     <form method="POST" action="${LOGIN_PATH}">
       <label for="password">Password</label>

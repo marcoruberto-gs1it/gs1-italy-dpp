@@ -43,7 +43,7 @@ export default defineConfig(() => {
         // Sbarramento con password (vedi auth-gate.ts). Registrato in configureServer,
         // che Vite chiama PRIMA di installare i propri middleware: quindi intercetta
         // anche il proxy /api verso il business-agent, non solo le pagine.
-        name: "gs1-auth-gate",
+        name: "auth-gate",
         configureServer(server) {
           server.middlewares.use(authGate());
         },

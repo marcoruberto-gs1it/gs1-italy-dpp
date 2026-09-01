@@ -36,7 +36,7 @@ interface ChatMessageProps {
   isLastCheckout?: boolean;
 }
 
-/** Avatar dell'assistente: la scintilla arancione GS1 usata anche sul sito. */
+/** Avatar dell'assistente: la stessa scintilla del logo usata sul sito. */
 function AgentAvatar() {
   return (
     <span className="chat-avatar" aria-hidden="true">
