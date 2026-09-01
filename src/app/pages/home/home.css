@@ -8,11 +8,11 @@
 .modern-hero {
   position: relative;
   text-align: center;
-  padding: 96px 24px 84px;
+  padding: 76px 24px 64px;
   margin: 0 -24px 32px;
   overflow: hidden;
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-  background: linear-gradient(160deg, #003a86 0%, var(--gs1-blue) 55%, #001c40 100%);
+  background: linear-gradient(160deg, #1c1338 0%, var(--brand-ink) 55%, #060510 100%);
 }
 
 .hero-mesh {
@@ -20,8 +20,8 @@
   inset: 0;
   z-index: 0;
   background-image:
-    repeating-radial-gradient(circle at 88% 20%, transparent 0, transparent 34px, rgba(255, 255, 255, 0.05) 35px, transparent 36px, transparent 70px, rgba(242, 99, 52, 0.1) 71px, transparent 72px),
-    radial-gradient(60% 70% at 10% 105%, rgba(242, 99, 52, 0.22), transparent 65%);
+    repeating-radial-gradient(circle at 88% 20%, transparent 0, transparent 34px, rgba(255, 255, 255, 0.05) 35px, transparent 36px, transparent 70px, rgba(0, 201, 167, 0.12) 71px, transparent 72px),
+    radial-gradient(60% 70% at 10% 105%, rgba(109, 79, 240, 0.35), transparent 65%);
 }
 
 .modern-hero::after {
@@ -40,32 +40,32 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
-  max-width: 760px;
+  gap: 18px;
+  max-width: 640px;
   margin: 0 auto;
 }
 
 .modern-hero h1 {
-  font-size: clamp(2.4rem, 5.2vw, 4.2rem);
+  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: -0.04em;
   margin: 0;
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--gs1-orange) 0%, #ffb27a 100%);
+  background: linear-gradient(135deg, var(--brand-accent) 0%, #8f7dff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .modern-hero p {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.78);
-  max-width: 620px;
-  line-height: 1.65;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 460px;
+  line-height: 1.55;
   margin: 0;
 }
 
@@ -79,13 +79,13 @@
 }
 
 .modern-hero .hero-search-btn.gs-btn--primary {
-  background: var(--gs1-orange);
+  background: var(--brand-accent);
   color: #ffffff;
-  box-shadow: 0 10px 28px -8px rgba(242, 99, 52, 0.55);
+  box-shadow: 0 10px 28px -8px rgba(0, 201, 167, 0.5);
 }
 
 .modern-hero .hero-search-btn.gs-btn--primary:hover {
-  background: #ff8f5c;
+  background: var(--brand-accent-strong);
 }
 
 .hero-search-btn .gs-kbd {

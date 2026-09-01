@@ -23,7 +23,7 @@
   font-weight: 500;
 }
 .breadcrumbs a:hover {
-  color: var(--gs1-blue);
+  color: var(--brand);
 }
 .separator {
   margin: 0 8px;
@@ -93,7 +93,7 @@
 }
 
 .thumbnail.active {
-  border-color: var(--gs1-blue);
+  border-color: var(--brand);
 }
 
 .thumbnail img {

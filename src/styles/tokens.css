@@ -1,40 +1,21 @@
 /* ==========================================================================
-   GS1 Digital Link Catalog — Design System Tokens
-   Fonte colori: GS1 Global Colour Palette (CMYK 2015-01-12)
-   Solo i colori ufficiali GS1 primari e secondari sono utilizzati.
+   Catalogo Smart — Design System Tokens
+   Palette proprietaria: violetto (brand) + turchese (accent), pensata per un
+   catalogo "smart" — non più i colori istituzionali GS1.
    ========================================================================== */
 
 :root {
-  /* --- GS1 Primary Palette --- */
-  --gs1-blue: #002c6c;
-  --gs1-orange: #f26334;
-  --gs1-dark-gray: #454545;
-  --gs1-dark-medium-gray: #888b8d;
-  --gs1-light-medium-gray: #b1b3b3;
-  --gs1-light-gray: #f4f4f4;
-
-  /* --- GS1 Secondary Palette --- */
-  --gs1-raspberry: #f05587;
-  --gs1-purple: #bf83b9;
-  --gs1-lavender: #af96d4;
-  --gs1-slate: #89aadb;
-  --gs1-sky: #00b6de;
-  --gs1-link: #008dbd;
-  --gs1-mist: #8db9ca;
-  --gs1-teal: #22bcb9;
-  --gs1-forest: #71b790;
-  --gs1-grass: #7ac143;
-  --gs1-recycling: #00b74f;
-  --gs1-olive: #9dbb68;
-  --gs1-lime: #c1d82f;
-  --gs1-gold: #c4b000;
-  --gs1-peach: #fbb034;
-  --gs1-tangerine: #ff8200;
-  --gs1-honey: #b78b20;
-  --gs1-terracotta: #d3875f;
+  /* --- Brand palette --- */
+  --brand: #6d4ff0;
+  --brand-strong: #4f34d1;
+  --brand-soft: rgba(109, 79, 240, 0.1);
+  --brand-accent: #00c9a7;
+  --brand-accent-strong: #00a688;
+  --brand-accent-soft: rgba(0, 201, 167, 0.12);
+  --brand-ink: #0d0b17;
 
   /* --- Typography --- */
-  --font-sans: 'Inter', 'Gotham', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
 
   /* --- Radii --- */
@@ -57,82 +38,82 @@
   --shadow-md: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
   --shadow-lg: 0 16px 40px -12px rgba(15, 23, 42, 0.18);
   --shadow-xl: 0 24px 64px -16px rgba(15, 23, 42, 0.28);
-  --shadow-glow-blue: 0 8px 32px -8px rgba(0, 44, 108, 0.35);
-  --shadow-glow-orange: 0 8px 32px -8px rgba(242, 99, 52, 0.35);
+  --shadow-glow-blue: 0 8px 32px -8px rgba(109, 79, 240, 0.35);
+  --shadow-glow-orange: 0 8px 32px -8px rgba(0, 201, 167, 0.35);
 
   /* --- Semantic surface tokens (LIGHT) --- */
-  --bg-canvas: #f7f8fa;
-  --bg-canvas-alt: #eef1f5;
+  --bg-canvas: #f7f7fb;
+  --bg-canvas-alt: #eeeef7;
   --bg-surface: #ffffff;
   --bg-surface-raised: #ffffff;
-  --bg-surface-sunken: #f4f4f4;
+  --bg-surface-sunken: #f3f2fa;
   --bg-glass: rgba(255, 255, 255, 0.7);
   --bg-glass-strong: rgba(255, 255, 255, 0.88);
-  --bg-overlay: rgba(10, 15, 30, 0.5);
-  --bg-inverse: #0b1220;
+  --bg-overlay: rgba(10, 8, 20, 0.5);
+  --bg-inverse: #0d0b17;
 
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-default: rgba(15, 23, 42, 0.12);
-  --border-strong: rgba(15, 23, 42, 0.2);
+  --border-subtle: rgba(20, 12, 48, 0.08);
+  --border-default: rgba(20, 12, 48, 0.12);
+  --border-strong: rgba(20, 12, 48, 0.2);
   --border-glass: rgba(255, 255, 255, 0.5);
 
-  --text-primary: #10182b;
-  --text-secondary: #454545;
-  --text-tertiary: #6b7280;
-  --text-muted: #9aa1ac;
+  --text-primary: #14101f;
+  --text-secondary: #47435a;
+  --text-tertiary: #6f6b81;
+  --text-muted: #9c98ab;
   --text-on-accent: #ffffff;
-  --text-link: var(--gs1-blue);
+  --text-link: var(--brand);
 
-  --accent: var(--gs1-blue);
-  --accent-strong: #001f4d;
-  --accent-soft: rgba(0, 44, 108, 0.08);
-  --accent-2: var(--gs1-orange);
-  --accent-2-soft: rgba(242, 99, 52, 0.1);
+  --accent: var(--brand);
+  --accent-strong: var(--brand-strong);
+  --accent-soft: var(--brand-soft);
+  --accent-2: var(--brand-accent);
+  --accent-2-soft: var(--brand-accent-soft);
 
   --success: #16875a;
   --success-soft: rgba(22, 135, 90, 0.12);
   --warning: #b45309;
   --warning-soft: rgba(180, 83, 9, 0.12);
 
-  --mesh-1: rgba(0, 44, 108, 0.55);
-  --mesh-2: rgba(242, 99, 52, 0.45);
-  --mesh-3: rgba(0, 182, 222, 0.35);
-  --scrollbar-thumb: rgba(15, 23, 42, 0.18);
+  --mesh-1: rgba(109, 79, 240, 0.5);
+  --mesh-2: rgba(0, 201, 167, 0.4);
+  --mesh-3: rgba(124, 92, 246, 0.3);
+  --scrollbar-thumb: rgba(20, 12, 48, 0.18);
 
   /* Superficie "terminale" sempre scura, indipendente dal tema (blocchi codice, URL bar) */
-  --surface-code: #0b1220;
+  --surface-code: #14101f;
 
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  --bg-canvas: #0a0e17;
-  --bg-canvas-alt: #0d1220;
-  --bg-surface: #121826;
-  --bg-surface-raised: #161e2e;
-  --bg-surface-sunken: #0d1220;
-  --bg-glass: rgba(18, 24, 38, 0.6);
-  --bg-glass-strong: rgba(18, 24, 38, 0.85);
-  --bg-overlay: rgba(2, 4, 10, 0.65);
-  --bg-inverse: #f7f8fa;
+  --bg-canvas: #0b0a12;
+  --bg-canvas-alt: #0e0c17;
+  --bg-surface: #15121f;
+  --bg-surface-raised: #1a1729;
+  --bg-surface-sunken: #0e0c17;
+  --bg-glass: rgba(21, 18, 31, 0.6);
+  --bg-glass-strong: rgba(21, 18, 31, 0.85);
+  --bg-overlay: rgba(2, 2, 6, 0.65);
+  --bg-inverse: #f7f7fb;
 
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-default: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(255, 255, 255, 0.22);
   --border-glass: rgba(255, 255, 255, 0.1);
 
-  --text-primary: #f3f5f9;
-  --text-secondary: #c3c9d4;
-  --text-tertiary: #8b93a3;
-  --text-muted: #5c6474;
+  --text-primary: #f5f4fa;
+  --text-secondary: #c7c3d6;
+  --text-tertiary: #938fa5;
+  --text-muted: #605c74;
   --text-on-accent: #ffffff;
-  --text-link: #6fa3ff;
+  --text-link: #a495ff;
 
-  --accent: #4d84e8;
-  --accent-strong: #7fa8ef;
-  --accent-soft: rgba(77, 132, 232, 0.16);
-  --accent-2: #ff8a5c;
-  --accent-2-soft: rgba(255, 138, 92, 0.16);
+  --accent: #8b74ff;
+  --accent-strong: #a998ff;
+  --accent-soft: rgba(139, 116, 255, 0.18);
+  --accent-2: #22e0bb;
+  --accent-2-soft: rgba(34, 224, 187, 0.16);
 
   --success: #34d399;
   --success-soft: rgba(52, 211, 153, 0.14);
@@ -144,12 +125,12 @@
   --shadow-md: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 20px 48px -12px rgba(0, 0, 0, 0.55);
   --shadow-xl: 0 30px 70px -16px rgba(0, 0, 0, 0.6);
-  --shadow-glow-blue: 0 0 40px -6px rgba(77, 132, 232, 0.45);
-  --shadow-glow-orange: 0 0 40px -6px rgba(255, 138, 92, 0.4);
+  --shadow-glow-blue: 0 0 40px -6px rgba(139, 116, 255, 0.45);
+  --shadow-glow-orange: 0 0 40px -6px rgba(34, 224, 187, 0.4);
 
-  --mesh-1: rgba(77, 132, 232, 0.35);
-  --mesh-2: rgba(255, 138, 92, 0.28);
-  --mesh-3: rgba(0, 182, 222, 0.22);
+  --mesh-1: rgba(139, 116, 255, 0.35);
+  --mesh-2: rgba(34, 224, 187, 0.28);
+  --mesh-3: rgba(124, 92, 246, 0.22);
   --scrollbar-thumb: rgba(255, 255, 255, 0.14);
 
   color-scheme: dark;
@@ -237,11 +218,10 @@ img.img-fallback {
   flex-shrink: 0;
 }
 
-/* AI Ready: arancione GS1, badge "pieno" per restare il segnale più prominente */
 .gs-badge--ai {
-  background: linear-gradient(135deg, var(--gs1-orange), #ff8f5c);
+  background: linear-gradient(135deg, var(--brand-accent), #4be0c8);
   color: #fff;
-  box-shadow: 0 4px 14px -4px rgba(242, 99, 52, 0.5);
+  box-shadow: 0 4px 14px -4px rgba(0, 201, 167, 0.5);
 }
 
 .gs-badge--verified {
@@ -249,22 +229,19 @@ img.img-fallback {
   color: var(--success);
 }
 
-/* GS1 Web Vocabulary: blu GS1, fisso indipendentemente dal tema */
 .gs-badge--vocab {
-  background: rgba(0, 44, 108, 0.14);
-  color: #002c6c;
+  background: rgba(109, 79, 240, 0.14);
+  color: var(--brand-strong);
 }
 
-/* schema.org: rosso del brand schema.org, fisso indipendentemente dal tema */
 .gs-badge--schema {
   background: rgba(153, 0, 0, 0.14);
   color: #990000;
 }
 
-/* Su sfondo scuro i colori di brand fissi perdono contrasto: schiariti solo per leggibilità */
 :root[data-theme='dark'] .gs-badge--vocab {
-  background: rgba(77, 132, 232, 0.18);
-  color: #82abf5;
+  background: rgba(139, 116, 255, 0.18);
+  color: #b7a8ff;
 }
 
 :root[data-theme='dark'] .gs-badge--schema {
@@ -301,7 +278,7 @@ img.img-fallback {
   border-radius: var(--radius-full);
 }
 
-/* Blocco codice JSON con evidenziazione sintattica (JSON-LD drawer, eventi EPCIS) */
+/* Blocco codice con evidenziazione sintattica */
 .gs-code-block {
   margin: 0;
   padding: 14px 16px;
@@ -345,7 +322,7 @@ img.img-fallback {
 }
 
 .gs-btn--primary {
-  background: var(--gs1-blue);
+  background: var(--brand);
   color: #fff;
   box-shadow: var(--shadow-glow-blue);
 }
