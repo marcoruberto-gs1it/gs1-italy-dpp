@@ -39,7 +39,7 @@ function walkHtmlFiles(dir) {
 
 /**
  * Percorso del file prerenderizzato → rotta pubblica servita da nginx.
- * `catalog/fmcg/index.html` → `/catalog/fmcg`, `index.html` → `/`.
+ * `01/08032089000017/index.html` → `/01/08032089000017`, `index.html` → `/`.
  * Restituisce null per index.csr.html, che non è una pagina ma la shell client-side.
  */
 function routeFromHtmlPath(file) {
@@ -59,11 +59,11 @@ for (const file of htmlFiles) {
     fixedFiles++;
   }
 
-  // Il canonical lo mette già app.ts (effect su navigationEnd → <link id="link-canonical">,
-  // con le istanze lotto/seriale ricondotte alla pagina prodotto), quindi qui non si inietta
-  // nulla: si verifica soltanto. Una pagina prerenderizzata che ne è priva segnala che quella
-  // rotta non è passata dall'effect — un caso che si nota solo leggendo l'HTML costruito,
-  // quindi tanto vale dirlo a build time invece di scoprirlo mesi dopo in un audit SEO.
+  // Il canonical lo mette già app.ts (effect su navigationEnd → <link id="link-canonical">),
+  // quindi qui non si inietta nulla: si verifica soltanto. Una pagina prerenderizzata che ne è
+  // priva segnala che quella rotta non è passata dall'effect — un caso che si nota solo
+  // leggendo l'HTML costruito, quindi tanto vale dirlo a build time invece di scoprirlo mesi
+  // dopo in un audit SEO.
   if (routeFromHtmlPath(file) && !/rel=["']canonical["']/i.test(text)) {
     missingCanonical.push(path.relative(BROWSER_DIR, file));
   }
@@ -74,60 +74,23 @@ if (missingCanonical.length) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. sitemap.xml — pagine statiche + una entry per prodotto (solo rotte prerenderizzate:
-//    le varianti lotto/seriale sono client-rendered, potenzialmente infinite, e comunque
-//    canonicalizzate sulla pagina prodotto — non hanno senso in una sitemap)
+// 2. sitemap.xml — home + una entry per prodotto (le varianti lotto/seriale non esistono più
+//    come rotte, vedi app.routes.ts)
 // ---------------------------------------------------------------------------
-const sectorIds = [...new Set(products.map((p) => p.sectorId))];
+const productUrls = products.map((p) => ({ loc: `/01/${p.gtin}` }));
 
-/**
- * Rotte prerenderizzate sotto una directory, lette dal build invece che ridichiarate qui.
- * I termini del vocabolario e gli identificatori di brand/organismi nascono da
- * getPrerenderParams (vedi app.routes.server.ts): elencarli di nuovo a mano significherebbe
- * tenere allineate due liste, ed è esattamente il motivo per cui erano finiti fuori dalla
- * sitemap — una trentina di pagine pubblicate e mai dichiarate.
- */
-function prerenderedRoutes(relDir) {
-  const dir = path.join(BROWSER_DIR, ...relDir.split('/'));
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .filter((e) => e.isDirectory() && fs.existsSync(path.join(dir, e.name, 'index.html')))
-    .map((e) => ({ loc: `/${relDir}/${e.name}` }));
-}
-
-const staticUrls = [
-  { loc: '/' },
-  { loc: '/validatore' },
-  { loc: '/knowledge-graph' },
-  { loc: '/voc' },
-  { loc: '/organizzazione' },
-  // /assistente non è più una pagina prerenderizzata di questo sito: è il chat-client React
-  // (vedi docker-compose.yml), una SPA senza contenuto statico da indicizzare.
-  ...sectorIds.map((id) => ({ loc: `/catalog/${id}` })),
-  ...prerenderedRoutes('voc'),
-  ...prerenderedRoutes('id/brand'),
-  ...prerenderedRoutes('id/certification-body'),
-];
-
-const productUrls = products.map((p) => ({
-  loc: `/01/${p.gtin}`,
-  lastmod: p.gdsn?.lastModified ? p.gdsn.lastModified.slice(0, 10) : undefined,
-}));
-
-function urlEntry({ loc, lastmod }) {
-  const lastmodTag = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : '';
-  return `  <url>\n    <loc>${SITE_URL}${loc}</loc>${lastmodTag}\n  </url>`;
+function urlEntry({ loc }) {
+  return `  <url>\n    <loc>${SITE_URL}${loc}</loc>\n  </url>`;
 }
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${[...staticUrls, ...productUrls].map(urlEntry).join('\n')}
+${[{ loc: '/' }, ...productUrls].map(urlEntry).join('\n')}
 </urlset>
 `;
 
 fs.writeFileSync(path.join(BROWSER_DIR, 'sitemap.xml'), sitemap);
-console.log(`generate-seo-files: sitemap.xml generato (${staticUrls.length + productUrls.length} URL, ${productUrls.filter((u) => u.lastmod).length} con lastmod)`);
+console.log(`generate-seo-files: sitemap.xml generato (${1 + productUrls.length} URL)`);
 
 // ---------------------------------------------------------------------------
 // 3. robots.txt
@@ -147,18 +110,18 @@ const AI_AGENTS = [
   'Amazonbot', 'Meta-ExternalAgent', 'Bytespider',
 ];
 
-const robots = `# Catalogo dimostrativo GS1 Digital Link: dati pensati per essere letti da motori di
-# ricerca e agenti AI (vedi /assistente e /01/*), quindi accesso volutamente permissivo.
+const robots = `# Catalogo prodotti: dati pensati per essere letti da motori di ricerca e agenti AI
+# (vedi /assistente e /01/*), quindi accesso volutamente permissivo.
 
 User-agent: *
 Allow: /
 
 ${AI_AGENTS.map((a) => `User-agent: ${a}\nAllow: /`).join('\n\n')}
 
-# Content-Signal (bozza IETF, non ancora uno standard consolidato — vedi il messaggio di
-# riepilogo): search = indicizzazione nei motori di ricerca; ai-input = uso come contesto da
-# parte di agenti AI in risposta a una richiesta (RAG); ai-train = uso per addestrare modelli.
-# Un parser che non riconosce questa direttiva la ignora semplicemente, per specifica.
+# Content-Signal (bozza IETF, non ancora uno standard consolidato): search = indicizzazione nei
+# motori di ricerca; ai-input = uso come contesto da parte di agenti AI in risposta a una
+# richiesta (RAG); ai-train = uso per addestrare modelli. Un parser che non riconosce questa
+# direttiva la ignora semplicemente, per specifica.
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 Sitemap: ${SITE_URL}/sitemap.xml
@@ -168,57 +131,32 @@ fs.writeFileSync(path.join(BROWSER_DIR, 'robots.txt'), robots);
 console.log('generate-seo-files: robots.txt generato');
 
 // ---------------------------------------------------------------------------
-// 4. llms.txt — https://llmstxt.org — in inglese per la massima comprensione da parte di
-//    agenti AI generici; i dati del catalogo restano comunque disponibili in IT/EN sul sito.
+// 4. llms.txt — https://llmstxt.org
 // ---------------------------------------------------------------------------
-const SECTOR_LABELS = {
-  fmcg: 'Consumer Goods', foodservice: 'Foodservice', healthcare: 'Healthcare',
-  apparel: 'Apparel', 'fresh-foods': 'Fresh Foods', costruzioni: 'Construction',
-};
-
 function oneLine(text, maxLen = 140) {
   const clean = text.replace(/\s+/g, ' ').trim();
   return clean.length > maxLen ? clean.slice(0, maxLen - 1).trimEnd() + '…' : clean;
 }
 
-const sectorSection = sectorIds
-  .map((id) => `- [${SECTOR_LABELS[id] || id}](${SITE_URL}/catalog/${id}): ${products.filter((p) => p.sectorId === id).length} products`)
-  .join('\n');
-
 const productSection = products
   .map((p) => `- [${p.name}](${SITE_URL}/01/${p.gtin}): ${oneLine(p.description)}`)
   .join('\n');
 
-const llmsTxt = `# GS1 Digital Link Catalog
+const llmsTxt = `# Catalogo Smart
 
-> Demo catalog showing how GS1 Digital Link turns a GTIN into the gateway to a product's
-> data, published as structured JSON-LD (GS1 Web Vocabulary and/or schema.org) so it can be
-> read by search engines and AI agents. ${products.length} fictional products across ${sectorIds.length} sectors, brand "GS1 Italy" (company prefix 8032089).
+> Un catalogo prodotti navigabile: cerca, sfoglia, apri la scheda di un prodotto. ${products.length} prodotti.
 
 ## Sections
 
-- [Home](${SITE_URL}/): sector overview and search
-- [GS1 Digital Link Validator](${SITE_URL}/validatore): parses a Digital Link or bracketed AI element string with the real GS1 Barcode Syntax Engine (WASM), with a CTA to validator.schema.org
-- [AI Shopping Assistant](${SITE_URL}/assistente): agentic chat (Google ADK + A2A + UCP) that searches the catalog, answers from the GS1 product sheets and can complete an order
-- [Knowledge graph](${SITE_URL}/knowledge-graph): the whole catalog as an RDF graph, browsable and queryable with SPARQL
-- [gs1it: vocabulary](${SITE_URL}/voc): definitions of the small extension used alongside the official GS1 Web Vocabulary (GDSN packaging hierarchy, certification bodies) — one page per term, each dereferenceable and machine-readable
-- [GS1 Italy](${SITE_URL}/organizzazione): the real-world Organization this catalog's standards belong to — not a fictional entity like the brands/products below
+- [Home](${SITE_URL}/): catalogo prodotti e ricerca
+- [AI Shopping Assistant](${SITE_URL}/assistente): chat che cerca nel catalogo e può completare un ordine
 - [Sitemap](${SITE_URL}/sitemap.xml)
 
 ## Machine-readable endpoints
 
-- [Knowledge graph dataset](${SITE_URL}/knowledge-graph.jsonld): the entire catalog as one JSON-LD document (@context + @graph, ~250 KB). The densest single entry point: it carries what the per-product list below carries, already structured
-- [Catalog feed](${SITE_URL}/catalog): lightweight JSON list of every product — gtin, name, brand, price, category, image, description. ~21 KB, for when the full graph is more than you need
-- [GS1 product sheet](${SITE_URL}/01/${products[0].gtin}): request any \`/01/{gtin}\` with \`Accept: application/ld+json\` to get the full GS1 Web Vocabulary sheet — the same document embedded in the HTML page. Returns 404 when a product publishes no structured data, which is itself the answer
+- [Catalog feed](${SITE_URL}/catalog): lightweight JSON list of every product — gtin, name, brand, price, category, image, description
 
-## Sectors
-
-${sectorSection}
-
-## Optional
-
-Every product page, one by one — the verbose path to what the knowledge graph above already
-carries in a single document. Safe to skip when working with a shorter context.
+## Products
 
 ${productSection}
 `;
@@ -229,11 +167,7 @@ console.log(`generate-seo-files: llms.txt generato (${(Buffer.byteLength(llmsTxt
 // ---------------------------------------------------------------------------
 // 4b. llms-full.txt — stessa convenzione llms.txt, ma la versione "exhaustive" prevista dallo
 //    stesso standard (https://llmstxt.org/#llms-full.txt): non un indice di link, il contenuto
-//    per intero in un solo documento, cosí un agente non deve seguire 63 link separati per
-//    avere l'intero catalogo. Stessa fonte dati di llms.txt (products.json, letto qui sopra),
-//    solo con descrizione integrale invece che troncata a 140 caratteri e i campi realmente
-//    disponibili (brand, categoria GPC, prezzo) invece del solo nome — niente di nuovo
-//    inventato, solo meno tagliato.
+//    per intero in un solo documento.
 // ---------------------------------------------------------------------------
 function formatPrice(p) {
   if (!p.price?.amount) return null;
@@ -243,50 +177,18 @@ function formatPrice(p) {
 
 const productFullSection = products
   .map((p) => {
-    const facts = [`GTIN ${p.gtin}`, `brand ${p.brand || 'GS1'}`];
+    const facts = [`GTIN ${p.gtin}`, `brand ${p.brand || '—'}`];
     if (p.category) facts.push(p.category);
     const price = formatPrice(p);
     if (price) facts.push(price);
-    if (p.rawGs1Data) {
-      const certCount = p.rawGs1Data['gs1:certification']?.length;
-      facts.push(p.gdsn ? 'AI-ready, GDSN packaging hierarchy' : 'AI-ready');
-      if (certCount) facts.push(`${certCount} certification${certCount > 1 ? 's' : ''}`);
-    } else {
-      facts.push('no structured data published (demo contrast case)');
-    }
     return `### ${p.name}\n${facts.join(' — ')}\n${p.description.replace(/\s+/g, ' ').trim()}\n[${SITE_URL}/01/${p.gtin}](${SITE_URL}/01/${p.gtin})`;
   })
   .join('\n\n');
 
-const llmsFullTxt = `# GS1 Digital Link Catalog — full content
+const llmsFullTxt = `# Catalogo Smart — full content
 
-> Same demo described in llms.txt, expanded: every product's full description and known facts
-> inline, not just a link to follow. ${products.length} fictional products across ${sectorIds.length} sectors, brand "GS1 Italy" (company prefix 8032089). Real, non-fictional facts (the
-> GS1 Italy organization, the gs1: and gs1it: vocabularies) are marked as such below and on
-> their own pages — everything else (brands, companies, GLNs, certifications) is invented for
-> this demo.
-
-## What this site is
-
-A working demonstration of GS1 Digital Link: a GTIN resolves to a page publishing structured
-data (GS1 Web Vocabulary and/or schema.org, content-negotiated via \`Accept: application/ld+json\`)
-instead of just a picture and a price. ${sectorSection.split('\n').length} sectors, a GS1 Web
-Vocabulary knowledge graph with real deduplicated brand/certification-body nodes, a GDSN
-packaging-hierarchy example, and an agentic shopping assistant that reads the same structured
-data a crawler would.
-
-## Real-world entities (not fictional)
-
-- [GS1 Italy](${SITE_URL}/organizzazione): the real non-profit organisation whose GS1 Digital
-  Link and GS1 Web Vocabulary standards this catalog demonstrates. Address, tax code and
-  official website on that page, not invented.
-- [gs1it: vocabulary](${SITE_URL}/voc): the small extension this project defines and hosts
-  itself (GDSN packaging hierarchy, certification-body class) for the concepts the official
-  GS1 Web Vocabulary doesn't cover — one dereferenceable page per term.
-
-## Sectors
-
-${sectorSection}
+> Same catalogue described in llms.txt, expanded: every product's full description and known
+> facts inline, not just a link to follow. ${products.length} products.
 
 ## Every product, in full
 
@@ -300,20 +202,17 @@ console.log(`generate-seo-files: llms-full.txt generato (${(Buffer.byteLength(ll
 // 5. .well-known/agent-skills/index.json — elenco machine-readable delle capacità reali del
 //    sito, in un formato pensato per la discovery automatica (a differenza di llms.txt, che è
 //    prosa per un LLM). Nessuno standard consolidato definisce ancora questo file: qui si
-//    descrivono solo endpoint che esistono davvero e si comportano come descritto — nello
-//    stesso spirito del resto del progetto, niente promesse su dati che non ci sono.
+//    descrivono solo endpoint che esistono davvero e si comportano come descritto.
 // ---------------------------------------------------------------------------
 const agentSkills = {
-  name: 'GS1 Digital Link Catalog',
-  description:
-    'Demo catalog: GS1 Digital Link URIs resolve to product pages that publish structured data (GS1 Web Vocabulary / schema.org) via content negotiation.',
+  name: 'Catalogo Smart',
+  description: 'Product catalogue: each product page publishes structured data (schema.org) via content negotiation.',
   url: SITE_URL,
   skills: [
     {
       id: 'product-lookup',
-      name: 'Look up a product’s structured GS1 data',
-      description:
-        'Resolve a GS1 Digital Link with Accept: application/ld+json to get the full GS1 Web Vocabulary / schema.org record for that product — allergens (with containment level), certifications, nutrition, materials, GDSN packaging hierarchy. Returns 404 when the product publishes no structured data: that absence is itself the answer, not an error to work around.',
+      name: 'Look up a product',
+      description: 'Fetch a product page with Accept: application/ld+json to get its structured record where published.',
       endpoint: `${SITE_URL}/01/{gtin}`,
       method: 'GET',
       requestHeaders: { Accept: 'application/ld+json' },
@@ -326,26 +225,10 @@ const agentSkills = {
       method: 'GET',
     },
     {
-      id: 'knowledge-graph-query',
-      name: 'Query the catalog as an RDF graph',
-      description:
-        'The whole catalog as one JSON-LD document (@context + @graph): products, brands and certification bodies as deduplicated nodes with stable @id, ready to load into any RDF/SPARQL engine.',
-      endpoint: `${SITE_URL}/knowledge-graph.jsonld`,
-      method: 'GET',
-    },
-    {
-      id: 'digital-link-validation',
-      name: 'Validate a GS1 Digital Link or AI element string',
-      description:
-        'Parses a GS1 Digital Link URI or a bracketed AI element string with the real GS1 Barcode Syntax Engine (the same library used by official GS1 tools) and returns the extracted identifiers.',
-      endpoint: `${SITE_URL}/validatore`,
-      method: 'GET',
-    },
-    {
       id: 'shopping-assistant',
       name: 'Conversational shopping assistant',
       description:
-        'An A2A/UCP commerce agent (Gemini) that searches the catalog, answers grounded only in the GS1 product sheets it can read — it states when a product has no structured data instead of guessing — and can complete a checkout. May require a password in this deployment; see the page for details.',
+        'An A2A/UCP commerce agent (Gemini) that searches the catalog and can complete a checkout. May require a password in this deployment; see the page for details.',
       endpoint: `${SITE_URL}/assistente`,
       protocol: 'A2A',
       protocolVersion: '0.3.0',

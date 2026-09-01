@@ -12,71 +12,39 @@
           {{ t('hero.searchCta') }}
           <span class="gs-kbd">/</span>
         </button>
-        <a href="#settori" class="gs-btn gs-btn--ghost">{{ t('hero.exploreCta') }}</a>
       </div>
     </div>
   </section>
 
-  <section class="trust-section" aria-labelledby="trust-heading">
-    <div class="trust-heading">
-      <h2 id="trust-heading">{{ t('hero.trustHeading') }}</h2>
-      <p>{{ t('hero.trustIntro') }}</p>
-    </div>
-
-    <ul class="trust-points">
-      <li class="trust-point">
-        <h3>{{ t('hero.trustPoint1Title') }}</h3>
-        <p>{{ t('hero.trustPoint1Body') }}</p>
-      </li>
-      <li class="trust-point">
-        <h3>{{ t('hero.trustPoint2Title') }}</h3>
-        <p>{{ t('hero.trustPoint2Body') }}</p>
-      </li>
-      <li class="trust-point">
-        <h3>{{ t('hero.trustPoint3Title') }}</h3>
-        <p>{{ t('hero.trustPoint3Body') }}</p>
-      </li>
-    </ul>
-  </section>
-
-  <section class="sectors-grid" id="settori">
-    <div class="sectors-heading">
-      <h2>{{ t('hero.sectionHeading') }} <span class="gradient-text">{{ t('hero.sectionHeadingHighlight') }}</span></h2>
-      <p>{{ t('hero.sectionSubtitle') }}</p>
-    </div>
-
-    <ul class="sectors-cards">
-      @for (sector of sectors(); track sector.id; let i = $index) {
-        <!-- <a> e non <article>: routerLink su un elemento che non è un'ancora non
-             produce alcun href, attacca solo un gestore di click. La home restava così
-             senza un solo link navigabile, e chi legge l'HTML senza eseguire JavaScript
-             — motori di ricerca e agenti AI, cioè il pubblico di questa demo — non aveva
-             alcun modo di raggiungere settori e prodotti. -->
+  <section class="catalog-section" id="catalogo">
+    <ul class="catalog-grid">
+      @for (product of products(); track product.gtin) {
         <li>
-          <a
-            class="sector-card"
-            [routerLink]="['/catalog', sector.id]"
-            [style.--sector-color]="sector.brandColor"
-            [style.--i]="i"
-          >
-            <div class="card-header">
-              <div class="icon-wrapper" [style.backgroundColor]="sector.brandColor + '1A'">
-                <img [src]="sector.icon" [alt]="sector.name" loading="lazy" />
-              </div>
-              <span class="sector-badge" [style.backgroundColor]="sector.brandColor">{{ sector.name }}</span>
+          <article class="product-card" [routerLink]="['/01', product.gtin]">
+            <div class="card-image-wrapper">
+              <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
             </div>
-
-            <div class="card-content">
-              <p class="description">{{ sector.description }}</p>
-
-              <div class="card-footer">
-                <span class="explore-btn" [style.color]="sector.brandColor">{{ t('hero.exploreProducts') }}</span>
-                <div class="arrow-icon" [style.color]="sector.brandColor">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </div>
+            <div class="card-body">
+              <span class="product-brand">{{ product.brand }}</span>
+              <h2 class="product-name">{{ product.name }}</h2>
+              <div class="card-price">
+                @if (product.price; as price) {
+                  <span class="card-price-current">{{ formatEuro(price.amount) }}</span>
+                  @if (price.unit) {
+                    <span class="card-price-unit">/{{ price.unit }}</span>
+                  }
+                  @if (price.listAmount && discountPercent(price); as pct) {
+                    <span class="card-price-original">{{ formatEuro(price.listAmount) }}</span>
+                    <span class="card-price-discount">-{{ pct }}%</span>
+                  }
+                }
               </div>
             </div>
-          </a>
+          </article>
+        </li>
+      } @empty {
+        <li class="empty-state">
+          <p>{{ t('hero.noProducts') }}</p>
         </li>
       }
     </ul>

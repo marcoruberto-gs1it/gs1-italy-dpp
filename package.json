@@ -4,8 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "prestart": "node generate-knowledge-graph.js",
-    "build": "node generate-routes.js && node generate-knowledge-graph.js && ng build",
+    "build": "node generate-routes.js && ng build",
     "postbuild": "node generate-seo-files.js && node generate-agent-feed.js && node publish-theme.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

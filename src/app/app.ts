@@ -1,11 +1,9 @@
-import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { SearchPaletteComponent } from './components/search-palette/search-palette';
-import { JsonLdDrawerComponent } from './components/json-ld-drawer/json-ld-drawer';
-import { SECTORS, localizeSector } from './data/sectors';
 import { UiStateService } from './services/ui-state.service';
 import { ThemeService } from './services/theme.service';
 import { LanguageService } from './services/language.service';
@@ -15,7 +13,7 @@ import { SiteOriginService } from './services/site-origin.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SearchPaletteComponent, JsonLdDrawerComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SearchPaletteComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -31,7 +29,6 @@ export class App {
   private seoLinks = inject(SeoLinkService);
   private siteOrigin = inject(SiteOriginService);
 
-  protected sectors = computed(() => SECTORS.map((s) => localizeSector(s, this.languageService.lang())));
   protected mobileNavOpen = signal(false);
 
   // Segnale che avanza a ogni navigazione completata: usato per aggiornare il link canonical

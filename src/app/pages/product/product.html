@@ -1,80 +1,32 @@
-@if (product(); as prod) {
-  <article class="product-page">
-
-    <!-- Breadcrumbs -->
+<div class="product-page">
+  @if (product(); as prod) {
     <nav class="breadcrumbs" aria-label="breadcrumb">
       <ol>
         <li><a routerLink="/">{{ t('nav.home') }}</a></li>
-        <li class="separator">/</li>
-        <li><a [routerLink]="['/catalog', prod.sectorId]">{{ prod.sectorName }}</a></li>
         <li class="separator">/</li>
         <li class="current" aria-current="page">{{ prod.name }}</li>
       </ol>
     </nav>
 
-    <div class="product-layout">
-
-      <!-- COLONNA SINISTRA: Gallery -->
-      <div class="product-left-col">
-        <div class="badges-row">
-          @if (isAiReady(prod)) {
-            <span class="gs-badge gs-badge--ai">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2H22l-6 4.4 2.3 7.2L12 16.4 5.7 20.8 8 13.6 2 9.2h7.6z"></path></svg>
-              {{ t('product.aiReady') }}
-            </span>
-          }
-          @if (isVerified(prod)) {
-            <span class="gs-badge gs-badge--verified">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
-              {{ t('product.verified') }}
-            </span>
-          }
-          @if (vocabularies().includes('gs1')) {
-            <span class="gs-badge gs-badge--vocab" [title]="t('product.gs1VocabularyTitle')">{{ t('product.gs1Vocabulary') }}</span>
-          }
-          @if (vocabularies().includes('schema')) {
-            <span class="gs-badge gs-badge--schema">{{ t('product.schemaOrg') }}</span>
-          }
+    <article class="product-layout">
+      <figure class="gallery">
+        <div class="main-image">
+          <img [src]="activeImage()" [alt]="prod.name" (error)="onImageError($event)">
         </div>
-
-        <figure class="gallery">
-          <button type="button" class="gallery-main" (click)="openLightbox()">
-            <img [src]="activeImage()" [alt]="prod.name" (error)="onImageError($event)">
-            <span class="gallery-zoom-hint">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
-              {{ t('product.enlarge') }}
-            </span>
-          </button>
-
-          @if (images().length > 1) {
-            <div class="gallery-thumbs">
-              @for (img of images(); track $index) {
-                <button type="button" class="thumb" [class.active]="$index === activeImageIndex()" (click)="selectImage($index)">
-                  <img [src]="img" [alt]="prod.name + ' immagine ' + ($index + 1)" (error)="onImageError($event)">
-                </button>
-              }
-            </div>
-          }
-        </figure>
-
-        @if (otherLinks().length > 0) {
-          <div class="gs1-links-container">
-            <h2>{{ t('product.relatedServices') }}</h2>
-            @for (link of otherLinks(); track $index) {
-              <a [href]="link.url" target="_blank" rel="noopener noreferrer" class="gs1-link-btn">
-                <span class="link-type-badge">{{ link.linkType.replace('gs1:', '') }}</span>
-                {{ link.label }}
-              </a>
+        @if (images().length > 1) {
+          <div class="thumbnails">
+            @for (img of images(); track img; let i = $index) {
+              <button type="button" class="thumbnail" [class.active]="i === activeImageIndex()" (click)="setActiveImage(i)">
+                <img [src]="img" [alt]="prod.name" (error)="onImageError($event)">
+              </button>
             }
           </div>
         }
-      </div>
+      </figure>
 
-      <!-- COLONNA DESTRA: Dettagli e identità -->
-      <div class="product-details">
-
-        <span class="brand-name">{{ prod.brand }}</span>
-        <h1 class="product-title">{{ prod.name }}</h1>
+      <div class="product-info">
+        <span class="product-brand">{{ prod.brand }}</span>
+        <h1 class="product-name">{{ prod.name }}</h1>
 
         @if (prod.rating) {
           <app-star-rating [value]="prod.rating.value" [count]="prod.rating.count"></app-star-rating>
@@ -82,618 +34,82 @@
 
         @if (prod.price; as price) {
           <div class="price-block">
-            <div class="price-main">
-              <span class="price-current">{{ formatEuro(price.amount) }}</span>
-              @if (price.unit) {
-                <span class="price-unit">/ {{ price.unit }}</span>
-              }
-              @if (price.listAmount && discountPercent(price); as pct) {
-                <span class="price-original">{{ formatEuro(price.listAmount) }}</span>
-                <span class="price-discount-badge">-{{ pct }}%</span>
-              }
-            </div>
-            <div class="price-meta">
-              <span class="price-vat">{{ price.vatIncluded ? t('product.vatIncluded') : t('product.vatExcluded') }} ({{ price.vatRate }}%)</span>
-              @if (price.discountLabel && price.listAmount) {
-                <span class="price-discount-label">{{ price.discountLabel }}</span>
-              }
-            </div>
+            <span class="price-current">{{ formatEuro(price.amount) }}</span>
+            @if (price.unit) {
+              <span class="price-unit">/{{ price.unit }}</span>
+            }
+            @if (price.listAmount && discountPercent(price); as pct) {
+              <span class="price-original">{{ formatEuro(price.listAmount) }}</span>
+              <span class="price-discount">-{{ pct }}%</span>
+            }
           </div>
         }
 
         <p class="product-description">{{ prod.description }}</p>
 
-        <!-- Tabs -->
-        <div class="product-tabs">
-          <div class="tabs-nav" role="tablist">
-            <button type="button" role="tab" id="tab-details" aria-controls="panel-details" [attr.aria-selected]="activeTab() === 'details'" [class.active]="activeTab() === 'details'" (click)="setTab('details')">{{ t('product.tabs.details') }}</button>
-            @if (hasSustainabilityTab()) {
-              <button type="button" role="tab" id="tab-sustainability" aria-controls="panel-sustainability" [attr.aria-selected]="activeTab() === 'sustainability'" [class.active]="activeTab() === 'sustainability'" (click)="setTab('sustainability')">{{ t('product.tabs.sustainability') }}</button>
+        @if (prod.food; as food) {
+          <div class="info-block">
+            @if (food.ingredients) {
+              <h2>{{ t('product.ingredients') }}</h2>
+              <p>{{ food.ingredients }}</p>
             }
-            <span class="tabs-divider" [attr.aria-label]="t('product.tabs.gs1GroupLabel')" role="separator"></span>
-            @if (hasSupplyChainData()) {
-              <button type="button" role="tab" id="tab-supply-chain" aria-controls="panel-supply-chain" [attr.aria-selected]="activeTab() === 'supply-chain'" class="tab-gs1" [class.active]="activeTab() === 'supply-chain'" (click)="setTab('supply-chain')">{{ t('product.tabs.supplyChain') }}</button>
+            @if (food.allergens) {
+              <h2>{{ t('product.allergens') }}</h2>
+              <p>{{ food.allergens }}</p>
             }
-            @if (hasGdsnTab()) {
-              <button type="button" role="tab" id="tab-gdsn" aria-controls="panel-gdsn" [attr.aria-selected]="activeTab() === 'gdsn'" class="tab-gs1" [class.active]="activeTab() === 'gdsn'" (click)="setTab('gdsn')">{{ t('product.tabs.gdsn') }}</button>
+            @if (food.nutrition; as nutrition) {
+              <h2>{{ t('product.nutrition') }}</h2>
+              <ul class="fact-list">
+                @if (nutrition.calories) { <li><span>{{ t('product.calories') }}</span><span>{{ nutrition.calories }}</span></li> }
+                @if (nutrition.fat) { <li><span>{{ t('product.fat') }}</span><span>{{ nutrition.fat }}</span></li> }
+                @if (nutrition.carbohydrates) { <li><span>{{ t('product.carbohydrates') }}</span><span>{{ nutrition.carbohydrates }}</span></li> }
+                @if (nutrition.sugars) { <li><span>{{ t('product.sugars') }}</span><span>{{ nutrition.sugars }}</span></li> }
+                @if (nutrition.protein) { <li><span>{{ t('product.protein') }}</span><span>{{ nutrition.protein }}</span></li> }
+                @if (nutrition.salt) { <li><span>{{ t('product.salt') }}</span><span>{{ nutrition.salt }}</span></li> }
+              </ul>
             }
-            @if (hasEdiTab()) {
-              <button type="button" role="tab" id="tab-edi" aria-controls="panel-edi" [attr.aria-selected]="activeTab() === 'edi'" class="tab-gs1" [class.active]="activeTab() === 'edi'" (click)="setTab('edi')">{{ t('product.tabs.edi') }}</button>
-            }
-            <button type="button" role="tab" id="tab-structured-data" aria-controls="panel-structured-data" [attr.aria-selected]="activeTab() === 'structured-data'" class="tab-gs1" [class.active]="activeTab() === 'structured-data'" (click)="setTab('structured-data')">{{ t('product.tabs.structuredData') }}</button>
           </div>
+        }
 
-          <div class="tab-panel">
-
-            <!-- DETTAGLI -->
-            <div class="panel-section" role="tabpanel" id="panel-details" aria-labelledby="tab-details" [hidden]="activeTab() !== 'details'">
-                @if (prod.logistics || prod.apparel) {
-                  <h2 class="panel-heading">{{ t('product.specs.heading') }}</h2>
-                  <ul class="structured-data-list icon-list">
-                    @if (prod.logistics?.netWeight) {
-                      <li><span class="data-label"><app-icon name="weight" [size]="16"></app-icon>{{ t('product.specs.netWeight') }}</span><span class="data-value">{{ prod.logistics!.netWeight }}</span></li>
-                    }
-                    @if (prod.logistics?.grossWeight) {
-                      <li><span class="data-label"><app-icon name="weight" [size]="16"></app-icon>{{ t('product.specs.grossWeight') }}</span><span class="data-value">{{ prod.logistics!.grossWeight }}</span></li>
-                    }
-                    @if (prod.logistics?.dimensions) {
-                      <li><span class="data-label"><app-icon name="ruler" [size]="16"></app-icon>{{ t('product.specs.dimensions') }}</span><span class="data-value">{{ prod.logistics!.dimensions }}</span></li>
-                    }
-                    @if (prod.apparel?.material) {
-                      <li><span class="data-label"><app-icon name="layers" [size]="16"></app-icon>{{ t('product.specs.composition') }}</span><span class="data-value">{{ prod.apparel!.material }}</span></li>
-                    }
-                    @if (prod.apparel?.color) {
-                      <li><span class="data-label"><app-icon name="swatch" [size]="16"></app-icon>{{ t('product.specs.color') }}</span><span class="data-value">{{ prod.apparel!.color }}</span></li>
-                    }
-                    @if (prod.apparel?.size) {
-                      <li><span class="data-label"><app-icon name="tag" [size]="16"></app-icon>{{ t('product.specs.size') }}</span><span class="data-value">{{ prod.apparel!.size }}</span></li>
-                    }
-                    @if (prod.apparel?.careInstructions) {
-                      <li class="full-width"><span class="data-label"><app-icon name="droplet" [size]="16"></app-icon>{{ t('product.specs.care') }}</span><p class="data-text">{{ prod.apparel!.careInstructions }}</p></li>
-                    }
-                  </ul>
-                }
-
-                @if (prod.food?.ingredients) {
-                  <h2 class="panel-heading">{{ t('product.ingredients') }}</h2>
-                  <p class="data-text">{{ prod.food!.ingredients }}</p>
-                }
-
-                @if (prod.food?.allergens) {
-                  <h2 class="panel-heading">{{ t('product.allergens') }}</h2>
-                  <p class="data-text text-warning">{{ prod.food!.allergens }}</p>
-                }
-
-                @if (prod.food?.nutrition) {
-                  <h2 class="panel-heading">{{ t('product.nutrition.heading') }} <span class="muted">{{ t('product.nutrition.per100g') }}</span></h2>
-                  <table class="nutrition-table">
-                    <caption class="sr-only">{{ t('product.nutrition.heading') }} {{ t('product.nutrition.per100g') }}</caption>
-                    <tbody>
-                      @if (prod.food!.nutrition!.calories) {
-                        <tr><th scope="row">{{ t('product.nutrition.energy') }}</th><td>{{ prod.food!.nutrition!.calories }}</td></tr>
-                      }
-                      @if (prod.food!.nutrition!.fat) {
-                        <tr><th scope="row">{{ t('product.nutrition.fat') }}</th><td>{{ prod.food!.nutrition!.fat }}</td></tr>
-                      }
-                      @if (prod.food!.nutrition!.carbohydrates) {
-                        <tr><th scope="row">{{ t('product.nutrition.carbohydrates') }}</th><td>{{ prod.food!.nutrition!.carbohydrates }}</td></tr>
-                      }
-                      @if (prod.food!.nutrition!.sugars) {
-                        <tr><th scope="row" class="sub-row">{{ t('product.nutrition.ofWhichSugars') }}</th><td>{{ prod.food!.nutrition!.sugars }}</td></tr>
-                      }
-                      @if (prod.food!.nutrition!.protein) {
-                        <tr><th scope="row">{{ t('product.nutrition.protein') }}</th><td>{{ prod.food!.nutrition!.protein }}</td></tr>
-                      }
-                      @if (prod.food!.nutrition!.salt) {
-                        <tr><th scope="row">{{ t('product.nutrition.salt') }}</th><td>{{ prod.food!.nutrition!.salt }}</td></tr>
-                      }
-                    </tbody>
-                  </table>
-                }
-
-                @if (!hasDetailsTab()) {
-                  <p class="data-text">{{ t('product.specs.noAdditionalSpecs') }}</p>
-                }
-            </div>
-
-            <!-- SOSTENIBILITÀ -->
-            @if (hasSustainabilityTab()) {
-              <div class="panel-section" role="tabpanel" id="panel-sustainability" aria-labelledby="tab-sustainability" [hidden]="activeTab() !== 'sustainability'">
-                @if (prod.environmentalImpact; as env) {
-                  <h2 class="panel-heading">{{ t('product.sustainability.environmentalImpact') }}</h2>
-                  <div class="stat-grid">
-                    @if (env.co2e) {
-                      <div class="stat-card">
-                        <span class="icon-badge" style="--icon-badge-bg: var(--accent-2-soft); --icon-badge-color: var(--gs1-orange)">
-                          <app-icon name="cloud"></app-icon>
-                        </span>
-                        <span class="stat-value">{{ env.co2e }}</span>
-                        <span class="stat-label">{{ t('product.sustainability.co2e') }}</span>
-                      </div>
-                    }
-                    @if (env.waterConsumption) {
-                      <div class="stat-card">
-                        <span class="icon-badge" style="--icon-badge-bg: rgba(0, 182, 222, 0.12); --icon-badge-color: var(--gs1-sky)">
-                          <app-icon name="droplet"></app-icon>
-                        </span>
-                        <span class="stat-value">{{ env.waterConsumption }}</span>
-                        <span class="stat-label">{{ t('product.sustainability.waterConsumption') }}</span>
-                      </div>
-                    }
-                    @if (env.energyConsumption) {
-                      <div class="stat-card">
-                        <span class="icon-badge" style="--icon-badge-bg: rgba(196, 176, 0, 0.14); --icon-badge-color: var(--gs1-gold)">
-                          <app-icon name="zap"></app-icon>
-                        </span>
-                        <span class="stat-value">{{ env.energyConsumption }}</span>
-                        <span class="stat-label">{{ t('product.sustainability.energyConsumption') }}</span>
-                      </div>
-                    }
-                    @if (env.chemicalConsumption) {
-                      <div class="stat-card">
-                        <span class="icon-badge" style="--icon-badge-bg: rgba(240, 85, 135, 0.12); --icon-badge-color: var(--gs1-raspberry)">
-                          <app-icon name="flask"></app-icon>
-                        </span>
-                        <span class="stat-value">{{ env.chemicalConsumption }}</span>
-                        <span class="stat-label">{{ t('product.sustainability.chemicalConsumption') }}</span>
-                      </div>
-                    }
-                    @if (env.recycledContent) {
-                      <div class="stat-card">
-                        <span class="icon-badge" style="--icon-badge-bg: rgba(0, 183, 79, 0.12); --icon-badge-color: var(--gs1-recycling)">
-                          <app-icon name="refresh"></app-icon>
-                        </span>
-                        <span class="stat-value">{{ env.recycledContent }}</span>
-                        <span class="stat-label">{{ t('product.sustainability.recycledContent') }}</span>
-                      </div>
-                    }
-                    @if (env.sustainabilityCertifiedContent) {
-                      <div class="stat-card">
-                        <span class="icon-badge" style="--icon-badge-bg: var(--success-soft); --icon-badge-color: var(--success)">
-                          <app-icon name="shield-check"></app-icon>
-                        </span>
-                        <span class="stat-value">{{ env.sustainabilityCertifiedContent }}</span>
-                        <span class="stat-label">{{ t('product.sustainability.certifiedMaterial') }}</span>
-                      </div>
-                    }
-                  </div>
-                }
-                @if (prod.certifications && prod.certifications.length > 0) {
-                  <h2 class="panel-heading">{{ t('product.sustainability.certifications') }}</h2>
-                  @for (cert of prod.certifications; track $index) {
-                    <div class="certification-card">
-                      <h3 class="cert-agency">{{ cert.agency }}</h3>
-                      @if (cert.standard) {
-                        <p class="cert-standard">{{ cert.standard }}</p>
-                      }
-                      <div class="cert-meta">
-                        @if (cert.value) {
-                          <span class="cert-badge">{{ cert.value }}</span>
-                        }
-                        @if (cert.id) {
-                          <span class="cert-id">{{ t('product.sustainability.certificationId') }}: {{ cert.id }}</span>
-                        }
-                      </div>
-                    </div>
-                  }
-                }
-                @if (sustainabilityLinks().length > 0) {
-                  <h2 class="panel-heading">{{ t('product.sustainability.insights') }}</h2>
-                  @for (link of sustainabilityLinks(); track $index) {
-                    <a [href]="link.url" target="_blank" rel="noopener noreferrer" class="gs1-link-btn">
-                      <span class="link-type-badge">{{ link.linkType.replace('gs1:', '') }}</span>
-                      {{ link.label }}
-                    </a>
-                  }
-                }
-              </div>
-            }
-
-            <!-- SUPPLY CHAIN -->
-            @if (hasSupplyChainData()) {
-              <div class="panel-section" role="tabpanel" id="panel-supply-chain" aria-labelledby="tab-supply-chain" [hidden]="activeTab() !== 'supply-chain'">
-                @if (countryOfOrigin().length > 0) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.origin') }}</h2>
-                  <ul class="structured-data-list">
-                    @for (c of countryOfOrigin(); track $index) {
-                      <li><span class="data-label">{{ t('product.supplyChain.countryOfOrigin') }}</span><span class="data-value">{{ c.countryCode }}</span></li>
-                    }
-                  </ul>
-                }
-                @if (prod.logistics?.storage) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.storage') }}</h2>
-                  <p class="data-text">{{ prod.logistics!.storage }}</p>
-                }
-                @if (packaging().length > 0) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.packaging') }}</h2>
-                  @for (pkg of packaging(); track $index) {
-                    <div class="certification-card">
-                      <h3 class="cert-agency">{{ t('product.supplyChain.packageType') }}: {{ pkg.packagingType }}</h3>
-                      @if (pkg.packagingMaterial?.length) {
-                        <div class="cert-meta">
-                          @for (mat of pkg.packagingMaterial; track $index) {
-                            <span class="cert-badge">{{ mat.packagingMaterialType?.['rdfs:label'] || mat.packagingMaterialType }}</span>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                }
-                @if (supplyChainLinks().length > 0) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.traceabilityAndDistribution') }}</h2>
-                  @for (link of supplyChainLinks(); track $index) {
-                    <a [href]="link.url" target="_blank" rel="noopener noreferrer" class="gs1-link-btn">
-                      <span class="link-type-badge">{{ link.linkType.replace('gs1:', '') }}</span>
-                      {{ link.label }}
-                    </a>
-                  }
-                }
-
-                @if (prod.economicOperator; as op) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.economicOperator') }}</h2>
-                  <div class="certification-card">
-                    <h3 class="cert-agency">{{ op.companyName }}</h3>
-                    <p class="cert-standard">{{ op.address }}</p>
-                    <div class="cert-meta">
-                      <span class="cert-badge">GLN {{ op.gln }}</span>
-                      @if (op.email) {
-                        <span class="cert-id">{{ op.email }}</span>
-                      }
-                    </div>
-                  </div>
-                }
-
-                @if (prod.traceability && prod.traceability.length > 0 && prod.traceabilityExample; as ex) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.lotSerialExampleHeading') }}</h2>
-                  <p class="data-text">{{ t('product.supplyChain.lotSerialExampleIntro') }}</p>
-                  <button type="button" class="trace-toggle" (click)="toggleLotSerialExample()">
-                    {{ showLotSerialExample() ? t('product.supplyChain.hideLotSerialExample') : t('product.supplyChain.showLotSerialExample') }}
-                  </button>
-
-                  @if (showLotSerialExample()) {
-                    <div class="lot-serial-example">
-                      @if (isHealthcare()) {
-                        <p class="udi-callout" [innerHTML]="t('product.supplyChain.udiCallout')"></p>
-                      }
-                      <div class="example-qr">
-                        <div class="carrier-box">
-                          @if (isBrowser()) {
-                            <span class="carrier-code" #qrExample>
-                              <qrcode
-                                [qrdata]="exampleDigitalLink()"
-                                [width]="76"
-                                [errorCorrectionLevel]="'Q'"
-                                [elementType]="'svg'"
-                                [margin]="0">
-                              </qrcode>
-                            </span>
-                            <span class="carrier-label">{{ t('product.supplyChain.qrCode') }}</span>
-                            <span class="carrier-actions">
-                              <button type="button" (click)="downloadBarcodePng(qrExample, 'gtin-' + gtin() + '-lotto-seriale-qr.png')">{{ t('product.supplyChain.png') }}</button>
-                              <button type="button" (click)="downloadBarcodeSvg(qrExample, 'gtin-' + gtin() + '-lotto-seriale-qr.svg')">{{ t('product.supplyChain.svg') }}</button>
-                            </span>
-                          }
-                        </div>
-                        @if (isHealthcare() && isBrowser()) {
-                          <div class="carrier-box">
-                            <span class="carrier-code" #dmExample>
-                              <app-data-matrix [data]="exampleDigitalLink()" [scale]="3"></app-data-matrix>
-                            </span>
-                            <span class="carrier-label">{{ t('product.supplyChain.dataMatrix') }}</span>
-                            <span class="carrier-actions">
-                              <button type="button" (click)="downloadBarcodePng(dmExample, 'gtin-' + gtin() + '-lotto-seriale-datamatrix.png')">{{ t('product.supplyChain.png') }}</button>
-                              <button type="button" (click)="downloadBarcodeSvg(dmExample, 'gtin-' + gtin() + '-lotto-seriale-datamatrix.svg')">{{ t('product.supplyChain.svg') }}</button>
-                            </span>
-                          </div>
-                        }
-                        <p class="example-qr-hint">
-                          {{ isHealthcare() ? t('product.supplyChain.hintHealthcare') : t('product.supplyChain.hintDefault') }}
-                        </p>
-                      </div>
-
-                      <div class="identity-chips">
-                        <span class="id-chip"><span class="id-chip-label">{{ t('product.supplyChain.gtinChip') }}</span>{{ gtin() }}</span>
-                        <span class="id-chip"><span class="id-chip-label">{{ t('product.supplyChain.lotChip') }}</span>{{ ex.lot }}</span>
-                        <span class="id-chip"><span class="id-chip-label">{{ t('product.supplyChain.serialChip') }}</span>{{ ex.serial }}</span>
-                      </div>
-
-                      <app-digital-link-visualizer
-                        [link]="exampleDigitalLink()"
-                        [gtin]="gtin()"
-                        [lot]="ex.lot"
-                        [serial]="ex.serial">
-                      </app-digital-link-visualizer>
-
-                      <h3 class="trace-subheading">{{ t('product.supplyChain.chainHeading') }} <span class="muted">{{ t('product.supplyChain.chainSubheading') }}</span></h3>
-                      <ol class="trace-timeline">
-                        @for (event of prod.traceability; track $index) {
-                          <li class="trace-event">
-                            <span class="icon-badge round sm trace-icon" [style.--icon-badge-color]="traceDotColor($index)">
-                              <app-icon [name]="bizStepIcon(event.bizStep)" [size]="15"></app-icon>
-                            </span>
-                            <div class="trace-body">
-                              <div class="trace-head">
-                                <span class="trace-step">{{ event.label }}</span>
-                                <span class="trace-date">{{ event.date | date: 'dd/MM/yyyy, HH:mm' }}</span>
-                              </div>
-                              <span class="trace-company">{{ event.company }} · {{ event.location }}</span>
-                              <span class="trace-gln">GLN {{ event.gln }}</span>
-                              <button type="button" class="trace-toggle" (click)="toggleEvent($index)">
-                                {{ expandedEvent() === $index ? t('product.supplyChain.hideEpcisEvent') : t('product.supplyChain.showEpcisEvent') }}
-                              </button>
-                              @if (expandedEvent() === $index) {
-                                <pre class="gs-code-block trace-json"><code [innerHTML]="epcisJson(event, $index)"></code></pre>
-                              }
-                            </div>
-                          </li>
-                        }
-                      </ol>
-                    </div>
-                  }
-                }
-
-                @if (gdsnLogisticsUnits().length > 0) {
-                  <h2 class="panel-heading">{{ t('product.supplyChain.logisticsUnitsHeading') }}</h2>
-                  <p class="data-text" [innerHTML]="t('product.supplyChain.logisticsUnitsIntro')"></p>
-                  <button type="button" class="trace-toggle" (click)="toggleSsccExample()">
-                    {{ showSsccExample() ? t('product.supplyChain.hideSsccExample') : t('product.supplyChain.showSsccExample') }}
-                  </button>
-
-                  @if (showSsccExample()) {
-                    <div class="lot-serial-example sscc-list">
-                      @for (item of gdsnLogisticsUnits(); track item.gtin) {
-                        <div class="sscc-item">
-                          <div class="example-qr">
-                            @if (isBrowser()) {
-                              <span class="example-qr-code">
-                                <qrcode
-                                  [qrdata]="ssccDigitalLink(item.sscc!)"
-                                  [width]="76"
-                                  [errorCorrectionLevel]="'Q'"
-                                  [elementType]="'svg'"
-                                  [margin]="0">
-                                </qrcode>
-                              </span>
-                            }
-                            <p class="example-qr-hint">
-                              {{ item.level }} · SSCC {{ item.sscc }}<br>
-                              {{ t('product.supplyChain.ssccHint') }}
-                            </p>
-                          </div>
-                          <app-digital-link-visualizer
-                            [link]="ssccDigitalLink(item.sscc!)"
-                            [sscc]="item.sscc!">
-                          </app-digital-link-visualizer>
-                        </div>
-                      }
-                    </div>
-                  }
-                }
-              </div>
-            }
-
-            <!-- GDSN -->
-            @if (prod.gdsn; as gdsn) {
-              <div class="panel-section" role="tabpanel" id="panel-gdsn" aria-labelledby="tab-gdsn" [hidden]="activeTab() !== 'gdsn'">
-                <p class="data-text" [innerHTML]="t('product.gdsn.intro')"></p>
-
-                <div class="identity-chips gdsn-meta">
-                  <span class="id-chip"><span class="id-chip-label">{{ t('product.gdsn.market') }}</span>{{ gdsn.targetMarket }}</span>
-                  <span class="id-chip"><span class="id-chip-label">Data Pool</span>{{ gdsn.dataPool }}</span>
-                  <span class="id-chip"><span class="id-chip-label">{{ t('product.gdsn.updated') }}</span>{{ gdsn.lastModified | date: 'dd/MM/yyyy' }}</span>
-                </div>
-
-                <ol class="gdsn-hierarchy">
-                  @for (item of gdsn.hierarchy; track item.gtin; let i = $index; let last = $last) {
-                    <li class="gdsn-level">
-                      <div class="gdsn-level-head">
-                        <span class="icon-badge sm" [style.--icon-badge-color]="traceDotColor(i)">
-                          <app-icon [name]="i === 0 ? 'box' : (last ? 'truck' : 'layers')" [size]="14"></app-icon>
-                        </span>
-                        <div class="gdsn-level-titles">
-                          <span class="gdsn-level-title">{{ item.level }}</span>
-                          <span class="gdsn-level-sub">{{ item.packagingTypeLabel }} · GTIN {{ item.gtin }}</span>
-                        </div>
-                        @if (item.quantityContained) {
-                          <span class="gdsn-qty">× {{ item.quantityContained }} {{ item.containedLevel }}</span>
-                        }
-                      </div>
-
-                      <div class="gdsn-flags">
-                        @if (item.isBaseUnit) { <span class="gs-badge gs-badge--neutral">{{ t('product.gdsn.baseUnit') }}</span> }
-                        @if (item.isConsumerUnit) { <span class="gs-badge gs-badge--neutral">{{ t('product.gdsn.consumerUnit') }}</span> }
-                        @if (item.isOrderableUnit) { <span class="gs-badge gs-badge--neutral">{{ t('product.gdsn.orderable') }}</span> }
-                        @if (item.isDespatchUnit) { <span class="gs-badge gs-badge--neutral">{{ t('product.gdsn.logisticsUnit') }}</span> }
-                        @if (item.isInvoiceUnit) { <span class="gs-badge gs-badge--neutral">{{ t('product.gdsn.invoiceable') }}</span> }
-                      </div>
-
-                      <ul class="structured-data-list">
-                        @if (item.netWeight) {
-                          <li><span class="data-label">{{ t('product.gdsn.netWeight') }}</span><span class="data-value">{{ item.netWeight }}</span></li>
-                        }
-                        @if (item.grossWeight) {
-                          <li><span class="data-label">{{ t('product.gdsn.grossWeight') }}</span><span class="data-value">{{ item.grossWeight }}</span></li>
-                        }
-                        @if (item.dimensions) {
-                          <li><span class="data-label">{{ t('product.gdsn.dimensions') }}</span><span class="data-value">{{ item.dimensions }}</span></li>
-                        }
-                      </ul>
-                    </li>
-                  }
-                </ol>
-
-                <button type="button" class="trace-toggle" (click)="toggleGdsnExample()">
-                  {{ showGdsnExample() ? t('product.gdsn.hideJson') : t('product.gdsn.showJson') }}
-                </button>
-                @if (showGdsnExample()) {
-                  <pre class="gs-code-block trace-json"><code [innerHTML]="gdsnJson()"></code></pre>
-                  <p class="data-text webvocab-note" [innerHTML]="t('product.gdsn.webVocabNote')"></p>
-                }
-              </div>
-            }
-
-            <!-- GS1 EDI -->
-            @if (prod.economicOperator; as seller) {
-              <div class="panel-section edi-panel" role="tabpanel" id="panel-edi" aria-labelledby="tab-edi" [hidden]="activeTab() !== 'edi'">
-                <p class="data-text" [innerHTML]="t('product.edi.intro')"></p>
-
-                <div class="identity-chips">
-                  <span class="id-chip"><span class="id-chip-label">{{ t('product.edi.seller') }}</span>{{ seller.companyName }} · GLN {{ seller.gln }}</span>
-                  <span class="id-chip"><span class="id-chip-label">{{ t('product.edi.buyer') }}</span>{{ ediBuyer.companyName }} · GLN {{ ediBuyer.gln }}</span>
-                </div>
-
-                <h2 class="panel-heading">{{ t('product.edi.flowHeading') }} <span class="muted">{{ t('product.edi.flowSubheading') }}</span></h2>
-
-                <ol class="trace-timeline">
-                  @for (msg of ediFlow(); track msg.code; let i = $index) {
-                    <li class="trace-event">
-                      <span class="icon-badge round sm trace-icon" [style.--icon-badge-color]="traceDotColor(i)">
-                        <app-icon [name]="ediStepIcon(msg.code)" [size]="15"></app-icon>
-                      </span>
-                      <div class="trace-body">
-                        <div class="trace-head">
-                          <span class="trace-step">{{ msg.code }} — {{ t('product.edi.messages.' + msg.nameKey) }}</span>
-                          <span class="trace-date">{{ msg.date | date: 'dd/MM/yyyy' }}</span>
-                        </div>
-                        <span class="trace-company">
-                          {{ msg.from === 'buyer' ? ediBuyer.companyName : seller.companyName }}
-                          <span class="edi-arrow">→</span>
-                          {{ msg.from === 'buyer' ? seller.companyName : ediBuyer.companyName }}
-                        </span>
-                        <button type="button" class="trace-toggle" (click)="toggleEdiMessage(i)">
-                          {{ expandedEdiMessage() === i ? t('product.edi.hideSegments') : t('product.edi.showSegments') }}
-                        </button>
-                        @if (expandedEdiMessage() === i) {
-                          <ul class="edi-segment-list">
-                            @for (seg of msg.segments; track seg.code) {
-                              <li class="edi-segment-row">
-                                <code class="edi-segment-code">{{ seg.code }}</code>
-                                <span class="edi-segment-note">{{ t('product.edi.notes.' + seg.noteKey, seg.noteParams) }}</span>
-                              </li>
-                            }
-                          </ul>
-                        }
-                      </div>
-                    </li>
-                  }
-                </ol>
-
-                <h2 class="panel-heading">{{ t('product.edi.crosslinksHeading') }}</h2>
-                <div class="certification-card edi-crosslink">
-                  <h3 class="cert-agency edi-crosslink-title"><app-icon name="hash" [size]="15"></app-icon>{{ t('product.edi.crosslinkGtinLabel') }}</h3>
-                  <p class="cert-standard">{{ t('product.edi.crosslinkGtinValue', { gtin: gtin() ?? '' }) }}</p>
-                </div>
-                <div class="certification-card edi-crosslink">
-                  <h3 class="cert-agency edi-crosslink-title"><app-icon name="building" [size]="15"></app-icon>{{ t('product.edi.crosslinkGlnLabel') }}</h3>
-                  <p class="cert-standard">{{ t('product.edi.crosslinkGlnValue') }}</p>
-                </div>
-                @if (gdsnLogisticsUnits().length > 0) {
-                  <div class="certification-card edi-crosslink">
-                    <h3 class="cert-agency edi-crosslink-title"><app-icon name="truck" [size]="15"></app-icon>{{ t('product.edi.crosslinkSsccLabel') }}</h3>
-                    <p class="cert-standard">{{ t('product.edi.crosslinkSsccValue') }}</p>
-                  </div>
-                }
-
-                <h2 class="panel-heading">{{ t('product.edi.xmlHeading') }} <span class="muted">{{ t('product.edi.xmlSubheading') }}</span></h2>
-                <pre class="gs-code-block trace-json edi-xml-block"><code>{{ ediXmlExample() }}</code></pre>
-
-                <p class="engine-credit">{{ t('product.edi.disclaimer') }}</p>
-              </div>
-            }
-
-            <!-- DATI STRUTTURATI -->
-            <div class="panel-section structured-data-panel" role="tabpanel" id="panel-structured-data" aria-labelledby="tab-structured-data" [hidden]="activeTab() !== 'structured-data'">
-
-                <!-- Box Identificazione GS1 -->
-                <div class="gs1-identity-card">
-                  <div class="identity-top">
-                    <div class="identity-gtin">
-                      <span class="identity-label">{{ t('product.structuredData.gtinLabel') }}</span>
-                      <span class="identity-value">{{ gtin() }}</span>
-                      @if (isHealthcare()) {
-                        <span class="identity-udi-note" [innerHTML]="t('product.structuredData.udiNote')"></span>
-                      }
-                    </div>
-                    <div class="identity-carriers">
-                      <div class="carrier-box">
-                        @if (isBrowser()) {
-                          <span class="carrier-code" #qrIdentity>
-                            <qrcode
-                              [qrdata]="currentDigitalLink()"
-                              [width]="76"
-                              [errorCorrectionLevel]="'Q'"
-                              [elementType]="'svg'"
-                              [margin]="0">
-                            </qrcode>
-                          </span>
-                          <span class="carrier-label">{{ t('product.structuredData.qrCode') }}</span>
-                          <span class="carrier-actions">
-                            <button type="button" (click)="downloadBarcodePng(qrIdentity, 'gtin-' + gtin() + '-qr.png')">{{ t('product.structuredData.png') }}</button>
-                            <button type="button" (click)="downloadBarcodeSvg(qrIdentity, 'gtin-' + gtin() + '-qr.svg')">{{ t('product.structuredData.svg') }}</button>
-                          </span>
-                        } @else {
-                          <div style="width: 76px; height: 76px;"></div>
-                        }
-                      </div>
-                      @if (isHealthcare() && isBrowser()) {
-                        <div class="carrier-box">
-                          <span class="carrier-code" #dmIdentity>
-                            <app-data-matrix [data]="currentDigitalLink()" [scale]="3"></app-data-matrix>
-                          </span>
-                          <span class="carrier-label">{{ t('product.structuredData.dataMatrix') }}</span>
-                          <span class="carrier-actions">
-                            <button type="button" (click)="downloadBarcodePng(dmIdentity, 'gtin-' + gtin() + '-datamatrix.png')">{{ t('product.structuredData.png') }}</button>
-                            <button type="button" (click)="downloadBarcodeSvg(dmIdentity, 'gtin-' + gtin() + '-datamatrix.svg')">{{ t('product.structuredData.svg') }}</button>
-                          </span>
-                        </div>
-                      }
-                    </div>
-                  </div>
-
-                  <app-digital-link-visualizer
-                    [link]="currentDigitalLink()"
-                    [gtin]="gtin()"
-                    [lot]="lot()"
-                    [serial]="serial()"
-                    [expiration]="expiration()">
-                  </app-digital-link-visualizer>
-
-                  <ul class="readiness-checklist">
-                    <li class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg> {{ t('product.structuredData.gtinValid') }}</li>
-                    <li [class.ok]="isAiReady(prod)" [class.pending]="!isAiReady(prod)">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
-                      {{ t('product.structuredData.jsonLdPresent') }}
-                    </li>
-                    <li class="ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg> {{ t('product.structuredData.digitalLinkResolvable') }}</li>
-                  </ul>
-
-                  <div class="identity-actions">
-                    <button type="button" class="gs-btn gs-btn--ghost" (click)="copyDigitalLink()">{{ t('product.structuredData.copyLink') }}</button>
-                  </div>
-                </div>
-
-                @if (prod.rawGs1Data) {
-                  <p class="data-text">{{ t('product.structuredData.publishesIntro', { vocab: vocabLabel() }) }}</p>
-                  <div class="structured-cta-row">
-                    <button type="button" class="gs-btn gs-btn--primary" (click)="openJsonLdDrawer()">{{ t('product.structuredData.openJsonLdViewer') }}</button>
-                    <button type="button" class="gs-btn gs-btn--ghost" (click)="uiState.openJsonLd(prod, 'compare')">{{ t('product.structuredData.compare') }}</button>
-                  </div>
-                } @else {
-                  <p class="data-text">{{ t('product.structuredData.notAiReady') }}</p>
-                }
-            </div>
+        @if (prod.apparel; as apparel) {
+          <div class="info-block">
+            <h2>{{ t('product.apparelDetails') }}</h2>
+            <ul class="fact-list">
+              @if (apparel.material) { <li><span>{{ t('product.material') }}</span><span>{{ apparel.material }}</span></li> }
+              @if (apparel.color) { <li><span>{{ t('product.color') }}</span><span>{{ apparel.color }}</span></li> }
+              @if (apparel.size) { <li><span>{{ t('product.size') }}</span><span>{{ apparel.size }}</span></li> }
+              @if (apparel.careInstructions) { <li><span>{{ t('product.care') }}</span><span>{{ apparel.careInstructions }}</span></li> }
+            </ul>
           </div>
-        </div>
+        }
+
+        @if (prod.certifications?.length) {
+          <div class="info-block">
+            <h2>{{ t('product.certifications') }}</h2>
+            <ul class="tag-list">
+              @for (cert of prod.certifications; track cert.agency + (cert.id ?? '')) {
+                <li>{{ cert.standard || cert.agency }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (prod.environmentalImpact; as env) {
+          <div class="info-block">
+            <h2>{{ t('product.environmentalImpact') }}</h2>
+            <ul class="fact-list">
+              @if (env.co2e) { <li><span>{{ t('product.co2e') }}</span><span>{{ env.co2e }}</span></li> }
+              @if (env.recycledContent) { <li><span>{{ t('product.recycledContent') }}</span><span>{{ env.recycledContent }}</span></li> }
+              @if (env.waterConsumption) { <li><span>{{ t('product.waterConsumption') }}</span><span>{{ env.waterConsumption }}</span></li> }
+            </ul>
+          </div>
+        }
       </div>
-    </div>
-  </article>
-
-  @if (lightboxOpen()) {
-    <div class="lightbox-backdrop" (click)="closeLightbox()">
-      <button type="button" class="lightbox-close" (click)="closeLightbox()" [attr.aria-label]="t('product.lightboxClose')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-      <img [src]="activeImage()" [alt]="prod.name" (click)="$event.stopPropagation()">
+    </article>
+  } @else {
+    <div class="not-found">
+      <p>{{ t('product.notFound') }}</p>
+      <a routerLink="/" class="gs-btn gs-btn--ghost">{{ t('nav.home') }}</a>
     </div>
   }
-}
+</div>

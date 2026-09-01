@@ -17,11 +17,7 @@ try {
   routes.add('/');
 
   products.forEach(product => {
-    // Aggiungiamo la rotta del catalogo di appartenenza
-    if (product.sectorId) {
-      routes.add(`/catalog/${product.sectorId}`);
-    }
-    // Aggiungiamo la rotta del prodotto (Digital Link)
+    // Aggiungiamo la rotta del prodotto
     if (product.gtin) {
       routes.add(`/01/${product.gtin}`);
     }
