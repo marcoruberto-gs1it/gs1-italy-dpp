@@ -18,9 +18,9 @@ export const TRANSLATIONS = {
     },
     hero: {
       titleLine1: 'Il catalogo,',
-      titleHighlight: 'reso intelligente.',
+      titleHighlight: 'che le macchine capiscono.',
       subtitle:
-        'Sfoglia i prodotti, cerca quello che ti serve e trova subito le informazioni che contano — un catalogo pensato per essere semplice da usare.',
+        'Non solo bello da sfogliare: organizzato perché anche gli assistenti AI possano trovare, leggere e consigliare ogni prodotto. È questo che lo rende smart.',
       pageTitle: 'Catalogo Smart',
       searchCta: 'Cerca un prodotto',
       noProducts: 'Nessun prodotto disponibile al momento.',
@@ -77,8 +77,8 @@ export const TRANSLATIONS = {
     },
     hero: {
       titleLine1: 'The catalogue,',
-      titleHighlight: 'made smart.',
-      subtitle: 'Browse products, search for what you need and get straight to the information that matters — a catalogue designed to be simple to use.',
+      titleHighlight: 'machines actually understand.',
+      subtitle: 'Not just easy to browse: built so AI assistants can find, read and recommend every product too — that\'s what makes it smart.',
       pageTitle: 'Smart Catalogue',
       searchCta: 'Search a product',
       noProducts: 'No products available right now.',
