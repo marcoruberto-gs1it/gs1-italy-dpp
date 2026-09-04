@@ -54,7 +54,7 @@ const catalog = products.map((p) => ({
   price: p.price?.amount != null ? String(p.price.amount) : '',
   priceCurrency: p.price?.currency || 'EUR',
   category: p.sectorName || '',
-  image: p.image ? `${SITE_URL}/${p.image.replace(/^\//, '')}` : '',
+  image: p.image ? absoluteUrl(p.image) : '',
   description: p.description || '',
   // Se il prodotto pubblica una scheda GS1 o no. Serve alla chat per mostrare il badge
   // "AI Ready" solo a chi lo è davvero: senza questo dato il client non ha modo di
