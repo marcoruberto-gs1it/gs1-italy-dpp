@@ -113,6 +113,13 @@
   font-weight: 700;
 }
 
+.product-subbrand {
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
 .product-name {
   font-size: clamp(1.6rem, 3vw, 2.1rem);
   color: var(--text-primary);
@@ -150,6 +157,70 @@
   line-height: 1.6;
   margin: 14px 0 0;
   font-size: 0.96rem;
+}
+
+.product-legal-name {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  margin: 8px 0 0;
+}
+
+/* --- Badge "a colpo d'occhio" (biologico, vegano, senza-allergene, gradazione, certificazione):
+   le stesse informazioni dell'accordion, ma visibili subito sotto il titolo. --- */
+.highlight-badges {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.highlight-badges .gs-badge {
+  font-size: 0.7rem;
+  padding: 4px 10px 4px 8px;
+}
+
+/* --- Striscia "in breve": l'infografica della pagina prodotto — icona + etichetta + valore
+   per i fatti che altrimenti richiederebbero di aprire una sezione dell'accordion. --- */
+.quick-facts {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 14px 4px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.quick-facts li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.quick-fact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.quick-fact-label {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.quick-fact-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* --- Purchase card (prezzo + disponibilità + CTA), ispirata alle e-commerce card di gastronomia:
@@ -209,6 +280,11 @@
   font-weight: 600;
 }
 
+.price-label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
 .availability-badge svg {
   color: var(--success);
 }
@@ -228,6 +304,15 @@
 
 .accordion-item {
   border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Ogni sezione è anche un h2 (struttura del documento/navigazione da screen reader), ma deve
+   restare visivamente identica a un testo qualunque — il bottone dentro fa già tutto il lavoro
+   di stile. */
+.accordion-heading {
+  margin: 0;
+  font: inherit;
+  font-weight: inherit;
 }
 
 .accordion-header {
@@ -254,6 +339,34 @@
   gap: 8px;
 }
 
+.accordion-header app-icon {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+/* Link dalla scheda prodotto alla pagina del brand owner (GS1 Digital Link /414/{gln}),
+   dentro la sezione "Produttore": stesso trattamento di un chip informativo cliccabile. */
+.brand-owner-link {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.brand-owner-link:hover {
+  border-color: var(--border-strong);
+}
+
 .chevron {
   flex-shrink: 0;
   color: var(--text-tertiary);
@@ -273,6 +386,16 @@
   color: var(--text-secondary);
   line-height: 1.6;
   font-size: 0.94rem;
+}
+
+.accordion-body p + p {
+  margin-top: 10px;
+}
+
+.nutrition-serving {
+  margin-top: 12px !important;
+  color: var(--text-tertiary) !important;
+  font-size: 0.82rem !important;
 }
 
 .fact-list {
@@ -301,6 +424,33 @@
   color: var(--text-primary);
   font-weight: 600;
   text-align: right;
+}
+
+/* Elenco di sole affermazioni testuali (rivendicazioni), senza colonna valore a destra. */
+.fact-list--plain li {
+  display: block;
+  color: var(--text-secondary);
+}
+
+.fact-list--plain li span:last-child {
+  text-align: left;
+  font-weight: 400;
+  color: inherit;
+}
+
+/* Indirizzo produttore: righe impilate, non coppie etichetta/valore. */
+.fact-list--stacked li {
+  display: block;
+}
+
+.fact-list--stacked li span {
+  color: var(--text-secondary) !important;
+  font-weight: 400 !important;
+}
+
+.fact-list--stacked li:first-child span {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
 }
 
 .tag-list {

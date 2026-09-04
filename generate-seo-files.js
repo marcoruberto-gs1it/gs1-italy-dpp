@@ -74,10 +74,12 @@ if (missingCanonical.length) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. sitemap.xml — home + una entry per prodotto (le varianti lotto/seriale non esistono più
-//    come rotte, vedi app.routes.ts)
+// 2. sitemap.xml — home + una entry per prodotto + una per brand owner (GLN, deduplicato:
+//    vedi app.routes.server.ts, stessa logica)
 // ---------------------------------------------------------------------------
 const productUrls = products.map((p) => ({ loc: `/01/${p.gtin}` }));
+const brandGlns = [...new Set(products.map((p) => p.brandOwner?.gln).filter(Boolean))];
+const brandUrls = brandGlns.map((gln) => ({ loc: `/414/${gln}` }));
 
 function urlEntry({ loc }) {
   return `  <url>\n    <loc>${SITE_URL}${loc}</loc>\n  </url>`;
@@ -85,12 +87,12 @@ function urlEntry({ loc }) {
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${[{ loc: '/' }, ...productUrls].map(urlEntry).join('\n')}
+${[{ loc: '/' }, ...productUrls, ...brandUrls].map(urlEntry).join('\n')}
 </urlset>
 `;
 
 fs.writeFileSync(path.join(BROWSER_DIR, 'sitemap.xml'), sitemap);
-console.log(`generate-seo-files: sitemap.xml generato (${1 + productUrls.length} URL)`);
+console.log(`generate-seo-files: sitemap.xml generato (${1 + productUrls.length + brandUrls.length} URL, di cui ${brandUrls.length} pagine brand/GLN)`);
 
 // ---------------------------------------------------------------------------
 // 3. robots.txt

@@ -1,4 +1,4 @@
-import { Component, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, HostListener, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -93,5 +93,10 @@ export class App {
 
   closeMobileNav(): void {
     this.mobileNavOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.mobileNavOpen()) this.closeMobileNav();
   }
 }

@@ -1,3 +1,5 @@
+<a class="skip-link" href="#main-content">{{ t('nav.skipToContent') }}</a>
+
 <header class="site-header">
   <div class="header-container">
     <div class="header-left">
@@ -18,10 +20,9 @@
 
       <nav class="header-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
-        <!-- href e non routerLink: /assistente non è più una pagina Angular, è il chat-client
-             React servito da Traefik sullo stesso dominio (vedi docker-compose.yml). Serve un
-             page load vero, altrimenti il router Angular intercetterebbe il click. -->
-        <a href="/assistente">{{ t('nav.assistant') }}</a>
+        <!-- Voce "Assistente AI" (/assistente, chat-client React) nascosta per il momento su
+             richiesta: la rotta e il servizio restano attivi (docker-compose.yml), solo il link
+             in navigazione è rimosso. -->
         <button type="button" class="nav-search-trigger" (click)="uiState.openSearch()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <span>{{ t('nav.searchPlaceholder') }}</span>
@@ -37,19 +38,31 @@
       </div>
 
       <!-- Selettore tema: finché non si tocca, il sito segue le impostazioni di sistema;
-           al primo clic la scelta diventa esplicita e viene ricordata (ThemeService). -->
+           al primo clic la scelta diventa esplicita e viene ricordata (ThemeService).
+           Due bottoni distinti invece di un @if: la visibilità è decisa solo dal CSS in base
+           a [data-theme] su :root (vedi app.css), lo stesso attributo che lo script inline in
+           index.html applica PRIMA che Angular carichi. Così l'icona/aria-label corretta è
+           già quella giusta al primo paint, anche se il sito parte in dark — con l'@if
+           precedente, l'HTML prerenderizzato assumeva sempre tema chiaro (vedi ThemeService),
+           mostrando per un istante l'icona/etichetta sbagliata finché l'idratazione non
+           correggeva il segnale. -->
       <button
         type="button"
-        class="icon-btn theme-toggle"
-        (click)="themeService.toggle()"
-        [attr.aria-label]="themeService.theme() === 'dark' ? t('nav.switchToLight') : t('nav.switchToDark')"
-        [title]="themeService.theme() === 'dark' ? t('nav.switchToLight') : t('nav.switchToDark')"
+        class="icon-btn theme-toggle theme-toggle--to-light"
+        (click)="themeService.setTheme('light')"
+        [attr.aria-label]="t('nav.switchToLight')"
+        [title]="t('nav.switchToLight')"
       >
-        @if (themeService.theme() === 'dark') {
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
-        } @else {
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
-        }
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+      </button>
+      <button
+        type="button"
+        class="icon-btn theme-toggle theme-toggle--to-dark"
+        (click)="themeService.setTheme('dark')"
+        [attr.aria-label]="t('nav.switchToDark')"
+        [title]="t('nav.switchToDark')"
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
       </button>
 
       <button type="button" class="icon-btn mobile-search-trigger" (click)="uiState.openSearch()" [attr.aria-label]="t('nav.searchAria')">
@@ -65,7 +78,7 @@
 
 @if (mobileNavOpen()) {
   <div class="mobile-nav-backdrop" (click)="closeMobileNav()">
-    <aside class="mobile-nav" (click)="$event.stopPropagation()">
+    <aside class="mobile-nav" role="dialog" aria-modal="true" [attr.aria-label]="t('nav.menuAria')" (click)="$event.stopPropagation()">
       <div class="mobile-nav-header">
         <span>{{ t('hero.pageTitle') }}</span>
         <button type="button" class="icon-btn" (click)="closeMobileNav()" [attr.aria-label]="t('nav.closeMenuAria')">
@@ -73,7 +86,6 @@
         </button>
       </div>
       <a routerLink="/" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.home') }}</a>
-      <a href="/assistente" class="mobile-nav-link">{{ t('nav.assistant') }}</a>
       <div class="lang-switch mobile-lang-switch" role="group" [attr.aria-label]="t('nav.languageLabel')">
         <button type="button" [class.active]="languageService.lang() === 'it'" (click)="languageService.setLang('it')" [attr.aria-label]="t('nav.switchToItalian')">IT</button>
         <button type="button" [class.active]="languageService.lang() === 'en'" (click)="languageService.setLang('en')" [attr.aria-label]="t('nav.switchToEnglish')">EN</button>
@@ -82,7 +94,7 @@
   </div>
 }
 
-<main class="main-content">
+<main class="main-content" id="main-content" tabindex="-1">
   <router-outlet></router-outlet>
 </main>
 

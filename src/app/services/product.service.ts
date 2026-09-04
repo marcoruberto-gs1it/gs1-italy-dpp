@@ -19,17 +19,117 @@ export interface Logistics {
   storage?: string;
 }
 
+/** Un allergene dichiarato in etichetta, con il suo livello di presenza — stessa forma di gs1:hasAllergen. */
+export interface AllergenDeclaration {
+  code: string; // suffisso di gs1:AllergenTypeCode-*, es. "GLUTEN", "MILK", "HAZELNUTS"
+  containment: 'CONTAINS' | 'MAY_CONTAIN' | 'FREE_FROM';
+}
+
+/** Valori nutrizionali medi riferiti a un'unica base (100g o 100ml) — gs1:nutrientBasisQuantity. */
+export interface NutritionFacts {
+  basis: NetContent;
+  energyKj?: number;
+  energyKcal?: number;
+  fat?: number;
+  saturatedFat?: number;
+  monounsaturatedFat?: number;
+  polyunsaturatedFat?: number;
+  carbohydrates?: number;
+  sugars?: number;
+  fiber?: number;
+  protein?: number;
+  salt?: number;
+  calcium?: number; // mg
+}
+
 export interface FoodProfile {
   ingredients?: string;
+  /** Dicitura libera "Altro testo allergeni" della scheda — mostrata così com'è, oltre ai badge strutturati. */
   allergens?: string;
-  nutrition?: {
-    calories?: string;
-    fat?: string;
-    carbohydrates?: string;
-    sugars?: string;
-    protein?: string;
-    salt?: string;
-  };
+  allergenDeclarations?: AllergenDeclaration[];
+  nutrition?: NutritionFacts;
+  preparationInstructions?: string;
+  servingSize?: NetContent;
+  numberOfServingsPerPackage?: number;
+  /** Rivendicazioni nutrizionali/dietetiche testuali (etichetta "Caratteristiche"), es. "-75% grassi saturi". */
+  nutritionalClaims?: string[];
+}
+
+/** Rivendicazione dietetica strutturata — gs1:dietType (Vegan, Vegetarian, Organic, Free From Gluten...). */
+export interface DietClaim {
+  code: string; // suffisso di gs1:DietTypeCode-*
+  label: string; // etichetta italiana da mostrare, es. "Idoneo ai vegani"
+}
+
+export interface PackagingMaterial {
+  component: string; // es. "Bottiglia", "Tappo", "Vassoio"
+  materialLabel: string; // es. "Vetro trasparente" — per la UI
+  materialCode: string; // codice originale della scheda, es. "70 - Clear Glass"
+  gs1MaterialType?: string; // suffisso di gs1:PackagingMaterialTypeCode-*, solo se mappabile con certezza
+  recyclable?: boolean;
+}
+
+export interface Dimensions {
+  height: number;
+  width: number;
+  depth: number;
+  unitCode: 'MMT';
+}
+
+export interface PackagingInfo {
+  type: string; // es. "Bottiglia", "Confezione", "Cartone", "Barattolo", "Vassoio con pellicola"
+  netWeight?: NetContent;
+  grossWeight?: NetContent;
+  dimensions?: Dimensions;
+  materials?: PackagingMaterial[];
+  recyclingNotes?: string;
+}
+
+export interface StorageInfo {
+  type: string; // "Ambiente" | "Fresco" | ...
+  tempMinC?: number;
+  tempMaxC?: number;
+  instructions: string;
+}
+
+export interface AlcoholInfo {
+  percentageByVolume: number;
+}
+
+/** Rivendicazione biologica strutturata — gs1:organicClaim / OrganicClaimDetails. */
+export interface OrganicClaim {
+  agencyCode: string; // suffisso di gs1:OrganicClaimAgencyCode-*
+  agencyLabel: string;
+  certificateCode?: string; // es. "IT-BIO-006", testo libero non normato da GS1
+}
+
+export interface ManufacturerInfo {
+  companyName: string;
+  address?: string;
+  packagedFor?: { companyName: string; address?: string };
+  manufacturingSites?: string[];
+  phone?: string;
+  website?: string;
+}
+
+/**
+ * L'organizzazione che detiene il prefisso GS1 (GS1 Company Prefix) da cui è stato ricavato il
+ * GTIN del prodotto — gs1:brandOwner, "The organization that is responsible for allocating the
+ * GTIN to the product". Non coincide sempre con `manufacturer`: per i prodotti a marchio del
+ * distributore (es. Coop, Selex, Conad) è il distributore/`packagedFor` a possedere il prefisso,
+ * mentre `manufacturer` resta lo stabilimento terzista che confeziona fisicamente il prodotto.
+ *
+ * Il GS1 Company Prefix (le prime 7 cifre di `gln`) è reale, verificato via GEPIR
+ * (gepir.gs1.org) — il registro pubblico delle licenze GS1 — per ciascuna delle aziende qui
+ * presenti. Le schede Immagino fornite non riportano invece il GLN completo a 13 cifre (solo il
+ * distributore lo conosce): le cifre restanti (riferimento di sede + check digit) sono quindi un
+ * valore dimostrativo, calcolato con l'algoritmo di check digit GS1 standard su un riferimento di
+ * sede convenzionale, non il GLN realmente assegnato dall'azienda.
+ */
+export interface BrandOwner {
+  gln: string; // 13 cifre — vedi commento sopra
+  companyName: string;
+  website?: string;
 }
 
 export interface ApparelProfile {
@@ -144,12 +244,28 @@ export interface Product {
   gtin: string;
   name: string;
   brand: string;
+  subBrand?: string;
   image: string;
   images?: string[];
   description: string;
   sectorId: string;
   sectorName: string;
   rating?: Rating;
+
+  /** Denominazione di Vendita — nome legale/regolamentato del prodotto (gs1:regulatedProductName). */
+  legalName?: string;
+  /** "Marketing prodotto" / "Marketing prodotto esterno" della scheda — copy libero del brand. */
+  marketingCopy?: string;
+  dietClaims?: DietClaim[];
+  organicClaim?: OrganicClaim;
+  countryOfOrigin?: string;
+  originStatement?: string;
+  packaging?: PackagingInfo;
+  storage?: StorageInfo;
+  alcohol?: AlcoholInfo;
+  manufacturer?: ManufacturerInfo;
+  brandOwner?: BrandOwner;
+  targetMarket?: string;
 
   // Moduli Opzionali
   links?: Gs1Link[];
@@ -283,6 +399,11 @@ export function pricePerKg(price: PriceInfo, netContent?: NetContent): number | 
   return (price.amount / grams) * 1000;
 }
 
+/** "/100g" oppure "/100ml" — a seconda della base su cui sono riferiti i valori nutrizionali. */
+export function nutritionBasisLabel(basis: NetContent): string {
+  return basis.unitCode === 'MLT' || basis.unitCode === 'LTR' ? `/${basis.value}ml` : `/${basis.value}g`;
+}
+
 /** "500 GRM" -> "500 g" ; "1500 GRM" -> "1,5 kg" — il formato leggibile del contenuto netto. */
 export function formatNetContent(netContent?: NetContent): string | null {
   if (!netContent) return null;
@@ -292,6 +413,12 @@ export function formatNetContent(netContent?: NetContent): string | null {
   if (unitCode === 'MLT') return value >= 1000 ? `${(value / 1000).toLocaleString('it-IT')} l` : `${value} ml`;
   if (unitCode === 'LTR') return `${value} l`;
   return null;
+}
+
+/** "320 × 90 × 90 mm" — dimensioni della confezione (altezza × larghezza × profondità scaffale). */
+export function formatDimensions(d?: Dimensions): string | null {
+  if (!d) return null;
+  return `${d.height} × ${d.width} × ${d.depth} mm`;
 }
 
 @Injectable({
@@ -321,6 +448,16 @@ export class ProductService {
 
   getAllProducts(): Product[] {
     return this.products.map((p) => this.localize(p));
+  }
+
+  /** Tutti i prodotti riconducibili allo stesso brand owner (stesso GLN) — vedi BrandOwner. */
+  getProductsByGln(gln: string): Product[] {
+    return this.products.filter((p) => p.brandOwner?.gln === gln).map((p) => this.localize(p));
+  }
+
+  /** Il brand owner stesso, da un prodotto qualunque che gli sia riconducibile. */
+  getBrandOwnerByGln(gln: string): BrandOwner | undefined {
+    return this.products.find((p) => p.brandOwner?.gln === gln)?.brandOwner;
   }
 
   /** Ricerca istantanea su nome, marchio e GTIN (sui dati nella lingua corrente). */

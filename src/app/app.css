@@ -83,18 +83,45 @@
   transition: color var(--dur-fast) var(--ease-out);
 }
 
+/* var(--accent), non var(--brand): --accent è già il token che tokens.css ridefinisce sotto
+   :root[data-theme='dark'] (in chiaro coincide con --brand, quindi qui non cambia nulla).
+   Una regola qui con selettore :root[data-theme='dark'] non funzionerebbe: l'incapsulamento
+   emulato di Angular aggiunge l'attributo _ngcontent-* del componente a OGNI parte del
+   selettore composto, :root incluso — e <html> non porta mai quell'attributo, quindi la
+   regola non potrebbe mai far match. Per lo stesso motivo .theme-toggle--to-light/--to-dark
+   sotto sono condizionati da :root[data-theme='dark'] dentro tokens.css (foglio di stile
+   globale, non di componente), non qui. */
 .header-nav > a:hover,
 .header-nav > a.active {
-  color: var(--brand);
+  color: var(--accent);
 }
 
-:root[data-theme='dark'] .header-nav > a:hover,
-:root[data-theme='dark'] .header-nav > a.active {
-  color: var(--accent-strong);
+/* Skip-link per la navigazione da tastiera/screen reader: invisibile finché non riceve il
+   focus (Tab dalla cima della pagina), poi salta la ripetizione di header/nav a ogni pagina. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 12px;
+  z-index: 3000;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: top var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+  top: 12px;
 }
 
 /* Il selettore tema resta visibile a ogni larghezza: le altre icon-btn del header
-   compaiono solo su mobile, questa no. */
+   compaiono solo su mobile, questa no. Due bottoni (sole/luna) invece di uno solo con icona
+   condizionale: quale dei due si vede è deciso SOLO da [data-theme] su :root — vedi tokens.css
+   per le regole che decidono quale dei due mostrare (qui non funzionerebbero, vedi commento
+   là). */
 .theme-toggle {
   display: flex;
 }
@@ -193,12 +220,8 @@
 }
 
 .lang-switch button.active {
-  background: var(--brand);
-  color: #fff;
-}
-
-:root[data-theme='dark'] .lang-switch button.active {
   background: var(--accent);
+  color: #fff;
 }
 
 .mobile-lang-switch {

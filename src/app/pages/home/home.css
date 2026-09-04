@@ -119,11 +119,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   height: 100%;
   box-sizing: border-box;
-  cursor: pointer;
   box-shadow: var(--shadow-xs);
   transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-spring), border-color var(--dur-base) var(--ease-out);
 }
@@ -132,6 +129,17 @@
   box-shadow: var(--shadow-lg);
   transform: translateY(-6px);
   border-color: transparent;
+}
+
+/* L'intera card è un unico link — niente routerLink su un <article> non interattivo (non
+   raggiungibile da tastiera, non è un vero link per i crawler): vedi brand.css per lo stesso
+   pattern. */
+.card-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
 }
 
 .card-image-wrapper {

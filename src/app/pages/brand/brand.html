@@ -1,0 +1,78 @@
+<div class="brand-page">
+  @if (owner(); as owner) {
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+      <ol>
+        <li><a routerLink="/">{{ t('nav.home') }}</a></li>
+        <li class="separator">/</li>
+        <li class="current" aria-current="page">{{ owner.companyName }}</li>
+      </ol>
+    </nav>
+
+    <header class="brand-header">
+      <span class="icon-badge brand-icon"><app-icon name="building" [size]="24"></app-icon></span>
+      <div class="brand-heading">
+        <span class="gs-badge gs-badge--vocab">{{ t('brand.digitalLinkBadge') }}</span>
+        <h1>{{ owner.companyName }}</h1>
+        <dl class="brand-facts">
+          <div>
+            <dt>{{ t('brand.glnLabel') }}</dt>
+            <dd class="gs-kbd">{{ gln() }}</dd>
+          </div>
+          @if (owner.website) {
+            <div>
+              <dt>{{ t('brand.websiteLabel') }}</dt>
+              <dd><a [href]="normalizeUrl(owner.website)" target="_blank" rel="noopener noreferrer">{{ owner.website }}</a></dd>
+            </div>
+          }
+        </dl>
+      </div>
+    </header>
+
+    <p class="brand-note">
+      <app-icon name="hash" [size]="14"></app-icon>
+      {{ t('brand.demoNote') }}
+    </p>
+
+    <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="openJsonLd()" [attr.aria-label]="t('brand.viewJsonLdAria')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+      {{ t('product.viewJsonLd') }}
+    </button>
+
+    <section class="brand-products">
+      <h2>{{ t('brand.productsHeading') }} ({{ products().length }})</h2>
+      <ul class="catalog-grid">
+        @for (product of products(); track product.gtin) {
+          <li>
+            <article class="product-card">
+              <a [routerLink]="['/01', product.gtin]" class="card-link">
+                <div class="card-image-wrapper">
+                  <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
+                </div>
+                <div class="card-body">
+                  <span class="product-brand">{{ product.brand }}</span>
+                  <h3 class="product-name">{{ product.name }}</h3>
+                  <div class="card-price">
+                    @if (product.price; as price) {
+                      <span class="card-price-current">{{ formatEuro(price.amount) }}</span>
+                      @if (price.listAmount && discountPercent(price); as pct) {
+                        <span class="card-price-original">{{ formatEuro(price.listAmount) }}</span>
+                        <span class="card-price-discount">-{{ pct }}%</span>
+                      }
+                    }
+                  </div>
+                </div>
+              </a>
+            </article>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <app-json-ld-drawer [open]="jsonLdDrawerOpen()" [jsonLd]="jsonLdJson()" (closed)="closeJsonLd()"></app-json-ld-drawer>
+  } @else {
+    <div class="not-found">
+      <p>{{ t('brand.notFound') }}</p>
+      <a routerLink="/" class="gs-btn gs-btn--ghost">{{ t('nav.home') }}</a>
+    </div>
+  }
+</div>

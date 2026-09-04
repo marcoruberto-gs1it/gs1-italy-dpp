@@ -27,7 +27,12 @@ export type IconName =
   | 'braces'
   | 'file-text'
   | 'send'
-  | 'inbox';
+  | 'inbox'
+  | 'alert-triangle'
+  | 'chart-bar'
+  | 'award'
+  | 'thermometer'
+  | 'leaf';
 
 @Component({
   selector: 'app-icon',

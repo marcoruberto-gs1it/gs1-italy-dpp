@@ -44,6 +44,13 @@
   color: var(--text-primary);
 }
 
+/* Niente outline del browser (tagliato dal bordo arrotondato del pannello), ma un indicatore di
+   focus resta necessario (WCAG 2.4.7): il campo lo riceve subito all'apertura, ma un utente che
+   tabula via e poi torna indietro con Shift+Tab deve poterlo individuare di nuovo. */
+.palette-input-row:focus-within {
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
 .palette-input-row input::placeholder {
   color: var(--text-muted);
 }

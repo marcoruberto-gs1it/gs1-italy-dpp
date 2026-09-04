@@ -56,7 +56,4 @@ export class ThemeService {
     }
   }
 
-  toggle(): void {
-    this.setTheme(this.theme() === 'dark' ? 'light' : 'dark');
-  }
 }

@@ -91,9 +91,11 @@ for (const p of products) {
   // questo sito (non il placeholder di products.json, né id.gs1.org — non è il nostro dominio).
   doc['@id'] = doc['hasGS1DigitalLink'];
   if (doc.offers) doc.offers['schema:url'] = doc['hasGS1DigitalLink'];
-  // brand['@id'] è salvato in products.json col placeholder di dominio (vedi PLACEHOLDER_ORIGIN
-  // sopra): risolto qui con lo stesso principio di hasGS1DigitalLink, non copiato così com'è.
+  // brand['@id'] e gs1:brandOwner['@id'] sono salvati in products.json col placeholder di
+  // dominio (vedi PLACEHOLDER_ORIGIN sopra): risolti qui con lo stesso principio di
+  // hasGS1DigitalLink, non copiati così come sono.
   if (doc.brand?.['@id']) doc.brand['@id'] = resolveOrigin(doc.brand['@id']);
+  if (doc['gs1:brandOwner']?.['@id']) doc['gs1:brandOwner']['@id'] = resolveOrigin(doc['gs1:brandOwner']['@id']);
   // image è salvata relativa in products.json ("images/<gtin>.jpg"), che va bene per un <img>
   // in pagina ma non dentro un documento JSON-LD: chi lo consuma lo riceve staccato dalla
   // pagina (Accept: application/ld+json, o dal knowledge graph) e non ha nessun base URL su cui

@@ -16,7 +16,7 @@
         @if (images().length > 1) {
           <div class="thumbnails">
             @for (img of images(); track img; let i = $index) {
-              <button type="button" class="thumbnail" [class.active]="i === activeImageIndex()" (click)="setActiveImage(i)">
+              <button type="button" class="thumbnail" [class.active]="i === activeImageIndex()" (click)="setActiveImage(i)" [attr.aria-label]="prod.name + ' — ' + (i + 1)">
                 <img [src]="img" [alt]="prod.name" (error)="onImageError($event)">
               </button>
             }
@@ -25,8 +25,19 @@
       </figure>
 
       <div class="product-info">
-        <span class="product-brand">{{ prod.brand }}</span>
+        <span class="product-brand">{{ prod.brand }}@if (prod.subBrand) { <span class="product-subbrand">— {{ prod.subBrand }}</span> }</span>
         <h1 class="product-name">{{ prod.name }}</h1>
+
+        @if (highlightBadges().length) {
+          <ul class="highlight-badges">
+            @for (badge of highlightBadges(); track badge.label) {
+              <li class="gs-badge" [class.gs-badge--verified]="badge.tone === 'success'" [class.gs-badge--vocab]="badge.tone === 'accent'" [class.gs-badge--neutral]="badge.tone === 'neutral'">
+                <app-icon [name]="badge.icon" [size]="12"></app-icon>
+                {{ badge.label }}
+              </li>
+            }
+          </ul>
+        }
 
         @if (prod.rating) {
           <app-star-rating [value]="prod.rating.value" [count]="prod.rating.count"></app-star-rating>
@@ -40,6 +51,24 @@
         }
 
         <p class="product-description">{{ prod.description }}</p>
+
+        @if (prod.legalName) {
+          <p class="product-legal-name">{{ t('product.legalName') }}: {{ prod.legalName }}</p>
+        }
+
+        @if (quickFacts().length) {
+          <ul class="quick-facts">
+            @for (fact of quickFacts(); track fact.label) {
+              <li>
+                <span class="icon-badge sm"><app-icon [name]="fact.icon" [size]="15"></app-icon></span>
+                <span class="quick-fact-body">
+                  <span class="quick-fact-label">{{ fact.label }}</span>
+                  <span class="quick-fact-value">{{ fact.value }}</span>
+                </span>
+              </li>
+            }
+          </ul>
+        }
 
         @if (prod.price; as price) {
           <div class="purchase-card">
@@ -55,14 +84,17 @@
                 <span class="price-unit-ref">{{ formatEuro(perKg) }}/kg</span>
               }
             </div>
+            @if (price.discountLabel) {
+              <span class="price-label">{{ price.discountLabel }}</span>
+            }
 
             <span class="gs-badge gs-badge--verified availability-badge">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle></svg>
               {{ t('product.inStock') }}
             </span>
 
             <button type="button" class="gs-btn gs-btn--primary purchase-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
               {{ t('product.addToCart') }}
             </button>
           </div>
@@ -71,48 +103,150 @@
         <div class="accordion">
           @if (prod.food?.ingredients; as ingredients) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('ingredients')" [attr.aria-expanded]="isSectionOpen('ingredients')">
-                <span>{{ t('product.ingredients') }}</span>
-                <svg class="chevron" [class.open]="isSectionOpen('ingredients')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('ingredients')" [attr.aria-expanded]="isSectionOpen('ingredients')" aria-controls="section-ingredients">
+                  <span><app-icon name="flask" [size]="16"></app-icon>{{ t('product.ingredients') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('ingredients')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('ingredients')) {
-                <div class="accordion-body">
+                <div class="accordion-body" id="section-ingredients">
                   <p>{{ ingredients }}</p>
                 </div>
               }
             </div>
           }
 
-          @if (prod.food?.allergens; as allergens) {
+          @if (prod.food?.allergens || prod.food?.allergenDeclarations?.length) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('allergens')" [attr.aria-expanded]="isSectionOpen('allergens')">
-                <span>{{ t('product.allergens') }}</span>
-                <svg class="chevron" [class.open]="isSectionOpen('allergens')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('allergens')" [attr.aria-expanded]="isSectionOpen('allergens')" aria-controls="section-allergens">
+                  <span><app-icon name="alert-triangle" [size]="16"></app-icon>{{ t('product.allergens') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('allergens')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('allergens')) {
-                <div class="accordion-body">
-                  <p>{{ allergens }}</p>
+                <div class="accordion-body" id="section-allergens">
+                  @if (prod.food?.allergens) {
+                    <p>{{ prod.food.allergens }}</p>
+                  }
+                  @if (allergenBadges().length) {
+                    <ul class="allergen-badges">
+                      @for (badge of allergenBadges(); track badge.code) {
+                        <li class="allergen-badge" [class.allergen-badge--contains]="badge.containment === 'CONTAINS'">
+                          <span class="allergen-badge-name">{{ t('product.' + badge.labelKey) }}</span>
+                          <span class="allergen-badge-level">{{ t('product.' + badge.containmentKey) }}</span>
+                        </li>
+                      }
+                    </ul>
+                  }
                 </div>
               }
             </div>
           }
 
-          @if (prod.food?.nutrition; as nutrition) {
+          @if (nutritionRows().length) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('nutrition')" [attr.aria-expanded]="isSectionOpen('nutrition')">
-                <span>{{ t('product.nutrition') }}</span>
-                <svg class="chevron" [class.open]="isSectionOpen('nutrition')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('nutrition')" [attr.aria-expanded]="isSectionOpen('nutrition')" aria-controls="section-nutrition">
+                  <span><app-icon name="chart-bar" [size]="16"></app-icon>{{ t('product.nutrition') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('nutrition')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('nutrition')) {
-                <div class="accordion-body">
+                <div class="accordion-body" id="section-nutrition">
                   <ul class="fact-list">
-                    @if (nutrition.calories) { <li><span>{{ t('product.calories') }}</span><span>{{ nutrition.calories }}</span></li> }
-                    @if (nutrition.fat) { <li><span>{{ t('product.fat') }}</span><span>{{ nutrition.fat }}</span></li> }
-                    @if (nutrition.carbohydrates) { <li><span>{{ t('product.carbohydrates') }}</span><span>{{ nutrition.carbohydrates }}</span></li> }
-                    @if (nutrition.sugars) { <li><span>{{ t('product.sugars') }}</span><span>{{ nutrition.sugars }}</span></li> }
-                    @if (nutrition.protein) { <li><span>{{ t('product.protein') }}</span><span>{{ nutrition.protein }}</span></li> }
-                    @if (nutrition.salt) { <li><span>{{ t('product.salt') }}</span><span>{{ nutrition.salt }}</span></li> }
+                    @for (row of nutritionRows(); track row.labelKey) {
+                      <li><span>{{ t('product.' + row.labelKey) }}</span><span>{{ row.value }}</span></li>
+                    }
                   </ul>
+                  @if (prod.food?.servingSize || prod.food?.numberOfServingsPerPackage) {
+                    <p class="nutrition-serving">
+                      @if (prod.food?.servingSize; as s) { {{ t('product.servingSize') }}: {{ formatNetContent(s) }}. }
+                      @if (prod.food?.numberOfServingsPerPackage; as n) { {{ t('product.servingsPerPackage') }}: {{ n }}. }
+                    </p>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (prod.food?.nutritionalClaims?.length || prod.dietClaims?.length || prod.organicClaim || prod.alcohol) {
+            <div class="accordion-item">
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('claims')" [attr.aria-expanded]="isSectionOpen('claims')" aria-controls="section-claims">
+                  <span><app-icon name="award" [size]="16"></app-icon>{{ t('product.claims') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('claims')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
+              @if (isSectionOpen('claims')) {
+                <div class="accordion-body" id="section-claims">
+                  @if (prod.dietClaims?.length || prod.organicClaim) {
+                    <ul class="tag-list">
+                      @for (claim of prod.dietClaims; track claim.code) {
+                        <li>{{ claim.label }}</li>
+                      }
+                      @if (prod.organicClaim) {
+                        <li>{{ t('product.organic') }}@if (prod.organicClaim.certificateCode) { — {{ prod.organicClaim.certificateCode }} }</li>
+                      }
+                    </ul>
+                  }
+                  @if (prod.alcohol) {
+                    <p>{{ t('product.alcoholByVolume') }}: {{ prod.alcohol.percentageByVolume }}% vol.</p>
+                  }
+                  @if (prod.food?.nutritionalClaims?.length) {
+                    <ul class="fact-list fact-list--plain">
+                      @for (claim of prod.food?.nutritionalClaims; track claim) {
+                        <li>{{ claim }}</li>
+                      }
+                    </ul>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (prod.storage) {
+            <div class="accordion-item">
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('storage')" [attr.aria-expanded]="isSectionOpen('storage')" aria-controls="section-storage">
+                  <span><app-icon name="thermometer" [size]="16"></app-icon>{{ t('product.storage') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('storage')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
+              @if (isSectionOpen('storage')) {
+                <div class="accordion-body" id="section-storage">
+                  <p>{{ prod.storage.instructions }}</p>
+                  @if (prod.food?.preparationInstructions) {
+                    <p>{{ prod.food.preparationInstructions }}</p>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (prod.packaging) {
+            <div class="accordion-item">
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('packaging')" [attr.aria-expanded]="isSectionOpen('packaging')" aria-controls="section-packaging">
+                  <span><app-icon name="box" [size]="16"></app-icon>{{ t('product.packaging') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('packaging')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
+              @if (isSectionOpen('packaging')) {
+                <div class="accordion-body" id="section-packaging">
+                  <ul class="fact-list">
+                    @if (prod.packaging.type) { <li><span>{{ t('product.packagingType') }}</span><span>{{ prod.packaging.type }}</span></li> }
+                    @if (formatNetContent(prod.packaging.grossWeight); as gw) { <li><span>{{ t('product.grossWeight') }}</span><span>{{ gw }}</span></li> }
+                    @if (formatDimensions(prod.packaging.dimensions); as dim) { <li><span>{{ t('product.dimensions') }}</span><span>{{ dim }}</span></li> }
+                  </ul>
+                  @if (prod.packaging.materials?.length) {
+                    <ul class="tag-list">
+                      @for (m of prod.packaging.materials; track m.component) {
+                        <li>{{ m.component }}: {{ m.materialLabel }}</li>
+                      }
+                    </ul>
+                  }
                 </div>
               }
             </div>
@@ -120,12 +254,14 @@
 
           @if (prod.apparel; as apparel) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('apparel')" [attr.aria-expanded]="isSectionOpen('apparel')">
-                <span>{{ t('product.apparelDetails') }}</span>
-                <svg class="chevron" [class.open]="isSectionOpen('apparel')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('apparel')" [attr.aria-expanded]="isSectionOpen('apparel')" aria-controls="section-apparel">
+                  <span><app-icon name="swatch" [size]="16"></app-icon>{{ t('product.apparelDetails') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('apparel')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('apparel')) {
-                <div class="accordion-body">
+                <div class="accordion-body" id="section-apparel">
                   <ul class="fact-list">
                     @if (apparel.material) { <li><span>{{ t('product.material') }}</span><span>{{ apparel.material }}</span></li> }
                     @if (apparel.color) { <li><span>{{ t('product.color') }}</span><span>{{ apparel.color }}</span></li> }
@@ -139,15 +275,17 @@
 
           @if (prod.certifications?.length) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('certifications')" [attr.aria-expanded]="isSectionOpen('certifications')">
-                <span>{{ t('product.certifications') }}</span>
-                <svg class="chevron" [class.open]="isSectionOpen('certifications')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('certifications')" [attr.aria-expanded]="isSectionOpen('certifications')" aria-controls="section-certifications">
+                  <span><app-icon name="shield-check" [size]="16"></app-icon>{{ t('product.certifications') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('certifications')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('certifications')) {
-                <div class="accordion-body">
+                <div class="accordion-body" id="section-certifications">
                   <ul class="tag-list">
                     @for (cert of prod.certifications; track cert.agency + (cert.id ?? '')) {
-                      <li>{{ cert.standard || cert.agency }}</li>
+                      <li>{{ cert.standard || cert.agency }}@if (cert.value) { ({{ cert.value }}) }</li>
                     }
                   </ul>
                 </div>
@@ -157,12 +295,14 @@
 
           @if (prod.environmentalImpact; as env) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('environment')" [attr.aria-expanded]="isSectionOpen('environment')">
-                <span>{{ t('product.environmentalImpact') }}</span>
-                <svg class="chevron" [class.open]="isSectionOpen('environment')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('environment')" [attr.aria-expanded]="isSectionOpen('environment')" aria-controls="section-environment">
+                  <span><app-icon name="cloud" [size]="16"></app-icon>{{ t('product.environmentalImpact') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('environment')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('environment')) {
-                <div class="accordion-body">
+                <div class="accordion-body" id="section-environment">
                   <ul class="fact-list">
                     @if (env.co2e) { <li><span>{{ t('product.co2e') }}</span><span>{{ env.co2e }}</span></li> }
                     @if (env.recycledContent) { <li><span>{{ t('product.recycledContent') }}</span><span>{{ env.recycledContent }}</span></li> }
@@ -173,31 +313,58 @@
             </div>
           }
 
+          @if (prod.manufacturer) {
+            <div class="accordion-item">
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('manufacturer')" [attr.aria-expanded]="isSectionOpen('manufacturer')" aria-controls="section-manufacturer">
+                  <span><app-icon name="building" [size]="16"></app-icon>{{ t('product.manufacturer') }}</span>
+                  <svg class="chevron" [class.open]="isSectionOpen('manufacturer')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
+              @if (isSectionOpen('manufacturer')) {
+                <div class="accordion-body" id="section-manufacturer">
+                  <ul class="fact-list fact-list--stacked">
+                    <li><span>{{ prod.manufacturer.companyName }}</span></li>
+                    @if (prod.manufacturer.address) { <li><span>{{ prod.manufacturer.address }}</span></li> }
+                    @if (prod.manufacturer.packagedFor; as pf) {
+                      <li><span>{{ t('product.packagedFor') }}: {{ pf.companyName }}@if (pf.address) { — {{ pf.address }} }</span></li>
+                    }
+                    @for (site of prod.manufacturer.manufacturingSites; track site) {
+                      <li><span>{{ t('product.manufacturingSite') }}: {{ site }}</span></li>
+                    }
+                    @if (prod.manufacturer.phone) { <li><span>{{ t('product.customerService') }}: {{ prod.manufacturer.phone }}</span></li> }
+                    @if (prod.manufacturer.website) { <li><span>{{ prod.manufacturer.website }}</span></li> }
+                  </ul>
+                  @if (prod.brandOwner; as owner) {
+                    <a [routerLink]="['/414', owner.gln]" class="brand-owner-link">
+                      <app-icon name="hash" [size]="14"></app-icon>
+                      {{ t('product.brandOwnerLink') }} — {{ owner.companyName }}
+                      <span class="gs-kbd">GLN {{ owner.gln }}</span>
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+          }
+
           @if (prod.rawGs1Data) {
             <div class="accordion-item">
-              <button type="button" class="accordion-header" (click)="toggleSection('structured')" [attr.aria-expanded]="isSectionOpen('structured')">
-                <span>
-                  <span class="gs-badge gs-badge--vocab">GS1 Web Vocabulary</span>
-                  {{ t('product.structuredData') }}
-                </span>
-                <svg class="chevron" [class.open]="isSectionOpen('structured')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
+              <h2 class="accordion-heading">
+                <button type="button" class="accordion-header" (click)="toggleSection('structured')" [attr.aria-expanded]="isSectionOpen('structured')" aria-controls="section-structured">
+                  <span>
+                    <app-icon name="braces" [size]="16"></app-icon>
+                    <span class="gs-badge gs-badge--vocab">GS1 Web Vocabulary</span>
+                    {{ t('product.structuredData') }}
+                  </span>
+                  <svg class="chevron" [class.open]="isSectionOpen('structured')" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+              </h2>
               @if (isSectionOpen('structured')) {
-                <div class="accordion-body">
+                <div class="accordion-body" id="section-structured">
                   <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                     {{ t('product.viewJsonLd') }}
                   </button>
-                  @if (allergenBadges().length) {
-                    <ul class="allergen-badges">
-                      @for (badge of allergenBadges(); track badge.code) {
-                        <li class="allergen-badge" [class.allergen-badge--contains]="badge.containment === 'CONTAINS'">
-                          <span class="allergen-badge-name">{{ t('product.' + badge.labelKey) }}</span>
-                          <span class="allergen-badge-level">{{ t('product.' + badge.containmentKey) }}</span>
-                        </li>
-                      }
-                    </ul>
-                  }
                 </div>
               }
             </div>

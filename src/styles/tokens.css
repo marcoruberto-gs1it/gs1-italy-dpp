@@ -60,7 +60,10 @@
   --text-primary: #14101f;
   --text-secondary: #47435a;
   --text-tertiary: #6f6b81;
-  --text-muted: #9c98ab;
+  /* #9c98ab originale era 2.6:1 su questo sfondo — sotto la soglia AA (4.5:1) per il testo che
+     in pratica ci finisce dentro (GTIN, denominazione legale, copyright), non solo per
+     segnaposto/decorazione, che sarebbe esente. */
+  --text-muted: #726c85;
   --text-on-accent: #ffffff;
   --text-link: var(--brand);
 
@@ -70,10 +73,13 @@
   --accent-2: var(--brand-accent);
   --accent-2-soft: var(--brand-accent-soft);
 
-  --success: #16875a;
-  --success-soft: rgba(22, 135, 90, 0.12);
-  --warning: #b45309;
-  --warning-soft: rgba(180, 83, 9, 0.12);
+  /* Leggermente più scuri dell'originale (#16875a/#b45309): sui badge, dove questi colori
+     compaiono su --success-soft/--warning-soft invece che su bianco pieno, il testo a
+     0.62rem/700 degli scaduti era sotto 4.5:1 (3.9:1 e 4.25:1). */
+  --success: #147a51;
+  --success-soft: rgba(20, 122, 81, 0.12);
+  --warning: #aa4f09;
+  --warning-soft: rgba(170, 79, 9, 0.12);
 
   --mesh-1: rgba(109, 79, 240, 0.5);
   --mesh-2: rgba(0, 201, 167, 0.4);
@@ -105,7 +111,8 @@
   --text-primary: #f5f4fa;
   --text-secondary: #c7c3d6;
   --text-tertiary: #938fa5;
-  --text-muted: #605c74;
+  /* Stesso motivo della coppia in chiaro sopra: #605c74 era 2.9-3.1:1, sotto la soglia AA. */
+  --text-muted: #807c97;
   --text-on-accent: #ffffff;
   --text-link: #a495ff;
 
@@ -237,6 +244,23 @@ img.img-fallback {
 .gs-badge--schema {
   background: rgba(153, 0, 0, 0.14);
   color: #990000;
+}
+
+/* Bottoni sole/luna del selettore tema (vedi .theme-toggle in app.css): quale dei due si vede
+   deve stare in QUESTO foglio, non in un file di componente — l'incapsulamento emulato di
+   Angular aggiunge l'attributo _ngcontent-* del componente a ogni parte di un selettore
+   composto, :root incluso, e <html> non porta mai quell'attributo: una regola scritta lì non
+   farebbe mai match. Qui, foglio globale non soggetto a quello scoping, funziona. */
+:root[data-theme='dark'] .theme-toggle--to-light {
+  display: flex;
+}
+
+:root:not([data-theme='dark']) .theme-toggle--to-light {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-toggle--to-dark {
+  display: none;
 }
 
 :root[data-theme='dark'] .gs-badge--vocab {

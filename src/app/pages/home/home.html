@@ -20,26 +20,28 @@
     <ul class="catalog-grid">
       @for (product of products(); track product.gtin) {
         <li>
-          <article class="product-card" [routerLink]="['/01', product.gtin]">
-            <div class="card-image-wrapper">
-              <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
-            </div>
-            <div class="card-body">
-              <span class="product-brand">{{ product.brand }}</span>
-              <h2 class="product-name">{{ product.name }}</h2>
-              <div class="card-price">
-                @if (product.price; as price) {
-                  <span class="card-price-current">{{ formatEuro(price.amount) }}</span>
-                  @if (price.unit) {
-                    <span class="card-price-unit">/{{ price.unit }}</span>
-                  }
-                  @if (price.listAmount && discountPercent(price); as pct) {
-                    <span class="card-price-original">{{ formatEuro(price.listAmount) }}</span>
-                    <span class="card-price-discount">-{{ pct }}%</span>
-                  }
-                }
+          <article class="product-card">
+            <a [routerLink]="['/01', product.gtin]" class="card-link">
+              <div class="card-image-wrapper">
+                <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
               </div>
-            </div>
+              <div class="card-body">
+                <span class="product-brand">{{ product.brand }}</span>
+                <h2 class="product-name">{{ product.name }}</h2>
+                <div class="card-price">
+                  @if (product.price; as price) {
+                    <span class="card-price-current">{{ formatEuro(price.amount) }}</span>
+                    @if (price.unit) {
+                      <span class="card-price-unit">/{{ price.unit }}</span>
+                    }
+                    @if (price.listAmount && discountPercent(price); as pct) {
+                      <span class="card-price-original">{{ formatEuro(price.listAmount) }}</span>
+                      <span class="card-price-discount">-{{ pct }}%</span>
+                    }
+                  }
+                </div>
+              </div>
+            </a>
           </article>
         </li>
       } @empty {
