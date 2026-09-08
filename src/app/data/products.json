@@ -84,7 +84,8 @@
       "address": "via Beneventi 2/C, 50059 Vinci (FI), Italia",
       "packagedFor": {
         "companyName": "Coop Italia S.C.",
-        "address": "Via del Lavoro 6-8, 40033 Casalecchio di Reno (BO), Italia"
+        "address": "Via del Lavoro 6-8, 40033 Casalecchio di Reno (BO), Italia",
+        "website": "https://www.coop.it/store-online-coop"
       },
       "phone": "800 80 55 80",
       "website": "www.coop.it/contatti"
@@ -237,13 +238,41 @@
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 11.9,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 11.9,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8001120000002",
       "companyName": "Coop Italia Società Cooperativa",
       "website": "http://www.e-coop.it"
-    }
+    },
+    "price": {
+      "amount": 11.9,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.coop.it/il-prodotto-coop/fior-fiore/olio-e-aceto/alimentari-confezionati/oli-da-olive/olio-extra-vergine-5"
   },
   {
     "gtin": "07622202229244",
@@ -566,6 +595,12 @@
           "@type": "schema:Organization",
           "schema:name": "Catalogo Smart"
         },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 1.59,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        },
         "schema:description": "Prezzo consigliato"
       }
     },
@@ -573,7 +608,8 @@
       "gln": "7622202000003",
       "companyName": "Mondelez Schweiz GmbH",
       "website": "www.eu.mondelezinternational.com"
-    }
+    },
+    "officialProductUrl": "https://orosaiwa.it/pages/oro/oro-classico"
   },
   {
     "gtin": "08000500426494",
@@ -890,12 +926,40 @@
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 15,
         "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 4.49,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 4.49,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8000500000007",
       "companyName": "Ferrero Technical Services Srl"
-    }
+    },
+    "price": {
+      "amount": 4.49,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.nutella.com/it/it/prodotti/nutella-plant-based"
   },
   {
     "gtin": "08008440510303",
@@ -1164,12 +1228,40 @@
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 4.08,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 4.08,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8008440000002",
       "companyName": "Birra Peroni Srl"
-    }
+    },
+    "price": {
+      "amount": 4.08,
+      "currency": "EUR",
+      "vatRate": 22,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://peroni.it/birre/peroni-senza-glutine/"
   },
   {
     "gtin": "08076800195057",
@@ -1441,13 +1533,41 @@
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
         "gs1:preparationInstructions": "Cottura: 9 minuti."
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 1.19,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 1.19,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8076800000009",
       "companyName": "Barilla G. e R. Fratelli SpA",
       "website": "https://www.barilla.com/"
-    }
+    },
+    "price": {
+      "amount": 1.19,
+      "currency": "EUR",
+      "vatRate": 4,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.barilla.com/it-it/prodotti/pasta/i-classici/spaghetti-n-5"
   },
   {
     "gtin": "08076809507110",
@@ -1744,13 +1864,41 @@
         "gs1:value": 13,
         "gs1:unitCode": "GRM"
       },
-      "gs1:numberOfServingsPerPackage": 62
+      "gs1:numberOfServingsPerPackage": 62,
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 3.69,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 3.69,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
+      }
     },
     "brandOwner": {
       "gln": "8076809000000",
       "companyName": "Barilla G. e R. Fratelli SpA",
       "website": "https://www.barilla.com/"
-    }
+    },
+    "price": {
+      "amount": 3.69,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.mulinobianco.it/macine"
   },
   {
     "gtin": "00000080930679",
@@ -1971,12 +2119,40 @@
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 1.89,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 1.89,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8000500000007",
       "companyName": "Ferrero Technical Services Srl"
-    }
+    },
+    "price": {
+      "amount": 1.89,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.estathe.it/prodotti/zero"
   },
   {
     "gtin": "08010242000067",
@@ -2083,7 +2259,8 @@
       "companyName": "Astro Società Cooperativa Agricola",
       "address": "Via G. Galilei, 43 Z.I., 38015 Lavis (TN), Italia",
       "packagedFor": {
-        "companyName": "Esselunga S.p.A."
+        "companyName": "Esselunga S.p.A.",
+        "website": "https://spesaonline.esselunga.it"
       }
     },
     "rawGs1Data": {
@@ -2274,13 +2451,41 @@
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
         "gs1:preparationInstructions": "Modalità di cottura consigliata: dorati al burro."
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 4.9,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 4.9,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8010242000005",
       "companyName": "O.P. Astro - S. Coop. Agr.",
       "website": "http://www.troteastro.it"
-    }
+    },
+    "price": {
+      "amount": 4.9,
+      "currency": "EUR",
+      "vatRate": 10,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://spesaonline.esselunga.it/commerce/nav/supermercato/store/home"
   },
   {
     "gtin": "08003100994851",
@@ -2376,7 +2581,8 @@
       "address": "Via dei Pastai, 42, 80054 Gragnano (NA), Italia",
       "packagedFor": {
         "companyName": "Selex S.p.A.",
-        "address": "Via C. Colombo, 51, 20090 Trezzano s/Naviglio (MI), Italia"
+        "address": "Via C. Colombo, 51, 20090 Trezzano s/Naviglio (MI), Italia",
+        "website": "https://www.cosicomodo.it"
       }
     },
     "rawGs1Data": {
@@ -2552,13 +2758,41 @@
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
         "gs1:preparationInstructions": "10' di cottura."
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 1.99,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 1.99,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8003100000002",
       "companyName": "Selex Gruppo Commerciale SpA",
       "website": "http://www.selexgc.it"
-    }
+    },
+    "price": {
+      "amount": 1.99,
+      "currency": "EUR",
+      "vatRate": 4,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.prodottiselex.it/prodotto/8003100994851"
   },
   {
     "gtin": "07622201679811",
@@ -2852,13 +3086,41 @@
         "gs1:value": 28.6,
         "gs1:unitCode": "GRM"
       },
-      "gs1:numberOfServingsPerPackage": 7
+      "gs1:numberOfServingsPerPackage": 7,
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 2.98,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 2.98,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
+      }
     },
     "brandOwner": {
       "gln": "7622201000004",
       "companyName": "Mondelez Schweiz GmbH",
       "website": "www.eu.mondelezinternational.com"
-    }
+    },
+    "price": {
+      "amount": 2.98,
+      "currency": "EUR",
+      "vatRate": 22,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://www.sottilette.it/product/senza-lattosio"
   },
   {
     "gtin": "08003170095595",
@@ -2957,7 +3219,8 @@
       "address": "S.P. 9 Km 3+135, Casteldidone (CR), Italia",
       "packagedFor": {
         "companyName": "Conad S.C.",
-        "address": "Via Michelino, 59, Bologna, Italia"
+        "address": "Via Michelino, 59, Bologna, Italia",
+        "website": "https://spesaonline.conad.it"
       }
     },
     "organicClaim": {
@@ -3144,12 +3407,40 @@
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
         "gs1:preparationInstructions": "Tempo di cottura: 9-10 minuti. Fate bollire circa 1 litro di acqua salata per ogni 100g di pasta."
+      },
+      "offers": {
+        "@type": "schema:Offer",
+        "schema:price": 3.34,
+        "schema:priceCurrency": "EUR",
+        "schema:availability": {
+          "@id": "schema:InStock"
+        },
+        "schema:itemCondition": {
+          "@id": "schema:NewCondition"
+        },
+        "schema:seller": {
+          "@type": "schema:Organization",
+          "schema:name": "Catalogo Smart"
+        },
+        "schema:priceSpecification": {
+          "@type": "schema:PriceSpecification",
+          "schema:price": 3.34,
+          "schema:priceCurrency": "EUR",
+          "schema:valueAddedTaxIncluded": true
+        }
       }
     },
     "brandOwner": {
       "gln": "8003170000001",
       "companyName": "CONAD Società Cooperativa",
       "website": "http://www.conad.it"
-    }
+    },
+    "price": {
+      "amount": 3.34,
+      "currency": "EUR",
+      "vatRate": 4,
+      "vatIncluded": true
+    },
+    "officialProductUrl": "https://spesaonline.conad.it/p/conad-verso-natura-spaghetti-kamut-biologici-500-g--403723"
   }
 ]

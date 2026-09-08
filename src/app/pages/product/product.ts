@@ -8,6 +8,7 @@ import { StarRatingComponent } from '../../components/star-rating/star-rating';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { IconComponent, IconName } from '../../components/icon/icon';
 import { setSocialMeta } from '../../utils/social-meta';
+import { normalizeUrl } from '../../utils/url';
 import { onImageError } from '../../utils/image-fallback';
 import { I18nService } from '../../services/i18n.service';
 import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
@@ -130,6 +131,25 @@ export class ProductComponent implements OnDestroy {
   setActiveImage(index: number): void {
     this.activeImageIndex.set(index);
   }
+
+  // Sito ufficiale a cui punta il bottone della purchase-card, in ordine di priorità:
+  // 1. officialProductUrl — la scheda di QUESTO prodotto sul sito ufficiale (la più precisa,
+  //    fornita per ciascun prodotto);
+  // 2. per i prodotti a marchio del distributore (manufacturer.packagedFor valorizzato: il
+  //    produttore in etichetta è un terzista, non chi possiede il marchio) l'e-commerce del
+  //    distributore, non il sito dello stabilimento che lo confeziona;
+  // 3. il sito del produttore/brand (es. sottilette.it);
+  // 4. il sito del brand owner (es. conad.it).
+  // Mai un link coniato: sempre uno dei siti già presenti nel dato sorgente.
+  officialWebsiteUrl = computed(() => {
+    const prod = this.product();
+    const website =
+      prod?.officialProductUrl ||
+      prod?.manufacturer?.packagedFor?.website ||
+      prod?.manufacturer?.website ||
+      prod?.brandOwner?.website;
+    return website ? normalizeUrl(website) : null;
+  });
 
   private absoluteUrl(url: string): string {
     if (!url || /^https?:\/\//i.test(url)) return url;

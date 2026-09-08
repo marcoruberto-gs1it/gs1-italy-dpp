@@ -8,14 +8,10 @@ import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-d
 import { IconComponent } from '../../components/icon/icon';
 import { setSocialMeta } from '../../utils/social-meta';
 import { onImageError } from '../../utils/image-fallback';
+import { normalizeUrl } from '../../utils/url';
 import { I18nService } from '../../services/i18n.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
-
-/** Antepone https:// a un sito scritto senza protocollo nella scheda originale (es. "www.esempio.it"). */
-function normalizeUrl(website: string): string {
-  return /^https?:\/\//i.test(website) ? website : `https://${website}`;
-}
 
 /**
  * Pagina del brand owner, risolvibile via GS1 Digital Link con Application Identifier 414

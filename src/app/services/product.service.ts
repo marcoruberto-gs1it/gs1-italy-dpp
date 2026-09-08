@@ -106,7 +106,7 @@ export interface OrganicClaim {
 export interface ManufacturerInfo {
   companyName: string;
   address?: string;
-  packagedFor?: { companyName: string; address?: string };
+  packagedFor?: { companyName: string; address?: string; website?: string };
   manufacturingSites?: string[];
   phone?: string;
   website?: string;
@@ -265,6 +265,10 @@ export interface Product {
   alcohol?: AlcoholInfo;
   manufacturer?: ManufacturerInfo;
   brandOwner?: BrandOwner;
+  /** URL della scheda di QUESTO prodotto sul sito ufficiale del brand/distributore (non solo la
+   * home o la pagina del brand) — dove mancante, la pagina prodotto ripiega su un sito più
+   * generico (manufacturer/packagedFor/brandOwner). Vedi officialWebsiteUrl in product.ts. */
+  officialProductUrl?: string;
   targetMarket?: string;
 
   // Moduli Opzionali

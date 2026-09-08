@@ -338,6 +338,9 @@ img.img-fallback {
   gap: 8px;
   padding: 12px 20px;
   border-radius: var(--radius-md);
+  /* .gs-btn è usata sia su <button> sia su <a> (link stile bottone, es. verso un sito esterno) —
+     senza questo un <a> mostrerebbe la sottolineatura di default. */
+  text-decoration: none;
   transition: transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
 }
 
