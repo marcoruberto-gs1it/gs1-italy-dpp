@@ -2,13 +2,18 @@
 
 Angular 22 (SSR) product catalogue: browse products, search, open a product page.
 
-63 products across 6 categories (only Consumer Goods shown for now).
+11 real products (GS1 Immagino data), GTINs resolvable via GS1 Digital Link
+(`/01/{gtin}`, `/414/{gln}`).
+
+See [docs/FEATURES.md](docs/FEATURES.md) for what the catalogue does and
+[docs/GS1-STANDARDS.md](docs/GS1-STANDARDS.md) for how GS1 Digital Link, GTIN, GLN and the GS1
+Web Vocabulary are used.
 
 ## Features
 
 - Product catalogue with search
-- Structured data (schema.org) on product pages, where published
-- AI shopping assistant (`/assistente`)
+- Product pages with price/offer, GS1 Web Vocabulary JSON-LD, and brand owner pages (GLN)
+- Content negotiation: `Accept: application/ld+json` on a product page returns pure JSON-LD
 - IT/EN localization
 
 ## Stack
@@ -32,9 +37,9 @@ Docker Compose (Traefik + this app + the AI assistant services), see `docker-com
 
 ```
 src/app/
-  pages/       home, product
-  components/  search-palette, star-rating, icon
-  services/    product, language, i18n
+  pages/       home, product, brand
+  components/  search-palette, star-rating, icon, json-ld-drawer
+  services/    product, language, i18n, structured-data, site-origin
   data/        products.json, products.en.ts, sectors.ts
   i18n/        IT/EN dictionary
 ```
