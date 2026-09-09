@@ -71,7 +71,9 @@ export class BrandComponent implements OnDestroy {
       hasGS1DigitalLink: url,
       name: owner.companyName,
       'gs1:globalLocationNumber': gln,
-      'gs1:organizationName': owner.companyName,
+      // rdf:langString (range dichiarato di gs1:organizationName): senza @language non è un
+      // literal tipizzato correttamente, vedi lang() in add-gs1-jsonld.js per lo stesso motivo.
+      'gs1:organizationName': { '@value': owner.companyName, '@language': 'it' },
       ...(owner.website ? { 'gs1:homepage': owner.website, url: normalizeUrl(owner.website) } : {}),
     };
   });

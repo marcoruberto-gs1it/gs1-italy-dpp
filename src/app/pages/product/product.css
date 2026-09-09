@@ -478,43 +478,47 @@
   font-size: 0.8rem;
 }
 
-.allergen-badges {
+/* "Contiene: Grano, Glutine, Uova, Latte." — una frase per livello di rischio, non una pillola
+   per allergene che ripete la stessa parola N volte (si legge peggio di un'etichetta vera). */
+.allergen-summary {
   list-style: none;
-  margin: 12px 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
 }
 
-.allergen-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.allergen-line {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
   background: var(--bg-surface-sunken);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 6px 12px;
-  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
-.allergen-badge-name {
+.allergen-line strong {
   color: var(--text-primary);
-  font-weight: 700;
 }
 
-.allergen-badge-level {
-  color: var(--text-tertiary);
-}
-
-.allergen-badge--contains {
+.allergen-line--contains {
   background: var(--warning-soft);
-  border-color: transparent;
+  color: var(--warning);
 }
 
-.allergen-badge--contains .allergen-badge-name,
-.allergen-badge--contains .allergen-badge-level {
-  color: var(--warning);
+.allergen-line--contains strong {
+  color: inherit;
+}
+
+/* Testo libero originale della scheda (può avere sfumature che il solo Contiene/Può contenere
+   non cattura, es. percentuali di lattosio residuo): resta, ma come nota secondaria sotto il
+   riepilogo, non come primo elemento della sezione. */
+.allergen-note {
+  margin: 10px 0 0 !important;
+  font-size: 0.86rem !important;
+  color: var(--text-tertiary) !important;
 }
 
 /* --- Not found --- */

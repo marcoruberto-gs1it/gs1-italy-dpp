@@ -113,51 +113,87 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/coop",
-        "gs1:brandName": "Coop",
-        "gs1:subBrandName": "Fior Fiore"
+        "gs1:brandName": {
+          "@value": "Coop",
+          "@language": "it"
+        },
+        "gs1:subBrandName": {
+          "@value": "Fior Fiore",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Olio extra vergine di oliva 100% italiano - Olio di oliva di categoria superiore ottenuto direttamente dalle olive e unicamente mediante procedimenti meccanici",
+      "gs1:regulatedProductName": {
+        "@value": "Olio extra vergine di oliva 100% italiano - Olio di oliva di categoria superiore ottenuto direttamente dalle olive e unicamente mediante procedimenti meccanici",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 1,
         "gs1:unitCode": "LTR"
       },
-      "gs1:countryOfOriginStatement": "Italia — 100% Italiano | Selezione di Cultivar Italiane | Olio extra vergine di oliva 100% italiano",
-      "gs1:consumerStorageInstructions": "L'olio extra vergine è un prodotto che varia con il passare del tempo; i principali nemici dell'olio sono temperatura, luce e ossigeno. È bene quindi conservare il prodotto in ambiente fresco e lontano da fonti di luce e di calore. Il prodotto, non essendo filtrato, nel tempo può lasciare depositi naturali sul fondo.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia — 100% Italiano | Selezione di Cultivar Italiane | Olio extra vergine di oliva 100% italiano",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "L'olio extra vergine è un prodotto che varia con il passare del tempo; i principali nemici dell'olio sono temperatura, luce e ossigeno. È bene quindi conservare il prodotto in ambiente fresco e lontano da fonti di luce e di calore. Il prodotto, non essendo filtrato, nel tempo può lasciare depositi naturali sul fondo.",
+        "@language": "it"
+      },
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Montalbano Agricola Alimentare Toscana S.p.A."
+        "gs1:organizationName": {
+          "@value": "Montalbano Agricola Alimentare Toscana S.p.A.",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8001120000002",
         "gs1:globalLocationNumber": "8001120000002",
-        "gs1:organizationName": "Coop Italia Società Cooperativa",
+        "gs1:organizationName": {
+          "@value": "Coop Italia Società Cooperativa",
+          "@language": "it"
+        },
         "gs1:homepage": "http://www.e-coop.it"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 1457,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 320,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 90,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 90,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Bottiglia",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 1457,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 320,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 90,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 90,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -173,7 +209,138 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Olio extra vergine di oliva.",
+      "gs1:ingredientStatement": {
+        "@value": "Olio extra vergine di oliva.",
+        "@language": "it"
+      },
+      "gs1:hasAllergen": [
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        }
+      ],
       "gs1:nutrientBasisQuantity": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 100,
@@ -184,63 +351,66 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 3389,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 824,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 91.6,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 14,
         "gs1:unitCode": "GRM"
       },
       "gs1:monounsaturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 69.6,
         "gs1:unitCode": "GRM"
       },
       "gs1:polyunsaturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 8,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 11.9,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -249,14 +419,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 11.9,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 11.9,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -306,11 +482,15 @@
           "containment": "CONTAINS"
         },
         {
-          "code": "MILK",
-          "containment": "MAY_CONTAIN"
+          "code": "GLUTEN",
+          "containment": "CONTAINS"
         },
         {
           "code": "SOYBEANS",
+          "containment": "MAY_CONTAIN"
+        },
+        {
+          "code": "MILK",
           "containment": "MAY_CONTAIN"
         },
         {
@@ -414,51 +594,81 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/saiwa",
-        "gs1:brandName": "Saiwa",
-        "gs1:subBrandName": "Oro Saiwa"
+        "gs1:brandName": {
+          "@value": "Saiwa",
+          "@language": "it"
+        },
+        "gs1:subBrandName": {
+          "@value": "Oro Saiwa",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Biscotti",
+      "gs1:regulatedProductName": {
+        "@value": "Biscotti",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 250,
         "gs1:unitCode": "GRM"
       },
-      "gs1:countryOfOriginStatement": "100% Grano italiano",
-      "gs1:consumerStorageInstructions": "Conservare in luogo fresco ed asciutto. Proteggere dalla luce.",
+      "gs1:countryOfOriginStatement": {
+        "@value": "100% Grano italiano",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare in luogo fresco ed asciutto. Proteggere dalla luce.",
+        "@language": "it"
+      },
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Mondelez Italia (Mondelēz International)"
+        "gs1:organizationName": {
+          "@value": "Mondelez Italia (Mondelēz International)",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/7622202000003",
         "gs1:globalLocationNumber": "7622202000003",
-        "gs1:organizationName": "Mondelez Schweiz GmbH",
+        "gs1:organizationName": {
+          "@value": "Mondelez Schweiz GmbH",
+          "@language": "it"
+        },
         "gs1:homepage": "www.eu.mondelezinternational.com"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 265,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 124,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 206,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 50,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Confezione",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 265,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 124,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 206,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 50,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -480,8 +690,14 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Farina di frumento 82%, zucchero, olio di girasole, agenti lievitanti (carbonati di ammonio, carbonati di sodio, tartrati di potassio), amido di frumento, sale, aromi.",
-      "gs1:allergenStatement": "Può contenere soia, latte, senape",
+      "gs1:ingredientStatement": {
+        "@value": "Farina di frumento 82%, zucchero, olio di girasole, agenti lievitanti (carbonati di ammonio, carbonati di sodio, tartrati di potassio), amido di frumento, sale, aromi.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Può contenere soia, latte, senape",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
@@ -495,10 +711,10 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-MILK"
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
           }
         },
         {
@@ -513,10 +729,109 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-MUSTARD"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
           }
         }
       ],
@@ -530,48 +845,48 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 1760,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 417,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 8.3,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.8,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 76,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 20,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3.4,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 8.3,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.62,
         "gs1:unitCode": "GRM"
       },
@@ -582,7 +897,10 @@
       },
       "gs1:numberOfServingsPerPackage": 8,
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 1.59,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -591,14 +909,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 1.59,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 1.59,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         },
         "schema:description": "Prezzo consigliato"
@@ -633,6 +957,10 @@
       "allergenDeclarations": [
         {
           "code": "HAZELNUTS",
+          "containment": "CONTAINS"
+        },
+        {
+          "code": "TREE_NUTS",
           "containment": "CONTAINS"
         },
         {
@@ -754,16 +1082,37 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/ferrero",
-        "gs1:brandName": "Ferrero",
-        "gs1:subBrandName": "nutella"
+        "gs1:brandName": {
+          "@value": "Ferrero",
+          "@language": "it"
+        },
+        "gs1:subBrandName": {
+          "@value": "nutella",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Crema da spalmare alle nocciole e al cacao",
+      "gs1:regulatedProductName": {
+        "@value": "Crema da spalmare alle nocciole e al cacao",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 350,
         "gs1:unitCode": "GRM"
       },
-      "gs1:consumerStorageInstructions": "Non conservare in frigorifero. Tenere lontano da fonti di calore. Temperatura di conservazione: 18°C - 24°C.",
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Non conservare in frigorifero. Tenere lontano da fonti di calore. Temperatura di conservazione: 18°C - 24°C.",
+        "@language": "it"
+      },
       "gs1:dietCode": [
         {
           "@type": "gs1:DietTypeCodeDetails",
@@ -780,37 +1129,43 @@
       ],
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Ferrero Commerciale Italia S.r.l."
+        "gs1:organizationName": {
+          "@value": "Ferrero Commerciale Italia S.r.l.",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8000500000007",
         "gs1:globalLocationNumber": "8000500000007",
-        "gs1:organizationName": "Ferrero Technical Services Srl"
+        "gs1:organizationName": {
+          "@value": "Ferrero Technical Services Srl",
+          "@language": "it"
+        }
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 564,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 105,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 89,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 79,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Barattolo",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 564,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 105,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 89,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 79,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -832,13 +1187,28 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Zucchero, olio di palma, nocciole 13%, ceci, cacao magro 7,4%, sciroppo di riso in polvere, emulsionanti: lecitine (soia), sale, aromi.",
-      "gs1:allergenStatement": "Senza glutine. Può contenere latte poiché questo prodotto è fabbricato in uno stabilimento che utilizza latte.",
+      "gs1:ingredientStatement": {
+        "@value": "Zucchero, olio di palma, nocciole 13%, ceci, cacao magro 7,4%, sciroppo di riso in polvere, emulsionanti: lecitine (soia), sale, aromi.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Senza glutine. Può contenere latte poiché questo prodotto è fabbricato in uno stabilimento che utilizza latte.",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-HAZELNUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
@@ -870,6 +1240,96 @@
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
         }
       ],
       "gs1:nutrientBasisQuantity": {
@@ -882,43 +1342,43 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 2229,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 534,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 31.8,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 11,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 53.4,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 45.4,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 6.8,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.071,
         "gs1:unitCode": "GRM"
       },
@@ -928,7 +1388,10 @@
         "gs1:unitCode": "GRM"
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 4.49,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -937,14 +1400,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 4.49,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 4.49,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -1089,58 +1558,100 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/peroni",
-        "gs1:brandName": "Peroni"
+        "gs1:brandName": {
+          "@value": "Peroni",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Birra alc. 4,7% vol.",
+      "gs1:regulatedProductName": {
+        "@value": "Birra alc. 4,7% vol.",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 33,
         "gs1:unitCode": "MLT"
       },
-      "gs1:countryOfOriginStatement": "Italia — Malto 100% italiano tracciato | Indiscutibilmente italiana | La birra italiana Senza Glutine | Prodotta in Italia",
-      "gs1:consumerStorageInstructions": "Conservare a temperatura ambiente.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia — Malto 100% italiano tracciato | Indiscutibilmente italiana | La birra italiana Senza Glutine | Prodotta in Italia",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare a temperatura ambiente.",
+        "@language": "it"
+      },
       "gs1:percentageOfAlcoholByVolume": 4.7,
       "gs1:certification": [
         {
           "@type": "gs1:CertificationDetails",
-          "gs1:certificationAgency": "Associazione Italiana Celiachia (AIC)",
-          "gs1:certificationStandard": "Spiga Barrata",
-          "gs1:certificationValue": "IT-130-001"
+          "gs1:certificationAgency": {
+            "@value": "Associazione Italiana Celiachia (AIC)",
+            "@language": "it"
+          },
+          "gs1:certificationStandard": {
+            "@value": "Spiga Barrata",
+            "@language": "it"
+          },
+          "gs1:certificationValue": {
+            "@value": "IT-130-001",
+            "@language": "it"
+          }
         }
       ],
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Birra Peroni S.r.l."
+        "gs1:organizationName": {
+          "@value": "Birra Peroni S.r.l.",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8008440000002",
         "gs1:globalLocationNumber": "8008440000002",
-        "gs1:organizationName": "Birra Peroni Srl"
+        "gs1:organizationName": {
+          "@value": "Birra Peroni Srl",
+          "@language": "it"
+        }
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 1571,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 215,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 185,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 62,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Cartone (3 bottiglie da 33cl)",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 1571,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 215,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 185,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 62,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -1162,8 +1673,14 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Acqua, malto d'orzo, granturco, luppolo.",
-      "gs1:allergenStatement": "Senza glutine",
+      "gs1:ingredientStatement": {
+        "@value": "Acqua, malto d'orzo, granturco, luppolo.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Senza glutine",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
@@ -1182,6 +1699,123 @@
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
         }
       ],
       "gs1:nutrientBasisQuantity": {
@@ -1194,43 +1828,46 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 162,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 39,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 2.9,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.3,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 4.08,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -1239,14 +1876,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 4.08,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 4.08,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -1284,6 +1927,10 @@
       "allergenDeclarations": [
         {
           "code": "WHEAT",
+          "containment": "CONTAINS"
+        },
+        {
+          "code": "GLUTEN",
           "containment": "CONTAINS"
         },
         {
@@ -1385,50 +2032,83 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/barilla",
-        "gs1:brandName": "Barilla"
+        "gs1:brandName": {
+          "@value": "Barilla",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Pasta di semola di grano duro",
+      "gs1:regulatedProductName": {
+        "@value": "Pasta di semola di grano duro",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 500,
         "gs1:unitCode": "GRM"
       },
-      "gs1:countryOfOriginStatement": "Italia — Paese di coltivazione del grano: UE e non UE | Paese di molitura: Italia",
-      "gs1:consumerStorageInstructions": "Conservare in un luogo fresco ed asciutto.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia — Paese di coltivazione del grano: UE e non UE | Paese di molitura: Italia",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare in un luogo fresco ed asciutto.",
+        "@language": "it"
+      },
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Barilla G. e R. Fratelli - Società per Azioni"
+        "gs1:organizationName": {
+          "@value": "Barilla G. e R. Fratelli - Società per Azioni",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8076800000009",
         "gs1:globalLocationNumber": "8076800000009",
-        "gs1:organizationName": "Barilla G. e R. Fratelli SpA",
+        "gs1:organizationName": {
+          "@value": "Barilla G. e R. Fratelli SpA",
+          "@language": "it"
+        },
         "gs1:homepage": "https://www.barilla.com/"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 516,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 72,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 271,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 32,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Scatola",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 516,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 72,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 271,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 32,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -1438,13 +2118,28 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Semola di grano duro, acqua.",
-      "gs1:allergenStatement": "Può contenere tracce di soia e senape",
+      "gs1:ingredientStatement": {
+        "@value": "Semola di grano duro, acqua.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Può contenere tracce di soia e senape",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-WHEAT"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
@@ -1467,6 +2162,105 @@
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
         }
       ],
       "gs1:nutrientBasisQuantity": {
@@ -1479,48 +2273,48 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 1521,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 359,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 2,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 71,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 13,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.01,
         "gs1:unitCode": "GRM"
       },
@@ -1532,10 +2326,16 @@
       "gs1:numberOfServingsPerPackage": 6,
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
-        "gs1:preparationInstructions": "Cottura: 9 minuti."
+        "gs1:preparationInstructions": {
+          "@value": "Cottura: 9 minuti.",
+          "@language": "it"
+        }
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 1.19,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -1544,14 +2344,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 1.19,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 1.19,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -1589,11 +2395,19 @@
       "allergens": "Burro: contiene. Panna: contiene. Può contenere tracce di senape, frutta a guscio, semi di sesamo e soia",
       "allergenDeclarations": [
         {
+          "code": "WHEAT",
+          "containment": "CONTAINS"
+        },
+        {
+          "code": "GLUTEN",
+          "containment": "CONTAINS"
+        },
+        {
           "code": "EGGS",
           "containment": "CONTAINS"
         },
         {
-          "code": "WHEAT",
+          "code": "MILK",
           "containment": "CONTAINS"
         },
         {
@@ -1701,54 +2515,111 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/mulino-bianco",
-        "gs1:brandName": "Mulino Bianco"
+        "gs1:brandName": {
+          "@value": "Mulino Bianco",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Biscotti frollini con panna fresca",
+      "gs1:regulatedProductName": {
+        "@value": "Biscotti frollini con panna fresca",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 800,
         "gs1:unitCode": "GRM"
       },
-      "gs1:countryOfOriginStatement": "Italia — Con Panna Fresca 100% Italiana",
-      "gs1:consumerStorageInstructions": "Conservare in un luogo fresco ed asciutto.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia — Con Panna Fresca 100% Italiana",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare in un luogo fresco ed asciutto.",
+        "@language": "it"
+      },
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Barilla G. e R. Fratelli - Società per Azioni"
+        "gs1:organizationName": {
+          "@value": "Barilla G. e R. Fratelli - Società per Azioni",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8076809000000",
         "gs1:globalLocationNumber": "8076809000000",
-        "gs1:organizationName": "Barilla G. e R. Fratelli SpA",
+        "gs1:organizationName": {
+          "@value": "Barilla G. e R. Fratelli SpA",
+          "@language": "it"
+        },
         "gs1:homepage": "https://www.barilla.com/"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 819,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 322,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 200,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 74,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
-        "gs1:packagingType": "Confezione",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 819,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 322,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 200,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 74,
-          "gs1:unitCode": "MMT"
-        }
+        "gs1:packagingType": "Confezione"
       },
-      "gs1:ingredientStatement": "Farina di grano tenero 62,4%*, zucchero, olio di semi di girasole, amido di frumento, uova fresche, burro, panna fresca pastorizzata 2,5%*, sale, agente lievitante (carbonato acido di sodio), aromi. *% espresse sul prodotto finito.",
-      "gs1:allergenStatement": "Burro: contiene. Panna: contiene. Può contenere tracce di senape, frutta a guscio, semi di sesamo e soia",
+      "gs1:ingredientStatement": {
+        "@value": "Farina di grano tenero 62,4%*, zucchero, olio di semi di girasole, amido di frumento, uova fresche, burro, panna fresca pastorizzata 2,5%*, sale, agente lievitante (carbonato acido di sodio), aromi. *% espresse sul prodotto finito.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Burro: contiene. Panna: contiene. Può contenere tracce di senape, frutta a guscio, semi di sesamo e soia",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-WHEAT"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
@@ -1761,7 +2632,7 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-WHEAT"
+            "@id": "gs1:AllergenTypeCode-MILK"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
@@ -1802,6 +2673,69 @@
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
         }
       ],
       "gs1:nutrientBasisQuantity": {
@@ -1814,48 +2748,48 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 2024,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 482,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 20,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3.3,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 68,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 19,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 2.8,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 6,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.83,
         "gs1:unitCode": "GRM"
       },
@@ -1866,7 +2800,10 @@
       },
       "gs1:numberOfServingsPerPackage": 62,
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 3.69,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -1875,14 +2812,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 3.69,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 3.69,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -2011,48 +2954,72 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/estathe",
-        "gs1:brandName": "Estathé"
+        "gs1:brandName": {
+          "@value": "Estathé",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Bevanda di the alla pesca con edulcoranti",
+      "gs1:regulatedProductName": {
+        "@value": "Bevanda di the alla pesca con edulcoranti",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 200,
         "gs1:unitCode": "MLT"
       },
-      "gs1:consumerStorageInstructions": "Prodotto a conservazione garantita; si prega di non consumare e di richiedere al rivenditore la sostituzione gratuita di contenitori rigonfi o comunque danneggiati.",
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Prodotto a conservazione garantita; si prega di non consumare e di richiedere al rivenditore la sostituzione gratuita di contenitori rigonfi o comunque danneggiati.",
+        "@language": "it"
+      },
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Ferrero S.p.A."
+        "gs1:organizationName": {
+          "@value": "Ferrero S.p.A.",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8000500000007",
         "gs1:globalLocationNumber": "8000500000007",
-        "gs1:organizationName": "Ferrero Technical Services Srl"
+        "gs1:organizationName": {
+          "@value": "Ferrero Technical Services Srl",
+          "@language": "it"
+        }
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 616,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 90,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 210,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 72,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Confezione (3 x 200 ml)",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 616,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 90,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 210,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 72,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -2062,13 +3029,136 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Infuso di foglie di the nero (acqua, the nero), succo di pesca da concentrato (2%), esaltatori di sapidità (eritritolo, acido ascorbico), succo di limone da concentrato, aromi, acidificanti (acido malico, acido citrico, citrati di sodio), edulcoranti (sucralosio, glicosidi steviolici da Stevia).",
-      "gs1:allergenStatement": "Senza glutine",
+      "gs1:ingredientStatement": {
+        "@value": "Infuso di foglie di the nero (acqua, the nero), succo di pesca da concentrato (2%), esaltatori di sapidità (eritritolo, acido ascorbico), succo di limone da concentrato, aromi, acidificanti (acido malico, acido citrico, citrati di sodio), edulcoranti (sucralosio, glicosidi steviolici da Stevia).",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Senza glutine",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-GLUTEN"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
@@ -2085,43 +3175,46 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 7,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 2,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 1.3,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 1.89,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -2130,14 +3223,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 1.89,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 1.89,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -2178,11 +3277,11 @@
           "containment": "CONTAINS"
         },
         {
-          "code": "GLUTEN",
+          "code": "WHEAT",
           "containment": "CONTAINS"
         },
         {
-          "code": "WHEAT",
+          "code": "GLUTEN",
           "containment": "CONTAINS"
         }
       ],
@@ -2286,58 +3385,100 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/esselunga",
-        "gs1:brandName": "Esselunga",
-        "gs1:subBrandName": "Esselunga Naturama"
+        "gs1:brandName": {
+          "@value": "Esselunga",
+          "@language": "it"
+        },
+        "gs1:subBrandName": {
+          "@value": "Esselunga Naturama",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Fish Burger di Trota Iridea Naturama — Oncorhynchus mykiss",
+      "gs1:regulatedProductName": {
+        "@value": "Fish Burger di Trota Iridea Naturama — Oncorhynchus mykiss",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 200,
         "gs1:unitCode": "GRM"
       },
-      "gs1:countryOfOriginStatement": "Italia — Zona di pesca: allevato in Italia (Trentino). Bollo CE: IT 1332 CE.",
-      "gs1:consumerStorageInstructions": "Conservare da 0°C a +4°C. Da consumare previa cottura. Prodotto fresco, adatto a essere congelato a casa.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia — Zona di pesca: allevato in Italia (Trentino). Bollo CE: IT 1332 CE.",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare da 0°C a +4°C. Da consumare previa cottura. Prodotto fresco, adatto a essere congelato a casa.",
+        "@language": "it"
+      },
       "gs1:certification": [
         {
           "@type": "gs1:CertificationDetails",
-          "gs1:certificationAgency": "Friend of the Sea (FOS)",
-          "gs1:certificationStandard": "Acquacoltura sostenibile"
+          "gs1:certificationAgency": {
+            "@value": "Friend of the Sea (FOS)",
+            "@language": "it"
+          },
+          "gs1:certificationStandard": {
+            "@value": "Acquacoltura sostenibile",
+            "@language": "it"
+          }
         }
       ],
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Astro Società Cooperativa Agricola"
+        "gs1:organizationName": {
+          "@value": "Astro Società Cooperativa Agricola",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8010242000005",
         "gs1:globalLocationNumber": "8010242000005",
-        "gs1:organizationName": "O.P. Astro - S. Coop. Agr.",
+        "gs1:organizationName": {
+          "@value": "O.P. Astro - S. Coop. Agr.",
+          "@language": "it"
+        },
         "gs1:homepage": "http://www.troteastro.it"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 216,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 237,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 123,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 23,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Vassoio con pellicola",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 216,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 237,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 123,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 23,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -2353,12 +3494,24 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Trota iridea 95%, pangrattato 5% (farina di frumento (glutine), sale), sale.",
+      "gs1:ingredientStatement": {
+        "@value": "Trota iridea 95%, pangrattato 5% (farina di frumento (glutine), sale), sale.",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-WHEAT"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
@@ -2376,10 +3529,109 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-WHEAT"
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
           },
           "gs1:allergenLevelOfContainmentCode": {
-            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
           }
         }
       ],
@@ -2393,67 +3645,73 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 640,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 153,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 6.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 1.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:monounsaturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 1.8,
         "gs1:unitCode": "GRM"
       },
       "gs1:polyunsaturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3.2,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 4.4,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 19,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.9,
         "gs1:unitCode": "GRM"
       },
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
-        "gs1:preparationInstructions": "Modalità di cottura consigliata: dorati al burro."
+        "gs1:preparationInstructions": {
+          "@value": "Modalità di cottura consigliata: dorati al burro.",
+          "@language": "it"
+        }
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 4.9,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -2462,14 +3720,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 4.9,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 4.9,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -2509,6 +3773,10 @@
       "allergenDeclarations": [
         {
           "code": "WHEAT",
+          "containment": "CONTAINS"
+        },
+        {
+          "code": "GLUTEN",
           "containment": "CONTAINS"
         },
         {
@@ -2608,58 +3876,100 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/selex",
-        "gs1:brandName": "Selex",
-        "gs1:subBrandName": "Saper di Sapori"
+        "gs1:brandName": {
+          "@value": "Selex",
+          "@language": "it"
+        },
+        "gs1:subBrandName": {
+          "@value": "Saper di Sapori",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Pasta di semola di grano duro",
+      "gs1:regulatedProductName": {
+        "@value": "Pasta di semola di grano duro",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 500,
         "gs1:unitCode": "GRM"
       },
-      "gs1:countryOfOriginStatement": "Italia — Grano italiano | Paese di coltivazione del grano: Italia | Paese di molitura: Italia",
-      "gs1:consumerStorageInstructions": "Conservare in luogo fresco e asciutto.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia — Grano italiano | Paese di coltivazione del grano: Italia | Paese di molitura: Italia",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare in luogo fresco e asciutto.",
+        "@language": "it"
+      },
       "gs1:certification": [
         {
           "@type": "gs1:CertificationDetails",
-          "gs1:certificationAgency": "Organismo di Controllo autorizzato dal Ministero competente - Italia",
-          "gs1:certificationStandard": "Indicazione Geografica Protetta (IGP) — Pasta di Gragnano"
+          "gs1:certificationAgency": {
+            "@value": "Organismo di Controllo autorizzato dal Ministero competente - Italia",
+            "@language": "it"
+          },
+          "gs1:certificationStandard": {
+            "@value": "Indicazione Geografica Protetta (IGP) — Pasta di Gragnano",
+            "@language": "it"
+          }
         }
       ],
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Pastificio Lucio Garofalo S.p.A."
+        "gs1:organizationName": {
+          "@value": "Pastificio Lucio Garofalo S.p.A.",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8003100000002",
         "gs1:globalLocationNumber": "8003100000002",
-        "gs1:organizationName": "Selex Gruppo Commerciale SpA",
+        "gs1:organizationName": {
+          "@value": "Selex Gruppo Commerciale SpA",
+          "@language": "it"
+        },
         "gs1:homepage": "http://www.selexgc.it"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 509,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 170,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 108,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 67,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Confezione",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 509,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 170,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 108,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 67,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -2669,13 +3979,28 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Semola di grano duro, acqua.",
-      "gs1:allergenStatement": "Può contenere soia e senape",
+      "gs1:ingredientStatement": {
+        "@value": "Semola di grano duro, acqua.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Può contenere soia e senape",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-WHEAT"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
@@ -2698,6 +4023,105 @@
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
         }
       ],
       "gs1:nutrientBasisQuantity": {
@@ -2710,57 +4134,63 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 1489,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 351,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 1,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.1,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 70,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 14,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.01,
         "gs1:unitCode": "GRM"
       },
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
-        "gs1:preparationInstructions": "10' di cottura."
+        "gs1:preparationInstructions": {
+          "@value": "10' di cottura.",
+          "@language": "it"
+        }
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 1.99,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -2769,14 +4199,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 1.99,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 1.99,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -2818,11 +4254,11 @@
           "containment": "CONTAINS"
         },
         {
-          "code": "GLUTEN",
+          "code": "LACTOSE",
           "containment": "FREE_FROM"
         },
         {
-          "code": "LACTOSE",
+          "code": "GLUTEN",
           "containment": "FREE_FROM"
         }
       ],
@@ -2924,15 +4360,33 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/sottilette",
-        "gs1:brandName": "Sottilette"
+        "gs1:brandName": {
+          "@value": "Sottilette",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Formaggio fuso a fette con fibre, senza lattosio",
+      "gs1:regulatedProductName": {
+        "@value": "Formaggio fuso a fette con fibre, senza lattosio",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 200,
         "gs1:unitCode": "GRM"
       },
-      "gs1:consumerStorageInstructions": "Conservare in frigo (max +8°C).",
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare in frigo (max +8°C).",
+        "@language": "it"
+      },
       "gs1:dietCode": [
         {
           "@type": "gs1:DietTypeCodeDetails",
@@ -2943,38 +4397,44 @@
       ],
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "Mondelez Italia"
+        "gs1:organizationName": {
+          "@value": "Mondelez Italia",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/7622201000004",
         "gs1:globalLocationNumber": "7622201000004",
-        "gs1:organizationName": "Mondelez Schweiz GmbH",
+        "gs1:organizationName": {
+          "@value": "Mondelez Schweiz GmbH",
+          "@language": "it"
+        },
         "gs1:homepage": "www.eu.mondelezinternational.com"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 205,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 84,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 91,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 28,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
         "gs1:packagingType": "Confezione (7 fette)",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 205,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 84,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 91,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 28,
-          "gs1:unitCode": "MMT"
-        },
         "gs1:packagingMaterial": [
           {
             "@type": "gs1:PackagingMaterialDetails",
@@ -2990,8 +4450,14 @@
           }
         ]
       },
-      "gs1:ingredientStatement": "Formaggio, acqua, proteine del latte, fibre (3%), sale di fusione (citrati di sodio), sale, correttore di acidità (acido lattico), burro concentrato. Il prodotto è preparato con ingredienti lattieri selezionati a basso contenuto di lattosio (inferiore allo 0,1% nel prodotto finito). Contiene glucosio e galattosio.",
-      "gs1:allergenStatement": "Formaggio: contiene. Burro: contiene. Senza lattosio. Senza glutine",
+      "gs1:ingredientStatement": {
+        "@value": "Formaggio, acqua, proteine del latte, fibre (3%), sale di fusione (citrati di sodio), sale, correttore di acidità (acido lattico), burro concentrato. Il prodotto è preparato con ingredienti lattieri selezionati a basso contenuto di lattosio (inferiore allo 0,1% nel prodotto finito). Contiene glucosio e galattosio.",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Formaggio: contiene. Burro: contiene. Senza lattosio. Senza glutine",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
@@ -3000,6 +4466,15 @@
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LACTOSE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
           }
         },
         {
@@ -3014,7 +4489,106 @@
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
-            "@id": "gs1:AllergenTypeCode-LACTOSE"
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SOYBEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MUSTARD"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
@@ -3031,53 +4605,53 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 909,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 218,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 15,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 9.8,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.4,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.4,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 3,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 18,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 2.9,
         "gs1:unitCode": "GRM"
       },
       "gs1:calciumPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 639,
         "gs1:unitCode": "MGM"
       },
@@ -3088,7 +4662,10 @@
       },
       "gs1:numberOfServingsPerPackage": 7,
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 2.98,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -3097,14 +4674,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 2.98,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 2.98,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }
@@ -3144,6 +4727,10 @@
       "allergenDeclarations": [
         {
           "code": "WHEAT",
+          "containment": "CONTAINS"
+        },
+        {
+          "code": "GLUTEN",
           "containment": "CONTAINS"
         },
         {
@@ -3251,17 +4838,47 @@
       "brand": {
         "@type": "gs1:Brand",
         "@id": "https://tuodominio-produzione.it/id/brand/conad",
-        "gs1:brandName": "Conad",
-        "gs1:subBrandName": "Verso Natura"
+        "gs1:brandName": {
+          "@value": "Conad",
+          "@language": "it"
+        },
+        "gs1:subBrandName": {
+          "@value": "Verso Natura",
+          "@language": "it"
+        }
       },
-      "gs1:regulatedProductName": "Specialità alimentare al grano Khorasan Kamut biologica",
+      "gs1:regulatedProductName": {
+        "@value": "Specialità alimentare al grano Khorasan Kamut biologica",
+        "@language": "it"
+      },
       "gs1:netContent": {
         "@type": "gs1:QuantitativeValue",
         "gs1:value": 500,
         "gs1:unitCode": "GRM"
       },
-      "gs1:countryOfOriginStatement": "Italia",
-      "gs1:consumerStorageInstructions": "Conservare in luogo fresco e asciutto.",
+      "gs1:countryOfOrigin": [
+        {
+          "@type": "gs1:Country",
+          "gs1:countryCode": "IT"
+        }
+      ],
+      "gs1:countryOfOriginStatement": {
+        "@value": "Italia",
+        "@language": "it"
+      },
+      "gs1:targetMarket": {
+        "@type": "gs1:TargetMarketDetails",
+        "gs1:targetMarketCountries": [
+          {
+            "@type": "gs1:Country",
+            "gs1:countryCode": "IT"
+          }
+        ]
+      },
+      "gs1:consumerStorageInstructions": {
+        "@value": "Conservare in luogo fresco e asciutto.",
+        "@language": "it"
+      },
       "gs1:organicClaim": {
         "@type": "gs1:OrganicClaimDetails",
         "gs1:organicClaimAgency": {
@@ -3279,52 +4896,79 @@
       "gs1:certification": [
         {
           "@type": "gs1:CertificationDetails",
-          "gs1:certificationAgency": "Kamut Khorasan",
-          "gs1:certificationStandard": "Marchio di Grano"
+          "gs1:certificationAgency": {
+            "@value": "Kamut Khorasan",
+            "@language": "it"
+          },
+          "gs1:certificationStandard": {
+            "@value": "Marchio di Grano",
+            "@language": "it"
+          }
         }
       ],
       "gs1:manufacturer": {
         "@type": "gs1:Organization",
-        "gs1:organizationName": "A.S.T.R.A. Bio S.r.l."
+        "gs1:organizationName": {
+          "@value": "A.S.T.R.A. Bio S.r.l.",
+          "@language": "it"
+        }
       },
       "gs1:brandOwner": {
         "@type": "gs1:Organization",
         "@id": "https://tuodominio-produzione.it/414/8003170000001",
         "gs1:globalLocationNumber": "8003170000001",
-        "gs1:organizationName": "CONAD Società Cooperativa",
+        "gs1:organizationName": {
+          "@value": "CONAD Società Cooperativa",
+          "@language": "it"
+        },
         "gs1:homepage": "http://www.conad.it"
+      },
+      "gs1:grossWeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 506,
+        "gs1:unitCode": "GRM"
+      },
+      "gs1:inPackageHeight": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 315,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageWidth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 95,
+        "gs1:unitCode": "MMT"
+      },
+      "gs1:inPackageDepth": {
+        "@type": "gs1:QuantitativeValue",
+        "gs1:value": 28,
+        "gs1:unitCode": "MMT"
       },
       "gs1:packaging": {
         "@type": "gs1:PackagingDetails",
-        "gs1:packagingType": "Confezione",
-        "gs1:grossWeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 506,
-          "gs1:unitCode": "GRM"
-        },
-        "gs1:inPackageHeight": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 315,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageWidth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 95,
-          "gs1:unitCode": "MMT"
-        },
-        "gs1:inPackageDepth": {
-          "@type": "gs1:QuantitativeValue",
-          "gs1:value": 28,
-          "gs1:unitCode": "MMT"
-        }
+        "gs1:packagingType": "Confezione"
       },
-      "gs1:ingredientStatement": "Farina di grano khorasan Kamut* (*da agricoltura biologica).",
-      "gs1:allergenStatement": "Può contenere soia e senape",
+      "gs1:ingredientStatement": {
+        "@value": "Farina di grano khorasan Kamut* (*da agricoltura biologica).",
+        "@language": "it"
+      },
+      "gs1:allergenStatement": {
+        "@value": "Può contenere soia e senape",
+        "@language": "it"
+      },
       "gs1:hasAllergen": [
         {
           "@type": "gs1:AllergenDetails",
           "gs1:allergenType": {
             "@id": "gs1:AllergenTypeCode-WHEAT"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-CONTAINS"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-GLUTEN"
           },
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-CONTAINS"
@@ -3347,6 +4991,105 @@
           "gs1:allergenLevelOfContainmentCode": {
             "@id": "gs1:LevelOfContainmentCode-MAY_CONTAIN"
           }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CRUSTACEANS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-EGGS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-FISH"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-PEANUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MILK"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-TREE_NUTS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-CELERY"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SESAME_SEEDS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-SULPHUR_DIOXIDE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-LUPINE"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
+        },
+        {
+          "@type": "gs1:AllergenDetails",
+          "gs1:allergenType": {
+            "@id": "gs1:AllergenTypeCode-MOLLUSCS"
+          },
+          "gs1:allergenLevelOfContainmentCode": {
+            "@id": "gs1:LevelOfContainmentCode-FREE_FROM"
+          }
         }
       ],
       "gs1:nutrientBasisQuantity": {
@@ -3359,57 +5102,63 @@
       },
       "gs1:energyPerNutrientBasis": [
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 1474,
           "gs1:unitCode": "KJO"
         },
         {
-          "@type": "gs1:QuantitativeValue",
+          "@type": "gs1:NutritionMeasurementType",
           "gs1:value": 348,
           "gs1:unitCode": "E14"
         }
       ],
       "gs1:fatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 1.2,
         "gs1:unitCode": "GRM"
       },
       "gs1:saturatedFatPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0.3,
         "gs1:unitCode": "GRM"
       },
       "gs1:carbohydratesPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 67,
         "gs1:unitCode": "GRM"
       },
       "gs1:sugarsPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 2.1,
         "gs1:unitCode": "GRM"
       },
       "gs1:fibrePerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 4.5,
         "gs1:unitCode": "GRM"
       },
       "gs1:proteinPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 15,
         "gs1:unitCode": "GRM"
       },
       "gs1:saltPerNutrientBasis": {
-        "@type": "gs1:QuantitativeValue",
+        "@type": "gs1:NutritionMeasurementType",
         "gs1:value": 0,
         "gs1:unitCode": "GRM"
       },
       "gs1:preparationInformation": {
         "@type": "gs1:FoodAndBeveragePreparationInformation",
-        "gs1:preparationInstructions": "Tempo di cottura: 9-10 minuti. Fate bollire circa 1 litro di acqua salata per ogni 100g di pasta."
+        "gs1:preparationInstructions": {
+          "@value": "Tempo di cottura: 9-10 minuti. Fate bollire circa 1 litro di acqua salata per ogni 100g di pasta.",
+          "@language": "it"
+        }
       },
       "offers": {
-        "@type": "schema:Offer",
+        "@type": [
+          "schema:Offer",
+          "gs1:Offer"
+        ],
         "schema:price": 3.34,
         "schema:priceCurrency": "EUR",
         "schema:availability": {
@@ -3418,14 +5167,20 @@
         "schema:itemCondition": {
           "@id": "schema:NewCondition"
         },
-        "schema:seller": {
-          "@type": "schema:Organization",
-          "schema:name": "Catalogo Smart"
+        "gs1:seller": {
+          "@type": "gs1:Organization",
+          "gs1:organizationName": {
+            "@value": "Catalogo Smart",
+            "@language": "it"
+          }
         },
-        "schema:priceSpecification": {
-          "@type": "schema:PriceSpecification",
-          "schema:price": 3.34,
-          "schema:priceCurrency": "EUR",
+        "gs1:priceSpecification": {
+          "@type": [
+            "schema:PriceSpecification",
+            "gs1:PriceSpecification"
+          ],
+          "gs1:price": 3.34,
+          "gs1:priceCurrency": "EUR",
           "schema:valueAddedTaxIncluded": true
         }
       }

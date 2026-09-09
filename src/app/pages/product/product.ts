@@ -55,6 +55,13 @@ interface AllergenBadge {
   containmentKey: string;
 }
 
+/** Una riga "Contiene: X, Y, Z" / "Può contenere: A, B" — nomi già uniti in una frase, non un
+ * pillola per allergene che ripete la parola "Contiene" N volte. */
+interface AllergenGroup {
+  containmentKey: string;
+  names: string;
+}
+
 interface NutritionRow {
   labelKey: string;
   value: string;
@@ -199,6 +206,11 @@ export class ProductComponent implements OnDestroy {
   });
 
   // Controparte leggibile di gs1:hasAllergen — stessa fonte del JSON-LD, non testo separato.
+  // Il JSON-LD dichiara sempre tutti i 14 allergeni UE (anche i FREE_FROM, per completezza
+  // machine-readable — vedi buildAllergens() nello script che popola rawGs1Data), ma qui si
+  // mostrano solo CONTAINS/MAY_CONTAIN: un'etichetta reale non elenca mai gli allergeni assenti,
+  // solo quelli presenti o possibili — un badge "Senza X" per ognuno dei 14 sarebbe rumore, non
+  // informazione.
   allergenBadges = computed<AllergenBadge[]>(() => {
     const details = this.product()?.rawGs1Data?.['gs1:hasAllergen'];
     if (!Array.isArray(details)) return [];
@@ -206,11 +218,28 @@ export class ProductComponent implements OnDestroy {
       .map((d: any): AllergenBadge | null => {
         const code = String(d?.['gs1:allergenType']?.['@id'] ?? '').replace('gs1:AllergenTypeCode-', '');
         const containment = String(d?.['gs1:allergenLevelOfContainmentCode']?.['@id'] ?? '').replace('gs1:LevelOfContainmentCode-', '');
+        if (containment === 'FREE_FROM') return null;
         const labelKey = ALLERGEN_CODE_KEYS[code];
         const containmentKey = CONTAINMENT_KEYS[containment];
         return labelKey && containmentKey ? { code, containment, labelKey, containmentKey } : null;
       })
       .filter((b: AllergenBadge | null): b is AllergenBadge => b !== null);
+  });
+
+  // "Contiene: Grano, Glutine, Uova, Latte." invece di quattro pillole che ripetono ognuna la
+  // parola "Contiene" — più vicino a come si legge davvero un'etichetta.
+  allergenGroups = computed<AllergenGroup[]>(() => {
+    const badges = this.allergenBadges();
+    const order = ['CONTAINS', 'MAY_CONTAIN'];
+    return order
+      .map((containment) => ({
+        containmentKey: CONTAINMENT_KEYS[containment],
+        names: badges
+          .filter((b) => b.containment === containment)
+          .map((b) => this.t('product.' + b.labelKey))
+          .join(', '),
+      }))
+      .filter((group) => group.names.length > 0);
   });
 
   // Righe della tabella valori nutrizionali, in ordine di etichetta — un unico posto dove

@@ -130,18 +130,17 @@
               </h2>
               @if (isSectionOpen('allergens')) {
                 <div class="accordion-body" id="section-allergens">
-                  @if (prod.food?.allergens) {
-                    <p>{{ prod.food.allergens }}</p>
-                  }
-                  @if (allergenBadges().length) {
-                    <ul class="allergen-badges">
-                      @for (badge of allergenBadges(); track badge.code) {
-                        <li class="allergen-badge" [class.allergen-badge--contains]="badge.containment === 'CONTAINS'">
-                          <span class="allergen-badge-name">{{ t('product.' + badge.labelKey) }}</span>
-                          <span class="allergen-badge-level">{{ t('product.' + badge.containmentKey) }}</span>
+                  @if (allergenGroups().length) {
+                    <ul class="allergen-summary">
+                      @for (group of allergenGroups(); track group.containmentKey) {
+                        <li class="allergen-line" [class.allergen-line--contains]="group.containmentKey === 'allergenContains'">
+                          <strong>{{ t('product.' + group.containmentKey) }}:</strong> {{ group.names }}
                         </li>
                       }
                     </ul>
+                  }
+                  @if (prod.food?.allergens) {
+                    <p class="allergen-note">{{ prod.food.allergens }}</p>
                   }
                 </div>
               }
