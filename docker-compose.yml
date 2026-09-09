@@ -14,13 +14,20 @@
 # Il business-agent non ha un router Traefik: vive solo sulla rete Docker.
 
 services:
+  # Traefik per l'ambiente locale, dove questo stack è l'unico sulla macchina.
+  # In produzione questo sito convive sul droplet con poc-lab.gs1it.dev (branch main,
+  # clonato in un'altra directory) e la porta 80 è una: il reverse proxy è lo stack
+  # condiviso `edge/`, che sta nel branch main e va avviato una volta sola da lì. Qui il
+  # servizio NON deve partire — da cui il profilo. In locale si accende mettendo
+  # `COMPOSE_PROFILES=edge` nel proprio .env (vedi .env.example).
   traefik:
+    profiles: ["edge"]
     image: traefik:v3.7
     restart: unless-stopped
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=gs1-web
+      - --providers.docker.network=catalogosmart-web
       - --entrypoints.web.address=:80
       - --log.level=INFO
       - --accesslog=true
@@ -57,11 +64,25 @@ services:
       retries: 5
     labels:
       traefik.enable: "true"
-      traefik.http.services.webshop.loadbalancer.server.port: "80"
+      # Su quale rete Traefik deve raggiungere questo container: lo Traefik di `edge/` è
+      # connesso anche alla rete di poc-lab.gs1it.dev e non ha un default globale.
+      traefik.docker.network: "catalogosmart-web"
+      # Il prefisso `smart-` non è cosmetico: router, servizi e middleware sono nomi
+      # globali in Traefik, non per container, e lo stack di poc-lab.gs1it.dev dichiara
+      # già `webshop`. Verificato che cosa succede senza prefisso, con due container che
+      # dichiarano lo stesso nome di router e regole Host diverse: Traefik non ne sceglie
+      # uno e non li bilancia — scarta la configurazione e NESSUNO dei due siti risponde
+      # più (404 su entrambi i domini). Nei log:
+      #   ERR HTTP router defined multiple times with different configurations
+      #       routerName=webshop-tls providerName=docker
+      # Il bilanciamento a rotazione avviene solo quando le due configurazioni sono
+      # identiche: è il meccanismo con cui funziona `--scale`, ma qui le regole Host
+      # differiscono per definizione.
+      traefik.http.services.smart-webshop.loadbalancer.server.port: "80"
       # In locale nessun dominio: catch-all su qualsiasi Host (http://localhost).
-      # In produzione il router `webshop-tls` con regola Host ha priorità più alta.
-      traefik.http.routers.webshop.entrypoints: "web"
-      traefik.http.routers.webshop.rule: "PathPrefix(`/`)"
+      # In produzione il router `smart-webshop-tls` con regola Host ha priorità più alta.
+      traefik.http.routers.smart-webshop.entrypoints: "web"
+      traefik.http.routers.smart-webshop.rule: "PathPrefix(`/`)"
 
   # Agente commerciale: Google ADK + A2A + UCP, modello Gemini su Vertex AI.
   business-agent:
@@ -114,19 +135,30 @@ services:
       - business-agent
     labels:
       traefik.enable: "true"
-      traefik.http.services.chat-client.loadbalancer.server.port: "3000"
+      # Su quale rete Traefik deve raggiungere questo container: lo Traefik di `edge/` è
+      # connesso anche alla rete di poc-lab.gs1it.dev e non ha un default globale.
+      traefik.docker.network: "catalogosmart-web"
+      # Prefisso `smart-`: vedi il commento sui nomi globali nel webshop qui sopra.
+      traefik.http.services.smart-chat-client.loadbalancer.server.port: "3000"
       # Regole più lunghe del catch-all del webshop: Traefik dà loro priorità automatica.
-      traefik.http.routers.chat-client.entrypoints: "web"
-      traefik.http.routers.chat-client.rule: "PathPrefix(`/assistente`) || PathPrefix(`/api`)"
-      traefik.http.routers.chat-client.middlewares: "assistente-trailing-slash"
+      traefik.http.routers.smart-chat-client.entrypoints: "web"
+      traefik.http.routers.smart-chat-client.rule: "PathPrefix(`/assistente`) || PathPrefix(`/api`)"
+      traefik.http.routers.smart-chat-client.middlewares: "smart-assistente-trailing-slash"
       # Vite serve l'app solo su /assistente/ (con la barra finale) e non redirige da solo:
       # senza questo, il link "Assistente" del sito finirebbe su un 404. $$ sfugge
       # l'interpolazione di compose, a Traefik arriva ${1}.
-      traefik.http.middlewares.assistente-trailing-slash.redirectregex.regex: "^(https?://[^/]+)/assistente$$"
-      traefik.http.middlewares.assistente-trailing-slash.redirectregex.replacement: "$${1}/assistente/"
+      traefik.http.middlewares.smart-assistente-trailing-slash.redirectregex.regex: "^(https?://[^/]+)/assistente$$"
+      traefik.http.middlewares.smart-assistente-trailing-slash.redirectregex.replacement: "$${1}/assistente/"
 
 networks:
   web:
     # Nome esplicito: Traefik risolve `--providers.docker.network` sul nome reale della
     # rete Docker, che altrimenti sarebbe prefissato col nome del progetto compose.
-    name: gs1-web
+    #
+    # Rete propria, distinta da quella di poc-lab.gs1it.dev, e non è un vezzo: i nomi di
+    # servizio sono uguali nei due stack (webshop, business-agent, chat-client) e su una
+    # rete condivisa esisterebbero due volte nel DNS di Docker. `CATALOG_URL: http://webshop`
+    # risolverebbe a caso, e l'agente di questo sito finirebbe a leggere il catalogo
+    # dell'altro. Lo stack `edge/` la dichiara `external` per attaccarvisi; qui resta
+    # creata e gestita da compose, così in locale non serve crearla a mano.
+    name: catalogosmart-web

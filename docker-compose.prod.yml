@@ -1,67 +1,59 @@
-# Override di produzione (droplet DigitalOcean): aggiunge HTTPS con certificati
-# Let's Encrypt automatici e redirect 80 → 443.
+# Override di produzione (droplet DigitalOcean): aggiunge i router HTTPS del dominio.
 #
-#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build webshop
 #
-# Richiede un file .env con almeno WEBSHOP_HOST, ACME_EMAIL e SITE_URL (vedi .env.example),
-# e i record DNS del dominio già puntati all'IP del droplet: senza risoluzione DNS
-# corretta la challenge HTTP-01 di Let's Encrypt fallisce.
+# A differenza del branch main, qui NON c'è il servizio traefik: sul droplet questo sito
+# convive con poc-lab.gs1it.dev e il reverse proxy è lo stack condiviso `edge/`, che vive
+# nel branch main e si avvia una volta sola da lì. Di conseguenza ACME_EMAIL non serve nel
+# .env di questo stack — i certificati li chiede Traefik con il resolver nominato qui sotto.
+#
+# Richiede un .env con WEBSHOP_HOST e SITE_URL (vedi .env.example) e il record DNS del
+# dominio già puntato all'IP del droplet: senza risoluzione corretta la challenge HTTP-01
+# di Let's Encrypt fallisce.
+#
+# Il sito gira col solo `webshop`: l'assistente AI (chat-client + business-agent) resta
+# spento di proposito — la voce di menu è già nascosta lato Angular, la quota Vertex è in
+# Dynamic Shared Quota condivisa con l'agente dell'altro sito, e per far crawlare il
+# catalogo dai bot AI serve solo nginx. Per accenderlo un domani basta aggiungere
+# `chat-client business-agent` alla riga di `up`: le label sono già pronte.
 
 services:
-  traefik:
-    # `command` viene sostituito interamente dall'override (non concatenato): qui va
-    # ripetuta anche la configurazione già presente nel file base.
-    command:
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=gs1-web
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      # Tutto il traffico in chiaro viene rediretto su HTTPS. La challenge ACME resta
-      # comunque servita: Traefik la gestisce prima del redirect.
-      - --entrypoints.web.http.redirections.entryPoint.to=websecure
-      - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.redirections.entryPoint.permanent=true
-      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?ACME_EMAIL non impostata}
-      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.le.acme.httpchallenge=true
-      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
-      # Decommentare per provare la configurazione senza consumare i rate limit di
-      # Let's Encrypt (i certificati staging non sono validi per i browser):
-      # - --certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
-      - --log.level=INFO
-      - --accesslog=true
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      # acme.json deve sopravvivere ai redeploy, altrimenti a ogni `up` si riemettono
-      # i certificati e si finisce contro i rate limit di Let's Encrypt.
-      - traefik_letsencrypt:/letsencrypt
-
   webshop:
     build:
       args:
         SITE_URL: ${SITE_URL:?SITE_URL non impostata}
     labels:
       traefik.enable: "true"
-      traefik.http.services.webshop.loadbalancer.server.port: "80"
-      traefik.http.routers.webshop-tls.rule: "Host(`${WEBSHOP_HOST:?WEBSHOP_HOST non impostata}`)"
-      traefik.http.routers.webshop-tls.entrypoints: "websecure"
-      traefik.http.routers.webshop-tls.tls: "true"
-      traefik.http.routers.webshop-tls.tls.certresolver: "le"
+      traefik.docker.network: "catalogosmart-web"
+      traefik.http.services.smart-webshop.loadbalancer.server.port: "80"
+      traefik.http.routers.smart-webshop-tls.rule: "Host(`${WEBSHOP_HOST:?WEBSHOP_HOST non impostata}`)"
+      traefik.http.routers.smart-webshop-tls.entrypoints: "websecure"
+      traefik.http.routers.smart-webshop-tls.tls: "true"
+      traefik.http.routers.smart-webshop-tls.tls.certresolver: "le"
 
+      # ── www → apex, da attivare quando il DNS di www esiste ─────────────────
+      # Il canonico è l'apex (`catalogosmart.it`): è quello che finisce in SITE_URL, e
+      # quindi in sitemap.xml, nei rel=canonical, nel JSON-LD e nel feed /catalog.
+      # Le tre righe sotto vanno decommentate SOLO dopo aver creato il record di
+      # www.catalogosmart.it: finché non risolve, includerlo nella regola Host fa fallire
+      # la challenge HTTP-01 di quel nome e Let's Encrypt non emette il certificato —
+      # nemmeno per l'apex, perché è un unico ordine per tutti i nomi del router.
+      #
+      # traefik.http.routers.smart-webshop-tls.rule: "Host(`${WEBSHOP_HOST}`) || Host(`www.${WEBSHOP_HOST}`)"
+      # traefik.http.routers.smart-webshop-tls.middlewares: "smart-www-to-apex"
+      # traefik.http.middlewares.smart-www-to-apex.redirectregex.regex: "^https?://www\\.(.+)"
+      # traefik.http.middlewares.smart-www-to-apex.redirectregex.replacement: "https://$${1}"
+      # traefik.http.middlewares.smart-www-to-apex.redirectregex.permanent: "true"
+
+  # Spento in produzione (vedi intestazione): le label restano pronte per il giorno in cui
+  # si vuole pubblicare anche l'assistente su questo dominio.
   chat-client:
     labels:
       traefik.enable: "true"
-      traefik.http.services.chat-client.loadbalancer.server.port: "3000"
-      traefik.http.routers.chat-client-tls.rule: "Host(`${WEBSHOP_HOST}`) && (PathPrefix(`/assistente`) || PathPrefix(`/api`))"
-      traefik.http.routers.chat-client-tls.entrypoints: "websecure"
-      traefik.http.routers.chat-client-tls.tls: "true"
-      traefik.http.routers.chat-client-tls.tls.certresolver: "le"
-      # Stesso redirect /assistente → /assistente/ del file base (vedi il commento lì).
-      traefik.http.routers.chat-client-tls.middlewares: "assistente-trailing-slash"
-
-volumes:
-  traefik_letsencrypt:
+      traefik.docker.network: "catalogosmart-web"
+      traefik.http.services.smart-chat-client.loadbalancer.server.port: "3000"
+      traefik.http.routers.smart-chat-client-tls.rule: "Host(`${WEBSHOP_HOST}`) && (PathPrefix(`/assistente`) || PathPrefix(`/api`))"
+      traefik.http.routers.smart-chat-client-tls.entrypoints: "websecure"
+      traefik.http.routers.smart-chat-client-tls.tls: "true"
+      traefik.http.routers.smart-chat-client-tls.tls.certresolver: "le"
+      traefik.http.routers.smart-chat-client-tls.middlewares: "smart-assistente-trailing-slash"
