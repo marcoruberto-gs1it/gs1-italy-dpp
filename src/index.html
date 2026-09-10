@@ -30,6 +30,19 @@
       } catch {}
     })();
   </script>
+  <!-- Google Analytics 4. Come il meta di Search Console qui sopra, sta nell'head comune:
+       vale così per tutte le pagine prerenderizzate senza ripeterlo altrove. Caricato async
+       e messo dopo lo script del tema, che deve restare il primo a girare per non far
+       lampeggiare la pagina al primo paint. -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YXXHX7C04F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-YXXHX7C04F');
+  </script>
 </head>
 <body>
   <app-root></app-root>
