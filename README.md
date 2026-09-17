@@ -12,8 +12,8 @@ scheda pubblicata da `/admin` quando esiste.
 ## Struttura del progetto
 
 - **Frontend** (root) — Angular 22 (standalone, signals, SSR/prerendering), IT/EN.
-- **`registry-api/`** — backend Node/Express/TypeScript: CRUD delle schede DPP (SQLite) dietro
-  password, più la pubblicazione verso un registro UE di riferimento
+- **`registry-api/`** — backend Node/Express/TypeScript: CRUD delle schede DPP (Postgres,
+  Supabase) dietro password, più la pubblicazione verso un registro UE di riferimento
   ([CIRPASS-2/mock-eu-registry](https://github.com/CIRPASS-2/mock-eu-registry)) via OAuth2
   client-credentials (Auth0).
 
@@ -26,7 +26,7 @@ src/app/
   i18n/        dizionario IT/EN
 
 registry-api/src/
-  db.ts               SQLite (better-sqlite3): le schede DPP
+  db.ts               Postgres (Supabase): le schede DPP
   auth.ts              sbarramento a password per /admin
   routes/dpp.ts        CRUD + pubblicazione (autenticato)
   routes/public.ts      lettura pubblica per GTIN (usata dalle pagine prodotto)
@@ -52,12 +52,16 @@ npm install
 npm run dev       # http://localhost:4310 — legge il .env della radice del repo
 ```
 
-Senza altra configurazione, `/admin` funziona per intero (login, creare/modificare/eliminare
-schede) usando solo un `REGISTRY_ADMIN_PASSWORD` locale. Solo il pulsante "Pubblica" richiede
-Supabase/Auth0/Render: vedi **[docs/REGISTRY-SETUP.md](docs/REGISTRY-SETUP.md)** per la
-configurazione passo-passo, con tutte le insidie già risolte.
+`registry-api` richiede sempre un Postgres (`REGISTRY_DATABASE_URL`, un progetto Supabase
+gratuito basta) per i dati delle schede — vedi **[docs/REGISTRY-SETUP.md](docs/REGISTRY-SETUP.md)**.
+Senza il resto della configurazione (`AUTH0_*`, `MOCK_EU_REGISTRY_URL`), `/admin` funziona
+comunque per intero (login, creare/modificare/eliminare schede): solo il pulsante "Pubblica"
+fallisce con un errore esplicito finché non è configurato.
 
 ## Deploy
 
-Docker Compose (Traefik + `webshop` + `registry-api`), vedi `docker-compose.yml`,
-`docker-compose.prod.yml` (override TLS) e `webshop/Dockerfile`.
+In produzione `webshop` e `registry-api` girano come due Web Service Docker separati su
+Render (piano gratuito), non con Docker Compose — vedi **[docs/DEPLOY.md](docs/DEPLOY.md)**
+per la guida passo-passo. `docker-compose.yml` resta solo per lo sviluppo locale (riproduce
+lo stesso instradamento same-origin di produzione via Traefik, comodo per non dover
+configurare CORS neanche in locale).

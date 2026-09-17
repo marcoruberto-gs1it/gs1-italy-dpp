@@ -29,6 +29,14 @@ RUN npm run build
 FROM nginx:1.29-alpine
 
 COPY --from=build /app/dist/gs1-catalog/browser /usr/share/nginx/html
-COPY webshop/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Template invece di conf.d/default.conf diretto: l'immagine ufficiale nginx sostituisce da
+# sola, a ogni avvio del container (non a build time), ogni ${VAR} che corrisponde a una
+# variabile d'ambiente realmente impostata — usato per instradare /registry-api (vedi
+# webshop/nginx.conf) verso l'URL del servizio registry-api, diverso tra locale/Traefik e
+# Render. Il default qui sotto vale per il docker-compose.yml locale, dove comunque non
+# viene mai raggiunto (Traefik instrada /registry-api prima che arrivi a questo container).
+COPY webshop/nginx.conf /etc/nginx/templates/default.conf.template
+ENV REGISTRY_API_URL=http://registry-api:4310
 
 EXPOSE 80

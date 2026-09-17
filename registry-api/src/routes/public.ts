@@ -6,8 +6,8 @@ import { getPublishedByGtin } from '../db.ts';
  * catalogo statico (products.json). Solo lettura, solo schede già pubblicate. */
 export const publicRouter = Router();
 
-publicRouter.get('/dpp/:gtin', (req, res) => {
-  const record = getPublishedByGtin(req.params.gtin);
+publicRouter.get('/dpp/:gtin', async (req, res) => {
+  const record = await getPublishedByGtin(req.params.gtin);
   if (!record) {
     res.status(404).json({ error: 'nessuna scheda pubblicata per questo GTIN' });
     return;

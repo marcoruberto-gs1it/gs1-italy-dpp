@@ -27,12 +27,12 @@ function validateInput(body: unknown): string | null {
   return null;
 }
 
-dppRouter.get('/', (_req, res) => {
-  res.json(listDpp());
+dppRouter.get('/', async (_req, res) => {
+  res.json(await listDpp());
 });
 
-dppRouter.get('/:id', (req, res) => {
-  const record = getDpp(req.params.id);
+dppRouter.get('/:id', async (req, res) => {
+  const record = await getDpp(req.params.id);
   if (!record) {
     res.status(404).json({ error: 'scheda non trovata' });
     return;
@@ -40,18 +40,18 @@ dppRouter.get('/:id', (req, res) => {
   res.json(record);
 });
 
-dppRouter.post('/', (req, res) => {
+dppRouter.post('/', async (req, res) => {
   const error = validateInput(req.body);
   if (error) {
     res.status(400).json({ error });
     return;
   }
-  const record = createDpp(req.body);
+  const record = await createDpp(req.body);
   res.status(201).json(record);
 });
 
-dppRouter.put('/:id', (req, res) => {
-  const existing = getDpp(req.params.id);
+dppRouter.put('/:id', async (req, res) => {
+  const existing = await getDpp(req.params.id);
   if (!existing) {
     res.status(404).json({ error: 'scheda non trovata' });
     return;
@@ -65,11 +65,11 @@ dppRouter.put('/:id', (req, res) => {
     res.status(400).json({ error });
     return;
   }
-  res.json(updateDpp(req.params.id, req.body));
+  res.json(await updateDpp(req.params.id, req.body));
 });
 
-dppRouter.delete('/:id', (req, res) => {
-  const deleted = deleteDpp(req.params.id);
+dppRouter.delete('/:id', async (req, res) => {
+  const deleted = await deleteDpp(req.params.id);
   if (!deleted) {
     res.status(404).json({ error: 'scheda non trovata' });
     return;
@@ -78,7 +78,7 @@ dppRouter.delete('/:id', (req, res) => {
 });
 
 dppRouter.post('/:id/publish', async (req, res) => {
-  const record = getDpp(req.params.id);
+  const record = await getDpp(req.params.id);
   if (!record) {
     res.status(404).json({ error: 'scheda non trovata' });
     return;
@@ -89,7 +89,7 @@ dppRouter.post('/:id/publish', async (req, res) => {
   }
   try {
     const { registryId, proofJwt } = await registerDpp(record);
-    res.json(markPublished(record.id, registryId, proofJwt));
+    res.json(await markPublished(record.id, registryId, proofJwt));
   } catch (err) {
     res.status(502).json({ error: err instanceof Error ? err.message : 'errore sconosciuto durante la pubblicazione' });
   }

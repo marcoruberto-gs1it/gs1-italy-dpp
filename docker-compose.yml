@@ -1,10 +1,13 @@
-# Stack base — è quello che gira in locale (solo HTTP, nessun certificato).
-# In produzione si aggiunge docker-compose.prod.yml, che attiva HTTPS/Let's Encrypt:
+# Stack di SVILUPPO LOCALE (solo HTTP, nessun certificato) — non usato in produzione: il
+# deploy vero gira su Render come due Web Service Docker indipendenti (vedi
+# docs/DEPLOY.md), non con questo compose. Qui serve solo a riprodurre in locale lo stesso
+# instradamento same-origin che in produzione fa nginx (vedi il blocco `/registry-api` in
+# webshop/nginx.conf) tramite Traefik, comodo per non dover configurare CORS neanche in
+# sviluppo.
 #
-#   locale:      docker compose up -d --build
-#   produzione:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#   docker compose up -d --build
 #
-# Tre servizi dietro un unico Traefik, tutti sullo stesso dominio (niente CORS):
+# Due servizi dietro un unico Traefik, tutti sullo stesso dominio (niente CORS):
 #
 #   /             → webshop         nginx con l'Angular prerenderizzato
 #   /registry-api → registry-api    CRUD schede DPP + pubblicazione su mock-eu-registry
@@ -15,12 +18,11 @@
 # sulla rete Docker.
 
 services:
-  # Traefik per l'ambiente locale, dove questo stack è l'unico sulla macchina.
-  # In produzione questo sito convive sul droplet con poc-lab.gs1it.dev (branch main,
-  # clonato in un'altra directory) e la porta 80 è una: il reverse proxy è lo stack
-  # condiviso `edge/`, che sta nel branch main e va avviato una volta sola da lì. Qui il
-  # servizio NON deve partire — da cui il profilo. In locale si accende mettendo
-  # `COMPOSE_PROFILES=edge` nel proprio .env (vedi .env.example).
+  # Traefik locale — unico servizio di questo file con una porta pubblicata sull'host (vedi
+  # `ports:` sotto): si accende mettendo `COMPOSE_PROFILES=edge` nel proprio .env (vedi
+  # .env.example). Senza, webshop/registry-api restano irraggiungibili da fuori Docker — per
+  # sviluppare senza Docker si usa invece `npm start` + `registry-api/npm run dev` (vedi
+  # README.md), che non passano da qui.
   traefik:
     profiles: ["edge"]
     image: traefik:v3.7
@@ -82,8 +84,9 @@ services:
       traefik.http.routers.smart-webshop.entrypoints: "web"
       traefik.http.routers.smart-webshop.rule: "PathPrefix(`/`)"
 
-  # Sezione admin DPP: CRUD delle schede (SQLite locale) + pubblicazione su mock-eu-registry
-  # (chiamata in uscita, non sulla rete Docker — vedi commento in cima al file).
+  # Sezione admin DPP: CRUD delle schede (Postgres Supabase, tabella separata da mock-eu-registry)
+  # + pubblicazione su mock-eu-registry (chiamata in uscita, non sulla rete Docker — vedi
+  # commento in cima al file).
   registry-api:
     build:
       context: ./registry-api
@@ -91,10 +94,10 @@ services:
     restart: unless-stopped
     networks:
       - web
-    volumes:
-      - registry-api-data:/data
     environment:
       SITE_URL: "${SITE_URL:-http://localhost}"
+      # Dati delle schede DPP — vedi docs/REGISTRY-SETUP.md.
+      REGISTRY_DATABASE_URL: "${REGISTRY_DATABASE_URL:?REGISTRY_DATABASE_URL non impostata}"
       # Sbarramento a password davanti a /registry-api (vedi registry-api/src/auth.ts).
       # Vuota = accesso libero: in locale si lavora senza login, in produzione si valorizza.
       REGISTRY_ADMIN_PASSWORD: "${REGISTRY_ADMIN_PASSWORD:-}"
@@ -126,8 +129,3 @@ networks:
     # per attaccarvisi; qui resta creata e gestita da compose, così in locale non serve
     # crearla a mano.
     name: catalogosmart-web
-
-volumes:
-  # Le schede DPP (bozze e pubblicate) sopravvivono a un `docker compose down` — solo un
-  # `-v` esplicito le cancella.
-  registry-api-data:
