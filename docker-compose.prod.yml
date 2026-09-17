@@ -11,11 +11,8 @@
 # dominio già puntato all'IP del droplet: senza risoluzione corretta la challenge HTTP-01
 # di Let's Encrypt fallisce.
 #
-# Il sito gira col solo `webshop`: l'assistente AI (chat-client + business-agent) resta
-# spento di proposito — la voce di menu è già nascosta lato Angular, la quota Vertex è in
-# Dynamic Shared Quota condivisa con l'agente dell'altro sito, e per far crawlare il
-# catalogo dai bot AI serve solo nginx. Per accenderlo un domani basta aggiungere
-# `chat-client business-agent` alla riga di `up`: le label sono già pronte.
+# Il sito gira con `webshop` + `registry-api`: per far crawlare il catalogo dai bot AI serve
+# solo nginx, `registry-api` serve la sezione admin (/admin, /registry-api).
 
 services:
   webshop:
@@ -33,7 +30,7 @@ services:
 
       # ── www → apex, da attivare quando il DNS di www esiste ─────────────────
       # Il canonico è l'apex (`catalogosmart.it`): è quello che finisce in SITE_URL, e
-      # quindi in sitemap.xml, nei rel=canonical, nel JSON-LD e nel feed /catalog.
+      # quindi in sitemap.xml, nei rel=canonical e nel JSON-LD.
       # Le tre righe sotto vanno decommentate SOLO dopo aver creato il record di
       # www.catalogosmart.it: finché non risolve, includerlo nella regola Host fa fallire
       # la challenge HTTP-01 di quel nome e Let's Encrypt non emette il certificato —
@@ -45,15 +42,14 @@ services:
       # traefik.http.middlewares.smart-www-to-apex.redirectregex.replacement: "https://$${1}"
       # traefik.http.middlewares.smart-www-to-apex.redirectregex.permanent: "true"
 
-  # Spento in produzione (vedi intestazione): le label restano pronte per il giorno in cui
-  # si vuole pubblicare anche l'assistente su questo dominio.
-  chat-client:
+  registry-api:
+    build:
+      context: ./registry-api
     labels:
       traefik.enable: "true"
       traefik.docker.network: "catalogosmart-web"
-      traefik.http.services.smart-chat-client.loadbalancer.server.port: "3000"
-      traefik.http.routers.smart-chat-client-tls.rule: "Host(`${WEBSHOP_HOST}`) && (PathPrefix(`/assistente`) || PathPrefix(`/api`))"
-      traefik.http.routers.smart-chat-client-tls.entrypoints: "websecure"
-      traefik.http.routers.smart-chat-client-tls.tls: "true"
-      traefik.http.routers.smart-chat-client-tls.tls.certresolver: "le"
-      traefik.http.routers.smart-chat-client-tls.middlewares: "smart-assistente-trailing-slash"
+      traefik.http.services.smart-registry-api.loadbalancer.server.port: "4310"
+      traefik.http.routers.smart-registry-api-tls.rule: "Host(`${WEBSHOP_HOST}`) && PathPrefix(`/registry-api`)"
+      traefik.http.routers.smart-registry-api-tls.entrypoints: "websecure"
+      traefik.http.routers.smart-registry-api-tls.tls: "true"
+      traefik.http.routers.smart-registry-api-tls.tls.certresolver: "le"

@@ -1,39 +1,50 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, computed, effect, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { Product, ProductService, discountPercent, formatEuro } from '../../services/product.service';
-import { UiStateService } from '../../services/ui-state.service';
+import { QRCodeComponent } from 'angularx-qrcode';
+import { IconComponent } from '../../components/icon/icon';
+import { Sector, SECTORS, localizeSector } from '../../data/sectors';
 import { I18nService } from '../../services/i18n.service';
-import { onImageError } from '../../utils/image-fallback';
+import { LanguageService } from '../../services/language.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
 import { setSocialMeta } from '../../utils/social-meta';
 
-// Unico settore mostrato per ora (vedi discussione branch "catalogo-smart"): il resto del
-// catalogo tornerà una volta decisi i prodotti da includere.
-const VISIBLE_SECTOR_ID = 'fmcg';
+const AUTOPLAY_INTERVAL_MS = 5000;
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, IconComponent, QRCodeComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnDestroy {
-  protected uiState = inject(UiStateService);
   protected t = inject(I18nService).t;
-  private productService = inject(ProductService);
+  private languageService = inject(LanguageService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
-  private siteOrigin = inject(SiteOriginService);
+  protected siteOrigin = inject(SiteOriginService);
   private structuredData = inject(StructuredDataService);
+  private platformId = inject(PLATFORM_ID);
+  /** angularx-qrcode manipola direttamente il DOM (canvas/SVG): non è compatibile col
+   * rendering lato server, quindi il codice QR reale compare solo dopo l'idratazione. */
+  protected isBrowser = isPlatformBrowser(this.platformId);
 
-  protected onImageError = onImageError;
-  protected discountPercent = discountPercent;
-  protected formatEuro = formatEuro;
+  /** I settori target del progetto DPP, nella lingua corrente — anche fonte delle card del
+   * carosello di anteprima nella hero (un settore = una card), niente dati duplicati. */
+  sectors = computed<Sector[]>(() => SECTORS.map((s) => localizeSector(s, this.languageService.lang())));
 
-  products = computed<Product[]>(() => this.productService.getProductsBySector(VISIBLE_SECTOR_ID));
+  protected activeIndex = signal(0);
+  protected activeCard = computed(() => this.sectors()[this.activeIndex()]);
+  protected autoplay = signal(true);
+  protected qrValue = computed(() => `${this.siteOrigin.value}/01/${this.activeCard().exampleGtin}`);
+  /** Element string GS1 mostrato nella card — AI (01) più l'eventuale AI aggiuntivo (es. lotto). */
+  protected elementString = computed(() => {
+    const card = this.activeCard();
+    return card.exampleExtraElement ? `(01) ${card.exampleGtin}\n${card.exampleExtraElement}` : `(01) ${card.exampleGtin}`;
+  });
+
+  private autoplayTimer?: ReturnType<typeof setInterval>;
 
   // Identità del sito come schema:WebSite — non presente altrove, e la home è l'unica pagina
   // dove ha senso pubblicarla una volta sola (le pagine prodotto/brand hanno già il proprio
@@ -60,9 +71,30 @@ export class Home implements OnDestroy {
     effect(() => {
       this.structuredData.apply('website-jsonld', this.websiteJsonLd());
     });
+
+    // Il carosello avanza da solo solo lato browser: durante il prerendering (Node, nessun
+    // event loop persistente da servire) un setInterval non serve e non andrebbe mai ripulito.
+    if (isPlatformBrowser(this.platformId)) {
+      this.autoplayTimer = setInterval(() => {
+        if (this.autoplay()) this.next();
+      }, AUTOPLAY_INTERVAL_MS);
+    }
+  }
+
+  next(): void {
+    this.activeIndex.update((i) => (i + 1) % this.sectors().length);
+  }
+
+  prev(): void {
+    this.activeIndex.update((i) => (i - 1 + this.sectors().length) % this.sectors().length);
+  }
+
+  toggleAutoplay(): void {
+    this.autoplay.update((v) => !v);
   }
 
   ngOnDestroy(): void {
     this.structuredData.remove('website-jsonld');
+    if (this.autoplayTimer) clearInterval(this.autoplayTimer);
   }
 }

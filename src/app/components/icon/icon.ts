@@ -32,7 +32,18 @@ export type IconName =
   | 'chart-bar'
   | 'award'
   | 'thermometer'
-  | 'leaf';
+  | 'leaf'
+  | 'battery'
+  | 'qr-code'
+  | 'link'
+  | 'play'
+  | 'pause'
+  | 'chevron-left'
+  | 'chevron-right'
+  | 'wheel'
+  | 'sofa'
+  | 'bed'
+  | 'cpu';
 
 @Component({
   selector: 'app-icon',

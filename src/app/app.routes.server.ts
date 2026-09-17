@@ -23,6 +23,12 @@ export const serverRoutes: ServerRoute[] = [
     }
   },
   {
+    // Sezione admin: dati privati dietro password, niente da prerenderizzare — vedi il
+    // blocco `location /admin` in webshop/nginx.conf per il fallback su index.csr.html.
+    path: 'admin',
+    renderMode: RenderMode.Client
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender
   }

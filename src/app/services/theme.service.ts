@@ -5,8 +5,7 @@ export type AppTheme = 'light' | 'dark';
 
 /**
  * Stessa chiave letta dallo script inline in src/index.html, che applica il tema prima del
- * primo paint per non far lampeggiare la pagina, e dal chat-client React su /assistente:
- * essendo sullo stesso dominio, la scelta fatta qui vale anche là e viceversa.
+ * primo paint per non far lampeggiare la pagina.
  */
 const STORAGE_KEY = 'gs1-theme';
 

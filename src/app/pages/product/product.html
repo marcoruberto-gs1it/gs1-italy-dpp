@@ -376,6 +376,63 @@
     </article>
 
     <app-json-ld-drawer [open]="jsonLdDrawerOpen()" [jsonLd]="jsonLdJson()" (closed)="closeJsonLd()"></app-json-ld-drawer>
+  } @else if (dppRecord(); as dpp) {
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+      <ol>
+        <li><a routerLink="/">{{ t('nav.home') }}</a></li>
+        <li class="separator">/</li>
+        <li class="current" aria-current="page">{{ dpp.name }}</li>
+      </ol>
+    </nav>
+
+    <article class="dpp-view gs-card">
+      <div class="dpp-view-head">
+        <span class="dpp-view-icon icon-flat" [style.--icon-color]="dppSector()?.brandColor">
+          <app-icon [name]="dppSector()?.icon ?? 'box'" [size]="30"></app-icon>
+        </span>
+        <div>
+          @if (dppSector(); as sector) {
+            <span class="dpp-view-eyebrow" [style.color]="sector.brandColor">{{ sector.shortName }}</span>
+          }
+          <h1 class="dpp-view-name">{{ dpp.name }}</h1>
+          <span class="gs-badge gs-badge--verified">
+            <app-icon name="check-circle" [size]="12"></app-icon>
+            {{ t('product.dppVerified') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="dpp-view-identity">
+        <span class="meta-chip">(01) {{ dpp.gtin }}</span>
+        @if (dpp.batchOrSerial) {
+          <span class="meta-chip">{{ dpp.batchOrSerial }}</span>
+        }
+        <span class="gs-badge gs-badge--neutral">{{ dpp.granularityLevel }}</span>
+      </div>
+
+      @if (dppSector(); as sector) {
+        <p class="dpp-view-description">{{ sector.description }}</p>
+      }
+
+      @if (dppAttributeEntries().length) {
+        <div class="dpp-view-facts">
+          @for (entry of dppAttributeEntries(); track entry[0]) {
+            <div class="fact-tile">
+              <span class="fact-label">{{ entry[0] }}</span>
+              <span class="fact-value">{{ entry[1] }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (dpp.registryId) {
+        <p class="dpp-view-registry">{{ t('product.dppRegistryId') }}: <code>{{ dpp.registryId }}</code></p>
+      }
+    </article>
+  } @else if (dppLoading()) {
+    <div class="not-found">
+      <p>{{ t('product.dppLoading') }}</p>
+    </div>
   } @else {
     <div class="not-found">
       <p>{{ t('product.notFound') }}</p>

@@ -1,52 +1,178 @@
-<div class="modern-container">
-  <section class="modern-hero">
-    <div class="hero-mesh" aria-hidden="true"></div>
+<section class="modern-hero">
+  <div class="hero-inner">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1>{{ t('hero.titleLine1') }}<br><span class="hero-highlight">{{ t('hero.titleHighlight') }}</span></h1>
+        <p>{{ t('hero.subtitle') }}</p>
 
-    <div class="hero-content">
-      <h1>{{ t('hero.titleLine1') }}<br><span class="gradient-text">{{ t('hero.titleHighlight') }}</span></h1>
-      <p>{{ t('hero.subtitle') }}</p>
-
-      <div class="hero-actions">
-        <button type="button" class="gs-btn gs-btn--primary hero-search-btn" (click)="uiState.openSearch()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          {{ t('hero.searchCta') }}
-          <span class="gs-kbd">/</span>
-        </button>
+        <div class="hero-actions">
+          <a href="#dpp" class="hero-pill hero-pill--primary">
+            <app-icon name="shield-check" [size]="18"></app-icon>
+            {{ t('hero.primaryCta') }}
+          </a>
+          <a href="#settori" class="hero-pill hero-pill--ghost">
+            <app-icon name="layers" [size]="18"></app-icon>
+            {{ t('hero.secondaryCta') }}
+          </a>
+        </div>
       </div>
+
+      <div class="hero-preview">
+        <div class="preview-card">
+          <div class="preview-top">
+            <div class="preview-image icon-flat" [style.--icon-color]="activeCard().brandColor">
+              <app-icon [name]="activeCard().icon" [size]="40"></app-icon>
+            </div>
+
+            <div class="preview-info">
+              <span class="preview-eyebrow" [style.color]="activeCard().brandColor">
+                {{ activeCard().shortName }}
+              </span>
+              <h3 class="preview-name">{{ activeCard().exampleName }}</h3>
+              <span class="preview-reg">{{ activeCard().regulationRef }}</span>
+              <span class="preview-gs1">{{ elementString() }}</span>
+              <div class="preview-chips">
+                <span class="gs-badge gs-badge--neutral">{{ t('heroPreview.digitalLinkChip') }}</span>
+                <span class="gs-badge gs-badge--neutral">{{ activeCard().dateLabel }}</span>
+              </div>
+            </div>
+
+            <div class="preview-qr">
+              <div class="preview-qr-box">
+                @if (isBrowser) {
+                  <qrcode
+                    [qrdata]="qrValue()"
+                    [width]="96"
+                    [margin]="1"
+                    elementType="svg"
+                    colorDark="#14101f"
+                    colorLight="#ffffff"
+                    errorCorrectionLevel="M"
+                  ></qrcode>
+                } @else {
+                  <div class="preview-qr-fallback">
+                    <app-icon name="qr-code" [size]="44"></app-icon>
+                  </div>
+                }
+              </div>
+              <span class="preview-qr-caption">{{ t('heroPreview.caption') }}</span>
+            </div>
+          </div>
+
+          <div class="preview-footer">
+            <span class="preview-counter">{{ activeIndex() + 1 }} / {{ sectors().length }}</span>
+            <div class="preview-controls">
+              <button type="button" class="preview-ctrl" (click)="prev()" [attr.aria-label]="t('heroPreview.prev')">
+                <app-icon name="chevron-left" [size]="16"></app-icon>
+              </button>
+              <button
+                type="button"
+                class="preview-ctrl preview-ctrl--main"
+                (click)="toggleAutoplay()"
+                [attr.aria-label]="autoplay() ? t('heroPreview.pause') : t('heroPreview.play')"
+              >
+                <app-icon [name]="autoplay() ? 'pause' : 'play'" [size]="15"></app-icon>
+              </button>
+              <button type="button" class="preview-ctrl" (click)="next()" [attr.aria-label]="t('heroPreview.next')">
+                <app-icon name="chevron-right" [size]="16"></app-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modern-container">
+  <section class="info-section" id="dpp">
+    <div class="section-head">
+      <span class="section-eyebrow">{{ t('dpp.eyebrow') }}</span>
+      <h2>{{ t('dpp.title') }}</h2>
+      <p>{{ t('dpp.intro') }}</p>
+    </div>
+
+    <ol class="dpp-steps">
+      <li class="dpp-step">
+        <span class="step-number">01</span>
+        <span class="step-icon icon-flat"><app-icon name="hash" [size]="20"></app-icon></span>
+        <h3>{{ t('dpp.step1Title') }}</h3>
+        <p>{{ t('dpp.step1Text') }}</p>
+      </li>
+      <li class="dpp-step">
+        <span class="step-number">02</span>
+        <span class="step-icon icon-flat"><app-icon name="qr-code" [size]="20"></app-icon></span>
+        <h3>{{ t('dpp.step2Title') }}</h3>
+        <p>{{ t('dpp.step2Text') }}</p>
+      </li>
+      <li class="dpp-step">
+        <span class="step-number">03</span>
+        <span class="step-icon icon-flat"><app-icon name="link" [size]="20"></app-icon></span>
+        <h3>{{ t('dpp.step3Title') }}</h3>
+        <p>{{ t('dpp.step3Text') }}</p>
+      </li>
+      <li class="dpp-step">
+        <span class="step-number">04</span>
+        <span class="step-icon icon-flat"><app-icon name="shield-check" [size]="20"></app-icon></span>
+        <h3>{{ t('dpp.step4Title') }}</h3>
+        <p>{{ t('dpp.step4Text') }}</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="info-section info-section--alt" id="normativa">
+    <div class="section-head">
+      <span class="section-eyebrow">{{ t('regulation.eyebrow') }}</span>
+      <h2>{{ t('regulation.title') }}</h2>
+      <p>{{ t('regulation.intro') }}</p>
+    </div>
+
+    <ol class="reg-timeline">
+      <li class="reg-item">
+        <span class="reg-date">{{ t('regulation.item1Date') }}</span>
+        <h3>{{ t('regulation.item1Title') }}</h3>
+        <p>{{ t('regulation.item1Text') }}</p>
+      </li>
+      <li class="reg-item">
+        <span class="reg-date">{{ t('regulation.item2Date') }}</span>
+        <h3>{{ t('regulation.item2Title') }}</h3>
+        <p>{{ t('regulation.item2Text') }}</p>
+      </li>
+      <li class="reg-item">
+        <span class="reg-date">{{ t('regulation.item3Date') }}</span>
+        <h3>{{ t('regulation.item3Title') }}</h3>
+        <p>{{ t('regulation.item3Text') }}</p>
+      </li>
+    </ol>
+
+    <p class="standards-note">
+      {{ t('regulation.standardsNote') }}
+    </p>
+    <div class="standards-badges">
+      <span class="gs-badge gs-badge--neutral">GS1 Digital Link</span>
+      <span class="gs-badge gs-badge--neutral">EPCIS 2.0</span>
+      <span class="gs-badge gs-badge--neutral">GS1 Web Vocabulary</span>
     </div>
   </section>
 
-  <section class="catalog-section" id="catalogo">
-    <ul class="catalog-grid">
-      @for (product of products(); track product.gtin) {
-        <li>
-          <article class="product-card">
-            <a [routerLink]="['/01', product.gtin]" class="card-link">
-              <div class="card-image-wrapper">
-                <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onImageError($event)">
-              </div>
-              <div class="card-body">
-                <span class="product-brand">{{ product.brand }}</span>
-                <h2 class="product-name">{{ product.name }}</h2>
-                <div class="card-price">
-                  @if (product.price; as price) {
-                    <span class="card-price-current">{{ formatEuro(price.amount) }}</span>
-                    @if (price.unit) {
-                      <span class="card-price-unit">/{{ price.unit }}</span>
-                    }
-                    @if (price.listAmount && discountPercent(price); as pct) {
-                      <span class="card-price-original">{{ formatEuro(price.listAmount) }}</span>
-                      <span class="card-price-discount">-{{ pct }}%</span>
-                    }
-                  }
-                </div>
-              </div>
-            </a>
-          </article>
-        </li>
-      } @empty {
-        <li class="empty-state">
-          <p>{{ t('hero.noProducts') }}</p>
+  <section class="info-section" id="settori">
+    <div class="section-head">
+      <span class="section-eyebrow">{{ t('sectorsSection.eyebrow') }}</span>
+      <h2>{{ t('sectorsSection.title') }}</h2>
+      <p>{{ t('sectorsSection.intro') }}</p>
+    </div>
+
+    <ul class="sector-grid">
+      @for (sector of sectors(); track sector.id) {
+        <li class="sector-card">
+          <span class="sector-icon icon-flat" [style.--icon-color]="sector.brandColor">
+            <app-icon [name]="sector.icon" [size]="20"></app-icon>
+          </span>
+          <div class="sector-body">
+            <h3>{{ sector.name }}</h3>
+            <p>{{ sector.description }}</p>
+            <span class="gs-badge gs-badge--neutral sector-date">{{ sector.dateLabel }}</span>
+          </div>
         </li>
       }
     </ul>

@@ -531,3 +531,88 @@
   gap: 16px;
   color: var(--text-tertiary);
 }
+
+/* --- Scheda DPP (creata in /admin, non nel catalogo statico) --- */
+.dpp-view {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dpp-view-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dpp-view-icon {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpp-view-eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.dpp-view-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.dpp-view-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.dpp-view-description {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dpp-view-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dpp-view-registry {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.dpp-view-registry code {
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 600px) {
+  .dpp-view {
+    padding: 24px;
+  }
+
+  .dpp-view-facts {
+    grid-template-columns: 1fr;
+  }
+}

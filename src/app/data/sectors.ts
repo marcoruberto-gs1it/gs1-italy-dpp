@@ -1,99 +1,257 @@
 import { AppLang } from '../services/language.service';
+import { IconName } from '../components/icon/icon';
 
 export interface Sector {
   id: string;
+  /** Nome completo, usato nella card del settore. */
   name: string;
-  icon: string;
+  /** Versione breve, per l'eyebrow della card di anteprima nella hero (deve stare su una riga). */
+  shortName: string;
+  /** Nome dell'icona in app-icon (vedi components/icon/icon.ts) — non un percorso immagine. */
+  icon: IconName;
   description: string;
+  /** Colore piatto usato per l'icona del settore (vedi .icon-flat in home.css) — niente gradienti. */
   brandColor: string;
+  /** Etichetta breve mostrata come badge sulla card, es. "Obbligo dal 18 febbraio 2027". */
+  dateLabel: string;
+  /** Riferimento normativo breve per la card di anteprima nella hero. */
+  regulationRef: string;
+  /** 'coming-soon': settore annunciato in homepage ma senza ancora prodotti pubblicati. */
+  status: 'live' | 'coming-soon';
+  /** Nome del prodotto di esempio nella card di anteprima — dato dimostrativo, non un prodotto reale. */
+  exampleName: string;
+  /** GTIN di esempio (14 cifre, dato dimostrativo) per QR e element string della card di anteprima. */
+  exampleGtin: string;
+  /** Riga aggiuntiva dell'element string GS1 (es. AI (10) per un lotto) — solo dove serve. */
+  exampleExtraElement?: string;
 }
 
+// Il sito riparte da zero sul Digital Product Passport (ESPR, Regolamento (UE) 2024/1781):
+// i settori del vecchio "Catalogo Smart" FMCG (largo consumo, foodservice, sanità, alimenti
+// freschi, costruzioni generiche) sono stati rimossi insieme ai relativi prodotti. Al loro posto,
+// la roadmap dei settori realmente impattati dal DPP: le batterie (Regolamento (UE) 2023/1542,
+// obbligo autonomo) e gli altri, che arrivano scaglionati attraverso gli atti delegati ESPR
+// (date dal working plan della Commissione, vedi ricerca di progetto — soggette a slittamenti).
 export const SECTORS: Sector[] = [
   {
-    id: 'fmcg',
-    name: 'Largo consumo',
-    icon: 'icons/cpg.png',
-    description: "Un solo codice a barre, letto in cassa, apre anche a prezzo, ingredienti, certificazioni e origine del prodotto — senza mai dover ristampare l'etichetta per aggiornarli.",
-    brandColor: '#F26334', // GS1 Orange
-  },
-  {
-    id: 'foodservice',
-    name: 'Foodservice',
-    icon: 'icons/foodservice.png',
-    description: "Lo stesso identificativo che gestisce l'acquisto professionale segue il prodotto dal fornitore alla cucina, con formati, quantità e dati logistici pensati per la ristorazione.",
-    brandColor: '#7AC143', // GS1 Grass
-  },
-  {
-    id: 'healthcare',
-    name: 'Sanità',
-    icon: 'icons/healthcare.png',
-    description: 'Il codice già presente su dispositivi e farmaci, tramite UDI e GS1 DataMatrix, diventa una via d\'accesso a informazioni di sicurezza del paziente e tracciabilità di filiera.',
-    brandColor: '#00B6DE', // GS1 Sky
+    id: 'battery',
+    name: 'Batterie',
+    shortName: 'Batterie',
+    icon: 'battery',
+    description:
+      'Passaporto obbligatorio per batterie EV, LMT e industriali sopra i 2 kWh: origine dei materiali, impronta di carbonio, stato di salute e cicli di ricarica, accessibili da un QR code sulla batteria.',
+    brandColor: '#0A84FF',
+    dateLabel: 'Obbligo dal 18 febbraio 2027',
+    regulationRef: 'Regolamento (UE) 2023/1542',
+    status: 'coming-soon',
+    exampleName: 'Modulo batteria EV — esempio',
+    exampleGtin: '08000000000017',
   },
   {
     id: 'apparel',
-    name: 'Abbigliamento',
-    icon: 'icons/textiles.png',
-    description: "Un solo identificativo racconta la storia del capo — materiali, provenienza e cura — dallo scaffale all'armadio, in modo trasparente e verificabile.",
-    brandColor: '#AF96D4', // GS1 Lavender
+    name: 'Tessile e abbigliamento',
+    shortName: 'Tessile',
+    icon: 'swatch',
+    description:
+      "Composizione delle fibre, processi produttivi, tracciabilità di filiera e riciclabilità, a partire dal lotto di produzione — non dal singolo capo.",
+    brandColor: '#AF96D4',
+    dateLabel: 'Atto delegato atteso 2027',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Capo — esempio',
+    exampleGtin: '08000000000024',
+    exampleExtraElement: '(10) LOTTO2027A',
   },
   {
-    id: 'fresh-foods',
-    name: 'Alimenti freschi',
-    icon: 'icons/fresh_foods.png',
-    description: 'Lotto e scadenza si legano allo stesso identificativo di sempre, per garantire freschezza, qualità e tracciabilità dal campo alla tavola.',
-    brandColor: '#FBB034', // GS1 Peach
+    id: 'steel',
+    name: 'Siderurgia',
+    shortName: 'Siderurgia',
+    icon: 'flame',
+    description:
+      'Impronta di carbonio e contenuto riciclato per prodotti in ferro e acciaio — il primo settore del piano di lavoro ESPR dopo le batterie.',
+    brandColor: '#FF9F0A',
+    dateLabel: 'Atto delegato atteso Q4 2026',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Profilato in acciaio — esempio',
+    exampleGtin: '08000000000031',
   },
   {
-    id: 'costruzioni',
-    name: 'Costruzioni',
-    icon: 'icons/construction.png',
-    description: "Lo stesso identificativo che organizza la logistica di cantiere — dal singolo pezzo al pallet — apre anche a certificazioni di sicurezza e conformità del prodotto.",
-    brandColor: '#B78B20', // GS1 Honey
+    id: 'construction',
+    name: 'Edilizia',
+    shortName: 'Edilizia',
+    icon: 'building',
+    description:
+      'Materiali da costruzione con dati di sicurezza, conformità e fine vita, accessibili in cantiere e lungo tutta la filiera.',
+    brandColor: '#FFD60A',
+    dateLabel: 'Atto delegato atteso Q2 2027',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Pannello isolante — esempio',
+    exampleGtin: '08000000000048',
+  },
+  {
+    id: 'aluminium',
+    name: 'Alluminio',
+    shortName: 'Alluminio',
+    icon: 'layers',
+    description:
+      'Origine, contenuto riciclato e impronta di carbonio dei prodotti in alluminio immessi sul mercato europeo.',
+    brandColor: '#8E8E93',
+    dateLabel: 'Atto delegato atteso 2027',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Profilo in alluminio — esempio',
+    exampleGtin: '08000000000055',
+  },
+  {
+    id: 'tyres',
+    name: 'Pneumatici',
+    shortName: 'Pneumatici',
+    icon: 'wheel',
+    description:
+      'Prestazioni, durabilità e tracciabilità dei materiali per i pneumatici venduti nell\'Unione Europea.',
+    brandColor: '#48484A',
+    dateLabel: 'Atto delegato atteso 2027',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Pneumatico estivo — esempio',
+    exampleGtin: '08000000000062',
+  },
+  {
+    id: 'furniture',
+    name: 'Mobili',
+    shortName: 'Mobili',
+    icon: 'sofa',
+    description:
+      'Materiali, durabilità e riparabilità dei mobili, dal singolo pezzo alla filiera di produzione.',
+    brandColor: '#AC8E68',
+    dateLabel: 'Atto delegato atteso 2028',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Sedia da ufficio — esempio',
+    exampleGtin: '08000000000079',
+  },
+  {
+    id: 'mattresses',
+    name: 'Materassi',
+    shortName: 'Materassi',
+    icon: 'bed',
+    description: 'Composizione dei materiali e riciclabilità per i materassi immessi sul mercato europeo.',
+    brandColor: '#FF375F',
+    dateLabel: 'Atto delegato atteso 2029',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Materasso a molle — esempio',
+    exampleGtin: '08000000000086',
+  },
+  {
+    id: 'ict',
+    name: 'Elettronica e ICT',
+    shortName: 'Elettronica',
+    icon: 'cpu',
+    description:
+      'Riparabilità, disponibilità di ricambi e impronta ambientale per dispositivi elettronici e ICT.',
+    brandColor: '#40C8E0',
+    dateLabel: 'Atto delegato atteso 2029',
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    status: 'coming-soon',
+    exampleName: 'Router domestico — esempio',
+    exampleGtin: '08000000000093',
   },
 ];
 
 interface SectorTranslationEn {
   name: string;
+  shortName: string;
   description: string;
+  dateLabel: string;
+  regulationRef: string;
+  exampleName: string;
 }
 
 const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
-  fmcg: {
-    name: 'Consumer Goods',
+  battery: {
+    name: 'Batteries',
+    shortName: 'Batteries',
     description:
-      'A single barcode, scanned at checkout, also opens up price, ingredients, certifications and product origin — updatable at any time, without ever reprinting the label.',
-  },
-  foodservice: {
-    name: 'Foodservice',
-    description:
-      "The same identifier that manages a professional purchase follows the product from supplier to kitchen, with formats, quantities and logistics data built for foodservice.",
-  },
-  healthcare: {
-    name: 'Healthcare',
-    description:
-      'The code already on devices and medicines becomes, through UDI and GS1 DataMatrix, a gateway to patient safety information and supply chain traceability.',
+      'Mandatory passport for EV, LMT and industrial batteries above 2 kWh: material origin, carbon footprint, state of health and charge cycles, accessible from a QR code on the battery.',
+    dateLabel: 'Mandatory from 18 February 2027',
+    regulationRef: 'Regulation (EU) 2023/1542',
+    exampleName: 'EV battery module — example',
   },
   apparel: {
-    name: 'Apparel',
+    name: 'Textiles & apparel',
+    shortName: 'Textiles',
     description:
-      "A single identifier tells the garment's story — materials, origin and care — from shelf to wardrobe, transparently and verifiably.",
+      'Fibre composition, manufacturing processes, supply-chain traceability and recyclability, starting at production-batch level — not per garment.',
+    dateLabel: 'Delegated act expected 2027',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Garment — example',
   },
-  'fresh-foods': {
-    name: 'Fresh Foods',
+  steel: {
+    name: 'Iron & steel',
+    shortName: 'Iron & steel',
     description:
-      'Batch and expiry date are tied to the same identifier as always, guaranteeing freshness, quality and traceability from field to table.',
+      'Carbon footprint and recycled content for iron and steel products — the first sector on the ESPR working plan after batteries.',
+    dateLabel: 'Delegated act expected Q4 2026',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Steel profile — example',
   },
-  costruzioni: {
+  construction: {
     name: 'Construction',
+    shortName: 'Construction',
     description:
-      "The same identifier that organises site logistics — from single item to pallet — also opens up safety and compliance certifications for the product.",
+      'Construction materials with safety, compliance and end-of-life data, accessible on site and across the supply chain.',
+    dateLabel: 'Delegated act expected Q2 2027',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Insulation panel — example',
+  },
+  aluminium: {
+    name: 'Aluminium',
+    shortName: 'Aluminium',
+    description: 'Origin, recycled content and carbon footprint of aluminium products placed on the EU market.',
+    dateLabel: 'Delegated act expected 2027',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Aluminium profile — example',
+  },
+  tyres: {
+    name: 'Tyres',
+    shortName: 'Tyres',
+    description: "Performance, durability and material traceability for tyres sold in the European Union.",
+    dateLabel: 'Delegated act expected 2027',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Summer tyre — example',
+  },
+  furniture: {
+    name: 'Furniture',
+    shortName: 'Furniture',
+    description: 'Materials, durability and repairability of furniture, from the single piece to the production chain.',
+    dateLabel: 'Delegated act expected 2028',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Office chair — example',
+  },
+  mattresses: {
+    name: 'Mattresses',
+    shortName: 'Mattresses',
+    description: 'Material composition and recyclability for mattresses placed on the European market.',
+    dateLabel: 'Delegated act expected 2029',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Spring mattress — example',
+  },
+  ict: {
+    name: 'Electronics & ICT',
+    shortName: 'Electronics',
+    description: 'Repairability, spare-parts availability and environmental footprint for electronic and ICT devices.',
+    dateLabel: 'Delegated act expected 2029',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Home router — example',
   },
 };
 
-/** Restituisce il settore con nome e descrizione nella lingua richiesta (IT è quella di base). */
+/** Restituisce il settore con i testi nella lingua richiesta (IT è quella di base). */
 export function localizeSector(sector: Sector, lang: AppLang): Sector {
   if (lang === 'it') return sector;
   const t = SECTOR_TRANSLATIONS_EN[sector.id];
-  return t ? { ...sector, name: t.name, description: t.description } : sector;
+  return t ? { ...sector, ...t } : sector;
 }

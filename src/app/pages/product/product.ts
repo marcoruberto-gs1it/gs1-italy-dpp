@@ -1,5 +1,5 @@
-import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
@@ -11,8 +11,11 @@ import { setSocialMeta } from '../../utils/social-meta';
 import { normalizeUrl } from '../../utils/url';
 import { onImageError } from '../../utils/image-fallback';
 import { I18nService } from '../../services/i18n.service';
+import { LanguageService } from '../../services/language.service';
 import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
+import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
+import { SECTORS, localizeSector } from '../../data/sectors';
 
 // Stesso placeholder salvato in products.json per gli @id coniati (rawGs1Data.brand['@id']),
 // vedi generate-agent-feed.js: risolto qui verso l'origine reale con lo stesso principio.
@@ -104,6 +107,9 @@ export class ProductComponent implements OnDestroy {
   private metaService = inject(Meta);
   private siteOrigin = inject(SiteOriginService);
   private structuredData = inject(StructuredDataService);
+  private registryApi = inject(RegistryApiService);
+  private languageService = inject(LanguageService);
+  private platformId = inject(PLATFORM_ID);
   protected t = inject(I18nService).t;
 
   protected onImageError = onImageError;
@@ -127,6 +133,23 @@ export class ProductComponent implements OnDestroy {
     const gtin = this.gtin();
     return gtin ? this.productService.getProductByGtin(gtin) : undefined;
   });
+
+  // Scheda DPP creata/pubblicata da /admin per questo GTIN — recuperata solo quando il
+  // catalogo statico (products.json) non ha nulla per questo GTIN, vedi l'effect nel
+  // costruttore. `registry-api` è la sola fonte per questi GTIN: non fanno parte del build
+  // (products.json), quindi la pagina è sempre client-side per loro (vedi il commento su
+  // `/01/` in webshop/nginx.conf).
+  dppRecord = signal<DppRecord | null>(null);
+  dppLoading = signal(false);
+
+  dppSector = computed(() => {
+    const record = this.dppRecord();
+    if (!record) return null;
+    const base = SECTORS.find((s) => s.id === record.sectorId) ?? SECTORS[0];
+    return localizeSector(base, this.languageService.lang());
+  });
+
+  dppAttributeEntries = computed(() => Object.entries(this.dppRecord()?.attributes ?? {}));
 
   images = computed<string[]>(() => {
     const prod = this.product();
@@ -382,6 +405,44 @@ export class ProductComponent implements OnDestroy {
 
     effect(() => {
       this.structuredData.apply('product-breadcrumb-jsonld', this.breadcrumbJsonLd());
+    });
+
+    // Fetch della scheda DPP: solo lato browser (registry-api non esiste durante `ng build` /
+    // il prerender, vedi stesso pattern in home.ts per il QR code) e solo quando il GTIN non è
+    // nel catalogo statico — un GTIN presente in products.json non tocca mai registry-api.
+    if (isPlatformBrowser(this.platformId)) {
+      effect(() => {
+        const gtin = this.gtin();
+        const staticProduct = this.product();
+        this.dppRecord.set(null);
+        if (!gtin || staticProduct) {
+          this.dppLoading.set(false);
+          return;
+        }
+        this.dppLoading.set(true);
+        this.registryApi.getPublicByGtin(gtin).subscribe({
+          next: (record) => {
+            this.dppLoading.set(false);
+            this.dppRecord.set(record);
+          },
+          error: () => {
+            this.dppLoading.set(false);
+          },
+        });
+      });
+    }
+
+    effect(() => {
+      const dpp = this.dppRecord();
+      if (!dpp) return;
+      const sector = this.dppSector();
+      this.titleService.setTitle(`${dpp.name} | ${this.t('hero.pageTitle')}`);
+      this.metaService.updateTag({ name: 'description', content: sector?.description ?? dpp.name });
+      setSocialMeta(this.metaService, {
+        title: dpp.name,
+        description: sector?.description ?? dpp.name,
+        url: `${this.siteOrigin.value}/01/${dpp.gtin}`,
+      });
     });
   }
 

@@ -112,13 +112,15 @@ const AI_AGENTS = [
   'Amazonbot', 'Meta-ExternalAgent', 'Bytespider',
 ];
 
-const robots = `# Catalogo prodotti: dati pensati per essere letti da motori di ricerca e agenti AI
-# (vedi /assistente e /01/*), quindi accesso volutamente permissivo.
+const robots = `# Digital Product Passport: dati pensati per essere letti da motori di ricerca e agenti AI
+# (vedi /01/*), quindi accesso volutamente permissivo.
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /registry-api
 
-${AI_AGENTS.map((a) => `User-agent: ${a}\nAllow: /`).join('\n\n')}
+${AI_AGENTS.map((a) => `User-agent: ${a}\nAllow: /\nDisallow: /admin\nDisallow: /registry-api`).join('\n\n')}
 
 # Content-Signal (bozza IETF, non ancora uno standard consolidato): search = indicizzazione nei
 # motori di ricerca; ai-input = uso come contesto da parte di agenti AI in risposta a una
@@ -144,19 +146,15 @@ const productSection = products
   .map((p) => `- [${p.name}](${SITE_URL}/01/${p.gtin}): ${oneLine(p.description)}`)
   .join('\n');
 
-const llmsTxt = `# Catalogo Smart
+const llmsTxt = `# GS1 DPP
 
-> Un catalogo prodotti navigabile: cerca, sfoglia, apri la scheda di un prodotto. ${products.length} prodotti.
+> Il Digital Product Passport di GS1 Italy: identificativi, dati e standard per i settori
+> impattati dal regolamento ESPR. ${products.length} prodotti pubblicati.
 
 ## Sections
 
-- [Home](${SITE_URL}/): catalogo prodotti e ricerca
-- [AI Shopping Assistant](${SITE_URL}/assistente): chat che cerca nel catalogo e può completare un ordine
+- [Home](${SITE_URL}/): spiegazione del DPP, quadro normativo, settori
 - [Sitemap](${SITE_URL}/sitemap.xml)
-
-## Machine-readable endpoints
-
-- [Catalog feed](${SITE_URL}/catalog): lightweight JSON list of every product — gtin, name, brand, price, category, image, description
 
 ## Products
 
@@ -187,7 +185,7 @@ const productFullSection = products
   })
   .join('\n\n');
 
-const llmsFullTxt = `# Catalogo Smart — full content
+const llmsFullTxt = `# GS1 DPP — full content
 
 > Same catalogue described in llms.txt, expanded: every product's full description and known
 > facts inline, not just a link to follow. ${products.length} products.
@@ -207,8 +205,8 @@ console.log(`generate-seo-files: llms-full.txt generato (${(Buffer.byteLength(ll
 //    descrivono solo endpoint che esistono davvero e si comportano come descritto.
 // ---------------------------------------------------------------------------
 const agentSkills = {
-  name: 'Catalogo Smart',
-  description: 'Product catalogue: each product page publishes structured data (schema.org) via content negotiation.',
+  name: 'GS1 DPP',
+  description: 'Digital Product Passport: each product page publishes structured data (schema.org + gs1:) via content negotiation.',
   url: SITE_URL,
   skills: [
     {
@@ -218,22 +216,6 @@ const agentSkills = {
       endpoint: `${SITE_URL}/01/{gtin}`,
       method: 'GET',
       requestHeaders: { Accept: 'application/ld+json' },
-    },
-    {
-      id: 'catalog-feed',
-      name: 'List every product in the catalog',
-      description: `Lightweight JSON list of all ${products.length} products (gtin, name, brand, price, category, image, description) — what exists, before fetching individual sheets.`,
-      endpoint: `${SITE_URL}/catalog`,
-      method: 'GET',
-    },
-    {
-      id: 'shopping-assistant',
-      name: 'Conversational shopping assistant',
-      description:
-        'An A2A/UCP commerce agent (Gemini) that searches the catalog and can complete a checkout. May require a password in this deployment; see the page for details.',
-      endpoint: `${SITE_URL}/assistente`,
-      protocol: 'A2A',
-      protocolVersion: '0.3.0',
     },
   ],
 };

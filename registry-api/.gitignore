@@ -1,0 +1,9 @@
+node_modules
+dist
+*.log
+
+# Dati locali (SQLite): ricostruibile, mai le schede di sviluppo nel repository.
+data/
+
+# Segreti locali — mai committare (vedi .env.example per i nomi delle variabili).
+.env

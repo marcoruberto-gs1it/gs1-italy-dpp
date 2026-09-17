@@ -302,6 +302,41 @@ img.img-fallback {
   border-radius: var(--radius-full);
 }
 
+/* Badge icona piatto — un solo colore, niente gradienti: usato da step DPP, card settore,
+   carosello di anteprima e passaporto della sezione admin. Chi lo usa passa il colore via
+   --icon-color inline. Deliberatamente diverso da .icon-badge (tinta soft): qui il colore è
+   pieno, per un'icona che deve leggersi anche isolata (es. badge di settore). */
+.icon-flat {
+  background: var(--icon-color, var(--brand));
+  color: #ffffff;
+}
+
+/* Tessera "etichetta + valore" per gli attributi liberi di una scheda DPP — usata sia
+   dall'anteprima infografica di /admin sia dalla scheda pubblica su /01/:gtin. */
+.fact-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--bg-surface-sunken);
+  border-radius: var(--radius-md);
+}
+
+.fact-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.fact-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
 /* Blocco codice con evidenziazione sintattica */
 .gs-code-block {
   margin: 0;

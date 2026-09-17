@@ -46,9 +46,7 @@ sftp-mcp/.env
 # ── Override locale docker-compose (porte host, non condivise) ───────────────
 docker-compose.override.yml
 
-# Chiave service account Google Cloud (root) — solo il placeholder resta tracciato
 /*.json
-!/google-service-account.placeholder.json
 !/mcp.example.json
 test-model-garden/*.json
 
@@ -56,6 +54,9 @@ test-model-garden/*.json
 **/*.db
 **/*.db-shm
 **/*.db-wal
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
 
 # ── File generati / scaricati ─────────────────────────────────────────────────
 sap-mcp/metadata/*.json
@@ -80,11 +81,6 @@ build/
 .venv/
 venv/
 env/
-
-# ── Segreti ──────────────────────────────────────────────────────────────────
-# Service account GCP montato dal business-agent (/creds/sa.json): va caricato a mano
-# sul droplet via scp, non passa mai dal repository.
-/secrets/
 
 # ── Claude Code (sessioni interne) ───────────────────────────────────────────
 .claude/

@@ -4,14 +4,15 @@
 #   locale:      docker compose up -d --build
 #   produzione:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 #
-# Quattro servizi dietro un unico Traefik, tutti sullo stesso dominio (niente CORS):
+# Tre servizi dietro un unico Traefik, tutti sullo stesso dominio (niente CORS):
 #
-#   /            → webshop         nginx con l'Angular prerenderizzato
-#   /catalog     → webshop         feed JSON del catalogo, letto dal business-agent
-#   /assistente  → chat-client     la chat React (sample UCP di Google)
-#   /api         → chat-client     proxy Vite verso il business-agent
+#   /             → webshop         nginx con l'Angular prerenderizzato
+#   /registry-api → registry-api    CRUD schede DPP + pubblicazione su mock-eu-registry
 #
-# Il business-agent non ha un router Traefik: vive solo sulla rete Docker.
+# mock-eu-registry (il registro UE, https://github.com/CIRPASS-2/mock-eu-registry) NON è in
+# questo file: gira su Render (Postgres su Supabase, OIDC su Auth0) — vedi
+# docs/REGISTRY-SETUP.md. registry-api lo chiama via URL pubblica (MOCK_EU_REGISTRY_URL), non
+# sulla rete Docker.
 
 services:
   # Traefik per l'ambiente locale, dove questo stack è l'unico sulla macchina.
@@ -40,10 +41,8 @@ services:
     networks:
       - web
 
-  # Il sito GS1: pagine prodotto prerenderizzate con JSON-LD embeddato e, per gli agenti,
-  # il feed /catalog e la content negotiation su /01/{gtin} (vedi webshop/nginx.conf).
-  # È la sorgente dati del business-agent — nel sample di Google quel ruolo lo aveva un
-  # finto shop FastAPI, qui lo fa il sito vero.
+  # Il sito GS1 DPP: pagine prodotto prerenderizzate con JSON-LD embeddato e la content
+  # negotiation su /01/{gtin} (vedi webshop/nginx.conf).
   webshop:
     build:
       # Il context è la root del repo perché il sorgente Angular sta lì.
@@ -55,7 +54,6 @@ services:
     networks:
       - web
     healthcheck:
-      # Il business-agent carica il catalogo all'avvio: deve partire a sito servito.
       # 127.0.0.1 e non localhost: il wget di busybox prova prima ::1, dove nginx
       # (listen 80, solo IPv4) non ascolta.
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
@@ -84,71 +82,38 @@ services:
       traefik.http.routers.smart-webshop.entrypoints: "web"
       traefik.http.routers.smart-webshop.rule: "PathPrefix(`/`)"
 
-  # Agente commerciale: Google ADK + A2A + UCP, modello Gemini su Vertex AI.
-  business-agent:
+  # Sezione admin DPP: CRUD delle schede (SQLite locale) + pubblicazione su mock-eu-registry
+  # (chiamata in uscita, non sulla rete Docker — vedi commento in cima al file).
+  registry-api:
     build:
-      context: ./business-agent
+      context: ./registry-api
       dockerfile: Dockerfile
     restart: unless-stopped
     networks:
       - web
-    environment:
-      # I due punti di contatto col catalogo: GET /catalog all'avvio (store.py) e
-      # GET /01/{gtin} on-demand dal tool leggi_prodotto.
-      CATALOG_URL: "http://webshop"
-      # ── Vertex AI (usa il billing del progetto GCP, no API key) ──
-      GOOGLE_GENAI_USE_VERTEXAI: "true"
-      GOOGLE_CLOUD_PROJECT: "${GOOGLE_CLOUD_PROJECT:?GOOGLE_CLOUD_PROJECT non impostata}"
-      GOOGLE_CLOUD_LOCATION: "${GOOGLE_CLOUD_LOCATION:-global}"
-      GOOGLE_APPLICATION_CREDENTIALS: "/creds/sa.json"
-      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.5-flash}"
-      # Diagnostica del context caching (vedi main.py): 1 per vedere hit/miss nei log.
-      CACHE_DEBUG: "${CACHE_DEBUG:-0}"
-      # 0 disattiva il context caching (vedi agent_executor.py).
-      CONTEXT_CACHE: "${CONTEXT_CACHE:-1}"
     volumes:
-      - "./secrets/gcp-sa.json:/creds/sa.json:ro"
-    depends_on:
-      webshop:
-        condition: service_healthy
-
-  # UI di chat del sample UCP: dev server Vite, servito sotto /assistente (vedi base in
-  # vite.config.ts) e proxy /api verso l'agente.
-  chat-client:
-    build:
-      context: ./chat-client
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    networks:
-      - web
+      - registry-api-data:/data
     environment:
-      VITE_PROXY_TARGET: "http://business-agent:10999"
-      # Il profilo UCP è scaricato dal business-agent, non dal browser: deve essere un URL
-      # risolvibile dentro la rete Docker (per il container dell'agente `localhost` sarebbe
-      # sé stesso). Il path include il base di Vite.
-      VITE_PROFILE_URL: "http://chat-client:3000/assistente/profile/agent_profile.json"
-      # Sbarramento a password davanti a /assistente e /api (vedi chat-client/auth-gate.ts).
+      SITE_URL: "${SITE_URL:-http://localhost}"
+      # Sbarramento a password davanti a /registry-api (vedi registry-api/src/auth.ts).
       # Vuota = accesso libero: in locale si lavora senza login, in produzione si valorizza.
-      CHAT_PASSWORD: "${CHAT_PASSWORD:-}"
-      CHAT_AUTH_SECRET: "${CHAT_AUTH_SECRET:-}"
-    depends_on:
-      - business-agent
+      REGISTRY_ADMIN_PASSWORD: "${REGISTRY_ADMIN_PASSWORD:-}"
+      REGISTRY_AUTH_SECRET: "${REGISTRY_AUTH_SECRET:-}"
+      # Registro UE (mock-eu-registry su Render + Auth0 M2M) — vedi docs/REGISTRY-SETUP.md.
+      # Finché sono vuote, tutto il resto della sezione admin funziona: solo "Pubblica" fallisce
+      # con un errore esplicito (vedi registry-api/src/mockRegistryClient.ts).
+      MOCK_EU_REGISTRY_URL: "${MOCK_EU_REGISTRY_URL:-}"
+      AUTH0_DOMAIN: "${AUTH0_DOMAIN:-}"
+      AUTH0_M2M_CLIENT_ID: "${AUTH0_M2M_CLIENT_ID:-}"
+      AUTH0_M2M_CLIENT_SECRET: "${AUTH0_M2M_CLIENT_SECRET:-}"
+      AUTH0_M2M_AUDIENCE: "${AUTH0_M2M_AUDIENCE:-}"
     labels:
       traefik.enable: "true"
-      # Su quale rete Traefik deve raggiungere questo container: lo Traefik di `edge/` è
-      # connesso anche alla rete di poc-lab.gs1it.dev e non ha un default globale.
       traefik.docker.network: "catalogosmart-web"
       # Prefisso `smart-`: vedi il commento sui nomi globali nel webshop qui sopra.
-      traefik.http.services.smart-chat-client.loadbalancer.server.port: "3000"
-      # Regole più lunghe del catch-all del webshop: Traefik dà loro priorità automatica.
-      traefik.http.routers.smart-chat-client.entrypoints: "web"
-      traefik.http.routers.smart-chat-client.rule: "PathPrefix(`/assistente`) || PathPrefix(`/api`)"
-      traefik.http.routers.smart-chat-client.middlewares: "smart-assistente-trailing-slash"
-      # Vite serve l'app solo su /assistente/ (con la barra finale) e non redirige da solo:
-      # senza questo, il link "Assistente" del sito finirebbe su un 404. $$ sfugge
-      # l'interpolazione di compose, a Traefik arriva ${1}.
-      traefik.http.middlewares.smart-assistente-trailing-slash.redirectregex.regex: "^(https?://[^/]+)/assistente$$"
-      traefik.http.middlewares.smart-assistente-trailing-slash.redirectregex.replacement: "$${1}/assistente/"
+      traefik.http.services.smart-registry-api.loadbalancer.server.port: "4310"
+      traefik.http.routers.smart-registry-api.entrypoints: "web"
+      traefik.http.routers.smart-registry-api.rule: "PathPrefix(`/registry-api`)"
 
 networks:
   web:
@@ -156,9 +121,13 @@ networks:
     # rete Docker, che altrimenti sarebbe prefissato col nome del progetto compose.
     #
     # Rete propria, distinta da quella di poc-lab.gs1it.dev, e non è un vezzo: i nomi di
-    # servizio sono uguali nei due stack (webshop, business-agent, chat-client) e su una
-    # rete condivisa esisterebbero due volte nel DNS di Docker. `CATALOG_URL: http://webshop`
-    # risolverebbe a caso, e l'agente di questo sito finirebbe a leggere il catalogo
-    # dell'altro. Lo stack `edge/` la dichiara `external` per attaccarvisi; qui resta
-    # creata e gestita da compose, così in locale non serve crearla a mano.
+    # servizio sono uguali nei due stack (webshop, registry-api) e su una rete condivisa
+    # esisterebbero due volte nel DNS di Docker. Lo stack `edge/` la dichiara `external`
+    # per attaccarvisi; qui resta creata e gestita da compose, così in locale non serve
+    # crearla a mano.
     name: catalogosmart-web
+
+volumes:
+  # Le schede DPP (bozze e pubblicate) sopravvivono a un `docker compose down` — solo un
+  # `-v` esplicito le cancella.
+  registry-api-data:
