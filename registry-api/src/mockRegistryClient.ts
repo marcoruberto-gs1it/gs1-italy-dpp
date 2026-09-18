@@ -8,10 +8,10 @@
  * server-to-server, non un login utente: la nostra sezione admin ha già il proprio cancello
  * (vedi auth.ts), questo è un secondo livello, verso il registro stesso.
  *
- * Forma del payload verificata con richieste reali contro un'istanza live (non solo dedotta
- * dallo schema in repo, che in un punto — batchUpi per granularityLevel=ITEM — non corrisponde
- * a quanto l'istanza pubblicata accetta davvero): vedi main/src/main/resources/json-schema/
- * default-schema.json nel repo di mock-eu-registry per i vincoli completi.
+ * Forma del payload verificata sia contro richieste reali riuscite contro un'istanza live, sia
+ * rileggendo lo schema vero (main/src/main/resources/json-schema/default-schema.json nel repo
+ * di mock-eu-registry) campo per campo — compresi i vincoli non ovvi dal solo testare (upi come
+ * URI, non stringa libera; batchUpi facoltativo per ITEM, non obbligatorio).
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import type { SectorId } from './sectors.ts';
@@ -92,36 +92,65 @@ async function fetchAccessToken(config: ReturnType<typeof requiredConfig>): Prom
 }
 
 /** Costruisce l'URL pubblico GS1 Digital Link della scheda — stesso pattern già usato dal
- * resto del sito per le pagine prodotto (`/01/{gtin}`, vedi src/app/pages/product).
+ * resto del sito per le pagine prodotto (`/01/{gtin}`, vedi src/app/pages/product), con
+ * l'eventuale AI (10) lotto o (21) seriale in coda (`/01/{gtin}/10/{lotto}` o
+ * `/01/{gtin}/21/{seriale}`, sintassi standard GS1 Digital Link) quando presente — le route
+ * `01/:gtin/10/:batch` e `01/:gtin/21/:serial` in app.routes.ts risolvono anche queste.
  *
  * ATTENZIONE per lo sviluppo locale: mock-eu-registry scarica davvero questo URL per calcolarne
  * l'hash (dppHash/dppContentType nella risposta) — verificato empiricamente. Se SITE_URL punta a
  * localhost, la richiesta fallisce dal lato di mock-eu-registry (che gira nel cloud e non può
  * raggiungere la tua macchina): la pubblicazione in locale funziona solo con un SITE_URL
  * pubblicamente raggiungibile (il dominio reale in produzione, o un tunnel tipo ngrok in test). */
-function digitalLinkUrl(siteUrl: string, gtin: string): string {
-  return `${siteUrl.replace(/\/$/, '')}/01/${gtin}`;
+function digitalLinkUrl(siteUrl: string, gtin: string, ai?: '10' | '21', value?: string): string {
+  const base = `${siteUrl.replace(/\/$/, '')}/01/${gtin}`;
+  return ai && value ? `${base}/${ai}/${encodeURIComponent(value)}` : base;
 }
 
-/** Un identificativo unico per la registrazione — combina GTIN e lotto/seriale quando presente,
- * così due schede con lo stesso GTIN ma istanze diverse non collidono sullo stesso upi. */
-function buildUpi(gtin: string, batchOrSerial: string | null): string {
-  if (!batchOrSerial) return gtin;
-  const suffix = batchOrSerial.replace(/[()]/g, '').replace(/\s+/g, '-');
-  return `${gtin}-${suffix}`;
+/** Interpreta il campo libero "lotto o seriale" del form: AI (21) esplicito, o livello ITEM
+ * senza prefisso, è un seriale; altrimenti è un lotto (AI 10) — stessa euristica già usata per
+ * il JSON-LD, vedi jsonld.ts. */
+function parseBatchOrSerial(batchOrSerial: string, granularityLevel: GranularityLevel): { ai: '10' | '21'; value: string } {
+  const value = batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+  const ai = /^\(21\)/.test(batchOrSerial) || granularityLevel === 'ITEM' ? '21' : '10';
+  return { ai, value };
+}
+
+/** upi/modelUpi/batchUpi come URI GS1 Digital Link veri — non il GTIN nudo. Lo schema di
+ * mock-eu-registry (default-schema.json) non impone un `format`/`pattern` su questi campi, ma
+ * il suo stesso esempio è un URI (`"urn:epc:id:sgtin:..."`, la serializzazione EPC dello stesso
+ * concetto): un identificativo che non risolve a nulla non è conforme allo spirito dello
+ * standard, anche se il validatore lo accetterebbe. GS1 Digital Link è uno degli schemi di
+ * identificativo esplicitamente previsti per il DPP (insieme a EPC URN, UUID, DID) ed è quello
+ * che questo intero progetto risolve davvero — coerente con liveURL, che usa la stessa sintassi. */
+function buildUpi(siteUrl: string, record: DppRecord): string {
+  if (record.granularityLevel === 'MODEL' || !record.batchOrSerial) {
+    return digitalLinkUrl(siteUrl, record.gtin);
+  }
+  const { ai, value } = parseBatchOrSerial(record.batchOrSerial, record.granularityLevel);
+  return digitalLinkUrl(siteUrl, record.gtin, ai, value);
 }
 
 /** Campi di granularità richiesti dallo schema di mock-eu-registry — diversi per MODEL/BATCH/ITEM
- * (vedi il blocco `allOf` in default-schema.json). Il nostro modello dati non distingue livelli
- * di gerarchia reali (un solo GTIN per scheda), quindi modelUpi/batchUpi qui sono lo stesso GTIN
- * "nudo": corretto per una demo, non rappresenta una vera gerarchia modello→lotto→articolo. */
-function granularityFields(gtin: string, granularityLevel: GranularityLevel): Record<string, unknown> {
-  if (granularityLevel === 'MODEL') return {};
-  if (granularityLevel === 'BATCH') return { modelUpi: gtin };
-  // ITEM: modelUpi e deactivated obbligatori; l'istanza live richiede anche batchUpi
-  // (lo schema in repo lo darebbe per facoltativo, ma il comportamento reale è questo — vedi
-  // commento in testa al file).
-  return { modelUpi: gtin, batchUpi: gtin, deactivated: false };
+ * (vedi il blocco `allOf` in default-schema.json, scaricato e riletto per verificarlo). Il
+ * nostro modello dati non rappresenta una vera gerarchia modello→lotto→articolo (un solo GTIN
+ * per scheda): modelUpi punta sempre all'URI "nudo" (senza AI), coerente con "un solo modello
+ * per GTIN" anche se non tracciamo esplicitamente più schede collegate allo stesso modello. */
+function granularityFields(siteUrl: string, record: DppRecord): Record<string, unknown> {
+  const modelUpi = digitalLinkUrl(siteUrl, record.gtin);
+  if (record.granularityLevel === 'MODEL') return {};
+  if (record.granularityLevel === 'BATCH') return { modelUpi };
+  // ITEM: modelUpi e deactivated obbligatori. batchUpi è facoltativo per schema — "solo se
+  // l'item è davvero registrato attraverso un livello lotto intermedio" — lo includiamo perciò
+  // solo quando il lotto/seriale scritto nel form porta esplicitamente il prefisso AI (10):
+  // un utente che scrive "(21) SN123" sta descrivendo un seriale diretto dal modello, senza
+  // lotto intermedio.
+  const fields: Record<string, unknown> = { modelUpi, deactivated: false };
+  if (record.batchOrSerial && /^\(10\)/.test(record.batchOrSerial)) {
+    const { value } = parseBatchOrSerial(record.batchOrSerial, 'BATCH');
+    fields['batchUpi'] = digitalLinkUrl(siteUrl, record.gtin, '10', value);
+  }
+  return fields;
 }
 
 export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
@@ -131,7 +160,7 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
   const liveUrl = digitalLinkUrl(siteUrl, record.gtin);
 
   const requestBody = {
-    upi: buildUpi(record.gtin, record.batchOrSerial),
+    upi: buildUpi(siteUrl, record),
     // Identificativo demo dell'operatore economico — non abbiamo ancora un modello
     // multi-tenant reale, vedi "Esplicitamente fuori scope" nel piano di progetto.
     reoId: 'gs1-italy-dpp-demo',
@@ -140,7 +169,7 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     commodityCode: COMMODITY_CODES[record.sectorId],
     facilitiesId: ['gs1-italy-dpp-demo-facility'],
     granularityLevel: record.granularityLevel,
-    ...granularityFields(record.gtin, record.granularityLevel),
+    ...granularityFields(siteUrl, record),
   };
 
   const registerResponse = await fetch(`${config.registryUrl}/metadata/v1`, {

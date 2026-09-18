@@ -12,6 +12,17 @@ export const serverRoutes: ServerRoute[] = [
     }
   },
   {
+    // Stesso GS1 Digital Link con AI (10)/(21) in coda — vedi il commento in app.routes.ts.
+    // Lotto/seriale sono arbitrari (creati da /admin a runtime): client-side, come /admin
+    // stesso, non c'è nulla da prerenderizzare in fase di build.
+    path: '01/:gtin/10/:batch',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: '01/:gtin/21/:serial',
+    renderMode: RenderMode.Client
+  },
+  {
     path: '414/:gln',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {
