@@ -138,12 +138,17 @@
 
             <div class="form-card-head">
               <div>
-                <label for="f-sector">Settore</label>
-                <select id="f-sector" formControlName="sectorId">
-                  @for (sector of sectors; track sector.id) {
-                    <option [value]="sector.id">{{ sector.name }}</option>
-                  }
-                </select>
+                <label id="f-sector-label">Settore</label>
+                <hlm-select class="w-full" [value]="formValue().sectorId" [itemToString]="sectorItemToString" (valueChange)="onSectorChange($event)" aria-labelledby="f-sector-label">
+                  <hlm-select-trigger class="w-full">
+                    <hlm-select-value />
+                  </hlm-select-trigger>
+                  <hlm-select-content *hlmSelectPortal>
+                    @for (sector of sectors; track sector.id) {
+                      <hlm-select-item [value]="sector.id">{{ sector.name }}</hlm-select-item>
+                    }
+                  </hlm-select-content>
+                </hlm-select>
               </div>
               <button type="button" class="gs-btn gs-btn--ghost demo-fill-btn" (click)="fillDemoData()">
                 <app-icon name="refresh" [size]="15"></app-icon>
@@ -170,12 +175,17 @@
               <p class="field-hint">La cifra finale è calcolata dallo standard GS1 (GTIN) — se non torna, te lo segnaliamo subito.</p>
             }
 
-            <label for="f-granularity">Granularity level</label>
-            <select id="f-granularity" formControlName="granularityLevel">
-              @for (level of granularityLevels; track level) {
-                <option [value]="level">{{ level }}</option>
-              }
-            </select>
+            <label id="f-granularity-label">Granularity level</label>
+            <hlm-select class="w-full" [value]="formValue().granularityLevel" (valueChange)="onGranularityChange($event)" aria-labelledby="f-granularity-label">
+              <hlm-select-trigger class="w-full">
+                <hlm-select-value />
+              </hlm-select-trigger>
+              <hlm-select-content *hlmSelectPortal>
+                @for (level of granularityLevels; track level) {
+                  <hlm-select-item [value]="level">{{ level }}</hlm-select-item>
+                }
+              </hlm-select-content>
+            </hlm-select>
 
             <label for="f-batch">Lotto o seriale — AI (10)/(21), livello batch/item</label>
             <input id="f-batch" type="text" formControlName="batchOrSerial" placeholder="es. (21) SN12345" [class.field-invalid]="fieldError('batchOrSerial')" />

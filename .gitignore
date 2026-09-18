@@ -48,6 +48,7 @@ docker-compose.override.yml
 
 /*.json
 !/mcp.example.json
+!/components.json
 test-model-garden/*.json
 
 # ── Cache SQLite — ricostruibile a runtime ────────────────────────────────────
