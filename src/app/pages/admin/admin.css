@@ -503,6 +503,16 @@
   justify-content: center;
 }
 
+.passport-jsonld-btn {
+  align-self: center;
+  margin-top: 6px;
+}
+
+.passport-jsonld-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .form-card label {
   font-size: 0.82rem;
   font-weight: 700;

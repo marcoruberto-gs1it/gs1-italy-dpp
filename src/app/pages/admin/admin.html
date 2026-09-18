@@ -285,6 +285,17 @@
               <span class="gs-badge gs-badge--neutral">Anteprima — non ancora registrata</span>
             }
           </div>
+
+          <button
+            type="button"
+            class="gs-btn gs-btn--ghost gs-btn--sm passport-jsonld-btn"
+            [disabled]="!previewJsonLd()"
+            [title]="previewJsonLd() ? '' : 'Serve un UPI (GTIN) valido per generare il JSON-LD'"
+            (click)="openJsonLdPreview()"
+          >
+            <app-icon name="braces" [size]="15"></app-icon>
+            Vedi JSON-LD
+          </button>
         </aside>
       </form>
     }
@@ -300,3 +311,5 @@
   [longWait]="journeyLongWait()"
   (closed)="closeJourney()"
 ></app-publish-journey>
+
+<app-json-ld-drawer [open]="jsonLdPreviewOpen()" [jsonLd]="previewJsonLd()" (closed)="closeJsonLdPreview()"></app-json-ld-drawer>

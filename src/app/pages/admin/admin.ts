@@ -8,6 +8,7 @@ import { tap } from 'rxjs';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { IconComponent } from '../../components/icon/icon';
+import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
 import { DppInput, DppRecord, GranularityLevel, RegistryApiService } from '../../services/registry-api.service';
 import { SiteOriginService } from '../../services/site-origin.service';
@@ -37,7 +38,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, ...HlmSelectImports],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ...HlmSelectImports],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -139,6 +140,60 @@ export class Admin {
     const gtin = this.previewGtin();
     return gtin ? `${this.siteOrigin.value}/01/${gtin}` : null;
   });
+
+  /** Anteprima del JSON-LD (stessa logica di registry-api/src/jsonld.ts e product.ts —
+   * vedi lì per il dettaglio dei termini GS1 Web Vocabulary usati), aggiornata mentre si
+   * compila il form: mostra come apparirà la scheda anche prima di salvarla o pubblicarla.
+   * Richiede solo un UPI valido — nome/attributi possono ancora essere vuoti. */
+  protected previewJsonLd = computed<Record<string, unknown> | null>(() => {
+    const gtin = this.previewGtin();
+    if (!gtin) return null;
+    const f = this.formValue();
+
+    const doc: Record<string, unknown> = {
+      '@context': {
+        gs1: 'https://ref.gs1.org/voc/',
+        schema: 'http://schema.org/',
+        name: 'schema:name',
+        gtin: 'gs1:gtin',
+      },
+      '@type': ['schema:Product', 'gs1:Product'],
+      '@id': `${this.siteOrigin.value}/01/${gtin}`,
+      name: f.name || null,
+      gtin,
+      granularityLevel: f.granularityLevel,
+    };
+
+    if (f.batchOrSerial) {
+      const value = f.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+      if (/^\(21\)/.test(f.batchOrSerial) || f.granularityLevel === 'ITEM') {
+        doc['gs1:hasSerialNumber'] = value;
+      } else {
+        doc['gs1:hasBatchLotNumber'] = value;
+      }
+    }
+
+    const attrs = (f.attributes as { key: string; value: string }[]).filter((row) => row.key?.trim());
+    if (attrs.length) {
+      doc['schema:additionalProperty'] = attrs.map((row) => ({
+        '@type': 'schema:PropertyValue',
+        name: row.key.trim(),
+        value: row.value,
+      }));
+    }
+
+    return doc;
+  });
+
+  protected jsonLdPreviewOpen = signal(false);
+
+  protected openJsonLdPreview(): void {
+    this.jsonLdPreviewOpen.set(true);
+  }
+
+  protected closeJsonLdPreview(): void {
+    this.jsonLdPreviewOpen.set(false);
+  }
 
   constructor() {
     this.titleService.setTitle('Amministrazione DPP | GS1 DPP');
