@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output, computed, effect, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, computed, effect, inject, signal } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IconComponent, IconName } from '../../../components/icon/icon';
-import { DppRecord } from '../../../services/registry-api.service';
+import { DppRecord, PublishTechnicalTrace } from '../../../services/registry-api.service';
+import { highlightJson } from '../../../utils/json-highlight';
 
 export type JourneyPhase = 'running' | 'success' | 'error';
 
@@ -46,6 +48,8 @@ const STEPS: JourneyStep[] = [
   styleUrl: './publish-journey.css',
 })
 export class PublishJourneyComponent {
+  private sanitizer = inject(DomSanitizer);
+
   protected steps = STEPS;
   protected eoId = DEMO_EO_ID;
   protected facilityId = DEMO_FACILITY_ID;
@@ -55,6 +59,8 @@ export class PublishJourneyComponent {
   private _record = signal<DppRecord | null>(null);
   private _errorMessage = signal<string | null>(null);
   private _registryId = signal<string | null>(null);
+  private _technical = signal<PublishTechnicalTrace | null>(null);
+  private _liveUrlJsonLd = signal<Record<string, unknown> | null>(null);
 
   @Input() set open(v: boolean) {
     this._open.set(!!v);
@@ -74,6 +80,12 @@ export class PublishJourneyComponent {
   @Input() set longWait(v: boolean) {
     this._longWait.set(!!v);
   }
+  @Input() set technical(v: PublishTechnicalTrace | null) {
+    this._technical.set(v ?? null);
+  }
+  @Input() set liveUrlJsonLd(v: Record<string, unknown> | null) {
+    this._liveUrlJsonLd.set(v ?? null);
+  }
   @Output() closed = new EventEmitter<void>();
 
   private _longWait = signal(false);
@@ -83,6 +95,45 @@ export class PublishJourneyComponent {
   activeRecord = computed(() => this._record());
   activeError = computed(() => this._errorMessage());
   activeRegistryId = computed(() => this._registryId());
+
+  /** true solo quando l'utente ha aperto la vista tecnica per questo passaggio — richiusa da
+   * sola quando la pubblicazione riparte (constructor). */
+  protected technicalOpen = signal<Record<number, boolean>>({});
+
+  protected toggleTechnical(stepIndex: number): void {
+    this.technicalOpen.update((state) => ({ ...state, [stepIndex]: !state[stepIndex] }));
+  }
+
+  private highlight(data: unknown): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(highlightJson(JSON.stringify(data, null, 2)));
+  }
+
+  /** Passo 0 — "Scheda salvata": il record così com'è presso di noi, prima che qualunque dato
+   * lasci il sistema. */
+  protected localRecordJson = computed<SafeHtml | null>(() => {
+    const record = this._record();
+    return record ? this.highlight(record) : null;
+  });
+
+  /** Passo 1 — il payload REALE inviato a mock-eu-registry (non ricostruito: sono gli stessi
+   * byte che registry-api ha davvero spedito, vedi mockRegistryClient.ts). */
+  protected requestJson = computed<SafeHtml | null>(() => {
+    const technical = this._technical();
+    return technical ? this.highlight(technical.request) : null;
+  });
+
+  /** Passo 2 — il JSON-LD che mock-eu-registry scarica dal liveURL per calcolarne l'hash
+   * (stessa risorsa che risolve pubblicamente su /01/{gtin}, vedi jsonld.ts). */
+  protected liveUrlJson = computed<SafeHtml | null>(() => {
+    const doc = this._liveUrlJsonLd();
+    return doc ? this.highlight(doc) : null;
+  });
+
+  /** Passo 3 — la risposta REALE ricevuta da mock-eu-registry. */
+  protected responseJson = computed<SafeHtml | null>(() => {
+    const technical = this._technical();
+    return technical ? this.highlight(technical.response) : null;
+  });
 
   /** Passo fino a cui l'animazione "in corsa" è arrivata da sola (indipendente dalla vera
    * risposta di rete) — avanza da solo mentre `phase` resta 'running', poi si ferma al passo 2
@@ -100,6 +151,7 @@ export class PublishJourneyComponent {
         return;
       }
       this.staged.set(0);
+      this.technicalOpen.set({});
       this.timers.push(setTimeout(() => this.staged.set(1), 350));
       this.timers.push(setTimeout(() => this.staged.set(2), 1100));
       // Il passo 3 (registrazione confermata) lo sblocca solo l'arrivo vero della risposta

@@ -22,6 +22,13 @@ export interface DppRecord {
   registeredAt: string | null;
 }
 
+/** Il payload/risposta reali scambiati con mock-eu-registry durante una pubblicazione — solo
+ * nella risposta di publish(), non persistito. Vedi registry-api/src/mockRegistryClient.ts. */
+export interface PublishTechnicalTrace {
+  request: Record<string, unknown>;
+  response: Record<string, unknown>;
+}
+
 export interface DppInput {
   sectorId: string;
   gtin: string;
@@ -66,8 +73,8 @@ export class RegistryApiService {
     return this.http.delete<void>(`${BASE}/dpp/${id}`, { withCredentials: true });
   }
 
-  publish(id: string): Observable<DppRecord> {
-    return this.http.post<DppRecord>(`${BASE}/dpp/${id}/publish`, {}, { withCredentials: true });
+  publish(id: string): Observable<DppRecord & { technical?: PublishTechnicalTrace }> {
+    return this.http.post<DppRecord & { technical?: PublishTechnicalTrace }>(`${BASE}/dpp/${id}/publish`, {}, { withCredentials: true });
   }
 
   /** Lettura pubblica (nessun cookie, nessuna password) usata dalla pagina prodotto `/01/:gtin`

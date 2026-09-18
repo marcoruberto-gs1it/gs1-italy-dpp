@@ -21,6 +21,12 @@ export interface RegistrationResult {
   /** null se la registrazione riesce ma il recupero della proof fallisce — non blocchiamo la
    * pubblicazione per questo, vedi commento su getProof qui sotto. */
   proofJwt: string | null;
+  /** Il payload esatto inviato a mock-eu-registry e la risposta esatta ricevuta — non
+   * ricostruiti lato client, sono gli stessi byte davvero scambiati con l'API. Servono solo a
+   * mostrare all'utente (vedi PublishJourneyComponent) cosa succede davvero dietro
+   * l'animazione, non a nessuna logica applicativa. */
+  request: Record<string, unknown>;
+  response: Record<string, unknown>;
 }
 
 class RegistryNotConfiguredError extends Error {
@@ -124,24 +130,26 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
   const token = await fetchAccessToken(config);
   const liveUrl = digitalLinkUrl(siteUrl, record.gtin);
 
+  const requestBody = {
+    upi: buildUpi(record.gtin, record.batchOrSerial),
+    // Identificativo demo dell'operatore economico — non abbiamo ancora un modello
+    // multi-tenant reale, vedi "Esplicitamente fuori scope" nel piano di progetto.
+    reoId: 'gs1-italy-dpp-demo',
+    liveURL: liveUrl,
+    backupURL: liveUrl,
+    commodityCode: COMMODITY_CODES[record.sectorId],
+    facilitiesId: ['gs1-italy-dpp-demo-facility'],
+    granularityLevel: record.granularityLevel,
+    ...granularityFields(record.gtin, record.granularityLevel),
+  };
+
   const registerResponse = await fetch(`${config.registryUrl}/metadata/v1`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      upi: buildUpi(record.gtin, record.batchOrSerial),
-      // Identificativo demo dell'operatore economico — non abbiamo ancora un modello
-      // multi-tenant reale, vedi "Esplicitamente fuori scope" nel piano di progetto.
-      reoId: 'gs1-italy-dpp-demo',
-      liveURL: liveUrl,
-      backupURL: liveUrl,
-      commodityCode: COMMODITY_CODES[record.sectorId],
-      facilitiesId: ['gs1-italy-dpp-demo-facility'],
-      granularityLevel: record.granularityLevel,
-      ...granularityFields(record.gtin, record.granularityLevel),
-    }),
+    body: JSON.stringify(requestBody),
   });
   if (!registerResponse.ok) {
     if ([502, 503, 504].includes(registerResponse.status)) {
@@ -149,9 +157,14 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     }
     throw new Error(`Registrazione rifiutata da mock-eu-registry (${registerResponse.status}): ${await registerResponse.text()}`);
   }
-  const registered = (await registerResponse.json()) as { registryId: string };
+  const registered = (await registerResponse.json()) as { registryId: string } & Record<string, unknown>;
 
-  return { registryId: registered.registryId, proofJwt: await tryFetchProof(config, token, registered.registryId) };
+  return {
+    registryId: registered.registryId,
+    proofJwt: await tryFetchProof(config, token, registered.registryId),
+    request: requestBody,
+    response: registered,
+  };
 }
 
 /** La "proof of registration" è un bonus, non la conferma della registrazione stessa (quella è

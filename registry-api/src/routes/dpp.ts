@@ -88,8 +88,12 @@ dppRouter.post('/:id/publish', async (req, res) => {
     return;
   }
   try {
-    const { registryId, proofJwt } = await registerDpp(record);
-    res.json(await markPublished(record.id, registryId, proofJwt));
+    const { registryId, proofJwt, request, response } = await registerDpp(record);
+    const published = await markPublished(record.id, registryId, proofJwt);
+    // `technical`: il payload/risposta reali scambiati con mock-eu-registry, solo per la
+    // visibilità tecnica nell'interfaccia (vedi PublishJourneyComponent) — non persistiti,
+    // rilevanti solo per l'istante della pubblicazione appena avvenuta.
+    res.json({ ...published, technical: { request, response } });
   } catch (err) {
     if (err instanceof TransientRegistryError) {
       // Il frontend riprova da solo su retryable:true, senza mostrare nulla di tecnico

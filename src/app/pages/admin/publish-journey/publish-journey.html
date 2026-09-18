@@ -52,6 +52,17 @@
               @if (i === 3 && stepStatus(i) === 'done' && activeRegistryId()) {
                 <span class="journey-detail journey-detail--success">Registry ID: <code>{{ activeRegistryId() }}</code></span>
               }
+
+              @let stepJson = i === 0 ? localRecordJson() : i === 1 ? requestJson() : i === 2 ? liveUrlJson() : responseJson();
+              @if (stepJson) {
+                <button type="button" class="journey-tech-toggle" (click)="toggleTechnical(i)">
+                  <app-icon name="braces" [size]="12"></app-icon>
+                  {{ technicalOpen()[i] ? 'Nascondi JSON' : 'Mostra JSON' }}
+                </button>
+                @if (technicalOpen()[i]) {
+                  <pre class="journey-tech-json gs-code-block"><code [innerHTML]="stepJson"></code></pre>
+                }
+              }
             </div>
           </li>
         }

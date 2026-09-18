@@ -10,7 +10,7 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { IconComponent } from '../../components/icon/icon';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
-import { DppInput, DppRecord, GranularityLevel, RegistryApiService } from '../../services/registry-api.service';
+import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryApiService } from '../../services/registry-api.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
@@ -120,6 +120,10 @@ export class Admin {
   /** true quando siamo già ai tentativi automatici successivi al primo — la UI mostra una
    * rassicurazione in più senza mai nominare il motivo tecnico. */
   protected journeyLongWait = signal(false);
+  /** Il payload/risposta reali scambiati con mock-eu-registry, per chi vuole vedere il
+   * dettaglio tecnico dietro l'animazione (vedi PublishJourneyComponent) — valorizzato solo a
+   * registrazione riuscita, non è un dato ricostruito lato client. */
+  protected journeyTechnical = signal<PublishTechnicalTrace | null>(null);
 
   /** Il settore attualmente scelto nel form — pilota il pulsante dati demo, l'anteprima
    * infografica del passaporto e il QR code GS1 Digital Link qui sotto. */
@@ -387,6 +391,7 @@ export class Admin {
     this.journeyError.set(null);
     this.journeyRegistryId.set(null);
     this.journeyLongWait.set(false);
+    this.journeyTechnical.set(null);
     this.journeyPhase.set('running');
     this.journeyOpen.set(true);
 
@@ -403,6 +408,7 @@ export class Admin {
         this.publishPending.set(false);
         this.journeyPhase.set('success');
         this.journeyRegistryId.set(record.registryId);
+        this.journeyTechnical.set(record.technical ?? null);
         this.loadRecords().subscribe();
       },
       error: (err: HttpErrorResponse) => {
