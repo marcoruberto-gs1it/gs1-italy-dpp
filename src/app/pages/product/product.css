@@ -597,6 +597,11 @@
   gap: 10px;
 }
 
+.dpp-view-jsonld-btn {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
 .dpp-view-registry {
   display: flex;
   flex-direction: column;

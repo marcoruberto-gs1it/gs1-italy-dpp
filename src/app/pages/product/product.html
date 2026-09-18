@@ -374,8 +374,6 @@
         </div>
       </div>
     </article>
-
-    <app-json-ld-drawer [open]="jsonLdDrawerOpen()" [jsonLd]="jsonLdJson()" (closed)="closeJsonLd()"></app-json-ld-drawer>
   } @else if (dppRecord(); as dpp) {
     <nav class="breadcrumbs" aria-label="breadcrumb">
       <ol>
@@ -432,6 +430,11 @@
           <p><span class="dpp-view-registry-label">{{ t('product.dppFacility') }}</span> <code>{{ facilityId }}</code></p>
         </div>
       }
+
+      <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm dpp-view-jsonld-btn" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
+        <app-icon name="braces" [size]="15"></app-icon>
+        {{ t('product.viewJsonLd') }}
+      </button>
     </article>
   } @else if (dppLoading()) {
     <div class="not-found">
@@ -444,3 +447,5 @@
     </div>
   }
 </div>
+
+<app-json-ld-drawer [open]="jsonLdDrawerOpen()" [jsonLd]="activeJsonLd()" (closed)="closeJsonLd()"></app-json-ld-drawer>

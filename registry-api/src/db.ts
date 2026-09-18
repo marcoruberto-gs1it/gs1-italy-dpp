@@ -107,6 +107,17 @@ export async function getPublishedByGtin(gtin: string): Promise<DppRecord | unde
   return rows[0] ? fromRow(rows[0]) : undefined;
 }
 
+/** Qualunque scheda con questo GTIN, bozza compresa — solo per il JSON-LD servito a
+ * mock-eu-registry durante la registrazione (vedi routes/public.ts): il registro scarica il
+ * liveURL PRIMA di confermare la registrazione, quando la scheda presso di noi è ancora
+ * 'draft' (markPublished gira solo dopo la sua risposta) — filtrare qui su status='published'
+ * causerebbe lo stesso 404 già risolto una volta (vedi commit "Non bloccare mock-eu-registry
+ * sulla content negotiation JSON-LD"). Non esposta come lettura pubblica generica altrove. */
+export async function getAnyByGtin(gtin: string): Promise<DppRecord | undefined> {
+  const { rows } = await pool.query<DppRow>('SELECT * FROM gs1_dpp_records WHERE gtin = $1 ORDER BY updated_at DESC LIMIT 1', [gtin]);
+  return rows[0] ? fromRow(rows[0]) : undefined;
+}
+
 export interface CreateDppInput {
   sectorId: SectorId;
   gtin: string;

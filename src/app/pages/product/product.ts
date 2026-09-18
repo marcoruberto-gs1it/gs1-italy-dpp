@@ -221,6 +221,54 @@ export class ProductComponent implements OnDestroy {
     return doc;
   });
 
+  /** JSON-LD di una scheda DPP pubblicata — stessa logica di registry-api/src/jsonld.ts
+   * (due servizi, stesso contratto tenuto a mano, come DppRecord). Ogni termine gs1: è
+   * verificato contro il vocabolario ufficiale, vedi il commento lì per il dettaglio. */
+  dppJsonLdJson = computed(() => {
+    const dpp = this.dppRecord();
+    if (!dpp) return null;
+
+    const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
+    const doc: Record<string, unknown> = {
+      '@context': {
+        gs1: 'https://ref.gs1.org/voc/',
+        schema: 'http://schema.org/',
+        name: 'schema:name',
+        gtin: 'gs1:gtin',
+      },
+      '@type': ['schema:Product', 'gs1:Product'],
+      '@id': id,
+      name: dpp.name,
+      gtin: dpp.gtin,
+      granularityLevel: dpp.granularityLevel,
+    };
+
+    if (dpp.batchOrSerial) {
+      const value = dpp.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+      if (/^\(21\)/.test(dpp.batchOrSerial) || dpp.granularityLevel === 'ITEM') {
+        doc['gs1:hasSerialNumber'] = value;
+      } else {
+        doc['gs1:hasBatchLotNumber'] = value;
+      }
+    }
+
+    if (Object.keys(dpp.attributes).length > 0) {
+      doc['schema:additionalProperty'] = Object.entries(dpp.attributes).map(([propName, value]) => ({
+        '@type': 'schema:PropertyValue',
+        name: propName,
+        value,
+      }));
+    }
+
+    if (dpp.registryId) doc['registryId'] = dpp.registryId;
+
+    return doc;
+  });
+
+  /** Il documento JSON-LD davvero attivo nel drawer, quale che sia il ramo in vista (prodotto
+   * statico o scheda DPP) — un solo drawer condiviso invece di due istanze duplicate. */
+  activeJsonLd = computed(() => this.jsonLdJson() ?? this.dppJsonLdJson());
+
   // BreadcrumbList — stessa struttura del breadcrumb visibile in product.html, pubblicata anche
   // come dato strutturato (rich result "briciole di pane" nei risultati di ricerca).
   breadcrumbJsonLd = computed(() => {
