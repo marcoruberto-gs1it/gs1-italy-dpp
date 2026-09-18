@@ -7,6 +7,7 @@ import { IconComponent } from '../../components/icon/icon';
 import { SECTORS, Sector } from '../../data/sectors';
 import { DppInput, DppRecord, GranularityLevel, RegistryApiService } from '../../services/registry-api.service';
 import { DEMO_DATA } from './demo-data';
+import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
 
 type View = 'checking' | 'login' | 'list' | 'form';
 
@@ -32,7 +33,7 @@ const EMPTY_FORM = {
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, IconComponent, PublishJourneyComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -47,6 +48,32 @@ export class Admin {
   protected view = signal<View>('checking');
   protected records = signal<DppRecord[]>([]);
 
+  protected searchQuery = signal('');
+  protected statusFilter = signal<'all' | 'draft' | 'published'>('all');
+  protected statusFilters: { id: 'all' | 'draft' | 'published'; label: string }[] = [
+    { id: 'all', label: 'Tutte' },
+    { id: 'draft', label: 'Bozze' },
+    { id: 'published', label: 'Registrate' },
+  ];
+
+  protected filteredRecords = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    const status = this.statusFilter();
+    return this.records().filter((r) => {
+      if (status !== 'all' && r.status !== status) return false;
+      if (!query) return true;
+      return r.name.toLowerCase().includes(query) || r.gtin.includes(query);
+    });
+  });
+
+  protected filterCount(status: 'all' | 'draft' | 'published'): number {
+    return status === 'all' ? this.records().length : this.records().filter((r) => r.status === status).length;
+  }
+
+  protected onSearchInput(event: Event): void {
+    this.searchQuery.set((event.target as HTMLInputElement).value);
+  }
+
   protected loginPassword = signal('');
   protected loginError = signal<string | null>(null);
   protected loginPending = signal(false);
@@ -58,6 +85,14 @@ export class Admin {
   protected savePending = signal(false);
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
+
+  /** Il percorso animato verso il DPP Registry UE (vedi PublishJourneyComponent) — apparso al
+   * click su "Pubblica", chiuso solo dall'utente una volta arrivato l'esito vero. */
+  protected journeyOpen = signal(false);
+  protected journeyPhase = signal<JourneyPhase>('running');
+  protected journeyRecord = signal<DppRecord | null>(null);
+  protected journeyError = signal<string | null>(null);
+  protected journeyRegistryId = signal<string | null>(null);
   /** Il settore attualmente scelto nel form — pilota sia il pulsante dati demo sia l'anteprima
    * infografica del passaporto qui sotto. */
   protected currentSector = computed<Sector>(() => this.sectors.find((s) => s.id === this.form().sectorId) ?? this.sectors[0]);
@@ -219,16 +254,30 @@ export class Admin {
     if (!id) return;
     this.formError.set(null);
     this.publishPending.set(true);
+
+    this.journeyRecord.set(this.records().find((r) => r.id === id) ?? null);
+    this.journeyError.set(null);
+    this.journeyRegistryId.set(null);
+    this.journeyPhase.set('running');
+    this.journeyOpen.set(true);
+
     this.api.publish(id).subscribe({
-      next: () => {
+      next: (record) => {
         this.publishPending.set(false);
+        this.journeyPhase.set('success');
+        this.journeyRegistryId.set(record.registryId);
         this.loadRecords().subscribe();
       },
       error: (err: HttpErrorResponse) => {
         this.publishPending.set(false);
-        this.formError.set(err.error?.error ?? 'Errore durante la pubblicazione.');
+        this.journeyPhase.set('error');
+        this.journeyError.set(err.error?.error ?? 'Errore durante la pubblicazione.');
       },
     });
+  }
+
+  protected closeJourney(): void {
+    this.journeyOpen.set(false);
   }
 
   protected deleteRecord(record: DppRecord): void {

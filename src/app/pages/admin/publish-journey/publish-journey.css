@@ -1,0 +1,223 @@
+.journey-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(15, 15, 20, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: journey-fade-in 0.18s ease-out;
+}
+
+.journey-dialog {
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+  animation: journey-pop-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.journey-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.journey-header h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 6px 0 4px;
+}
+
+.journey-header p {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.journey-header code {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.journey-close {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.journey-close:hover {
+  color: var(--text-primary);
+}
+
+.journey-explainer {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 14px 0 24px;
+}
+
+.journey-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.journey-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  column-gap: 14px;
+  padding-bottom: 26px;
+}
+
+.journey-step:last-child {
+  padding-bottom: 0;
+}
+
+.journey-node {
+  grid-row: 1;
+  grid-column: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface-sunken);
+  color: var(--text-tertiary);
+  border: 2px solid var(--border-subtle);
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  z-index: 1;
+}
+
+.journey-line {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  width: 2px;
+  margin: 0 auto;
+  margin-top: 32px;
+  height: calc(100% - 6px);
+  background: var(--border-subtle);
+  transition: background 0.3s ease;
+}
+
+.journey-copy {
+  grid-row: 1;
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 4px;
+}
+
+.journey-copy strong {
+  font-size: 0.92rem;
+  color: var(--text-tertiary);
+  transition: color 0.25s ease;
+}
+
+.journey-term {
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+  opacity: 0.7;
+  font-family: var(--font-mono);
+}
+
+.journey-detail {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.journey-detail code {
+  font-family: var(--font-mono);
+  background: var(--bg-surface-sunken);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.journey-detail--success {
+  color: var(--success);
+}
+
+.journey-detail--error {
+  color: var(--warning);
+}
+
+/* --- Stati --- */
+.journey-step.is-done .journey-node {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.journey-step.is-done .journey-copy strong {
+  color: var(--text-primary);
+}
+
+.journey-step.is-done .journey-line {
+  background: var(--success);
+}
+
+.journey-step.is-active .journey-node {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  animation: journey-pulse 1.4s ease-in-out infinite;
+}
+
+.journey-step.is-active .journey-copy strong {
+  color: var(--text-primary);
+}
+
+.journey-step.is-error .journey-node {
+  background: var(--warning-soft);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.journey-step.is-error .journey-copy strong {
+  color: var(--warning);
+}
+
+.journey-dismiss {
+  width: 100%;
+  margin-top: 24px;
+}
+
+@keyframes journey-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes journey-pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes journey-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-soft); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-step.is-active .journey-node {
+    animation: none;
+  }
+}

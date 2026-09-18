@@ -38,7 +38,7 @@
       <div class="admin-header">
         <div>
           <h1>Schede DPP</h1>
-          <p>{{ records().length }} schede — bozze e pubblicate su mock-eu-registry.</p>
+          <p>{{ records().length }} schede — bozze e registrate sul DPP Registry UE.</p>
         </div>
         <div class="admin-header-actions">
           <button type="button" class="gs-btn gs-btn--primary" (click)="startCreate()">
@@ -49,82 +49,148 @@
         </div>
       </div>
 
-      <ul class="record-list">
-        @for (record of records(); track record.id) {
-          <li class="gs-card record-row">
-            <div class="record-main">
-              <span class="record-name">{{ record.name }}</span>
-              <span class="record-meta">{{ sectorName(record.sectorId) }} · GTIN {{ record.gtin }} · {{ record.granularityLevel }}</span>
-            </div>
-            <div class="record-actions">
-              @if (record.status === 'published') {
-                <span class="gs-badge gs-badge--verified">Pubblicata</span>
-              } @else {
-                <span class="gs-badge gs-badge--neutral">Bozza</span>
-              }
-              <button type="button" class="gs-btn gs-btn--ghost" (click)="startEdit(record)">Apri</button>
-              <button type="button" class="gs-btn gs-btn--ghost" (click)="deleteRecord(record)">Elimina</button>
-            </div>
-          </li>
-        } @empty {
-          <li class="admin-status">Nessuna scheda ancora. Crea la prima con "Nuova scheda".</li>
-        }
-      </ul>
+      <div class="list-toolbar">
+        <div class="search-field">
+          <app-icon name="hash" [size]="15"></app-icon>
+          <input
+            type="search"
+            placeholder="Cerca per nome o UPI (GTIN)…"
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            aria-label="Cerca schede"
+          />
+        </div>
+        <div class="status-filter" role="tablist" aria-label="Filtra per stato">
+          @for (filter of statusFilters; track filter.id) {
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="statusFilter() === filter.id"
+              [class.active]="statusFilter() === filter.id"
+              (click)="statusFilter.set(filter.id)"
+            >
+              {{ filter.label }} <span class="filter-count">{{ filterCount(filter.id) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="record-table-wrap">
+        <table class="record-table">
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">Settore</th>
+              <th scope="col">UPI (GTIN)</th>
+              <th scope="col">Granularità</th>
+              <th scope="col">Stato</th>
+              <th scope="col"><span class="sr-only">Azioni</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (record of filteredRecords(); track record.id) {
+              <tr>
+                <td data-label="Nome">
+                  <span class="record-name">{{ record.name }}</span>
+                </td>
+                <td data-label="Settore">{{ sectorName(record.sectorId) }}</td>
+                <td data-label="UPI (GTIN)"><code>{{ record.gtin }}</code></td>
+                <td data-label="Granularità"><span class="gs-badge gs-badge--neutral">{{ record.granularityLevel }}</span></td>
+                <td data-label="Stato">
+                  @if (record.status === 'published') {
+                    <span class="gs-badge gs-badge--verified">
+                      <app-icon name="check-circle" [size]="12"></app-icon>
+                      Registrata
+                    </span>
+                  } @else {
+                    <span class="gs-badge gs-badge--neutral">Bozza</span>
+                  }
+                </td>
+                <td data-label="Azioni" class="record-actions">
+                  <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="startEdit(record)">Apri</button>
+                  <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="deleteRecord(record)">Elimina</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr class="record-empty-row">
+                <td colspan="6">
+                  @if (records().length === 0) {
+                    Nessuna scheda ancora. Crea la prima con "Nuova scheda".
+                  } @else {
+                    Nessuna scheda corrisponde alla ricerca.
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
 
     @case ('form') {
       <div class="admin-header">
         <div>
           <h1>{{ editingId() ? 'Modifica scheda' : 'Nuova scheda' }}</h1>
-          <p>I campi non hanno ancora uno schema specifico per settore: usa "Attributi" per i dati liberi.</p>
+          <p>Terminologia CEN/CENELEC (EN&nbsp;18219) e del DPP Registry UE — "Attributi" per i dati liberi di prodotto.</p>
         </div>
         <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
       </div>
 
       <div class="form-layout">
         <div class="gs-card form-card">
-          <div class="form-card-head">
-            <div>
-              <label for="f-sector">Settore</label>
-              <select id="f-sector" (change)="updateField('sectorId', $event)">
-                @for (sector of sectors; track sector.id) {
-                  <option [value]="sector.id" [selected]="sector.id === form().sectorId">{{ sector.name }}</option>
-                }
-              </select>
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-eyebrow">Identificazione prodotto</span>
             </div>
-            <button type="button" class="gs-btn gs-btn--ghost demo-fill-btn" (click)="fillDemoData()">
-              <app-icon name="refresh" [size]="15"></app-icon>
-              Popola con dati demo
-            </button>
+
+            <div class="form-card-head">
+              <div>
+                <label for="f-sector">Settore</label>
+                <select id="f-sector" (change)="updateField('sectorId', $event)">
+                  @for (sector of sectors; track sector.id) {
+                    <option [value]="sector.id" [selected]="sector.id === form().sectorId">{{ sector.name }}</option>
+                  }
+                </select>
+              </div>
+              <button type="button" class="gs-btn gs-btn--ghost demo-fill-btn" (click)="fillDemoData()">
+                <app-icon name="refresh" [size]="15"></app-icon>
+                Popola con dati demo
+              </button>
+            </div>
+
+            <label for="f-name">Nome prodotto</label>
+            <input id="f-name" type="text" [value]="form().name" (input)="updateField('name', $event)" placeholder="es. Modulo batteria EV 75 kWh" />
+
+            <label for="f-gtin">UPI — Unique Product Identifier (GTIN, 8-14 cifre)</label>
+            <input id="f-gtin" type="text" [value]="form().gtin" (input)="updateField('gtin', $event)" placeholder="08000000000017" />
+
+            <label for="f-granularity">Granularity level</label>
+            <select id="f-granularity" (change)="updateField('granularityLevel', $event)">
+              @for (level of granularityLevels; track level) {
+                <option [value]="level" [selected]="level === form().granularityLevel">{{ level }}</option>
+              }
+            </select>
+
+            <label for="f-batch">Lotto o seriale — AI (10)/(21), livello batch/item</label>
+            <input id="f-batch" type="text" [value]="form().batchOrSerial" (input)="updateField('batchOrSerial', $event)" placeholder="es. (21) SN12345" />
           </div>
 
-          <label for="f-name">Nome prodotto</label>
-          <input id="f-name" type="text" [value]="form().name" (input)="updateField('name', $event)" placeholder="es. Modulo batteria EV 75 kWh" />
-
-          <label for="f-gtin">GTIN (8-14 cifre)</label>
-          <input id="f-gtin" type="text" [value]="form().gtin" (input)="updateField('gtin', $event)" placeholder="08000000000017" />
-
-          <label for="f-granularity">Granularità</label>
-          <select id="f-granularity" (change)="updateField('granularityLevel', $event)">
-            @for (level of granularityLevels; track level) {
-              <option [value]="level" [selected]="level === form().granularityLevel">{{ level }}</option>
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-eyebrow">Dati di prodotto (decentralizzati, non lasciano l'operatore economico)</span>
+            </div>
+            <div class="attributes-head">
+              <span>Attributi</span>
+              <button type="button" class="attr-add" (click)="addAttributeRow()">+ Aggiungi</button>
+            </div>
+            @for (row of attributeRows(); track $index) {
+              <div class="attribute-row">
+                <input type="text" placeholder="chiave" [value]="row.key" (input)="updateAttributeKey($index, $event)" />
+                <input type="text" placeholder="valore" [value]="row.value" (input)="updateAttributeValue($index, $event)" />
+                <button type="button" class="attr-remove" (click)="removeAttributeRow($index)" aria-label="Rimuovi attributo">✕</button>
+              </div>
             }
-          </select>
-
-          <label for="f-batch">Lotto o seriale (opzionale — AI (10)/(21))</label>
-          <input id="f-batch" type="text" [value]="form().batchOrSerial" (input)="updateField('batchOrSerial', $event)" placeholder="es. (21) SN12345" />
-
-          <div class="attributes-head">
-            <span>Attributi</span>
-            <button type="button" class="attr-add" (click)="addAttributeRow()">+ Aggiungi</button>
           </div>
-          @for (row of attributeRows(); track $index) {
-            <div class="attribute-row">
-              <input type="text" placeholder="chiave" [value]="row.key" (input)="updateAttributeKey($index, $event)" />
-              <input type="text" placeholder="valore" [value]="row.value" (input)="updateAttributeValue($index, $event)" />
-              <button type="button" class="attr-remove" (click)="removeAttributeRow($index)" aria-label="Rimuovi attributo">✕</button>
-            </div>
-          }
 
           <div class="form-actions">
             <button type="button" class="gs-btn gs-btn--ghost" [disabled]="savePending()" (click)="saveDraft()">
@@ -132,7 +198,7 @@
             </button>
             @if (editingId()) {
               <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending() || !!publishedRecord()" (click)="publish()">
-                {{ publishPending() ? 'Pubblicazione…' : publishedRecord() ? 'Già pubblicata' : 'Pubblica su mock-eu-registry' }}
+                {{ publishPending() ? 'Pubblicazione…' : publishedRecord() ? 'Già registrata' : 'Pubblica sul DPP Registry UE' }}
               </button>
             }
           </div>
@@ -141,8 +207,8 @@
             <div class="publish-result">
               <app-icon name="check-circle" [size]="18"></app-icon>
               <div>
-                <strong>Registrata.</strong>
-                <span>registryId: <code>{{ published.registryId }}</code></span>
+                <strong>Registrata sul DPP Registry UE.</strong>
+                <span>Registry ID: <code>{{ published.registryId }}</code></span>
               </div>
             </div>
           }
@@ -162,7 +228,7 @@
           </div>
 
           <div class="passport-identity">
-            <span class="passport-gtin">{{ form().gtin ? '(01) ' + form().gtin : '(01) — GTIN non impostato' }}</span>
+            <span class="passport-gtin">{{ form().gtin ? 'UPI (01) ' + form().gtin : 'UPI (01) — non impostato' }}</span>
             @if (form().batchOrSerial) {
               <span class="passport-gtin">{{ form().batchOrSerial }}</span>
             }
@@ -184,9 +250,9 @@
 
           <div class="passport-footer">
             @if (publishedRecord()) {
-              <span class="gs-badge gs-badge--verified">Pubblicata su mock-eu-registry</span>
+              <span class="gs-badge gs-badge--verified">Registrata sul DPP Registry UE</span>
             } @else {
-              <span class="gs-badge gs-badge--neutral">Anteprima — non ancora pubblicata</span>
+              <span class="gs-badge gs-badge--neutral">Anteprima — non ancora registrata</span>
             }
           </div>
         </aside>
@@ -194,3 +260,12 @@
     }
   }
 </div>
+
+<app-publish-journey
+  [open]="journeyOpen()"
+  [phase]="journeyPhase()"
+  [record]="journeyRecord()"
+  [errorMessage]="journeyError()"
+  [registryId]="journeyRegistryId()"
+  (closed)="closeJourney()"
+></app-publish-journey>

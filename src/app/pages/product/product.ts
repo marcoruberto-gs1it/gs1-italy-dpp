@@ -21,6 +21,12 @@ import { SECTORS, localizeSector } from '../../data/sectors';
 // vedi generate-agent-feed.js: risolto qui verso l'origine reale con lo stesso principio.
 const PLACEHOLDER_ORIGIN = SSR_FALLBACK_ORIGIN;
 
+// Stessi identificativi demo hardcoded in registry-api/src/mockRegistryClient.ts — duplicati
+// qui solo per mostrarli sulla scheda pubblica (EO/UOI e Facility/UFI viaggiano davvero verso
+// il DPP Registry UE ad ogni pubblicazione), non letti da lì.
+const DEMO_EO_ID = 'gs1-italy-dpp-demo';
+const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
+
 // gs1:AllergenTypeCode-* / gs1:LevelOfContainmentCode-* → chiave di traduzione in product.*
 // (vedi src/app/i18n/translations.ts). Copre solo i codici realmente usati da add-gs1-jsonld.js
 // per i 25 prodotti del catalogo.
@@ -150,6 +156,8 @@ export class ProductComponent implements OnDestroy {
   });
 
   dppAttributeEntries = computed(() => Object.entries(this.dppRecord()?.attributes ?? {}));
+  protected economicOperatorId = DEMO_EO_ID;
+  protected facilityId = DEMO_FACILITY_ID;
 
   images = computed<string[]>(() => {
     const prod = this.product();

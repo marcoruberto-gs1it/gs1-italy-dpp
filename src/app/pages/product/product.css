@@ -598,13 +598,34 @@
 }
 
 .dpp-view-registry {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.dpp-view-registry p {
   font-size: 0.82rem;
   color: var(--text-tertiary);
   margin: 0;
 }
 
+.dpp-view-registry-label {
+  display: inline-block;
+  min-width: 190px;
+}
+
 .dpp-view-registry code {
   font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 480px) {
+  .dpp-view-registry-label {
+    display: block;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 600px) {

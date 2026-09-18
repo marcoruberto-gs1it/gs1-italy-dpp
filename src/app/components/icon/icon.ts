@@ -43,7 +43,8 @@ export type IconName =
   | 'wheel'
   | 'sofa'
   | 'bed'
-  | 'cpu';
+  | 'cpu'
+  | 'save';
 
 @Component({
   selector: 'app-icon',

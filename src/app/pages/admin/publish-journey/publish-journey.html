@@ -1,0 +1,63 @@
+@if (isOpen()) {
+  <div class="journey-backdrop" (click)="onBackdropClick($event)">
+    <div class="journey-dialog" role="dialog" aria-modal="true" aria-label="Percorso di pubblicazione della scheda DPP">
+      <header class="journey-header">
+        <div>
+          <span class="gs-badge gs-badge--vocab">DPP Registry UE</span>
+          <h2>Pubblicazione in corso</h2>
+          @if (activeRecord(); as r) {
+            <p>{{ r.name }} — UPI <code>{{ r.gtin }}</code></p>
+          }
+        </div>
+        @if (activeError() !== null) {
+          <button type="button" class="journey-close" (click)="close()" aria-label="Chiudi">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        }
+      </header>
+
+      <p class="journey-explainer">
+        Solo gli identificativi e l'hash del link viaggiano verso il registro — i dati di prodotto
+        restano qui, presso l'operatore economico (vedi "Cos'è il DPP" in home).
+      </p>
+
+      <ol class="journey-steps">
+        @for (step of steps; track step.title; let i = $index) {
+          <li class="journey-step" [class]="'is-' + stepStatus(i)">
+            <span class="journey-node">
+              @if (stepStatus(i) === 'done') {
+                <app-icon name="check-circle" [size]="16"></app-icon>
+              } @else if (stepStatus(i) === 'error') {
+                <app-icon name="alert-triangle" [size]="16"></app-icon>
+              } @else {
+                <app-icon [name]="step.icon" [size]="16"></app-icon>
+              }
+            </span>
+            @if (i < steps.length - 1) {
+              <span class="journey-line"></span>
+            }
+            <div class="journey-copy">
+              <strong>{{ step.title }}</strong>
+              <span class="journey-term">{{ step.standardTerm }}</span>
+              @if (i === 1 && stepStatus(i) !== 'pending') {
+                <span class="journey-detail">EO (UOI): <code>{{ eoId }}</code> · Facility (UFI): <code>{{ facilityId }}</code></span>
+              }
+              @if (i === 2 && stepStatus(i) === 'error') {
+                <span class="journey-detail journey-detail--error">{{ activeError() }}</span>
+              }
+              @if (i === 3 && stepStatus(i) === 'done' && activeRegistryId()) {
+                <span class="journey-detail journey-detail--success">Registry ID: <code>{{ activeRegistryId() }}</code></span>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+
+      @if (activeError() !== null) {
+        <button type="button" class="gs-btn gs-btn--ghost journey-dismiss" (click)="close()">Chiudi</button>
+      } @else if (activeRegistryId()) {
+        <button type="button" class="gs-btn gs-btn--primary journey-dismiss" (click)="close()">Fatto</button>
+      }
+    </div>
+  </div>
+}

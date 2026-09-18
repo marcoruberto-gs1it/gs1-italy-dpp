@@ -403,7 +403,7 @@
       </div>
 
       <div class="dpp-view-identity">
-        <span class="meta-chip">(01) {{ dpp.gtin }}</span>
+        <span class="meta-chip">UPI (01) {{ dpp.gtin }}</span>
         @if (dpp.batchOrSerial) {
           <span class="meta-chip">{{ dpp.batchOrSerial }}</span>
         }
@@ -426,7 +426,11 @@
       }
 
       @if (dpp.registryId) {
-        <p class="dpp-view-registry">{{ t('product.dppRegistryId') }}: <code>{{ dpp.registryId }}</code></p>
+        <div class="dpp-view-registry">
+          <p><span class="dpp-view-registry-label">{{ t('product.dppRegistryId') }}</span> <code>{{ dpp.registryId }}</code></p>
+          <p><span class="dpp-view-registry-label">{{ t('product.dppEconomicOperator') }}</span> <code>{{ economicOperatorId }}</code></p>
+          <p><span class="dpp-view-registry-label">{{ t('product.dppFacility') }}</span> <code>{{ facilityId }}</code></p>
+        </div>
       }
     </article>
   } @else if (dppLoading()) {
