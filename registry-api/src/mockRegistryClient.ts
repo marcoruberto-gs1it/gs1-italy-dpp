@@ -138,6 +138,15 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     }),
   });
   if (!registerResponse.ok) {
+    // 502/503/504 qui sono quasi sempre il piano gratuito di Render che risveglia
+    // mock-eu-registry da uno stato addormentato (avvio JVM/Quarkus lento, anche 40-60s) — non
+    // un errore applicativo del registro, che altrimenti risponderebbe con un body JSON suo.
+    // Messaggio dedicato invece del testo grezzo (spesso una pagina HTML dell'edge di Render).
+    if ([502, 503, 504].includes(registerResponse.status)) {
+      throw new Error(
+        `Il registro UE si sta risvegliando (piano gratuito Render, può richiedere fino a un minuto) — riprova tra poco.`
+      );
+    }
     throw new Error(`Registrazione rifiutata da mock-eu-registry (${registerResponse.status}): ${await registerResponse.text()}`);
   }
   const registered = (await registerResponse.json()) as { registryId: string };
