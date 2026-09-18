@@ -38,7 +38,11 @@
             }
             <div class="journey-copy">
               <strong>{{ step.title }}</strong>
-              <span class="journey-term">{{ step.standardTerm }}</span>
+              @if (i === 2 && stepStatus(i) === 'active' && isLongWait()) {
+                <span class="journey-term journey-term--reassure">Ci vuole un po' più del solito, quasi fatto…</span>
+              } @else {
+                <span class="journey-term">{{ step.standardTerm }}</span>
+              }
               @if (i === 1 && stepStatus(i) !== 'pending') {
                 <span class="journey-detail">EO (UOI): <code>{{ eoId }}</code> · Facility (UFI): <code>{{ facilityId }}</code></span>
               }

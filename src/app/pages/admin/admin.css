@@ -534,6 +534,75 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.form-card input.field-invalid {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+.field-hint--error {
+  color: var(--warning);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.field-hint-fix {
+  appearance: none;
+  border: 1px solid var(--warning);
+  background: none;
+  color: var(--warning);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.field-hint-fix:hover {
+  background: var(--warning-soft);
+}
+
+/* --- QR code GS1 Digital Link nell'anteprima --- */
+.passport-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.passport-qr svg {
+  border-radius: var(--radius-sm);
+}
+
+.passport-qr-fallback {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: var(--bg-surface-sunken);
+  border-radius: var(--radius-sm);
+}
+
+.passport-qr-caption {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
 .attributes-head {
   display: flex;
   align-items: center;

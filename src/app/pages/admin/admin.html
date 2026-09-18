@@ -13,21 +13,14 @@
     }
 
     @case ('login') {
-      <form class="login-card" (submit)="$event.preventDefault(); submitLogin()">
+      <form class="login-card" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
         <h1>Amministrazione DPP</h1>
         <p>Sezione riservata: inserisci la password per creare o modificare una scheda.</p>
         @if (loginError()) {
           <p class="form-error">{{ loginError() }}</p>
         }
         <label for="admin-password">Password</label>
-        <input
-          id="admin-password"
-          type="password"
-          autocomplete="current-password"
-          [value]="loginPassword()"
-          (input)="onLoginPasswordInput($event)"
-          required
-        />
+        <input id="admin-password" type="password" autocomplete="current-password" formControlName="password" />
         <button type="submit" class="gs-btn gs-btn--primary" [disabled]="loginPending()">
           {{ loginPending() ? 'Verifica…' : 'Entra' }}
         </button>
@@ -136,7 +129,7 @@
         <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
       </div>
 
-      <div class="form-layout">
+      <form class="form-layout" [formGroup]="dppForm" (ngSubmit)="saveDraft()">
         <div class="gs-card form-card">
           <div class="form-section">
             <div class="form-section-head">
@@ -146,9 +139,9 @@
             <div class="form-card-head">
               <div>
                 <label for="f-sector">Settore</label>
-                <select id="f-sector" (change)="updateField('sectorId', $event)">
+                <select id="f-sector" formControlName="sectorId">
                   @for (sector of sectors; track sector.id) {
-                    <option [value]="sector.id" [selected]="sector.id === form().sectorId">{{ sector.name }}</option>
+                    <option [value]="sector.id">{{ sector.name }}</option>
                   }
                 </select>
               </div>
@@ -159,23 +152,39 @@
             </div>
 
             <label for="f-name">Nome prodotto</label>
-            <input id="f-name" type="text" [value]="form().name" (input)="updateField('name', $event)" placeholder="es. Modulo batteria EV 75 kWh" />
+            <input id="f-name" type="text" formControlName="name" placeholder="es. Modulo batteria EV 75 kWh" [class.field-invalid]="fieldError('name')" />
+            @if (fieldError('name'); as msg) {
+              <p class="field-hint field-hint--error">{{ msg }}</p>
+            }
 
             <label for="f-gtin">UPI — Unique Product Identifier (GTIN, 8-14 cifre)</label>
-            <input id="f-gtin" type="text" [value]="form().gtin" (input)="updateField('gtin', $event)" placeholder="08000000000017" />
+            <input id="f-gtin" type="text" formControlName="gtin" placeholder="08000000000019" [class.field-invalid]="fieldError('gtin')" />
+            @if (fieldError('gtin'); as msg) {
+              <p class="field-hint field-hint--error">
+                {{ msg }}
+                @if (gtinSuggestion(); as suggestion) {
+                  <button type="button" class="field-hint-fix" (click)="applyGtinSuggestion()">Usa {{ suggestion }}</button>
+                }
+              </p>
+            } @else {
+              <p class="field-hint">La cifra finale è calcolata dallo standard GS1 (GTIN) — se non torna, te lo segnaliamo subito.</p>
+            }
 
             <label for="f-granularity">Granularity level</label>
-            <select id="f-granularity" (change)="updateField('granularityLevel', $event)">
+            <select id="f-granularity" formControlName="granularityLevel">
               @for (level of granularityLevels; track level) {
-                <option [value]="level" [selected]="level === form().granularityLevel">{{ level }}</option>
+                <option [value]="level">{{ level }}</option>
               }
             </select>
 
             <label for="f-batch">Lotto o seriale — AI (10)/(21), livello batch/item</label>
-            <input id="f-batch" type="text" [value]="form().batchOrSerial" (input)="updateField('batchOrSerial', $event)" placeholder="es. (21) SN12345" />
+            <input id="f-batch" type="text" formControlName="batchOrSerial" placeholder="es. (21) SN12345" [class.field-invalid]="fieldError('batchOrSerial')" />
+            @if (fieldError('batchOrSerial'); as msg) {
+              <p class="field-hint field-hint--error">{{ msg }}</p>
+            }
           </div>
 
-          <div class="form-section">
+          <div class="form-section" formArrayName="attributes">
             <div class="form-section-head">
               <span class="form-section-eyebrow">Dati di prodotto (decentralizzati, non lasciano l'operatore economico)</span>
             </div>
@@ -183,17 +192,17 @@
               <span>Attributi</span>
               <button type="button" class="attr-add" (click)="addAttributeRow()">+ Aggiungi</button>
             </div>
-            @for (row of attributeRows(); track $index) {
-              <div class="attribute-row">
-                <input type="text" placeholder="chiave" [value]="row.key" (input)="updateAttributeKey($index, $event)" />
-                <input type="text" placeholder="valore" [value]="row.value" (input)="updateAttributeValue($index, $event)" />
+            @for (row of attributesArray.controls; track $index) {
+              <div class="attribute-row" [formGroupName]="$index">
+                <input type="text" placeholder="chiave" formControlName="key" />
+                <input type="text" placeholder="valore" formControlName="value" />
                 <button type="button" class="attr-remove" (click)="removeAttributeRow($index)" aria-label="Rimuovi attributo">✕</button>
               </div>
             }
           </div>
 
           <div class="form-actions">
-            <button type="button" class="gs-btn gs-btn--ghost" [disabled]="savePending()" (click)="saveDraft()">
+            <button type="submit" class="gs-btn gs-btn--ghost" [disabled]="savePending()">
               {{ savePending() ? 'Salvataggio…' : 'Salva bozza' }}
             </button>
             @if (editingId()) {
@@ -223,24 +232,35 @@
             </span>
             <div>
               <span class="passport-eyebrow" [style.color]="currentSector().brandColor">{{ currentSector().shortName }}</span>
-              <h3 class="passport-name">{{ form().name || 'Nome prodotto' }}</h3>
+              <h3 class="passport-name">{{ dppForm.controls.name.value || 'Nome prodotto' }}</h3>
             </div>
           </div>
 
           <div class="passport-identity">
-            <span class="passport-gtin">{{ form().gtin ? 'UPI (01) ' + form().gtin : 'UPI (01) — non impostato' }}</span>
-            @if (form().batchOrSerial) {
-              <span class="passport-gtin">{{ form().batchOrSerial }}</span>
+            <span class="passport-gtin">{{ previewGtin() ? 'UPI (01) ' + previewGtin() : 'UPI (01) — in attesa di un GTIN valido' }}</span>
+            @if (dppForm.controls.batchOrSerial.value) {
+              <span class="passport-gtin">{{ dppForm.controls.batchOrSerial.value }}</span>
             }
-            <span class="gs-badge gs-badge--neutral">{{ form().granularityLevel }}</span>
+            <span class="gs-badge gs-badge--neutral">{{ dppForm.controls.granularityLevel.value }}</span>
+          </div>
+
+          <div class="passport-qr">
+            @if (isBrowser && qrValue()) {
+              <qrcode [qrdata]="qrValue()!" [width]="120" [margin]="1" elementType="svg" colorDark="#14101f" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
+            } @else {
+              <div class="passport-qr-fallback">
+                <app-icon name="qr-code" [size]="36"></app-icon>
+              </div>
+            }
+            <p class="passport-qr-caption">GS1 Digital Link — inquadra per aprire questa scheda</p>
           </div>
 
           <div class="passport-facts">
-            @for (row of attributeRows(); track $index) {
-              @if (row.key.trim()) {
+            @for (row of attributesArray.controls; track $index) {
+              @if (row.value.key?.trim()) {
                 <div class="fact-tile">
-                  <span class="fact-label">{{ row.key }}</span>
-                  <span class="fact-value">{{ row.value || '—' }}</span>
+                  <span class="fact-label">{{ row.value.key }}</span>
+                  <span class="fact-value">{{ row.value.value || '—' }}</span>
                 </div>
               }
             } @empty {
@@ -256,7 +276,7 @@
             }
           </div>
         </aside>
-      </div>
+      </form>
     }
   }
 </div>
@@ -267,5 +287,6 @@
   [record]="journeyRecord()"
   [errorMessage]="journeyError()"
   [registryId]="journeyRegistryId()"
+  [longWait]="journeyLongWait()"
   (closed)="closeJourney()"
 ></app-publish-journey>

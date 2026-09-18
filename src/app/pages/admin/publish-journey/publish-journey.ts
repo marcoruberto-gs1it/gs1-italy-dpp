@@ -71,7 +71,13 @@ export class PublishJourneyComponent {
   @Input() set registryId(v: string | null) {
     this._registryId.set(v ?? null);
   }
+  @Input() set longWait(v: boolean) {
+    this._longWait.set(!!v);
+  }
   @Output() closed = new EventEmitter<void>();
+
+  private _longWait = signal(false);
+  isLongWait = computed(() => this._longWait());
 
   isOpen = computed(() => this._open());
   activeRecord = computed(() => this._record());

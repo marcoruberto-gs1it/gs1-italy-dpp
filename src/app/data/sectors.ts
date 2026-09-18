@@ -45,7 +45,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'Regolamento (UE) 2023/1542',
     status: 'coming-soon',
     exampleName: 'Modulo batteria EV — esempio',
-    exampleGtin: '08000000000017',
+    exampleGtin: '08000000000019',
   },
   {
     id: 'apparel',
@@ -59,7 +59,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Capo — esempio',
-    exampleGtin: '08000000000024',
+    exampleGtin: '08000000000026',
     exampleExtraElement: '(10) LOTTO2027A',
   },
   {
@@ -74,7 +74,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Profilato in acciaio — esempio',
-    exampleGtin: '08000000000031',
+    exampleGtin: '08000000000033',
   },
   {
     id: 'construction',
@@ -88,7 +88,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Pannello isolante — esempio',
-    exampleGtin: '08000000000048',
+    exampleGtin: '08000000000040',
   },
   {
     id: 'aluminium',
@@ -102,7 +102,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Profilo in alluminio — esempio',
-    exampleGtin: '08000000000055',
+    exampleGtin: '08000000000057',
   },
   {
     id: 'tyres',
@@ -116,7 +116,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Pneumatico estivo — esempio',
-    exampleGtin: '08000000000062',
+    exampleGtin: '08000000000064',
   },
   {
     id: 'furniture',
@@ -130,7 +130,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Sedia da ufficio — esempio',
-    exampleGtin: '08000000000079',
+    exampleGtin: '08000000000071',
   },
   {
     id: 'mattresses',
@@ -143,7 +143,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Materasso a molle — esempio',
-    exampleGtin: '08000000000086',
+    exampleGtin: '08000000000088',
   },
   {
     id: 'ict',
@@ -157,7 +157,7 @@ export const SECTORS: Sector[] = [
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Router domestico — esempio',
-    exampleGtin: '08000000000093',
+    exampleGtin: '08000000000095',
   },
 ];
 

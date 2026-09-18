@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createDpp, deleteDpp, getDpp, listDpp, markPublished, updateDpp } from '../db.ts';
-import { registerDpp } from '../mockRegistryClient.ts';
+import { registerDpp, TransientRegistryError } from '../mockRegistryClient.ts';
 import { isValidSectorId } from '../sectors.ts';
 
 export const dppRouter = Router();
@@ -91,6 +91,13 @@ dppRouter.post('/:id/publish', async (req, res) => {
     const { registryId, proofJwt } = await registerDpp(record);
     res.json(await markPublished(record.id, registryId, proofJwt));
   } catch (err) {
+    if (err instanceof TransientRegistryError) {
+      // Il frontend riprova da solo su retryable:true, senza mostrare nulla di tecnico
+      // all'utente — vedi admin.ts. Questo messaggio è solo un ultimo ripiego, se anche i
+      // tentativi automatici finiscono per esaurirsi.
+      res.status(503).json({ error: 'Il servizio sta impiegando più tempo del solito.', retryable: true });
+      return;
+    }
     res.status(502).json({ error: err instanceof Error ? err.message : 'errore sconosciuto durante la pubblicazione' });
   }
 });

@@ -139,6 +139,13 @@
   font-family: var(--font-mono);
 }
 
+.journey-term--reassure {
+  font-family: inherit;
+  font-style: italic;
+  opacity: 1;
+  color: var(--accent);
+}
+
 .journey-detail {
   font-size: 0.78rem;
   color: var(--text-secondary);

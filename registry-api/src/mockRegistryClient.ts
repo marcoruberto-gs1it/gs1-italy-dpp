@@ -30,6 +30,12 @@ class RegistryNotConfiguredError extends Error {
   }
 }
 
+/** Un 502/503/504 qui è quasi sempre il piano gratuito di Render che sta risvegliando
+ * mock-eu-registry (avvio JVM/Quarkus, anche 40-60s) — non un errore applicativo del
+ * registro, che altrimenti risponderebbe con un body JSON suo. routes/dpp.ts la usa per
+ * dire al frontend "riprova da solo", invece di mostrare un errore tecnico all'utente. */
+export class TransientRegistryError extends Error {}
+
 /** Codice merceologico (HS/TARIC, 4-10 cifre — obbligatorio nello schema di mock-eu-registry,
  * che rifiuta stringhe libere) plausibile per settore. Solo per la demo: non è una
  * classificazione doganale verificata prodotto per prodotto. */
@@ -138,14 +144,8 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     }),
   });
   if (!registerResponse.ok) {
-    // 502/503/504 qui sono quasi sempre il piano gratuito di Render che risveglia
-    // mock-eu-registry da uno stato addormentato (avvio JVM/Quarkus lento, anche 40-60s) — non
-    // un errore applicativo del registro, che altrimenti risponderebbe con un body JSON suo.
-    // Messaggio dedicato invece del testo grezzo (spesso una pagina HTML dell'edge di Render).
     if ([502, 503, 504].includes(registerResponse.status)) {
-      throw new Error(
-        `Il registro UE si sta risvegliando (piano gratuito Render, può richiedere fino a un minuto) — riprova tra poco.`
-      );
+      throw new TransientRegistryError(await registerResponse.text());
     }
     throw new Error(`Registrazione rifiutata da mock-eu-registry (${registerResponse.status}): ${await registerResponse.text()}`);
   }

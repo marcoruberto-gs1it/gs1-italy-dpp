@@ -1,39 +1,42 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
+import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../components/icon/icon';
 import { SECTORS, Sector } from '../../data/sectors';
 import { DppInput, DppRecord, GranularityLevel, RegistryApiService } from '../../services/registry-api.service';
+import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
+import { batchOrSerialValidator, gtinValidator, isValidGtin } from '../../utils/gs1-validators';
 
 type View = 'checking' | 'login' | 'list' | 'form';
 
-interface AttributeRow {
-  key: string;
-  value: string;
-}
-
 const GRANULARITY_LEVELS: GranularityLevel[] = ['MODEL', 'BATCH', 'ITEM'];
 
-const EMPTY_FORM = {
-  sectorId: SECTORS[0].id,
-  gtin: '',
-  name: '',
-  granularityLevel: 'ITEM' as GranularityLevel,
-  batchOrSerial: '',
-};
+/** Attese tra un tentativo automatico e l'altro quando il registro UE sta ancora "svegliandosi"
+ * (vedi retryable in registry-api/src/routes/dpp.ts) — cumulate, coprono circa un minuto, la
+ * durata tipica di un avvio a freddo osservata in questa integrazione. L'utente vede solo
+ * l'animazione proseguire, mai un errore intermedio: vedi publish()/attemptPublish() sotto. */
+const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
 
 /**
  * Sezione admin per creare/modificare schede DPP e pubblicarle su mock-eu-registry
  * (il registro puntatori UE — vedi registry-api/src/mockRegistryClient.ts per il perché
  * dell'architettura). Non prerenderizzata: vedi RenderMode.Client in app.routes.server.ts.
+ *
+ * Form reattivi (ReactiveFormsModule): la validazione dei campi identificativi (UPI/GTIN,
+ * lotto/seriale) segue gli algoritmi reali degli standard GS1 (vedi utils/gs1-validators.ts),
+ * non un generico controllo di lunghezza — un GTIN con la cifra di controllo sbagliata viene
+ * segnalato subito, con il valore corretto suggerito.
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, IconComponent, PublishJourneyComponent],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -41,6 +44,12 @@ export class Admin {
   private api = inject(RegistryApiService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
+  private fb = inject(FormBuilder);
+  private siteOrigin = inject(SiteOriginService);
+  private platformId = inject(PLATFORM_ID);
+  /** angularx-qrcode manipola direttamente il DOM: non è compatibile con SSR/prerender — non
+   * che /admin lo sia mai (RenderMode.Client), ma resta la stessa guardia usata in home.ts. */
+  protected isBrowser = isPlatformBrowser(this.platformId);
 
   protected sectors = SECTORS;
   protected granularityLevels = GRANULARITY_LEVELS;
@@ -74,13 +83,26 @@ export class Admin {
     this.searchQuery.set((event.target as HTMLInputElement).value);
   }
 
-  protected loginPassword = signal('');
+  protected loginForm = this.fb.nonNullable.group({
+    password: ['', Validators.required],
+  });
   protected loginError = signal<string | null>(null);
   protected loginPending = signal(false);
 
   protected editingId = signal<string | null>(null);
-  protected form = signal({ ...EMPTY_FORM });
-  protected attributeRows = signal<AttributeRow[]>([]);
+  protected dppForm = this.fb.nonNullable.group({
+    sectorId: [SECTORS[0].id, Validators.required],
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    gtin: ['', [Validators.required, gtinValidator()]],
+    granularityLevel: ['ITEM' as GranularityLevel, Validators.required],
+    batchOrSerial: ['', batchOrSerialValidator()],
+    attributes: this.fb.array<FormGroup>([]),
+  });
+  /** L'intero valore del form come signal — la reattività di Angular Forms è basata su
+   * Observable (valueChanges), qui ponte verso i signal usati dal resto del componente
+   * (anteprima infografica, QR code, settore corrente). */
+  private formValue = toSignal(this.dppForm.valueChanges, { initialValue: this.dppForm.getRawValue() });
+
   protected formError = signal<string | null>(null);
   protected savePending = signal(false);
   protected publishPending = signal(false);
@@ -93,9 +115,29 @@ export class Admin {
   protected journeyRecord = signal<DppRecord | null>(null);
   protected journeyError = signal<string | null>(null);
   protected journeyRegistryId = signal<string | null>(null);
-  /** Il settore attualmente scelto nel form — pilota sia il pulsante dati demo sia l'anteprima
-   * infografica del passaporto qui sotto. */
-  protected currentSector = computed<Sector>(() => this.sectors.find((s) => s.id === this.form().sectorId) ?? this.sectors[0]);
+  /** true quando siamo già ai tentativi automatici successivi al primo — la UI mostra una
+   * rassicurazione in più senza mai nominare il motivo tecnico. */
+  protected journeyLongWait = signal(false);
+
+  /** Il settore attualmente scelto nel form — pilota il pulsante dati demo, l'anteprima
+   * infografica del passaporto e il QR code GS1 Digital Link qui sotto. */
+  protected currentSector = computed<Sector>(() => this.sectors.find((s) => s.id === this.formValue().sectorId) ?? this.sectors[0]);
+  /** GTIN corrente, solo se valido — l'anteprima e il QR code mostrano un GTIN solo quando è
+   * un UPI reale, non una stringa a metà digitazione. Controllo diretto con isValidGtin() (la
+   * stessa funzione pura usata dal validatore reattivo) invece di leggere `control.valid`: un
+   * computed() deve dipendere solo da signal veri, non da un getter imperativo del FormControl
+   * che può aggiornarsi con un giro di reattività diverso da `formValue`. */
+  protected previewGtin = computed(() => {
+    const gtin = this.formValue().gtin;
+    return gtin && isValidGtin(gtin) ? gtin : null;
+  });
+  /** URL GS1 Digital Link (`/01/{gtin}`) codificato nel QR — la stessa sintassi delle pagine
+   * prodotto pubbliche (vedi product.ts): chi scansiona questo QR, anche prima della
+   * pubblicazione, finisce esattamente sulla scheda che si sta compilando. */
+  protected qrValue = computed<string | null>(() => {
+    const gtin = this.previewGtin();
+    return gtin ? `${this.siteOrigin.value}/01/${gtin}` : null;
+  });
 
   constructor() {
     this.titleService.setTitle('Amministrazione DPP | GS1 DPP');
@@ -123,17 +165,34 @@ export class Admin {
     return this.api.list().pipe(tap((records) => this.records.set(records)));
   }
 
-  protected onLoginPasswordInput(event: Event): void {
-    this.loginPassword.set((event.target as HTMLInputElement).value);
+  /** Messaggio di errore leggibile per un campo, solo dopo che l'utente ci ha interagito —
+   * mai in rosso su un campo ancora vuoto e intonso. Un solo messaggio alla volta: il primo
+   * errore attivo, quello più utile da risolvere per primo. */
+  protected fieldError(name: keyof typeof this.dppForm.controls): string | null {
+    const control = this.dppForm.controls[name];
+    if (!control.errors || !(control.dirty || control.touched)) return null;
+    const firstError = Object.values(control.errors)[0] as { message?: string } | undefined;
+    return firstError?.message ?? null;
+  }
+
+  protected gtinSuggestion(): string | null {
+    return (this.dppForm.controls.gtin.errors?.['gtinCheckDigit']?.suggestion as string | undefined) ?? null;
+  }
+
+  protected applyGtinSuggestion(): void {
+    const suggestion = this.gtinSuggestion();
+    if (suggestion) this.dppForm.controls.gtin.setValue(suggestion);
   }
 
   protected submitLogin(): void {
+    this.loginForm.markAllAsTouched();
+    if (this.loginForm.invalid) return;
     this.loginError.set(null);
     this.loginPending.set(true);
-    this.api.login(this.loginPassword()).subscribe({
+    this.api.login(this.loginForm.getRawValue().password).subscribe({
       next: () => {
         this.loginPending.set(false);
-        this.loginPassword.set('');
+        this.loginForm.reset();
         this.loadRecords().subscribe({ next: () => this.view.set('list') });
       },
       error: (err: HttpErrorResponse) => {
@@ -149,22 +208,25 @@ export class Admin {
 
   protected startCreate(): void {
     this.editingId.set(null);
-    this.form.set({ ...EMPTY_FORM });
-    this.attributeRows.set([]);
+    this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', gtin: '', granularityLevel: 'ITEM', batchOrSerial: '' });
+    this.attributesArray.clear();
     this.formError.set(null);
     this.view.set('form');
   }
 
   protected startEdit(record: DppRecord): void {
     this.editingId.set(record.id);
-    this.form.set({
+    this.dppForm.reset({
       sectorId: record.sectorId,
       gtin: record.gtin,
       name: record.name,
       granularityLevel: record.granularityLevel,
       batchOrSerial: record.batchOrSerial ?? '',
     });
-    this.attributeRows.set(Object.entries(record.attributes).map(([key, value]) => ({ key, value })));
+    this.attributesArray.clear();
+    for (const [key, value] of Object.entries(record.attributes)) {
+      this.attributesArray.push(this.attributeGroup(key, value));
+    }
     this.formError.set(null);
     this.view.set('form');
   }
@@ -175,48 +237,45 @@ export class Admin {
 
   /** Popola il form con dati fittizi plausibili per il settore attualmente selezionato — solo
    * per velocizzare la demo. Sovrascrive tutto, GTIN incluso: dopo un cambio di settore l'utente
-   * si aspetta una scheda demo coerente col nuovo settore, non un GTIN rimasto del precedente. */
+   * si aspetta una scheda demo coerente col nuovo settore, non un GTIN rimasto del precedente.
+   * I GTIN demo (vedi data/sectors.ts) hanno una cifra di controllo GS1 valida, quindi passano
+   * la stessa validazione di un GTIN vero. */
   protected fillDemoData(): void {
     const sector = this.currentSector();
     const demo = DEMO_DATA[sector.id];
     if (!demo) return;
-    this.form.update((f) => ({
-      ...f,
+    this.dppForm.patchValue({
       gtin: sector.exampleGtin,
       name: demo.name,
       granularityLevel: demo.granularityLevel,
       batchOrSerial: demo.batchOrSerial,
-    }));
-    this.attributeRows.set(Object.entries(demo.attributes).map(([key, value]) => ({ key, value })));
+    });
+    this.attributesArray.clear();
+    for (const [key, value] of Object.entries(demo.attributes)) {
+      this.attributesArray.push(this.attributeGroup(key, value));
+    }
   }
 
-  protected updateField<K extends keyof typeof EMPTY_FORM>(field: K, event: Event): void {
-    const value = (event.target as HTMLInputElement | HTMLSelectElement).value;
-    this.form.update((f) => ({ ...f, [field]: value }));
+  protected get attributesArray(): FormArray<FormGroup> {
+    return this.dppForm.controls.attributes;
+  }
+
+  private attributeGroup(key = '', value = ''): FormGroup {
+    return this.fb.nonNullable.group({ key: [key], value: [value] });
   }
 
   protected addAttributeRow(): void {
-    this.attributeRows.update((rows) => [...rows, { key: '', value: '' }]);
+    this.attributesArray.push(this.attributeGroup());
   }
 
   protected removeAttributeRow(index: number): void {
-    this.attributeRows.update((rows) => rows.filter((_, i) => i !== index));
-  }
-
-  protected updateAttributeKey(index: number, event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.attributeRows.update((rows) => rows.map((row, i) => (i === index ? { ...row, key: value } : row)));
-  }
-
-  protected updateAttributeValue(index: number, event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.attributeRows.update((rows) => rows.map((row, i) => (i === index ? { ...row, value } : row)));
+    this.attributesArray.removeAt(index);
   }
 
   private buildInput(): DppInput {
-    const f = this.form();
+    const f = this.dppForm.getRawValue();
     const attributes: Record<string, string> = {};
-    for (const row of this.attributeRows()) {
+    for (const row of f.attributes as { key: string; value: string }[]) {
       if (row.key.trim()) attributes[row.key.trim()] = row.value;
     }
     return {
@@ -230,6 +289,8 @@ export class Admin {
   }
 
   protected saveDraft(): void {
+    this.dppForm.markAllAsTouched();
+    if (this.dppForm.invalid) return;
     this.formError.set(null);
     this.savePending.set(true);
     const input = this.buildInput();
@@ -258,9 +319,18 @@ export class Admin {
     this.journeyRecord.set(this.records().find((r) => r.id === id) ?? null);
     this.journeyError.set(null);
     this.journeyRegistryId.set(null);
+    this.journeyLongWait.set(false);
     this.journeyPhase.set('running');
     this.journeyOpen.set(true);
 
+    this.attemptPublish(id, 0);
+  }
+
+  /** Un tentativo di pubblicazione. Se il registro risponde "riprova" (retryable, vedi
+   * registry-api/src/routes/dpp.ts), non mostra alcun errore: aspetta e riprova da sola,
+   * restando nella fase 'running' — solo l'ultimo, vero fallimento arriva all'utente, in
+   * linguaggio semplice. */
+  private attemptPublish(id: string, attempt: number): void {
     this.api.publish(id).subscribe({
       next: (record) => {
         this.publishPending.set(false);
@@ -269,9 +339,17 @@ export class Admin {
         this.loadRecords().subscribe();
       },
       error: (err: HttpErrorResponse) => {
+        const retryable = err.error?.retryable === true;
+        if (retryable && attempt < PUBLISH_RETRY_DELAYS_MS.length) {
+          if (attempt >= 1) this.journeyLongWait.set(true);
+          setTimeout(() => this.attemptPublish(id, attempt + 1), PUBLISH_RETRY_DELAYS_MS[attempt]);
+          return;
+        }
         this.publishPending.set(false);
         this.journeyPhase.set('error');
-        this.journeyError.set(err.error?.error ?? 'Errore durante la pubblicazione.');
+        this.journeyError.set(
+          retryable ? 'Il servizio non risponde da un po’. Riprova tra qualche minuto.' : err.error?.error ?? 'Qualcosa non ha funzionato. Riprova.'
+        );
       },
     });
   }
