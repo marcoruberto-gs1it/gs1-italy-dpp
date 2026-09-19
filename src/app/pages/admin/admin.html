@@ -162,7 +162,7 @@
               <p class="field-hint field-hint--error">{{ msg }}</p>
             }
 
-            <label for="f-gtin">UPI — Unique Product Identifier (GTIN, 8-14 cifre)</label>
+            <label for="f-gtin">GTIN (8-14 cifre)</label>
             <input id="f-gtin" type="text" formControlName="gtin" placeholder="08000000000019" [class.field-invalid]="fieldError('gtin')" />
             @if (fieldError('gtin'); as msg) {
               <p class="field-hint field-hint--error">
@@ -171,6 +171,8 @@
                   <button type="button" class="field-hint-fix" (click)="applyGtinSuggestion()">Usa {{ suggestion }}</button>
                 }
               </p>
+            } @else if (previewUpi(); as upi) {
+              <p class="field-hint">UPI che verrà registrato (URI GS1 Digital Link): <code>{{ upi }}</code></p>
             } @else {
               <p class="field-hint">La cifra finale è calcolata dallo standard GS1 (GTIN) — se non torna, te lo segnaliamo subito.</p>
             }
@@ -247,7 +249,7 @@
           </div>
 
           <div class="passport-identity">
-            <span class="passport-gtin">{{ previewGtin() ? 'UPI (01) ' + previewGtin() : 'UPI (01) — in attesa di un GTIN valido' }}</span>
+            <span class="passport-gtin">{{ previewGtin() ? 'GTIN (01) ' + previewGtin() : 'GTIN (01) — in attesa di un valore valido' }}</span>
             @if (dppForm.controls.batchOrSerial.value) {
               <span class="passport-gtin">{{ dppForm.controls.batchOrSerial.value }}</span>
             }

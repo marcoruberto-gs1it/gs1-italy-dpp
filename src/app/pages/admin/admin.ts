@@ -137,13 +137,27 @@ export class Admin {
     const gtin = this.formValue().gtin;
     return gtin && isValidGtin(gtin) ? gtin : null;
   });
-  /** URL GS1 Digital Link (`/01/{gtin}`) codificato nel QR — la stessa sintassi delle pagine
-   * prodotto pubbliche (vedi product.ts): chi scansiona questo QR, anche prima della
-   * pubblicazione, finisce esattamente sulla scheda che si sta compilando. */
-  protected qrValue = computed<string | null>(() => {
+  /** L'UPI — Unique Product Identifier — che verrà davvero inviato al DPP Registry UE al
+   * momento della pubblicazione: un URI GS1 Digital Link, non il GTIN da solo (che è solo
+   * l'identificativo numerico da cui l'UPI si costruisce — vedi l'etichetta del campo GTIN
+   * qui sopra). Stessa identica logica di registry-api/src/mockRegistryClient.ts#buildUpi,
+   * duplicata qui solo per l'anteprima (due servizi separati, come il resto del contratto). */
+  protected previewUpi = computed<string | null>(() => {
     const gtin = this.previewGtin();
-    return gtin ? `${this.siteOrigin.value}/01/${gtin}` : null;
+    if (!gtin) return null;
+    const base = `${this.siteOrigin.value}/01/${gtin}`;
+    const f = this.formValue();
+    if (f.granularityLevel === 'MODEL' || !f.batchOrSerial) return base;
+    const value = f.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+    if (!value) return base;
+    const ai = /^\(21\)/.test(f.batchOrSerial) || f.granularityLevel === 'ITEM' ? '21' : '10';
+    return `${base}/${ai}/${encodeURIComponent(value)}`;
   });
+  /** URI GS1 Digital Link codificato nel QR — lo stesso UPI che finirà nel Registro UE, non
+   * solo la pagina base: chi lo scansiona, anche prima della pubblicazione, finisce esattamente
+   * sulla scheda che si sta compilando (le route con AI (10)/(21) in coda risolvono anche
+   * quelle, vedi app.routes.ts). */
+  protected qrValue = computed<string | null>(() => this.previewUpi());
 
   /** Anteprima del JSON-LD (stessa logica di registry-api/src/jsonld.ts e product.ts —
    * vedi lì per il dettaglio dei termini GS1 Web Vocabulary usati), aggiornata mentre si
