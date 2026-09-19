@@ -100,8 +100,11 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
   },
   ict: {
     name: 'Router Wi-Fi 6 domestico — demo',
-    granularityLevel: 'ITEM',
-    batchOrSerial: '(21) SNRT88452X',
+    // Unico settore demo a livello MODEL (gli altri 8 sono ITEM/BATCH): un router non
+    // serializzato individualmente — passaporto valido per l'intera linea di prodotto, non
+    // per il singolo esemplare o lotto. Nessun batchOrSerial: non si applica a MODEL.
+    granularityLevel: 'MODEL',
+    batchOrSerial: '',
     attributes: {
       'indice di riparabilità': '7.2 / 10',
       'disponibilità ricambi (anni)': '7',
