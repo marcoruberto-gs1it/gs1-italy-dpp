@@ -8,10 +8,12 @@
  * server-to-server, non un login utente: la nostra sezione admin ha già il proprio cancello
  * (vedi auth.ts), questo è un secondo livello, verso il registro stesso.
  *
- * Forma del payload verificata sia contro richieste reali riuscite contro un'istanza live, sia
- * rileggendo lo schema vero (main/src/main/resources/json-schema/default-schema.json nel repo
- * di mock-eu-registry) campo per campo — compresi i vincoli non ovvi dal solo testare (upi come
- * URI, non stringa libera; batchUpi facoltativo per ITEM, non obbligatorio).
+ * Forma del payload verificata sia rileggendo lo schema vero (main/src/main/resources/
+ * json-schema/default-schema.json nel repo di mock-eu-registry) campo per campo, sia con
+ * richieste reali riuscite contro l'istanza live — che non sempre concordano: per
+ * granularityLevel=ITEM lo schema sul branch main dichiara batchUpi facoltativo, ma l'istanza
+ * pubblicata (immagine Docker :latest, evidentemente non allineata al branch) lo rifiuta come
+ * mancante se omesso. Dove i due divergono vince il comportamento verificato dal vivo.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import type { SectorId } from './sectors.ts';
@@ -140,17 +142,19 @@ function granularityFields(siteUrl: string, record: DppRecord): Record<string, u
   const modelUpi = digitalLinkUrl(siteUrl, record.gtin);
   if (record.granularityLevel === 'MODEL') return {};
   if (record.granularityLevel === 'BATCH') return { modelUpi };
-  // ITEM: modelUpi e deactivated obbligatori. batchUpi è facoltativo per schema — "solo se
-  // l'item è davvero registrato attraverso un livello lotto intermedio" — lo includiamo perciò
-  // solo quando il lotto/seriale scritto nel form porta esplicitamente il prefisso AI (10):
-  // un utente che scrive "(21) SN123" sta descrivendo un seriale diretto dal modello, senza
-  // lotto intermedio.
-  const fields: Record<string, unknown> = { modelUpi, deactivated: false };
-  if (record.batchOrSerial && /^\(10\)/.test(record.batchOrSerial)) {
-    const { value } = parseBatchOrSerial(record.batchOrSerial, 'BATCH');
-    fields['batchUpi'] = digitalLinkUrl(siteUrl, record.gtin, '10', value);
-  }
-  return fields;
+  // ITEM: modelUpi e deactivated obbligatori per schema. Lo schema scaricato da GitHub
+  // dichiara batchUpi facoltativo per ITEM, ma l'istanza live pubblicata lo rifiuta come
+  // mancante se omesso — verificato con una richiesta reale, HTTP 400 "$: required property
+  // 'batchUpi' not found": la sua immagine Docker (:latest) evidentemente non è allineata al
+  // branch main del repo. Lo includiamo perciò sempre, riusando il lotto/seriale del form (o
+  // il GTIN nudo come URI degenere se non specificato) — il comportamento verificato conta più
+  // di quello scritto nello schema quando i due divergono.
+  const value = record.batchOrSerial ? parseBatchOrSerial(record.batchOrSerial, 'BATCH').value : record.gtin;
+  return {
+    modelUpi,
+    deactivated: false,
+    batchUpi: digitalLinkUrl(siteUrl, record.gtin, '10', value),
+  };
 }
 
 export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
