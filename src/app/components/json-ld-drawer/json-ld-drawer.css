@@ -76,6 +76,17 @@
   padding: 20px 24px 32px;
 }
 
+.jsonld-explainer {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
 .jsonld-toolbar {
   display: flex;
   align-items: center;

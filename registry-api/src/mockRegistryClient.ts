@@ -14,6 +14,21 @@
  * granularityLevel=ITEM lo schema sul branch main dichiara batchUpi facoltativo, ma l'istanza
  * pubblicata (immagine Docker :latest, evidentemente non allineata al branch) lo rifiuta come
  * mancante se omesso. Dove i due divergono vince il comportamento verificato dal vivo.
+ *
+ * ATTENZIONE (importante per chi legge questo file conoscendo lo standard CEN/CENELEC): mockeu-registry è l'implementazione di riferimento CIRPASS-2, con un proprio schema JSON — NON è
+ * la stessa cosa del metodo astratto "RegisterProductDPP" descritto in FprEN 18222:2026 §5.2
+ * (Tabella 8), che definisce un oggetto "DppRegistryEntry" con nomi di campo diversi. I due non
+ * sono intercambiabili: lo standard descrive il CONCETTO, mock-eu-registry è un'implementazione
+ * concreta con le sue scelte di naming. Corrispondenza concettuale, campo per campo, tra ciò che
+ * inviamo davvero (a sinistra) e il nome equivalente nello standard (a destra):
+ *   upi            ~ DppRegistryEntry.uniqueProductIdentifier
+ *   reoId          ~ DppRegistryEntry.uniqueEconomicOperatorIdentifier
+ *   liveURL        ~ DppRegistryEntry.dppApiEndPoint
+ *   (nessun campo) ~ DppRegistryEntry.digitalProductPassportId (non richiesto da mock-eu-registry;
+ *                    esposto comunque nel nostro JSON-LD pubblico, vedi jsonld.ts)
+ * commodityCode, facilitiesId, granularityLevel, modelUpi, batchUpi, deactivated, backupURL sono
+ * campi propri dello schema di mock-eu-registry, senza equivalente nella Tabella 8 dello
+ * standard (che lascia i dettagli del payload di registrazione all'implementazione del registro).
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import type { SectorId } from './sectors.ts';

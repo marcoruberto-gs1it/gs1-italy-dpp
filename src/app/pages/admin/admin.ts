@@ -167,6 +167,9 @@ export class Admin {
     const gtin = this.previewGtin();
     if (!gtin) return null;
     const f = this.formValue();
+    // Se stiamo modificando una scheda già salvata, usiamo i suoi valori reali (id, stato,
+    // ultimo aggiornamento) invece di segnaposto — stessa idea di registry-api/src/jsonld.ts.
+    const existing = this.records().find((r) => r.id === this.editingId());
 
     const doc: Record<string, unknown> = {
       '@context': {
@@ -177,9 +180,17 @@ export class Admin {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': `${this.siteOrigin.value}/01/${gtin}`,
+      // Nomi di campo e struttura allineati a FprEN 18223:2026 §4.1.2.1 (Tabella 1) — vedi il
+      // commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
+      digitalProductPassportId: existing ? `urn:uuid:${existing.id}` : 'urn:uuid:(assegnato al salvataggio)',
+      uniqueProductIdentifier: this.previewUpi(),
       name: f.name || null,
       gtin,
-      granularityLevel: f.granularityLevel,
+      granularity: (f.granularityLevel ?? 'MODEL').toLowerCase(),
+      dppSchemaVersion: 'FprEN18223:2026',
+      dppStatus: existing?.status === 'published' ? 'active' : 'inactive',
+      lastUpdate: existing?.updatedAt ?? new Date().toISOString(),
+      economicOperatorId: 'gs1-italy-dpp-demo',
     };
 
     if (f.batchOrSerial) {
@@ -198,6 +209,12 @@ export class Admin {
         name: row.key.trim(),
         value: row.value,
       }));
+    }
+
+    if (existing?.registryId) {
+      // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2, Tabella 8): il DPP
+      // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
+      doc['registrationId'] = existing.registryId;
     }
 
     return doc;

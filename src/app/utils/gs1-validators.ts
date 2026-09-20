@@ -62,7 +62,10 @@ export function batchOrSerialValidator(): ValidatorFn {
       return { batchLength: { message: 'Lotto/seriale può avere al massimo 20 caratteri (AI (10)/(21) GS1).' } };
     }
     if (/[|~^]/.test(content)) {
-      return { batchChars: { message: 'Evita i caratteri | ~ ^, riservati come separatori negli Element String GS1.' } };
+      // Non sono i separatori GS1 veri (quello è il carattere di controllo FNC1/GS, non
+      // digitabile) — qui evitiamo solo caratteri che risulterebbero ambigui o codificati in modo
+      // poco leggibile una volta percent-encoded nell'URI GS1 Digital Link (RFC 3986).
+      return { batchChars: { message: 'Evita i caratteri | ~ ^: renderebbero l’URI del prodotto poco leggibile.' } };
     }
     return null;
   };

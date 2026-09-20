@@ -158,6 +158,8 @@ export const TRANSLATIONS = {
       closeAria: 'Chiudi',
       copyJson: 'Copia JSON',
       copied: 'Copiato!',
+      explainer:
+        "Questo è il formato \"leggibile dalle macchine\" della scheda: lo stesso testo che un motore di ricerca o un altro sistema legge automaticamente. \"gtin\" è il codice prodotto; \"uniqueProductIdentifier\" è l'indirizzo web che lo rappresenta (standard GS1 Digital Link); \"digitalProductPassportId\" identifica questo passaporto digitale in sé, distinto dal prodotto; \"granularity\" indica se la scheda vale per l'intero modello, un lotto o un singolo esemplare.",
     },
     search: {
       dialogAria: 'Ricerca prodotti',
@@ -329,6 +331,8 @@ export const TRANSLATIONS = {
       closeAria: 'Close',
       copyJson: 'Copy JSON',
       copied: 'Copied!',
+      explainer:
+        'This is the "machine-readable" version of the record: the same text a search engine or another system reads automatically. "gtin" is the product code; "uniqueProductIdentifier" is the web address that resolves to it (GS1 Digital Link standard); "digitalProductPassportId" identifies this digital passport itself, separate from the product; "granularity" says whether the record covers the whole model, a batch, or a single item.',
     },
     search: {
       dialogAria: 'Product search',

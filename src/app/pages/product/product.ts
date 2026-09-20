@@ -229,6 +229,18 @@ export class ProductComponent implements OnDestroy {
     if (!dpp) return null;
 
     const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
+    // UPI: stesso URI GS1 Digital Link registrato come "upi" presso il DPP Registry UE (vedi
+    // mockRegistryClient.ts#buildUpi) — al livello di granularità più fine dichiarato dalla
+    // scheda (FprEN 18219 §4.4.2(1)), quindi con l'AI (10)/(21) in coda quando presente.
+    const upi =
+      dpp.granularityLevel === 'MODEL' || !dpp.batchOrSerial
+        ? id
+        : (() => {
+            const value = dpp.batchOrSerial!.replace(/^\(\d{2}\)\s*/, '').trim();
+            const ai = /^\(21\)/.test(dpp.batchOrSerial!) || dpp.granularityLevel === 'ITEM' ? '21' : '10';
+            return `${id}/${ai}/${encodeURIComponent(value)}`;
+          })();
+
     const doc: Record<string, unknown> = {
       '@context': {
         gs1: 'https://ref.gs1.org/voc/',
@@ -238,9 +250,17 @@ export class ProductComponent implements OnDestroy {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': id,
+      // Nomi di campo e struttura allineati a FprEN 18223:2026 §4.1.2.1 (Tabella 1) — vedi il
+      // commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
+      digitalProductPassportId: `urn:uuid:${dpp.id}`,
+      uniqueProductIdentifier: upi,
       name: dpp.name,
       gtin: dpp.gtin,
-      granularityLevel: dpp.granularityLevel,
+      granularity: dpp.granularityLevel.toLowerCase(),
+      dppSchemaVersion: 'FprEN18223:2026',
+      dppStatus: dpp.status === 'published' ? 'active' : 'inactive',
+      lastUpdate: dpp.updatedAt,
+      economicOperatorId: DEMO_EO_ID,
     };
 
     if (dpp.batchOrSerial) {
@@ -260,7 +280,9 @@ export class ProductComponent implements OnDestroy {
       }));
     }
 
-    if (dpp.registryId) doc['registryId'] = dpp.registryId;
+    // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2, Tabella 8): il DPP
+    // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
+    if (dpp.registryId) doc['registrationId'] = dpp.registryId;
 
     return doc;
   });
