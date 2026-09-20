@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, Signal, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, Signal, inject, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { IconComponent } from '../../../components/icon/icon';
 import { ScrollRevealDirective } from '../../../directives/scroll-reveal';
 import { Sector } from '../../../data/sectors';
-import { GranularityLevel } from '../../../services/registry-api.service';
+import { GranularityLevel, RegistryApiService } from '../../../services/registry-api.service';
 import { hasIncompleteAttributeRow, isValidBatchOrSerial, isValidGtin } from '../../../utils/gs1-validators';
 
 /** Duplicato apposta di ToastSeverity in admin.ts, non importato — stesso motivo di
@@ -68,6 +68,11 @@ const STEPS: WizardStep[] = [
   styleUrl: './dpp-wizard.css',
 })
 export class DppWizardComponent {
+  /** Solo per leggere coldStartRetrying() nel pulsante "Salva bozza" (vedi dpp-wizard.html) —
+   * un servizio singleton iniettabile direttamente, non un riferimento al componente Admin: non
+   * ricrea il problema di riferimento circolare descritto sopra per DppFormGroup/ToastSeverity. */
+  protected api = inject(RegistryApiService);
+
   @Input({ required: true }) form!: DppFormGroup;
   @Input({ required: true }) sectors!: Sector[];
   @Input({ required: true }) currentSector!: Signal<Sector>;

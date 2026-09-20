@@ -9,7 +9,7 @@
 
   @switch (view()) {
     @case ('checking') {
-      <p class="admin-status">Verifica accesso…</p>
+      <p class="admin-status">{{ api.coldStartRetrying() ? 'Il servizio si sta risvegliando — può richiedere fino a un minuto…' : 'Verifica accesso…' }}</p>
     }
 
     @case ('login') {
@@ -22,7 +22,7 @@
         <label for="admin-password">Password</label>
         <input id="admin-password" type="password" autocomplete="current-password" formControlName="password" />
         <button type="submit" class="gs-btn gs-btn--primary" [disabled]="loginPending()">
-          {{ loginPending() ? 'Verifica…' : 'Entra' }}
+          {{ loginPending() ? (api.coldStartRetrying() ? 'Il servizio si sta risvegliando…' : 'Verifica…') : 'Entra' }}
         </button>
       </form>
     }
@@ -284,7 +284,7 @@
 
           <div class="form-actions">
             <button type="submit" class="gs-btn gs-btn--ghost" [disabled]="savePending()">
-              {{ savePending() ? 'Salvataggio…' : 'Salva bozza' }}
+              {{ savePending() ? (api.coldStartRetrying() ? 'Il servizio si sta risvegliando…' : 'Salvataggio…') : 'Salva bozza' }}
             </button>
             @if (editingId()) {
               <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending() || !!publishedRecord()" (click)="publish()">

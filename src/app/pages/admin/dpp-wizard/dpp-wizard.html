@@ -208,7 +208,7 @@
 
         <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="savePending" (click)="saveDraft.emit()">
           @if (savePending) {
-            Salvataggio…
+            {{ api.coldStartRetrying() ? 'Il servizio si sta risvegliando…' : 'Salvataggio…' }}
           } @else {
             <app-icon name="save" [size]="16"></app-icon>
             Salva bozza

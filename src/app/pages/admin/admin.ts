@@ -48,7 +48,10 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
   styleUrl: './admin.css',
 })
 export class Admin {
-  private api = inject(RegistryApiService);
+  /** protected (non private): il template legge api.coldStartRetrying() per mostrare "il
+   * servizio si sta risvegliando…" durante un risveglio a freddo di registry-api (vedi
+   * RegistryApiService) invece di un pulsante "Salvataggio…"/"Verifica accesso…" muto. */
+  protected api = inject(RegistryApiService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private fb = inject(FormBuilder);
