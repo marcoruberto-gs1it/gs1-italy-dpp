@@ -200,6 +200,14 @@
   color: #fff;
 }
 
+/* Nel tema scuro --success è pensato per leggersi come testo su sfondo scuro (10:1), non come
+   riempimento con icona bianca sopra (1.9:1, sotto anche la soglia 3:1 per elementi grafici
+   non testuali) — qui serve una tinta più scura, verificata solo per questo riempimento. */
+:root[data-theme='dark'] .journey-step.is-done .journey-node {
+  background: #059669;
+  border-color: #059669;
+}
+
 .journey-step.is-done .journey-copy strong {
   color: var(--text-primary);
 }

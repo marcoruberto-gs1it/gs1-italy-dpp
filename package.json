@@ -30,6 +30,7 @@
     "clsx": "^2.1.1",
     "express": "^5.1.0",
     "gs1encoder": "^1.4.1",
+    "gsap": "^3.15.0",
     "jsonld": "^9.0.0",
     "oxigraph": "^0.5.9",
     "qr-scanner": "^1.4.2",

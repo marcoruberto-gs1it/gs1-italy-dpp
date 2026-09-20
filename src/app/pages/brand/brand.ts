@@ -12,6 +12,7 @@ import { normalizeUrl } from '../../utils/url';
 import { I18nService } from '../../services/i18n.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
+import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
 /**
  * Pagina del brand owner, risolvibile via GS1 Digital Link con Application Identifier 414
@@ -23,7 +24,7 @@ import { StructuredDataService } from '../../services/structured-data.service';
 @Component({
   selector: 'app-brand',
   standalone: true,
-  imports: [CommonModule, RouterLink, JsonLdDrawerComponent, IconComponent],
+  imports: [CommonModule, RouterLink, JsonLdDrawerComponent, IconComponent, ScrollRevealDirective],
   templateUrl: './brand.html',
   styleUrl: './brand.css',
 })

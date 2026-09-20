@@ -40,7 +40,7 @@
 
     <section class="brand-products">
       <h2>{{ t('brand.productsHeading') }} ({{ products().length }})</h2>
-      <ul class="catalog-grid">
+      <ul class="catalog-grid" appScrollReveal="stagger" [revealGrid]="true" [revealStagger]="0.06">
         @for (product of products(); track product.gtin) {
           <li>
             <article class="product-card">

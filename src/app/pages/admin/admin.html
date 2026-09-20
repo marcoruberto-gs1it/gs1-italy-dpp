@@ -80,7 +80,7 @@
               <th scope="col"><span class="sr-only">Azioni</span></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody appScrollReveal="stagger" revealSelector="tr" [revealStagger]="0.04" [revealDuration]="0.3" [revealDistance]="10">
             @for (record of filteredRecords(); track record.id) {
               <tr>
                 <td data-label="Nome">
@@ -129,7 +129,7 @@
         <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
       </div>
 
-      <form class="form-layout" [formGroup]="dppForm" (ngSubmit)="saveDraft()">
+      <form class="form-layout" [formGroup]="dppForm" (ngSubmit)="saveDraft()" appScrollReveal="stagger" [revealStagger]="0.1" [revealDuration]="0.35" [revealDistance]="14">
         <div class="gs-card form-card">
           <div class="form-section">
             <div class="form-section-head">

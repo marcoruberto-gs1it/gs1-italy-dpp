@@ -266,12 +266,9 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  /* @keyframes drawer-in ora condivisa in tokens.css (prima era duplicata identica qui e in
+     json-ld-drawer.css, come due definizioni indipendenti nello scoping per-componente). */
   animation: drawer-in var(--dur-base) var(--ease-out);
-}
-
-@keyframes drawer-in {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
 }
 
 .mobile-nav-header {

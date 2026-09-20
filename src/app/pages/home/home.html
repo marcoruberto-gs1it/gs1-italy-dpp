@@ -1,7 +1,7 @@
 <section class="modern-hero">
   <div class="hero-inner">
     <div class="hero-grid">
-      <div class="hero-copy">
+      <div class="hero-copy" appScrollReveal="stagger" [revealStagger]="0.12">
         <h1>{{ t('hero.titleLine1') }}<br><span class="hero-highlight">{{ t('hero.titleHighlight') }}</span></h1>
         <p>{{ t('hero.subtitle') }}</p>
 
@@ -92,7 +92,7 @@
       <p>{{ t('dpp.intro') }}</p>
     </div>
 
-    <ol class="dpp-steps">
+    <ol class="dpp-steps" appScrollReveal="stagger">
       <li class="dpp-step">
         <span class="step-number">01</span>
         <span class="step-icon icon-flat"><app-icon name="hash" [size]="20"></app-icon></span>
@@ -127,7 +127,7 @@
       <p>{{ t('regulation.intro') }}</p>
     </div>
 
-    <ol class="reg-timeline">
+    <ol class="reg-timeline" appScrollReveal="stagger">
       <li class="reg-item">
         <span class="reg-date">{{ t('regulation.item1Date') }}</span>
         <h3>{{ t('regulation.item1Title') }}</h3>
@@ -162,7 +162,7 @@
       <p>{{ t('sectorsSection.intro') }}</p>
     </div>
 
-    <ul class="sector-grid">
+    <ul class="sector-grid" appScrollReveal="stagger" [revealGrid]="true" [revealStagger]="0.06">
       @for (sector of sectors(); track sector.id) {
         <li class="sector-card">
           <span class="sector-icon icon-flat" [style.--icon-color]="sector.brandColor">

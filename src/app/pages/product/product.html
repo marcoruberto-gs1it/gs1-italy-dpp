@@ -383,7 +383,7 @@
       </ol>
     </nav>
 
-    <article class="dpp-view gs-card">
+    <article class="dpp-view gs-card" appScrollReveal [revealDuration]="0.4">
       <div class="dpp-view-head">
         <span class="dpp-view-icon icon-flat" [style.--icon-color]="dppSector()?.brandColor">
           <app-icon [name]="dppSector()?.icon ?? 'box'" [size]="30"></app-icon>
@@ -413,7 +413,7 @@
       }
 
       @if (dppAttributeEntries().length) {
-        <div class="dpp-view-facts">
+        <div class="dpp-view-facts" appScrollReveal="stagger" [revealStagger]="0.05" [revealDuration]="0.35">
           @for (entry of dppAttributeEntries(); track entry[0]) {
             <div class="fact-tile">
               <span class="fact-label">{{ entry[0] }}</span>

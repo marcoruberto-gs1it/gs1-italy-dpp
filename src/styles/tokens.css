@@ -1,21 +1,37 @@
 /* ==========================================================================
    Catalogo Smart — Design System Tokens
-   Palette proprietaria: violetto (brand) + turchese (accent), pensata per un
-   catalogo "smart" — non più i colori istituzionali GS1.
+   Palette proprietaria: indaco (brand) + smeraldo (accent) — redesign 2026,
+   sostituisce la precedente coppia violetto/turchese. Ogni valore sotto è
+   stato verificato con un contrast-checker WCAG 2.x prima di essere scelto
+   (vedi commenti puntuali dove un colore ha richiesto un aggiustamento).
    ========================================================================== */
 
 :root {
-  /* --- Brand palette --- */
-  --brand: #6d4ff0;
-  --brand-strong: #4f34d1;
-  --brand-soft: rgba(109, 79, 240, 0.1);
-  --brand-accent: #00c9a7;
-  --brand-accent-strong: #00a688;
-  --brand-accent-soft: rgba(0, 201, 167, 0.12);
-  --brand-ink: #0d0b17;
+  /* --- Brand palette ---
+     --brand/--brand-strong: ruolo "riempimento" — sfondo di bottoni, badge
+     pieni, skip-link, icona di settore di default: qui sopra ci va sempre
+     testo/icona BIANCA, quindi il colore deve reggere almeno 4.5:1 con il
+     bianco. --brand-accent/--brand-accent-strong: ruolo "testo/icona su
+     tela" (star rating, capolettera della timeline normativa) — qui serve
+     invece contrasto con lo sfondo pagina, non con il bianco: una tinta
+     più scura del brand va bene qui ma fallirebbe come riempimento.
+     --brand-accent-vivid: caso a parte — usato SOLO per elementi con testo
+     scuro sopra (pillola CTA dell'hero, badge "AI", selezione testo), fisso
+     indipendente dal tema come --brand-ink, con cui va sempre in coppia. */
+  --brand: #4338ca;
+  --brand-strong: #372fa8;
+  --brand-soft: rgba(67, 56, 202, 0.1);
+  --brand-accent: #047857;
+  --brand-accent-strong: #065f46;
+  --brand-accent-soft: rgba(4, 120, 87, 0.12);
+  /* Smeraldo chiaro: 8.32:1 con testo --brand-ink sopra, MAI con testo bianco
+     (il turchese chiaro dell'impianto precedente ci arrivava solo a 2.12:1 —
+     un bottone illeggibile mai verificato prima d'ora). */
+  --brand-accent-vivid: #34d399;
+  --brand-ink: #1e1b4b;
 
   /* --- Typography --- */
-  --font-sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
 
   /* --- Radii --- */
@@ -38,33 +54,33 @@
   --shadow-md: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
   --shadow-lg: 0 16px 40px -12px rgba(15, 23, 42, 0.18);
   --shadow-xl: 0 24px 64px -16px rgba(15, 23, 42, 0.28);
-  --shadow-glow-blue: 0 8px 32px -8px rgba(109, 79, 240, 0.35);
-  --shadow-glow-orange: 0 8px 32px -8px rgba(0, 201, 167, 0.35);
+  --shadow-glow-blue: 0 8px 32px -8px rgba(67, 56, 202, 0.35);
+  --shadow-glow-orange: 0 8px 32px -8px rgba(4, 120, 87, 0.35);
 
   /* --- Semantic surface tokens (LIGHT) --- */
-  --bg-canvas: #f7f7fb;
-  --bg-canvas-alt: #eeeef7;
+  --bg-canvas: #f5f3ff;
+  --bg-canvas-alt: #eef0fb;
   --bg-surface: #ffffff;
   --bg-surface-raised: #ffffff;
-  --bg-surface-sunken: #f3f2fa;
+  --bg-surface-sunken: #ebeffa;
   --bg-glass: rgba(255, 255, 255, 0.7);
   --bg-glass-strong: rgba(255, 255, 255, 0.88);
-  --bg-overlay: rgba(10, 8, 20, 0.5);
-  --bg-inverse: #0d0b17;
+  --bg-overlay: rgba(15, 13, 35, 0.5);
+  --bg-inverse: #1e1b4b;
 
-  --border-subtle: rgba(20, 12, 48, 0.08);
-  --border-default: rgba(20, 12, 48, 0.12);
-  --border-strong: rgba(20, 12, 48, 0.2);
+  --border-subtle: rgba(30, 27, 75, 0.08);
+  --border-default: rgba(30, 27, 75, 0.12);
+  --border-strong: rgba(30, 27, 75, 0.2);
   --border-glass: rgba(255, 255, 255, 0.5);
 
-  --text-primary: #14101f;
-  --text-secondary: #47435a;
-  --text-tertiary: #6f6b81;
-  /* #9c98ab originale era 2.6:1 su questo sfondo — sotto la soglia AA (4.5:1) per il testo che
-     in pratica ci finisce dentro (GTIN, denominazione legale, copyright), non solo per
-     segnaposto/decorazione, che sarebbe esente. */
-  --text-muted: #726c85;
+  --text-primary: #1e1b4b;
+  --text-secondary: #433f72;
+  --text-tertiary: #5c577f;
+  --text-muted: #5c577f;
   --text-on-accent: #ffffff;
+  /* --brand (7.21:1 sul canvas, 7.90:1 su superficie bianca) regge sia da
+     link-su-tela sia da riempimento — solo il tema scuro ha bisogno di un
+     valore separato (vedi sotto), perché lì le due esigenze divergono. */
   --text-link: var(--brand);
 
   --accent: var(--brand);
@@ -73,54 +89,64 @@
   --accent-2: var(--brand-accent);
   --accent-2-soft: var(--brand-accent-soft);
 
-  /* Leggermente più scuri dell'originale (#16875a/#b45309): sui badge, dove questi colori
-     compaiono su --success-soft/--warning-soft invece che su bianco pieno, il testo a
-     0.62rem/700 degli scaduti era sotto 4.5:1 (3.9:1 e 4.25:1). */
+  /* Verificati sulla nuova --bg-canvas: 4.87:1 e 5.00:1, sopra la soglia AA
+     — non toccati dal redesign, sono indipendenti dall'identità di brand. */
   --success: #147a51;
   --success-soft: rgba(20, 122, 81, 0.12);
   --warning: #aa4f09;
   --warning-soft: rgba(170, 79, 9, 0.12);
 
-  --mesh-1: rgba(109, 79, 240, 0.5);
-  --mesh-2: rgba(0, 201, 167, 0.4);
-  --mesh-3: rgba(124, 92, 246, 0.3);
-  --scrollbar-thumb: rgba(20, 12, 48, 0.18);
+  --mesh-1: rgba(67, 56, 202, 0.45);
+  --mesh-2: rgba(4, 120, 87, 0.35);
+  --mesh-3: rgba(99, 102, 241, 0.28);
+  --scrollbar-thumb: rgba(30, 27, 75, 0.18);
 
   /* Superficie "terminale" sempre scura, indipendente dal tema (blocchi codice, URL bar) */
-  --surface-code: #14101f;
+  --surface-code: #1e1b4b;
 
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  --bg-canvas: #0b0a12;
-  --bg-canvas-alt: #0e0c17;
-  --bg-surface: #15121f;
-  --bg-surface-raised: #1a1729;
-  --bg-surface-sunken: #0e0c17;
-  --bg-glass: rgba(21, 18, 31, 0.6);
-  --bg-glass-strong: rgba(21, 18, 31, 0.85);
-  --bg-overlay: rgba(2, 2, 6, 0.65);
-  --bg-inverse: #f7f7fb;
+  --bg-canvas: #0b0a17;
+  --bg-canvas-alt: #0e0c1f;
+  --bg-surface: #15132a;
+  --bg-surface-raised: #1a1830;
+  --bg-surface-sunken: #0e0c1f;
+  --bg-glass: rgba(21, 19, 42, 0.6);
+  --bg-glass-strong: rgba(21, 19, 42, 0.85);
+  --bg-overlay: rgba(2, 2, 10, 0.65);
+  --bg-inverse: #f5f3ff;
 
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-default: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(255, 255, 255, 0.22);
   --border-glass: rgba(255, 255, 255, 0.1);
 
-  --text-primary: #f5f4fa;
-  --text-secondary: #c7c3d6;
-  --text-tertiary: #938fa5;
-  /* Stesso motivo della coppia in chiaro sopra: #605c74 era 2.9-3.1:1, sotto la soglia AA. */
-  --text-muted: #807c97;
+  --text-primary: #f1f0ff;
+  --text-secondary: #c8c4e8;
+  --text-tertiary: #9a96be;
+  --text-muted: #a29dc9;
   --text-on-accent: #ffffff;
-  --text-link: #a495ff;
+  /* Qui NON può essere var(--accent): --accent scuro deve restare abbastanza
+     scuro da reggere testo bianco sopra (riempimento bottoni/pillole), ma
+     quello stesso scuro è troppo poco luminoso da leggersi come link sul
+     canvas quasi nero. Due esigenze opposte → due valori distinti, come
+     già faceva l'impianto precedente (stesso pattern, nuova tinta: 6.58:1). */
+  --text-link: #818cf8;
 
-  --accent: #8b74ff;
-  --accent-strong: #a998ff;
-  --accent-soft: rgba(139, 116, 255, 0.18);
-  --accent-2: #22e0bb;
-  --accent-2-soft: rgba(34, 224, 187, 0.16);
+  /* Riempimento (bottoni/pillole con testo bianco sopra): 6.29:1. */
+  --accent: #4f46e5;
+  /* Hover/pressed — si scurisce, stessa direzione del tema chiaro: 7.90:1. */
+  --accent-strong: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.18);
+  /* --brand-accent/--brand-accent-strong (testo/icona su tela — star rating, capolettera
+     timeline, bordo decorativo): senza questa ridefinizione avrebbero ereditato il valore del
+     tema chiaro (troppo scuro, illeggibile su sfondo quasi nero). 7.74:1 e 10.21:1. */
+  --brand-accent: #10b981;
+  --brand-accent-strong: #34d399;
+  --accent-2: var(--brand-accent);
+  --accent-2-soft: rgba(16, 185, 129, 0.16);
 
   --success: #34d399;
   --success-soft: rgba(52, 211, 153, 0.14);
@@ -132,12 +158,12 @@
   --shadow-md: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 20px 48px -12px rgba(0, 0, 0, 0.55);
   --shadow-xl: 0 30px 70px -16px rgba(0, 0, 0, 0.6);
-  --shadow-glow-blue: 0 0 40px -6px rgba(139, 116, 255, 0.45);
-  --shadow-glow-orange: 0 0 40px -6px rgba(34, 224, 187, 0.4);
+  --shadow-glow-blue: 0 0 40px -6px rgba(79, 70, 229, 0.45);
+  --shadow-glow-orange: 0 0 40px -6px rgba(16, 185, 129, 0.4);
 
-  --mesh-1: rgba(139, 116, 255, 0.35);
-  --mesh-2: rgba(34, 224, 187, 0.28);
-  --mesh-3: rgba(124, 92, 246, 0.22);
+  --mesh-1: rgba(79, 70, 229, 0.35);
+  --mesh-2: rgba(16, 185, 129, 0.28);
+  --mesh-3: rgba(129, 140, 248, 0.22);
   --scrollbar-thumb: rgba(255, 255, 255, 0.14);
 
   color-scheme: dark;
@@ -153,6 +179,12 @@
 
 html {
   background: var(--bg-canvas);
+  /* Scorrimento morbido per i link in-pagina (es. le CTA dell'hero verso #dpp/#settori) —
+     annullato sotto prefers-reduced-motion dalla regola più sotto in questo stesso file
+     (scroll-behavior: auto !important). scroll-padding-top evita che l'header sticky copra
+     l'inizio della sezione appena raggiunta. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
 }
 
 body {
@@ -165,8 +197,8 @@ body {
 }
 
 ::selection {
-  background: var(--accent-2);
-  color: #ffffff;
+  background: var(--brand-accent-vivid);
+  color: var(--brand-ink);
 }
 
 ::-webkit-scrollbar {
@@ -226,9 +258,9 @@ img.img-fallback {
 }
 
 .gs-badge--ai {
-  background: linear-gradient(135deg, var(--brand-accent), #4be0c8);
-  color: #fff;
-  box-shadow: 0 4px 14px -4px rgba(0, 201, 167, 0.5);
+  background: var(--brand-accent-vivid);
+  color: var(--brand-ink);
+  box-shadow: 0 4px 14px -4px rgba(52, 211, 153, 0.5);
 }
 
 .gs-badge--verified {
@@ -237,7 +269,7 @@ img.img-fallback {
 }
 
 .gs-badge--vocab {
-  background: rgba(109, 79, 240, 0.14);
+  background: rgba(67, 56, 202, 0.14);
   color: var(--brand-strong);
 }
 
@@ -264,8 +296,8 @@ img.img-fallback {
 }
 
 :root[data-theme='dark'] .gs-badge--vocab {
-  background: rgba(139, 116, 255, 0.18);
-  color: #b7a8ff;
+  background: rgba(129, 140, 248, 0.18);
+  color: #b6bbff;
 }
 
 :root[data-theme='dark'] .gs-badge--schema {
@@ -436,6 +468,20 @@ img.img-fallback {
 @keyframes gs-shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+/* Condivisa da app.css (mobile nav / drawer laterale) e json-ld-drawer.css — prima erano due
+   @keyframes identiche ma indipendenti in due file diversi; unificate qui per evitare che
+   divergano in futuro. */
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

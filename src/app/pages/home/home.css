@@ -68,13 +68,16 @@
   transform: scale(0.97);
 }
 
+/* Smeraldo chiaro + testo scuro (non bianco): è l'unica combinazione che regge il contrasto
+   sia sull'hero sempre scuro sia, volendo, su sfondo chiaro — il turchese precedente con testo
+   bianco non aveva mai superato 3:1, verificato solo ora in fase di redesign. */
 .hero-pill--primary {
-  background: var(--brand-accent);
-  color: #ffffff;
+  background: var(--brand-accent-vivid);
+  color: var(--brand-ink);
 }
 
 .hero-pill--primary:hover {
-  background: var(--brand-accent-strong);
+  filter: brightness(0.94);
 }
 
 .hero-pill--ghost {

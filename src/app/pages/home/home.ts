@@ -3,6 +3,7 @@ import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } f
 import { Meta, Title } from '@angular/platform-browser';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../components/icon/icon';
+import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { Sector, SECTORS, localizeSector } from '../../data/sectors';
 import { I18nService } from '../../services/i18n.service';
 import { LanguageService } from '../../services/language.service';
@@ -14,7 +15,7 @@ const AUTOPLAY_INTERVAL_MS = 5000;
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, IconComponent, QRCodeComponent],
+  imports: [CommonModule, IconComponent, QRCodeComponent, ScrollRevealDirective],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

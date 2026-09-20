@@ -15,6 +15,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
 import { batchOrSerialValidator, gtinValidator, isValidGtin } from '../../utils/gs1-validators';
+import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
 type View = 'checking' | 'login' | 'list' | 'form';
 
@@ -38,7 +39,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ...HlmSelectImports],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ScrollRevealDirective, ...HlmSelectImports],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })

@@ -15,6 +15,7 @@ import { LanguageService } from '../../services/language.service';
 import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
+import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
 
 // Stesso placeholder salvato in products.json per gli @id coniati (rawGs1Data.brand['@id']),
@@ -102,7 +103,7 @@ const DIET_ICONS: Record<string, IconName> = {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, RouterLink, StarRatingComponent, JsonLdDrawerComponent, IconComponent],
+  imports: [CommonModule, RouterLink, StarRatingComponent, JsonLdDrawerComponent, IconComponent, ScrollRevealDirective],
   templateUrl: './product.html',
   styleUrl: './product.css',
 })

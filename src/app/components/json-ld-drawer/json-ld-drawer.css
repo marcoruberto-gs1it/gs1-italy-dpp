@@ -18,12 +18,9 @@
   box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
+  /* @keyframes drawer-in condivisa in tokens.css — prima duplicata qui con un valore
+     leggermente diverso (24px invece di 20px), ora unificata con il drawer della nav mobile. */
   animation: drawer-in var(--dur-base) var(--ease-out);
-}
-
-@keyframes drawer-in {
-  from { transform: translateX(24px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
 }
 
 .drawer-header {
