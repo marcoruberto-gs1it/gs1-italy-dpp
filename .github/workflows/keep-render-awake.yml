@@ -1,0 +1,23 @@
+name: Tieni svegli i servizi Render
+
+# Il piano gratuito di Render addormenta ogni servizio dopo ~15 minuti di inattività (vedi
+# docs/DEPLOY.md e src/app/services/registry-api.service.ts#COLD_START_RETRY_DELAYS_MS per il
+# perché) — questa action li "ping-a" ogni 10 minuti così non arrivano mai a quel limite.
+# Il retry automatico lato app resta comunque in piedi come rete di sicurezza per il caso in
+# cui GitHub ritardi un'esecuzione schedulata (capita, specie sotto carico).
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sveglia gs1-italy-dpp-web (webshop)
+        run: curl -fsS --max-time 60 https://gs1-italy-dpp-web.onrender.com/health || echo "::warning::webshop non ha risposto entro 60s (probabile risveglio a freddo in corso)"
+
+      - name: Sveglia gs1-italy-dpp (registry-api)
+        run: curl -fsS --max-time 60 https://gs1-italy-dpp.onrender.com/registry-api/health || echo "::warning::registry-api non ha risposto entro 60s (probabile risveglio a freddo in corso)"
