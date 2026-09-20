@@ -6,7 +6,12 @@ import { IconComponent } from '../../../components/icon/icon';
 import { ScrollRevealDirective } from '../../../directives/scroll-reveal';
 import { Sector } from '../../../data/sectors';
 import { GranularityLevel } from '../../../services/registry-api.service';
-import { isValidBatchOrSerial, isValidGtin } from '../../../utils/gs1-validators';
+import { hasIncompleteAttributeRow, isValidBatchOrSerial, isValidGtin } from '../../../utils/gs1-validators';
+
+/** Duplicato apposta di ToastSeverity in admin.ts, non importato — stesso motivo di
+ * DppFormGroup qui sotto: admin.ts importa questo componente come valore, quindi il Wizard non
+ * può importare nulla, nemmeno solo a livello di tipo, da admin.ts (riferimento circolare). */
+export type ToastSeverity = 'error' | 'warning';
 
 /** Stessa forma esatta di `dppForm` in admin.ts — ripetuta qui invece di importarne il tipo da
  * `Admin` per evitare un riferimento circolare tra i due file (Admin importa il componente
@@ -77,6 +82,8 @@ export class DppWizardComponent {
   @Output() addAttribute = new EventEmitter<void>();
   @Output() removeAttribute = new EventEmitter<number>();
   @Output() requestDemoFill = new EventEmitter<void>();
+  @Output() requestFieldDemo = new EventEmitter<'name' | 'gtin' | 'granularityLevel' | 'batchOrSerial'>();
+  @Output() showToast = new EventEmitter<{ message: string; severity: ToastSeverity }>();
   @Output() saveDraft = new EventEmitter<void>();
   @Output() switchToFullForm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
@@ -92,11 +99,49 @@ export class DppWizardComponent {
     if (index <= this.lastReachedStep()) this.currentStep.set(index);
   }
 
+  /** A differenza di una volta, il pulsante "Avanti" resta sempre cliccabile (vedi
+   * dpp-wizard.html): un pulsante disabilitato non spiega da sé perché non si può proseguire.
+   * Qui invece, se il passo corrente non è valido, marchiamo i controlli come touched (così
+   * fieldError() mostra il messaggio sotto al campo) ed emettiamo un toast — solo a questo
+   * tentativo, mai ad ogni tasto premuto durante la digitazione. */
   protected next(): void {
-    if (!this.isStepValid(this.currentStep())) return;
-    const nextStep = Math.min(this.currentStep() + 1, this.steps.length - 1);
+    const step = this.currentStep();
+    if (!this.isStepValid(step)) {
+      this.markStepTouched(step);
+      this.showToast.emit({ message: this.stepValidationMessage(step), severity: 'error' });
+      return;
+    }
+    if (step === 3 && hasIncompleteAttributeRow(this.form.getRawValue().attributes as { key: string; value: string }[])) {
+      // Non bloccante: una riga con solo la chiave o solo il valore viene semplicemente
+      // ignorata al salvataggio (vedi Admin.buildInput()) — un avviso, non un errore.
+      this.showToast.emit({ message: 'Un attributo ha solo il nome o solo il valore compilato: verrà ignorato al salvataggio.', severity: 'warning' });
+    }
+    const nextStep = Math.min(step + 1, this.steps.length - 1);
     this.currentStep.set(nextStep);
     this.lastReachedStep.set(Math.max(this.lastReachedStep(), nextStep));
+  }
+
+  private markStepTouched(index: number): void {
+    switch (index) {
+      case 1:
+        this.form.controls.name.markAsTouched();
+        this.form.controls.gtin.markAsTouched();
+        break;
+      case 2:
+        this.form.controls.batchOrSerial.markAsTouched();
+        break;
+    }
+  }
+
+  private stepValidationMessage(index: number): string {
+    switch (index) {
+      case 1:
+        return this.fieldError('name') ?? this.fieldError('gtin') ?? 'Controlla nome e GTIN prima di continuare.';
+      case 2:
+        return this.fieldError('batchOrSerial') ?? 'Controlla lotto/seriale prima di continuare.';
+      default:
+        return 'Controlla i campi di questo passo prima di continuare.';
+    }
   }
 
   protected back(): void {

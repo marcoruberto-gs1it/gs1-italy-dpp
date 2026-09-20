@@ -57,6 +57,18 @@ export function isValidBatchOrSerial(value: string): boolean {
   return content.length <= 20 && !/[|~^]/.test(content);
 }
 
+/** Vero quando almeno una riga di attributo ha solo la chiave o solo il valore compilato — un
+ * refuso plausibile (non un errore bloccante: la riga viene semplicemente ignorata al
+ * salvataggio, vedi Admin.buildInput()), segnalato con un toast di avviso invece che d'errore
+ * sia dal form a pagina singola sia dal Wizard (vedi le rispettive next()/saveDraft()). */
+export function hasIncompleteAttributeRow(attributes: { key: string; value: string }[]): boolean {
+  return attributes.some((row) => {
+    const key = row.key?.trim();
+    const value = row.value?.trim();
+    return (!!key && !value) || (!key && !!value);
+  });
+}
+
 /** Lotto/seriale (AI (10)/(21) — GS1 General Specifications): fino a 20 caratteri alfanumerici,
  * niente caratteri che l'Element String GS1 non ammette (es. il separatore FNC1). Campo
  * opzionale: una stringa vuota è sempre valida. */

@@ -16,10 +16,12 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
 import { DppWizardComponent } from './dpp-wizard/dpp-wizard';
-import { batchOrSerialValidator, gtinValidator, isValidGtin } from '../../utils/gs1-validators';
+import { batchOrSerialValidator, gtinValidator, hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
 type View = 'checking' | 'login' | 'list' | 'create-choice' | 'form' | 'wizard';
+
+export type ToastSeverity = 'error' | 'warning';
 
 const GRANULARITY_LEVELS: GranularityLevel[] = ['MODEL', 'BATCH', 'ITEM'];
 
@@ -114,7 +116,16 @@ export class Admin {
   private passportIdentityEl = viewChild<ElementRef<HTMLElement>>('passportIdentity');
   private passportFactsEl = viewChild<ElementRef<HTMLElement>>('passportFacts');
 
-  protected formError = signal<string | null>(null);
+  /** Un solo toast alla volta, con severità: 'error' per problemi bloccanti (campo non valido,
+   * salvataggio/pubblicazione falliti), 'warning' per avvisi non bloccanti (es. un attributo con
+   * solo la chiave o solo il valore compilato — verrà semplicemente ignorato, non impedisce di
+   * salvare). Mostrato solo al tentativo di procedere (Avanti/Salva), mai ad ogni tasto premuto —
+   * il messaggio di errore sotto al singolo campo (fieldError()) resta sempre visibile a parte. */
+  protected toast = signal<{ message: string; severity: ToastSeverity } | null>(null);
+
+  protected showToast(message: string, severity: ToastSeverity = 'error'): void {
+    this.toast.set({ message, severity });
+  }
   protected savePending = signal(false);
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
@@ -252,8 +263,8 @@ export class Admin {
     // pagina, l'utente non è detto ci torni con lo sguardo. Si chiude da solo dopo un po' o col
     // pulsante di chiusura; ogni nuovo errore riparte da zero.
     effect((onCleanup) => {
-      if (!this.formError()) return;
-      const timer = setTimeout(() => this.formError.set(null), 6000);
+      if (!this.toast()) return;
+      const timer = setTimeout(() => this.toast.set(null), 6000);
       onCleanup(() => clearTimeout(timer));
     });
 
@@ -301,6 +312,21 @@ export class Admin {
     return firstError?.message ?? null;
   }
 
+  /** Riepilogo leggibile dei soli campi non validi, per il toast d'errore mostrato al tentativo
+   * di salvare (vedi saveDraft()) — il messaggio specifico di ciascun campo resta comunque sotto
+   * al campo stesso (fieldError()), questo è solo un richiamo visibile anche se l'utente non ha
+   * ancora scorso fin lì. */
+  private buildValidationSummary(): string {
+    const labels: Partial<Record<keyof typeof this.dppForm.controls, string>> = {
+      name: 'Nome prodotto',
+      gtin: 'GTIN',
+      batchOrSerial: 'Lotto/seriale',
+    };
+    const invalidFields = (Object.keys(labels) as (keyof typeof labels)[]).filter((key) => this.dppForm.controls[key as keyof typeof this.dppForm.controls].invalid).map((key) => labels[key]);
+    if (!invalidFields.length) return 'Controlla i campi evidenziati prima di continuare.';
+    return `Controlla: ${invalidFields.join(', ')}.`;
+  }
+
   protected gtinSuggestion(): string | null {
     return (this.dppForm.controls.gtin.errors?.['gtinCheckDigit']?.suggestion as string | undefined) ?? null;
   }
@@ -339,7 +365,7 @@ export class Admin {
     this.editingId.set(null);
     this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', gtin: '', granularityLevel: 'ITEM', batchOrSerial: '' });
     this.attributesArray.clear();
-    this.formError.set(null);
+    this.toast.set(null);
     this.view.set('create-choice');
   }
 
@@ -370,7 +396,7 @@ export class Admin {
     for (const [key, value] of Object.entries(record.attributes)) {
       this.attributesArray.push(this.attributeGroup(key, value));
     }
-    this.formError.set(null);
+    this.toast.set(null);
     this.view.set('form');
   }
 
@@ -407,6 +433,37 @@ export class Admin {
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(demo.attributes)) {
       this.attributesArray.push(this.attributeGroup(key, value));
+    }
+  }
+
+  /** Come fillDemoData(), ma per un solo campo scalare — il piccolo link "Usa demo" accanto a
+   * ciascun campo (admin.html/dpp-wizard.html), per chi vuole solo un esempio veloce per QUEL
+   * campo invece di sovrascrivere tutta la scheda. */
+  protected demoFillField(field: 'name' | 'gtin' | 'granularityLevel' | 'batchOrSerial'): void {
+    const sector = this.currentSector();
+    const demo = DEMO_DATA[sector.id];
+    if (!demo) return;
+    if (field === 'batchOrSerial') {
+      // Il lotto/seriale demo del dataset del settore può appartenere a un livello di
+      // granularità diverso da quello scelto ora nel form (es. il dataset demo è ITEM ma
+      // l'utente ha già scelto BATCH) — riadattiamo il prefisso AI al livello attuale invece di
+      // copiare alla lettera, altrimenti l'AI mostrerebbe un livello diverso da quello scelto.
+      const currentLevel = this.dppForm.controls.granularityLevel.value;
+      const rawValue = demo.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim() || 'DEMO001';
+      const ai = currentLevel === 'ITEM' ? '21' : '10';
+      this.dppForm.controls.batchOrSerial.setValue(`(${ai}) ${rawValue}`);
+      return;
+    }
+    switch (field) {
+      case 'name':
+        this.dppForm.controls.name.setValue(demo.name);
+        break;
+      case 'gtin':
+        this.dppForm.controls.gtin.setValue(sector.exampleGtin);
+        break;
+      case 'granularityLevel':
+        this.dppForm.controls.granularityLevel.setValue(demo.granularityLevel);
+        break;
     }
   }
 
@@ -455,8 +512,15 @@ export class Admin {
 
   protected saveDraft(): void {
     this.dppForm.markAllAsTouched();
-    if (this.dppForm.invalid) return;
-    this.formError.set(null);
+    if (this.dppForm.invalid) {
+      this.showToast(this.buildValidationSummary(), 'error');
+      return;
+    }
+    if (hasIncompleteAttributeRow(this.dppForm.getRawValue().attributes as { key: string; value: string }[])) {
+      this.showToast('Un attributo ha solo il nome o solo il valore compilato: verrà ignorato al salvataggio.', 'warning');
+    } else {
+      this.toast.set(null);
+    }
     this.savePending.set(true);
     const input = this.buildInput();
     const id = this.editingId();
@@ -470,7 +534,7 @@ export class Admin {
       },
       error: (err: HttpErrorResponse) => {
         this.savePending.set(false);
-        this.formError.set(err.error?.error ?? 'Errore durante il salvataggio.');
+        this.showToast(err.error?.error ?? 'Errore durante il salvataggio.', 'error');
       },
     });
   }
@@ -478,7 +542,7 @@ export class Admin {
   protected publish(): void {
     const id = this.editingId();
     if (!id) return;
-    this.formError.set(null);
+    this.toast.set(null);
     this.publishPending.set(true);
 
     this.journeyRecord.set(this.records().find((r) => r.id === id) ?? null);
@@ -529,7 +593,7 @@ export class Admin {
     if (!confirm(`Eliminare la scheda "${record.name}"?`)) return;
     this.api.delete(record.id).subscribe({
       next: () => this.loadRecords().subscribe(),
-      error: (err: HttpErrorResponse) => this.formError.set(err.error?.error ?? 'Errore durante l\'eliminazione.'),
+      error: (err: HttpErrorResponse) => this.showToast(err.error?.error ?? 'Errore durante l\'eliminazione.', 'error'),
     });
   }
 

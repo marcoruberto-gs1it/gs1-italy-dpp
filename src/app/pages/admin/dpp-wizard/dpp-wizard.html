@@ -60,13 +60,21 @@
           con un suggerimento se qualcosa non torna.
         </p>
 
-        <label for="w-name">Nome prodotto</label>
+        <div class="wizard-field-label-row">
+          <label for="w-name">Nome prodotto</label>
+          <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('name')">Usa demo</button>
+        </div>
         <input id="w-name" type="text" formControlName="name" placeholder="Es. Modulo batteria EV 75 kWh" />
         @if (fieldError('name'); as msg) {
           <p class="wizard-field-error">{{ msg }}</p>
+        } @else {
+          <p class="wizard-field-hint">Il nome che comparirà nella scheda pubblica e nel DPP Registry UE.</p>
         }
 
-        <label for="w-gtin">GTIN (8-14 cifre)</label>
+        <div class="wizard-field-label-row">
+          <label for="w-gtin">GTIN (8-14 cifre)</label>
+          <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('gtin')">Usa demo</button>
+        </div>
         <input id="w-gtin" type="text" inputmode="numeric" formControlName="gtin" placeholder="Es. 08000000000019" />
         @if (fieldError('gtin'); as msg) {
           <p class="wizard-field-error">
@@ -107,10 +115,13 @@
         </div>
 
         @if (form.controls.granularityLevel.value !== 'MODEL') {
-          <label for="w-batch" class="wizard-field-followup">
-            {{ form.controls.granularityLevel.value === 'ITEM' ? 'Numero seriale' : 'Lotto' }}
-            — AI ({{ form.controls.granularityLevel.value === 'ITEM' ? '21' : '10' }}) GS1
-          </label>
+          <div class="wizard-field-label-row wizard-field-followup">
+            <label for="w-batch">
+              {{ form.controls.granularityLevel.value === 'ITEM' ? 'Numero seriale' : 'Lotto' }}
+              — AI ({{ form.controls.granularityLevel.value === 'ITEM' ? '21' : '10' }}) GS1
+            </label>
+            <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('batchOrSerial')">Usa demo</button>
+          </div>
           <input
             id="w-batch"
             type="text"
@@ -214,7 +225,7 @@
         <button type="button" class="wizard-switch-link" (click)="switchToFullForm.emit()">Passa alla vista completa</button>
       </div>
       @if (currentStep() < steps.length - 1) {
-        <button type="button" class="gs-btn gs-btn--primary" [disabled]="!isStepValid(currentStep())" (click)="next()">Avanti →</button>
+        <button type="button" class="gs-btn gs-btn--primary" (click)="next()">Avanti →</button>
       }
     </div>
   </div>

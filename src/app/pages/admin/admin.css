@@ -101,6 +101,14 @@
   border: 1px solid currentColor;
 }
 
+/* Avviso non bloccante (es. attributo con solo chiave o solo valore) — stesso contenitore del
+   toast d'errore ma un tono neutro, per non sembrare un problema che impedisce di procedere. */
+.toast--warning {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+
 .toast span {
   flex: 1;
 }
@@ -597,6 +605,45 @@
 
 .form-card label:first-child {
   margin-top: 0;
+}
+
+/* Riga label + link "Usa demo" per un singolo campo — il link riempie solo quel campo con un
+   valore d'esempio plausibile per il settore corrente (vedi Admin.demoFillField()). */
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.field-label-row:first-child {
+  margin-top: 0;
+}
+
+.field-label-row label {
+  margin: 0;
+}
+
+.field-demo-link {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--brand);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin: 4px 0 10px;
+  white-space: nowrap;
+}
+
+.field-demo-link:hover {
+  text-decoration: underline;
+}
+
+.field-label-row .field-demo-link {
+  margin: 0;
 }
 
 .form-card input,

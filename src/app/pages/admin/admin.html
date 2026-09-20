@@ -1,9 +1,9 @@
 <div class="admin-container">
-  @if (formError(); as msg) {
-    <div class="toast toast--error" role="alert">
+  @if (toast(); as t) {
+    <div class="toast" [class.toast--error]="t.severity === 'error'" [class.toast--warning]="t.severity === 'warning'" role="alert">
       <app-icon name="alert-triangle" [size]="16"></app-icon>
-      <span>{{ msg }}</span>
-      <button type="button" class="toast-close" (click)="formError.set(null)" aria-label="Chiudi">✕</button>
+      <span>{{ t.message }}</span>
+      <button type="button" class="toast-close" (click)="toast.set(null)" aria-label="Chiudi">✕</button>
     </div>
   }
 
@@ -160,6 +160,8 @@
         (addAttribute)="addAttributeRow()"
         (removeAttribute)="removeAttributeRow($event)"
         (requestDemoFill)="fillDemoAttributes()"
+        (requestFieldDemo)="demoFillField($event)"
+        (showToast)="showToast($event.message, $event.severity)"
         (saveDraft)="saveDraft()"
         (switchToFullForm)="switchToSinglePageForm()"
         (cancel)="cancelForm()"
@@ -202,13 +204,21 @@
               </button>
             </div>
 
-            <label for="f-name">Nome prodotto</label>
+            <div class="field-label-row">
+              <label for="f-name">Nome prodotto</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('name')">Usa demo</button>
+            </div>
             <input id="f-name" type="text" formControlName="name" placeholder="es. Modulo batteria EV 75 kWh" [class.field-invalid]="fieldError('name')" />
             @if (fieldError('name'); as msg) {
               <p class="field-hint field-hint--error">{{ msg }}</p>
+            } @else {
+              <p class="field-hint">Il nome che comparirà nella scheda pubblica e nel DPP Registry UE.</p>
             }
 
-            <label for="f-gtin">GTIN (8-14 cifre)</label>
+            <div class="field-label-row">
+              <label for="f-gtin">GTIN (8-14 cifre)</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('gtin')">Usa demo</button>
+            </div>
             <input id="f-gtin" type="text" formControlName="gtin" placeholder="08000000000019" [class.field-invalid]="fieldError('gtin')" />
             @if (fieldError('gtin'); as msg) {
               <p class="field-hint field-hint--error">
@@ -223,7 +233,10 @@
               <p class="field-hint">La cifra finale è calcolata dallo standard GS1 (GTIN) — se non torna, te lo segnaliamo subito.</p>
             }
 
-            <label id="f-granularity-label">Granularity level</label>
+            <div class="field-label-row">
+              <label id="f-granularity-label">Granularity level</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('granularityLevel')">Usa demo</button>
+            </div>
             <hlm-select class="w-full" [value]="formValue().granularityLevel" (valueChange)="onGranularityChange($event)" aria-labelledby="f-granularity-label">
               <hlm-select-trigger class="w-full">
                 <hlm-select-value />
@@ -234,11 +247,17 @@
                 }
               </hlm-select-content>
             </hlm-select>
+            <p class="field-hint">MODEL: un passaporto per l'intera linea di prodotto. BATCH: uno per ogni lotto di produzione. ITEM: uno per ogni singolo esemplare, con numero seriale.</p>
 
-            <label for="f-batch">Lotto o seriale — AI (10)/(21), livello batch/item</label>
+            <div class="field-label-row">
+              <label for="f-batch">Lotto o seriale — AI (10)/(21), livello batch/item</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('batchOrSerial')">Usa demo</button>
+            </div>
             <input id="f-batch" type="text" formControlName="batchOrSerial" placeholder="es. (21) SN12345" [class.field-invalid]="fieldError('batchOrSerial')" />
             @if (fieldError('batchOrSerial'); as msg) {
               <p class="field-hint field-hint--error">{{ msg }}</p>
+            } @else {
+              <p class="field-hint">Diventa l'ultimo segmento dell'UPI — lascia vuoto se il livello scelto sopra è MODEL.</p>
             }
           </div>
 
@@ -250,6 +269,10 @@
               <span>Attributi</span>
               <button type="button" class="attr-add" (click)="addAttributeRow()">+ Aggiungi</button>
             </div>
+            <p class="field-hint">Dati liberi specifici del settore (es. composizione, impronta di carbonio) — diventano proprietà <code>schema:additionalProperty</code> nel JSON-LD della scheda pubblica.</p>
+            @if (attributesArray.controls.length === 0) {
+              <button type="button" class="field-demo-link" (click)="fillDemoAttributes()">Usa attributi demo per questo settore</button>
+            }
             @for (row of attributesArray.controls; track $index) {
               <div class="attribute-row" [formGroupName]="$index">
                 <input type="text" placeholder="chiave" formControlName="key" />

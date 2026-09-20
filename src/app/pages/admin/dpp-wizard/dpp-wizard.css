@@ -117,6 +117,40 @@
   margin-top: 0;
 }
 
+/* Riga label + link "Usa demo" per un singolo campo — stesso pattern di admin.css
+   (.field-label-row/.field-demo-link), qui per il Wizard. */
+.wizard-field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.wizard-field-label-row:first-child {
+  margin-top: 0;
+}
+
+.wizard-field-label-row label {
+  margin: 0;
+}
+
+.wizard-field-demo-link {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--brand);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.wizard-field-demo-link:hover {
+  text-decoration: underline;
+}
+
 .wizard-step input {
   width: 100%;
   box-sizing: border-box;
