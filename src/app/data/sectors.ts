@@ -60,7 +60,7 @@ export const SECTORS: Sector[] = [
     description:
       "Composizione delle fibre, processi produttivi, tracciabilità di filiera e riciclabilità, a partire dal lotto di produzione — non dal singolo capo.",
     brandColor: '#AF96D4',
-    dateLabel: 'Atto delegato atteso 2027',
+    dateLabel: 'Atto delegato atteso Q3-Q4 2027',
     roadmapYear: 2027.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -106,7 +106,7 @@ export const SECTORS: Sector[] = [
     description:
       'Origine, contenuto riciclato e impronta di carbonio dei prodotti in alluminio immessi sul mercato europeo.',
     brandColor: '#8E8E93',
-    dateLabel: 'Atto delegato atteso 2027',
+    dateLabel: 'Atto delegato atteso Q3-Q4 2027',
     roadmapYear: 2027.6,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -121,7 +121,7 @@ export const SECTORS: Sector[] = [
     description:
       'Prestazioni, durabilità e tracciabilità dei materiali per i pneumatici venduti nell\'Unione Europea.',
     brandColor: '#48484A',
-    dateLabel: 'Atto delegato atteso 2027',
+    dateLabel: 'Atto delegato atteso Q3-Q4 2027',
     roadmapYear: 2027.7,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -198,7 +198,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     shortName: 'Textiles',
     description:
       'Fibre composition, manufacturing processes, supply-chain traceability and recyclability, starting at production-batch level — not per garment.',
-    dateLabel: 'Delegated act expected 2027',
+    dateLabel: 'Delegated act expected Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Garment — example',
   },
@@ -224,7 +224,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     name: 'Aluminium',
     shortName: 'Aluminium',
     description: 'Origin, recycled content and carbon footprint of aluminium products placed on the EU market.',
-    dateLabel: 'Delegated act expected 2027',
+    dateLabel: 'Delegated act expected Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Aluminium profile — example',
   },
@@ -232,7 +232,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     name: 'Tyres',
     shortName: 'Tyres',
     description: "Performance, durability and material traceability for tyres sold in the European Union.",
-    dateLabel: 'Delegated act expected 2027',
+    dateLabel: 'Delegated act expected Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Summer tyre — example',
   },
