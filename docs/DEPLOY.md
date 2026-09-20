@@ -26,8 +26,13 @@ oggi in locale fa Traefik.
 **New → Web Service → Build and deploy from a Git repository** → connetti (se non già fatto)
 e seleziona `marcoruberto-gs1it/gs1-italy-dpp`.
 
-- **Name**: scegline uno ora, es. `gs1-dpp-registry-api` — determina l'URL
-  (`https://gs1-dpp-registry-api.onrender.com`), che ti servirà al passo 2.
+- **Name**: scegline uno ora — determina l'URL pubblico (`https://<nome-scelto>.onrender.com`),
+  che ti servirà al passo 2. **Attenzione**: se il nome è già preso da un altro utente Render
+  (i sottodomini `.onrender.com` sono globali, non solo tuoi), Render lo cambia in silenzio
+  aggiungendo un suffisso — l'URL vero è sempre quello mostrato in cima alla pagina del
+  servizio nella dashboard Render, non necessariamente quello che avevi scelto. Verificalo lì
+  prima di incollarlo altrove: un URL sbagliato qui rompe silenziosamente ogni pubblicazione,
+  con un errore che sembra tutt'altro (vedi nota più sotto).
 - **Root Directory**: `registry-api`
 - **Runtime**: Docker (Dockerfile Path: `Dockerfile`, relativo alla Root Directory sopra)
 - **Instance Type**: Free
@@ -48,28 +53,40 @@ e seleziona `marcoruberto-gs1it/gs1-italy-dpp`.
 Deploy. La tabella `gs1_dpp_records` si crea da sola al primo avvio (vedi `db.ts`) — a
 differenza di `mock-eu-registry`, qui non serve eseguire nulla a mano su Supabase.
 
-Verifica:
+Verifica (sostituisci con l'URL vero mostrato nella dashboard Render per questo servizio):
 ```
-curl https://gs1-dpp-registry-api.onrender.com/registry-api/health
+curl https://<nome-vero-del-servizio>.onrender.com/registry-api/health
 # {"status":"ok"}
 ```
+Se questa `curl` non risponde `{"status":"ok"}` — in particolare se la risposta è una pagina
+HTML di errore invece di JSON, o l'header `x-render-routing` vale `no-server` — il servizio non
+è raggiungibile a QUEL nome: prima di guardare altrove, controlla l'URL vero nella dashboard.
 
 ## 2. webshop
 
 **New → Web Service** → stesso repo.
 
-- **Name**: quello usato come `SITE_URL`/`REGISTRY_ADMIN_...SITE_URL` sopra, es.
-  `gs1-dpp-webshop`.
+- **Name**: scegline uno — stessa avvertenza di sopra sul suffisso che Render può aggiungere in
+  silenzio: usa sempre l'URL vero mostrato nella dashboard, non quello che avevi scelto.
 - **Root Directory**: lascia vuoto (il build context è la root del repo, non `webshop/` —
   serve l'intero progetto Angular).
 - **Runtime**: Docker (Dockerfile Path: `webshop/Dockerfile`)
 - **Instance Type**: Free
 - **Environment Variables**:
   ```
-  SITE_URL=https://gs1-dpp-webshop.onrender.com
-  REGISTRY_API_URL=https://gs1-dpp-registry-api.onrender.com
+  SITE_URL=https://<URL VERO DI QUESTO SERVIZIO — dalla dashboard, passo dopo aver creato il servizio>
+  REGISTRY_API_URL=https://<URL VERO del servizio registry-api creato al passo 1 — dalla dashboard>
   PORT=80
   ```
+  **Entrambi vanno incollati dalla dashboard Render, non digitati a mano** — è esattamente
+  l'errore che ha rotto la pubblicazione la prima volta in produzione: `REGISTRY_API_URL`
+  impostato al nome che si pensava di usare, invece del nome vero assegnato da Render (diverso
+  perché quello scelto era già preso da un altro utente). Il sintomo era fuorviante: l'admin
+  mostrava un errore generico ("Qualcosa non ha funzionato") sul passo "Verifica del Digital
+  Link" dell'animazione — che in realtà è solo il passo in cui l'interfaccia resta in attesa
+  della risposta del backend, quindi mostra lì qualunque errore, anche uno di semplice
+  instradamento come questo.
+
   `SITE_URL` qui è usato come **build arg** Docker (Render inietta automaticamente le
   variabili d'ambiente del servizio come build arg, vedi `webshop/Dockerfile`): finisce in
   sitemap.xml, robots.txt, llms.txt e nei canonical dell'HTML prerenderizzato — cambiarlo
@@ -78,11 +95,15 @@ curl https://gs1-dpp-registry-api.onrender.com/registry-api/health
   `/registry-api`. `PORT=80` dice a Render su quale porta ascolta nginx (`listen 80` in
   `nginx.conf`) — senza, Render si aspetta la sua porta di default e il deploy fallisce.
 
+  Ricontrolla anche `SITE_URL` sul servizio **registry-api** del passo 1 (non su questo): deve
+  essere anch'esso l'URL vero di QUESTO servizio webshop — serve a `mock-eu-registry` per
+  scaricare il liveURL della scheda durante la registrazione (vedi REGISTRY-SETUP.md).
+
 Deploy.
 
 ## 3. Verifica end-to-end
 
-- Apri `https://gs1-dpp-webshop.onrender.com` — homepage.
+- Apri l'URL vero del servizio webshop (dalla dashboard Render) — homepage.
 - `/admin` → login, crea una scheda, "Pubblica su mock-eu-registry" → questa volta dovrebbe
   funzionare per intero (a differenza dei test in locale): `SITE_URL` è finalmente un URL
   pubblico che `mock-eu-registry` può raggiungere per calcolare l'hash della scheda (vedi la
