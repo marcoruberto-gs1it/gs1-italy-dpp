@@ -160,6 +160,76 @@
   gap: 10px;
 }
 
+/* --- Schermata di scelta "Nuova scheda": Wizard guidato vs form a pagina singola --- */
+.create-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 880px;
+}
+
+.create-choice-card {
+  appearance: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-sans);
+  transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+
+.create-choice-card:hover {
+  border-color: var(--brand);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.create-choice-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.create-choice-card h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.create-choice-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.create-choice-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+@media (max-width: 720px) {
+  .create-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -468,7 +538,9 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  padding-bottom: 16px;
+  padding: 6px 6px 16px;
+  margin: -6px -6px 0;
+  border-radius: var(--radius-md);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -487,6 +559,9 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+  padding: 6px;
+  margin: -6px;
+  border-radius: var(--radius-md);
 }
 
 .passport-empty {

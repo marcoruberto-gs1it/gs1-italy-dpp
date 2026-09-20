@@ -35,6 +35,24 @@ export class Home implements OnDestroy {
    * carosello di anteprima nella hero (un settore = una card), niente dati duplicati. */
   sectors = computed<Sector[]>(() => SECTORS.map((s) => localizeSector(s, this.languageService.lang())));
 
+  /** Marker + percorso del grafico "roadmap normativa" (sezione #settori in home.html):
+   * posiziona ogni settore lungo un asse temporale REALE (`roadmapYear` in sectors.ts, che
+   * riflette lo stesso `dateLabel` mostrato per esteso sulla card) — non un layout decorativo.
+   * viewBox fisso 0 0 1000 170, coordinate già in unità SVG (nessun calcolo nel template).
+   * Niente etichette incollate ai punti (vedi .roadmap-legend sotto nel template): con 9
+   * settori, alcuni a poche settimane di distanza, si sovrapporrebbero. */
+  protected roadmapChart = computed(() => {
+    const xMin = 2026.6;
+    const xMax = 2029.7;
+    const sorted = [...this.sectors()].sort((a, b) => a.roadmapYear - b.roadmapYear);
+    const points = sorted.map((sector) => {
+      const t = (sector.roadmapYear - xMin) / (xMax - xMin);
+      return { sector, x: 40 + t * 920, y: 130 - t * 110 };
+    });
+    const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    return { points, path };
+  });
+
   protected activeIndex = signal(0);
   protected activeCard = computed(() => this.sectors()[this.activeIndex()]);
   protected autoplay = signal(true);

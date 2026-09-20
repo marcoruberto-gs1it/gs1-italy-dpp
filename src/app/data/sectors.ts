@@ -14,6 +14,10 @@ export interface Sector {
   brandColor: string;
   /** Etichetta breve mostrata come badge sulla card, es. "Obbligo dal 18 febbraio 2027". */
   dateLabel: string;
+  /** Stessa data di dateLabel, come numero (anno + frazione per il trimestre) — usato solo per
+   * posizionare il settore sull'asse del grafico roadmap in home.html. Non tradotto (un
+   * numero non ha lingua), non mostrato direttamente all'utente. */
+  roadmapYear: number;
   /** Riferimento normativo breve per la card di anteprima nella hero. */
   regulationRef: string;
   /** 'coming-soon': settore annunciato in homepage ma senza ancora prodotti pubblicati. */
@@ -42,6 +46,7 @@ export const SECTORS: Sector[] = [
       'Passaporto obbligatorio per batterie EV, LMT e industriali sopra i 2 kWh: origine dei materiali, impronta di carbonio, stato di salute e cicli di ricarica, accessibili da un QR code sulla batteria.',
     brandColor: '#0A84FF',
     dateLabel: 'Obbligo dal 18 febbraio 2027',
+    roadmapYear: 2027.13,
     regulationRef: 'Regolamento (UE) 2023/1542',
     status: 'coming-soon',
     exampleName: 'Modulo batteria EV — esempio',
@@ -56,6 +61,7 @@ export const SECTORS: Sector[] = [
       "Composizione delle fibre, processi produttivi, tracciabilità di filiera e riciclabilità, a partire dal lotto di produzione — non dal singolo capo.",
     brandColor: '#AF96D4',
     dateLabel: 'Atto delegato atteso 2027',
+    roadmapYear: 2027.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Capo — esempio',
@@ -71,6 +77,7 @@ export const SECTORS: Sector[] = [
       'Impronta di carbonio e contenuto riciclato per prodotti in ferro e acciaio — il primo settore del piano di lavoro ESPR dopo le batterie.',
     brandColor: '#FF9F0A',
     dateLabel: 'Atto delegato atteso Q4 2026',
+    roadmapYear: 2026.9,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Profilato in acciaio — esempio',
@@ -85,6 +92,7 @@ export const SECTORS: Sector[] = [
       'Materiali da costruzione con dati di sicurezza, conformità e fine vita, accessibili in cantiere e lungo tutta la filiera.',
     brandColor: '#FFD60A',
     dateLabel: 'Atto delegato atteso Q2 2027',
+    roadmapYear: 2027.4,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Pannello isolante — esempio',
@@ -99,6 +107,7 @@ export const SECTORS: Sector[] = [
       'Origine, contenuto riciclato e impronta di carbonio dei prodotti in alluminio immessi sul mercato europeo.',
     brandColor: '#8E8E93',
     dateLabel: 'Atto delegato atteso 2027',
+    roadmapYear: 2027.6,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Profilo in alluminio — esempio',
@@ -113,6 +122,7 @@ export const SECTORS: Sector[] = [
       'Prestazioni, durabilità e tracciabilità dei materiali per i pneumatici venduti nell\'Unione Europea.',
     brandColor: '#48484A',
     dateLabel: 'Atto delegato atteso 2027',
+    roadmapYear: 2027.7,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Pneumatico estivo — esempio',
@@ -127,6 +137,7 @@ export const SECTORS: Sector[] = [
       'Materiali, durabilità e riparabilità dei mobili, dal singolo pezzo alla filiera di produzione.',
     brandColor: '#AC8E68',
     dateLabel: 'Atto delegato atteso 2028',
+    roadmapYear: 2028.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Sedia da ufficio — esempio',
@@ -140,6 +151,7 @@ export const SECTORS: Sector[] = [
     description: 'Composizione dei materiali e riciclabilità per i materassi immessi sul mercato europeo.',
     brandColor: '#FF375F',
     dateLabel: 'Atto delegato atteso 2029',
+    roadmapYear: 2029.2,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Materasso a molle — esempio',
@@ -154,6 +166,7 @@ export const SECTORS: Sector[] = [
       'Riparabilità, disponibilità di ricambi e impronta ambientale per dispositivi elettronici e ICT.',
     brandColor: '#40C8E0',
     dateLabel: 'Atto delegato atteso 2029',
+    roadmapYear: 2029.4,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
     exampleName: 'Router domestico — esempio',

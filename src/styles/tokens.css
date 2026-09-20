@@ -29,6 +29,9 @@
      un bottone illeggibile mai verificato prima d'ora). */
   --brand-accent-vivid: #34d399;
   --brand-ink: #1e1b4b;
+  /* Gradiente per CTA principali (hero, Wizard) — entrambi gli stop verificati 8.3:1+ con
+     --brand-ink sopra, stessa regola di --brand-accent-vivid qui accanto: mai testo bianco. */
+  --gradient-cta: linear-gradient(120deg, var(--brand-accent-vivid), #22d3aa);
 
   /* --- Typography --- */
   --font-sans: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -309,6 +312,78 @@ img.img-fallback {
   background: var(--bg-surface-sunken);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
+}
+
+/* Pillola piccola per filtri/tag attivi — variante di .gs-badge con affordance di filtro
+   (bordo più marcato, dimensione touch-friendly) invece del badge puramente informativo. */
+.gs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.gs-chip--active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+/* Sfondo scuro a griglia sottile + glow radiale smeraldo — per blocchi sempre scuri e fissi
+   indipendenti dal tema (come l'hero, che usa già --brand-ink fisso). Il pattern a griglia è
+   puramente decorativo (repeating-linear-gradient, non un'immagine) e il glow è un
+   radial-gradient centrato in alto: entrambi a bassissima opacità, non competono mai con il
+   testo sopra (che resta bianco/rgba(255,255,255,*), invariato). */
+.gs-grid-glow {
+  position: relative;
+  background-color: var(--brand-ink);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(52, 211, 153, 0.22), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 96px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 96px);
+}
+
+/* Griglia con divisori sottili INTERNI (stile "tabella statistiche") invece di card separate —
+   ogni cella condivide il bordo con la successiva. Contenuto tipografico libero per cella:
+   chi la usa struttura le celle come preferisce (numero grande + etichetta, testo, ecc). */
+.gs-stat-grid {
+  display: grid;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.gs-stat-cell {
+  padding: 22px 24px;
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.gs-stat-cell:last-child {
+  border-right: none;
+}
+
+.gs-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+.gs-stat-label {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  line-height: 1.4;
 }
 
 /* Badge circolare/quadrato colorato per icone a supporto di stat, timeline, infografiche */

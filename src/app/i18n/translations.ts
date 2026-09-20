@@ -41,6 +41,8 @@ export const TRANSLATIONS = {
     regulation: {
       eyebrow: 'Il quadro normativo',
       title: 'Dal regolamento quadro ai primi settori obbligati',
+      titlePre: 'Dal regolamento quadro ai primi ',
+      titleHighlight: 'settori obbligati',
       intro: 'Il Regolamento ESPR introduce il Digital Product Passport come requisito trasversale; i contenuti specifici arrivano settore per settore.',
       item1Date: 'Luglio 2024',
       item1Title: 'ESPR in vigore',
@@ -53,10 +55,22 @@ export const TRANSLATIONS = {
       item3Text: "Tessile, siderurgia, edilizia, alluminio, pneumatici, mobili, materassi ed elettronica seguiranno con i propri atti delegati, secondo il piano di lavoro della Commissione.",
       standardsNote: "La base tecnica è quella già standardizzata da GS1: GS1 Digital Link per l'identificativo e il codice, EPCIS 2.0 per gli eventi di filiera, GS1 Web Vocabulary per descrivere i dati di prodotto.",
     },
+    keyStats: {
+      stat1Value: '9',
+      stat1Label: 'Settori coperti dalla roadmap ESPR',
+      stat2Value: '18/02/2027',
+      stat2Label: 'Primo obbligo in assoluto (batterie)',
+      stat3Value: 'GS1 Digital Link',
+      stat3Label: 'Standard di identificazione e risoluzione',
+      stat4Value: '3',
+      stat4Label: 'Livelli di granularità: modello, lotto, articolo',
+    },
     sectorsSection: {
       eyebrow: 'I settori',
       title: 'Un passaporto per ogni categoria di prodotto',
       intro: 'Il regolamento ESPR arriverà, settore per settore, a coprire gran parte dei prodotti immessi sul mercato europeo. Ecco la roadmap che stiamo seguendo.',
+      roadmapTitle: 'La roadmap normativa, settore per settore',
+      roadmapIntro: "Ogni punto è posizionato sulla data reale dell'obbligo o dell'atto delegato atteso, indicata sulla card corrispondente qui sopra.",
     },
     heroPreview: {
       caption: 'Anteprima — non ancora un prodotto pubblicato',
@@ -214,6 +228,8 @@ export const TRANSLATIONS = {
     regulation: {
       eyebrow: 'The regulatory framework',
       title: 'From the framework regulation to the first mandated sectors',
+      titlePre: 'From the framework regulation to the first ',
+      titleHighlight: 'mandated sectors',
       intro: 'The ESPR Regulation introduces the Digital Product Passport as a cross-cutting requirement; the specific content arrives sector by sector.',
       item1Date: 'July 2024',
       item1Title: 'ESPR in force',
@@ -226,10 +242,22 @@ export const TRANSLATIONS = {
       item3Text: 'Textiles, iron & steel, construction, aluminium, tyres, furniture, mattresses and electronics will follow with their own delegated acts, per the Commission\'s working plan.',
       standardsNote: 'The technical foundation is already standardised by GS1: GS1 Digital Link for the identifier and the code, EPCIS 2.0 for supply-chain events, GS1 Web Vocabulary to describe product data.',
     },
+    keyStats: {
+      stat1Value: '9',
+      stat1Label: 'Sectors covered by the ESPR roadmap',
+      stat2Value: '18 Feb 2027',
+      stat2Label: 'First mandate of all (batteries)',
+      stat3Value: 'GS1 Digital Link',
+      stat3Label: 'Identification and resolution standard',
+      stat4Value: '3',
+      stat4Label: 'Granularity levels: model, batch, item',
+    },
     sectorsSection: {
       eyebrow: 'Sectors',
       title: 'A passport for every product category',
       intro: "The ESPR regulation will roll out, sector by sector, to cover most products placed on the EU market. Here's the roadmap we're following.",
+      roadmapTitle: 'The regulatory roadmap, sector by sector',
+      roadmapIntro: 'Each point sits on the real date of the mandate or expected delegated act, shown on its card above.',
     },
     heroPreview: {
       caption: 'Preview — not yet a published product',

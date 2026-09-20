@@ -594,7 +594,20 @@
 .dpp-view-facts {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 1px;
+  background: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Dentro questa griglia i fact-tile condivisi perdono l'angolo arrotondato e lo sfondo proprio
+   (il divisore sottile lo dà il gap di 1px sopra, sullo sfondo --border-subtle) — coerente con
+   lo stile "tabella statistiche" introdotto nel resto del sito (.gs-stat-grid in tokens.css),
+   senza toccare .fact-tile di per sé (condiviso anche con l'anteprima passaporto di /admin). */
+.dpp-view-facts .fact-tile {
+  border-radius: 0;
+  background: var(--bg-surface);
 }
 
 .dpp-view-jsonld-btn {

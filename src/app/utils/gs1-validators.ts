@@ -48,6 +48,15 @@ export function gtinValidator(): ValidatorFn {
   };
 }
 
+/** Stessa regola di batchOrSerialValidator qui sotto, come funzione pura (senza i messaggi di
+ * dettaglio) — usata dal Wizard per decidere se "Avanti" è cliccabile, senza dover leggere
+ * `control.valid` in un computed() (vedi la nota in dpp-wizard.ts sul perché). */
+export function isValidBatchOrSerial(value: string): boolean {
+  const content = (value ?? '').trim().replace(/^\(\d{2}\)\s*/, '');
+  if (!content) return true;
+  return content.length <= 20 && !/[|~^]/.test(content);
+}
+
 /** Lotto/seriale (AI (10)/(21) — GS1 General Specifications): fino a 20 caratteri alfanumerici,
  * niente caratteri che l'Element String GS1 non ammette (es. il separatore FNC1). Campo
  * opzionale: una stringa vuota è sempre valida. */

@@ -120,6 +120,52 @@
       </div>
     }
 
+    @case ('create-choice') {
+      <div class="admin-header">
+        <div>
+          <h1>Nuova scheda</h1>
+          <p>Come preferisci compilarla? Puoi passare dall'una all'altra modalità in qualsiasi momento, senza perdere quanto già inserito.</p>
+        </div>
+        <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
+      </div>
+
+      <div class="create-choice-grid">
+        <button type="button" class="create-choice-card" (click)="chooseWizard()" appScrollReveal>
+          <span class="create-choice-icon icon-flat" style="--icon-color: var(--brand)"><app-icon name="flag" [size]="22"></app-icon></span>
+          <h2>Modalità guidata</h2>
+          <p>Un passo alla volta: settore, identificazione, granularità, attributi e riepilogo — con una spiegazione del significato di ogni campo. Consigliata se è la prima volta.</p>
+          <span class="create-choice-cta">Inizia <app-icon name="chevron-right" [size]="16"></app-icon></span>
+        </button>
+        <button type="button" class="create-choice-card" (click)="chooseSinglePageForm()" appScrollReveal [revealDelay]="0.08">
+          <span class="create-choice-icon icon-flat" style="--icon-color: var(--brand-accent)"><app-icon name="file-text" [size]="22"></app-icon></span>
+          <h2>Form singola pagina</h2>
+          <p>Tutti i campi insieme, con anteprima del passaporto in tempo reale accanto — più rapido se sai già cosa inserire o stai modificando una scheda simile a un'altra.</p>
+          <span class="create-choice-cta">Apri il form <app-icon name="chevron-right" [size]="16"></app-icon></span>
+        </button>
+      </div>
+    }
+
+    @case ('wizard') {
+      <app-dpp-wizard
+        [form]="dppForm"
+        [sectors]="sectors"
+        [currentSector]="currentSector"
+        [previewGtin]="previewGtin"
+        [previewUpi]="previewUpi"
+        [previewJsonLd]="previewJsonLd"
+        [gtinSuggestion]="gtinSuggestion()"
+        [attributesArray]="attributesArray"
+        [savePending]="savePending()"
+        (applyGtinSuggestion)="applyGtinSuggestion()"
+        (addAttribute)="addAttributeRow()"
+        (removeAttribute)="removeAttributeRow($event)"
+        (requestDemoFill)="fillDemoAttributes()"
+        (saveDraft)="saveDraft()"
+        (switchToFullForm)="switchToSinglePageForm()"
+        (cancel)="cancelForm()"
+      ></app-dpp-wizard>
+    }
+
     @case ('form') {
       <div class="admin-header">
         <div>
@@ -248,7 +294,7 @@
             </div>
           </div>
 
-          <div class="passport-identity">
+          <div class="passport-identity" #passportIdentity>
             <span class="passport-gtin">{{ previewGtin() ? 'GTIN (01) ' + previewGtin() : 'GTIN (01) — in attesa di un valore valido' }}</span>
             @if (dppForm.controls.batchOrSerial.value) {
               <span class="passport-gtin">{{ dppForm.controls.batchOrSerial.value }}</span>
@@ -267,7 +313,7 @@
             <p class="passport-qr-caption">GS1 Digital Link — inquadra per aprire questa scheda</p>
           </div>
 
-          <div class="passport-facts">
+          <div class="passport-facts" #passportFacts>
             @for (row of attributesArray.controls; track $index) {
               @if (row.value.key?.trim()) {
                 <div class="fact-tile">

@@ -1,4 +1,4 @@
-<section class="modern-hero">
+<section class="modern-hero gs-grid-glow">
   <div class="hero-inner">
     <div class="hero-grid">
       <div class="hero-copy" appScrollReveal="stagger" [revealStagger]="0.12">
@@ -81,6 +81,15 @@
         </div>
       </div>
     </div>
+
+    <ul class="hero-sector-strip" appScrollReveal="stagger" [revealStagger]="0.04" [revealDelay]="0.3" aria-label="{{ t('sectorsSection.title') }}">
+      @for (sector of sectors(); track sector.id) {
+        <li class="hero-sector-chip">
+          <span class="hero-sector-chip-icon"><app-icon [name]="sector.icon" [size]="16"></app-icon></span>
+          {{ sector.shortName }}
+        </li>
+      }
+    </ul>
   </div>
 </section>
 
@@ -123,22 +132,25 @@
   <section class="info-section info-section--alt" id="normativa">
     <div class="section-head">
       <span class="section-eyebrow">{{ t('regulation.eyebrow') }}</span>
-      <h2>{{ t('regulation.title') }}</h2>
+      <h2>{{ t('regulation.titlePre') }}<span class="text-highlight">{{ t('regulation.titleHighlight') }}</span></h2>
       <p>{{ t('regulation.intro') }}</p>
     </div>
 
     <ol class="reg-timeline" appScrollReveal="stagger">
       <li class="reg-item">
+        <span class="reg-item-icon icon-flat"><app-icon name="flag" [size]="18"></app-icon></span>
         <span class="reg-date">{{ t('regulation.item1Date') }}</span>
         <h3>{{ t('regulation.item1Title') }}</h3>
         <p>{{ t('regulation.item1Text') }}</p>
       </li>
       <li class="reg-item">
+        <span class="reg-item-icon icon-flat"><app-icon name="battery" [size]="18"></app-icon></span>
         <span class="reg-date">{{ t('regulation.item2Date') }}</span>
         <h3>{{ t('regulation.item2Title') }}</h3>
         <p>{{ t('regulation.item2Text') }}</p>
       </li>
       <li class="reg-item">
+        <span class="reg-item-icon icon-flat"><app-icon name="layers" [size]="18"></app-icon></span>
         <span class="reg-date">{{ t('regulation.item3Date') }}</span>
         <h3>{{ t('regulation.item3Title') }}</h3>
         <p>{{ t('regulation.item3Text') }}</p>
@@ -152,6 +164,25 @@
       <span class="gs-badge gs-badge--neutral">GS1 Digital Link</span>
       <span class="gs-badge gs-badge--neutral">EPCIS 2.0</span>
       <span class="gs-badge gs-badge--neutral">GS1 Web Vocabulary</span>
+    </div>
+
+    <div class="gs-stat-grid key-stats" appScrollReveal>
+      <div class="gs-stat-cell">
+        <span class="gs-stat-value">{{ t('keyStats.stat1Value') }}</span>
+        <span class="gs-stat-label">{{ t('keyStats.stat1Label') }}</span>
+      </div>
+      <div class="gs-stat-cell">
+        <span class="gs-stat-value">{{ t('keyStats.stat2Value') }}</span>
+        <span class="gs-stat-label">{{ t('keyStats.stat2Label') }}</span>
+      </div>
+      <div class="gs-stat-cell">
+        <span class="gs-stat-value">{{ t('keyStats.stat3Value') }}</span>
+        <span class="gs-stat-label">{{ t('keyStats.stat3Label') }}</span>
+      </div>
+      <div class="gs-stat-cell">
+        <span class="gs-stat-value">{{ t('keyStats.stat4Value') }}</span>
+        <span class="gs-stat-label">{{ t('keyStats.stat4Label') }}</span>
+      </div>
     </div>
   </section>
 
@@ -176,5 +207,31 @@
         </li>
       }
     </ul>
+
+    <div class="roadmap-chart gs-card" appScrollReveal>
+      <div class="roadmap-chart-head">
+        <h3>{{ t('sectorsSection.roadmapTitle') }}</h3>
+        <p>{{ t('sectorsSection.roadmapIntro') }}</p>
+      </div>
+      <svg class="roadmap-svg" viewBox="0 0 1000 170" preserveAspectRatio="xMidYMid meet" role="img" [attr.aria-label]="t('sectorsSection.roadmapTitle')">
+        <line x1="40" y1="142" x2="960" y2="142" class="roadmap-axis" />
+        <path [attr.d]="roadmapChart().path" class="roadmap-line" />
+        @for (p of roadmapChart().points; track p.sector.id) {
+          <circle [attr.cx]="p.x" [attr.cy]="p.y" r="7" class="roadmap-dot" [style.--dot-color]="p.sector.brandColor" />
+        }
+      </svg>
+      <!-- Legenda: un punto sulla curva sopra ha lo stesso colore di una voce qui — niente
+           etichette incollate ai punti (con 9 settori, alcuni a distanza di poche settimane,
+           si sovrapporrebbero) -->
+      <ul class="roadmap-legend">
+        @for (p of roadmapChart().points; track p.sector.id) {
+          <li class="roadmap-legend-item">
+            <span class="roadmap-legend-dot" [style.--dot-color]="p.sector.brandColor"></span>
+            <span class="roadmap-legend-name">{{ p.sector.shortName }}</span>
+            <span class="roadmap-legend-date">{{ p.sector.dateLabel }}</span>
+          </li>
+        }
+      </ul>
+    </div>
   </section>
 </div>

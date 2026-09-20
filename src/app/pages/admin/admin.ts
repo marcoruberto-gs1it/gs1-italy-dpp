@@ -1,5 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, PLATFORM_ID, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { gsap } from 'gsap';
 import { Meta, Title } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,10 +15,11 @@ import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryA
 import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
+import { DppWizardComponent } from './dpp-wizard/dpp-wizard';
 import { batchOrSerialValidator, gtinValidator, isValidGtin } from '../../utils/gs1-validators';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
-type View = 'checking' | 'login' | 'list' | 'form';
+type View = 'checking' | 'login' | 'list' | 'create-choice' | 'form' | 'wizard';
 
 const GRANULARITY_LEVELS: GranularityLevel[] = ['MODEL', 'BATCH', 'ITEM'];
 
@@ -39,7 +41,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ScrollRevealDirective, ...HlmSelectImports],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent, ...HlmSelectImports],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -105,6 +107,12 @@ export class Admin {
    * Observable (valueChanges), qui ponte verso i signal usati dal resto del componente
    * (anteprima infografica, QR code, settore corrente). */
   protected formValue = toSignal(this.dppForm.valueChanges, { initialValue: this.dppForm.getRawValue() });
+
+  /** Riferimenti ai blocchi dell'anteprima passaporto che si "illuminano" per un istante quando
+   * il valore che rappresentano cambia (vedi l'effect nel costruttore) — puro feedback visivo,
+   * il valore mostrato viene già, a prescindere, dai signal/computed qui sopra. */
+  private passportIdentityEl = viewChild<ElementRef<HTMLElement>>('passportIdentity');
+  private passportFactsEl = viewChild<ElementRef<HTMLElement>>('passportFacts');
 
   protected formError = signal<string | null>(null);
   protected savePending = signal(false);
@@ -248,6 +256,32 @@ export class Admin {
       const timer = setTimeout(() => this.formError.set(null), 6000);
       onCleanup(() => clearTimeout(timer));
     });
+
+    // Anteprima passaporto "viva": un breve richiamo visivo (flash del colore di sfondo, non
+    // un ridisegno) sui blocchi identità/attributi quando il loro valore cambia davvero —
+    // mai al primo render (prevKey vuota) e mai sotto prefers-reduced-motion, stesso
+    // trattamento di ScrollRevealDirective (directives/scroll-reveal.ts).
+    let prevIdentityKey: string | null = null;
+    let prevFactsKey: string | null = null;
+    effect(() => {
+      const f = this.formValue();
+      const identityKey = `${f.gtin}|${f.granularityLevel}|${f.batchOrSerial}`;
+      const factsKey = JSON.stringify(f.attributes);
+      if (!this.isBrowser || (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+        prevIdentityKey = identityKey;
+        prevFactsKey = factsKey;
+        return;
+      }
+      const flashColor = getComputedStyle(document.documentElement).getPropertyValue('--brand-soft').trim();
+      const pulse = (el: HTMLElement | undefined) => {
+        if (!el) return;
+        gsap.fromTo(el, { backgroundColor: flashColor }, { backgroundColor: 'transparent', duration: 0.7, ease: 'power1.out' });
+      };
+      if (prevIdentityKey !== null && identityKey !== prevIdentityKey) pulse(this.passportIdentityEl()?.nativeElement);
+      if (prevFactsKey !== null && factsKey !== prevFactsKey) pulse(this.passportFactsEl()?.nativeElement);
+      prevIdentityKey = identityKey;
+      prevFactsKey = factsKey;
+    });
   }
 
   /** Ricarica l'elenco (`records`) e lo restituisce come Observable, senza toccare `view` —
@@ -298,11 +332,28 @@ export class Admin {
     this.api.logout().subscribe(() => this.view.set('login'));
   }
 
+  /** "Nuova scheda" non apre più il form direttamente: prima chiede quale modalità di
+   * compilazione usare (vedi 'create-choice' in admin.html) — Wizard guidato o form a pagina
+   * singola, sugli stessi identici campi di dppForm, nessuna duplicazione di dati. */
   protected startCreate(): void {
     this.editingId.set(null);
     this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', gtin: '', granularityLevel: 'ITEM', batchOrSerial: '' });
     this.attributesArray.clear();
     this.formError.set(null);
+    this.view.set('create-choice');
+  }
+
+  protected chooseWizard(): void {
+    this.view.set('wizard');
+  }
+
+  protected chooseSinglePageForm(): void {
+    this.view.set('form');
+  }
+
+  /** Passa dal Wizard alla vista completa senza perdere nulla: stesso dppForm, cambia solo
+   * quale template lo mostra. */
+  protected switchToSinglePageForm(): void {
     this.view.set('form');
   }
 
@@ -342,6 +393,17 @@ export class Admin {
       granularityLevel: demo.granularityLevel,
       batchOrSerial: demo.batchOrSerial,
     });
+    this.fillDemoAttributes();
+  }
+
+  /** Sottoinsieme di fillDemoData() che tocca solo gli attributi — usato dal Wizard al passo
+   * "Attributi" (dpp-wizard.ts), dove a differenza del form a pagina singola l'utente ha già
+   * scelto identificazione/granularità nei passi precedenti: sovrascriverle di nuovo qui
+   * sarebbe una sorpresa sgradita, non un aiuto. */
+  protected fillDemoAttributes(): void {
+    const sector = this.currentSector();
+    const demo = DEMO_DATA[sector.id];
+    if (!demo) return;
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(demo.attributes)) {
       this.attributesArray.push(this.attributeGroup(key, value));

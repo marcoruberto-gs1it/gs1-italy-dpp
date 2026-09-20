@@ -1,0 +1,221 @@
+<div class="wizard" [formGroup]="form">
+  <!-- Indicatore di avanzamento: i passi già raggiunti sono cliccabili per tornare indietro,
+       quelli non ancora sbloccati no (vedi goTo() in dpp-wizard.ts). -->
+  <ol class="wizard-progress">
+    @for (step of steps; track step.title; let i = $index) {
+      <li
+        class="wizard-progress-item"
+        [class.is-current]="i === currentStep()"
+        [class.is-done]="i < currentStep()"
+        [class.is-locked]="i > lastReachedStep()"
+      >
+        <button type="button" class="wizard-progress-dot" (click)="goTo(i)" [disabled]="i > lastReachedStep()" [attr.aria-current]="i === currentStep() ? 'step' : null">
+          @if (i < currentStep()) {
+            <app-icon name="check-circle" [size]="14"></app-icon>
+          } @else {
+            {{ i + 1 }}
+          }
+        </button>
+        <span class="wizard-progress-label">{{ step.short }}</span>
+      </li>
+    }
+  </ol>
+
+  <div class="wizard-panel gs-card">
+    <!-- Passo 1: Settore -->
+    @if (currentStep() === 0) {
+      <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
+        <h2>{{ steps[0].title }}</h2>
+        <p class="wizard-step-help">
+          Il settore determina quali requisiti del regolamento ESPR si applicano a questo prodotto e da quando —
+          batterie, tessile, elettronica e gli altri settori della roadmap hanno atti delegati e scadenze proprie
+          (vedi la home per il quadro completo).
+        </p>
+        <div class="wizard-sector-grid">
+          @for (sector of sectors; track sector.id) {
+            <button
+              type="button"
+              class="wizard-sector-card"
+              [class.is-selected]="form.controls.sectorId.value === sector.id"
+              (click)="selectSector(sector.id)"
+            >
+              <span class="wizard-sector-icon icon-flat" [style.--icon-color]="sector.brandColor">
+                <app-icon [name]="sector.icon" [size]="18"></app-icon>
+              </span>
+              {{ sector.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Passo 2: Identificazione prodotto -->
+    @if (currentStep() === 1) {
+      <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
+        <h2>{{ steps[1].title }}</h2>
+        <p class="wizard-step-help">
+          Il <strong>GTIN</strong> (Global Trade Item Number) è l'identificativo numerico GS1 del prodotto — la base
+          da cui si costruisce l'UPI (Unique Product Identifier), l'URI GS1 Digital Link che finirà nel QR code e nel
+          Registro UE. Deve avere 8, 12, 13 o 14 cifre e una cifra di controllo valida: la verifichiamo subito,
+          con un suggerimento se qualcosa non torna.
+        </p>
+
+        <label for="w-name">Nome prodotto</label>
+        <input id="w-name" type="text" formControlName="name" placeholder="Es. Modulo batteria EV 75 kWh" />
+        @if (fieldError('name'); as msg) {
+          <p class="wizard-field-error">{{ msg }}</p>
+        }
+
+        <label for="w-gtin">GTIN (8-14 cifre)</label>
+        <input id="w-gtin" type="text" inputmode="numeric" formControlName="gtin" placeholder="Es. 08000000000019" />
+        @if (fieldError('gtin'); as msg) {
+          <p class="wizard-field-error">
+            {{ msg }}
+            @if (gtinSuggestion) {
+              <button type="button" class="wizard-inline-fix" (click)="applyGtinSuggestion.emit()">Usa {{ gtinSuggestion }}</button>
+            }
+          </p>
+        }
+        @if (previewUpi(); as upi) {
+          <p class="wizard-field-hint">UPI che verrà registrato: <code>{{ upi }}</code></p>
+        }
+      </div>
+    }
+
+    <!-- Passo 3: Granularità -->
+    @if (currentStep() === 2) {
+      <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
+        <h2>{{ steps[2].title }}</h2>
+        <p class="wizard-step-help">
+          La norma CEN/CENELEC EN&nbsp;18219 ammette tre livelli di dettaglio per il passaporto — scegli il più
+          fine di cui hai davvero bisogno: un livello più granulare (lotto invece di modello, articolo invece di
+          lotto) migliora la tracciabilità ma richiede un identificativo per ogni lotto/pezzo.
+        </p>
+
+        <div class="wizard-granularity-grid">
+          @for (level of granularityLevels; track level) {
+            <button
+              type="button"
+              class="wizard-granularity-card"
+              [class.is-selected]="form.controls.granularityLevel.value === level"
+              (click)="onGranularityChange(level)"
+            >
+              <strong>{{ level }}</strong>
+              <span>{{ granularityHelp(level) }}</span>
+            </button>
+          }
+        </div>
+
+        @if (form.controls.granularityLevel.value !== 'MODEL') {
+          <label for="w-batch" class="wizard-field-followup">
+            {{ form.controls.granularityLevel.value === 'ITEM' ? 'Numero seriale' : 'Lotto' }}
+            — AI ({{ form.controls.granularityLevel.value === 'ITEM' ? '21' : '10' }}) GS1
+          </label>
+          <input
+            id="w-batch"
+            type="text"
+            formControlName="batchOrSerial"
+            [placeholder]="form.controls.granularityLevel.value === 'ITEM' ? 'Es. (21) SN12345' : 'Es. (10) LOTTO2027A'"
+          />
+          @if (fieldError('batchOrSerial'); as msg) {
+            <p class="wizard-field-error">{{ msg }}</p>
+          }
+          <p class="wizard-field-hint">
+            Diventa l'ultimo segmento dell'UPI (es. <code>.../{{ form.controls.granularityLevel.value === 'ITEM' ? '21' : '10' }}/valore</code>) —
+            puoi scrivere solo il valore, il prefisso AI si aggiunge da sé se non lo indichi.
+          </p>
+        }
+      </div>
+    }
+
+    <!-- Passo 4: Attributi -->
+    @if (currentStep() === 3) {
+      <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
+        <h2>{{ steps[3].title }}</h2>
+        <p class="wizard-step-help">
+          Dati liberi specifici del prodotto — impronta di carbonio, contenuto riciclato, composizione, garanzia:
+          tutto ciò che il tuo settore richiede e non rientra nei campi fissi qui sopra. Diventano proprietà
+          <code>schema:additionalProperty</code> nel JSON-LD della scheda pubblica.
+        </p>
+
+        @if (attributesArray.controls.length === 0) {
+          <button type="button" class="gs-btn gs-btn--ghost" (click)="requestDemoFill.emit()">
+            <app-icon name="refresh" [size]="16"></app-icon>
+            Popola con dati demo per questo settore
+          </button>
+        }
+
+        <div class="wizard-attributes" formArrayName="attributes">
+          @for (row of attributesArray.controls; track $index; let i = $index) {
+            <div class="wizard-attribute-row" [formGroupName]="i">
+              <input type="text" formControlName="key" placeholder="Nome campo (es. impronta di carbonio)" />
+              <input type="text" formControlName="value" placeholder="Valore" />
+              <button type="button" class="wizard-attribute-remove" (click)="removeAttribute.emit(i)" aria-label="Rimuovi attributo">✕</button>
+            </div>
+          }
+        </div>
+        <button type="button" class="wizard-add-attribute" (click)="addAttribute.emit()">+ Aggiungi attributo</button>
+      </div>
+    }
+
+    <!-- Passo 5: Riepilogo -->
+    @if (currentStep() === 4) {
+      <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
+        <h2>{{ steps[4].title }}</h2>
+        <p class="wizard-step-help">Controlla l'anteprima e salva la bozza — potrai pubblicarla sul DPP Registry UE subito dopo.</p>
+
+        <div class="wizard-summary">
+          <div class="wizard-summary-head">
+            <span class="wizard-summary-icon icon-flat" [style.--icon-color]="currentSector().brandColor">
+              <app-icon [name]="currentSector().icon" [size]="24"></app-icon>
+            </span>
+            <div>
+              <span class="wizard-summary-eyebrow" [style.color]="currentSector().brandColor">{{ currentSector().shortName }}</span>
+              <h3>{{ form.controls.name.value || 'Nome prodotto' }}</h3>
+            </div>
+          </div>
+          <div class="wizard-summary-chips">
+            <span class="wizard-summary-chip">{{ previewGtin() ? 'GTIN (01) ' + previewGtin() : 'GTIN — non valido' }}</span>
+            @if (form.controls.batchOrSerial.value) {
+              <span class="wizard-summary-chip">{{ form.controls.batchOrSerial.value }}</span>
+            }
+            <span class="gs-badge gs-badge--neutral">{{ form.controls.granularityLevel.value }}</span>
+          </div>
+          @if (attributesArray.controls.length) {
+            <div class="wizard-summary-facts">
+              @for (row of attributesArray.controls; track $index) {
+                @if (row.value.key?.trim()) {
+                  <div class="fact-tile">
+                    <span class="fact-label">{{ row.value.key }}</span>
+                    <span class="fact-value">{{ row.value.value || '—' }}</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="savePending" (click)="saveDraft.emit()">
+          @if (savePending) {
+            Salvataggio…
+          } @else {
+            <app-icon name="save" [size]="16"></app-icon>
+            Salva bozza
+          }
+        </button>
+      </div>
+    }
+
+    <div class="wizard-actions">
+      <div class="wizard-actions-left">
+        @if (currentStep() > 0) {
+          <button type="button" class="gs-btn gs-btn--ghost" (click)="back()">← Indietro</button>
+        }
+        <button type="button" class="wizard-switch-link" (click)="switchToFullForm.emit()">Passa alla vista completa</button>
+      </div>
+      @if (currentStep() < steps.length - 1) {
+        <button type="button" class="gs-btn gs-btn--primary" [disabled]="!isStepValid(currentStep())" (click)="next()">Avanti →</button>
+      }
+    </div>
+  </div>
+</div>
