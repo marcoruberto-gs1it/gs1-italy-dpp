@@ -21,3 +21,6 @@ jobs:
 
       - name: Sveglia gs1-italy-dpp (registry-api)
         run: curl -fsS --max-time 60 https://gs1-italy-dpp.onrender.com/registry-api/health || echo "::warning::registry-api non ha risposto entro 60s (probabile risveglio a freddo in corso)"
+
+      - name: Sveglia mock-eu-registry (terzo servizio nella catena di pubblicazione)
+        run: curl -fsS --max-time 60 https://mock-eu-registry-pgsql-oidc-latest.onrender.com/q/health || echo "::warning::mock-eu-registry non ha risposto entro 60s (probabile risveglio a freddo in corso)"
