@@ -129,6 +129,37 @@
     </ol>
   </section>
 
+  <section class="info-section">
+    <div class="section-head">
+      <span class="section-eyebrow">{{ t('benefits.eyebrow') }}</span>
+      <h2>{{ t('benefits.title') }}</h2>
+      <p>{{ t('benefits.intro') }}</p>
+    </div>
+
+    <ul class="benefit-grid" appScrollReveal="stagger" [revealGrid]="true" [revealStagger]="0.08">
+      <li class="benefit-card gs-card">
+        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand)"><app-icon name="leaf" [size]="20"></app-icon></span>
+        <h3>{{ t('benefits.item1Title') }}</h3>
+        <p>{{ t('benefits.item1Text') }}</p>
+      </li>
+      <li class="benefit-card gs-card">
+        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand-accent-strong)"><app-icon name="globe" [size]="20"></app-icon></span>
+        <h3>{{ t('benefits.item2Title') }}</h3>
+        <p>{{ t('benefits.item2Text') }}</p>
+      </li>
+      <li class="benefit-card gs-card">
+        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand)"><app-icon name="shield-check" [size]="20"></app-icon></span>
+        <h3>{{ t('benefits.item3Title') }}</h3>
+        <p>{{ t('benefits.item3Text') }}</p>
+      </li>
+      <li class="benefit-card gs-card">
+        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand-accent-strong)"><app-icon name="check-circle" [size]="20"></app-icon></span>
+        <h3>{{ t('benefits.item4Title') }}</h3>
+        <p>{{ t('benefits.item4Text') }}</p>
+      </li>
+    </ul>
+  </section>
+
   <section class="info-section info-section--alt" id="normativa">
     <div class="section-head">
       <span class="section-eyebrow">{{ t('regulation.eyebrow') }}</span>
@@ -163,13 +194,35 @@
       </li>
     </ol>
 
-    <p class="standards-note">
-      {{ t('regulation.standardsNote') }}
-    </p>
-    <div class="standards-badges">
-      <span class="gs-badge gs-badge--neutral">GS1 Digital Link</span>
-      <span class="gs-badge gs-badge--neutral">EPCIS 2.0</span>
-      <span class="gs-badge gs-badge--neutral">GS1 Web Vocabulary</span>
+    <div class="standards-panel gs-grid-glow" appScrollReveal>
+      <div class="standards-panel-head">
+        <span class="standards-eyebrow">{{ t('regulation.standardsEyebrow') }}</span>
+        <h3>{{ t('regulation.standardsTitle') }}</h3>
+        <p>{{ t('regulation.standardsIntro') }}</p>
+      </div>
+
+      <ul class="standards-pillars">
+        <li class="standards-pillar">
+          <span class="standards-pillar-icon icon-flat" style="--icon-color: var(--brand-accent-vivid)"><app-icon name="tag" [size]="18"></app-icon></span>
+          <h4>{{ t('regulation.standardsPillar1Title') }}</h4>
+          <span class="standards-pillar-standard">{{ t('regulation.standardsPillar1Standard') }}</span>
+          <p>{{ t('regulation.standardsPillar1Text') }}</p>
+        </li>
+        <li class="standards-pillar">
+          <span class="standards-pillar-icon icon-flat" style="--icon-color: var(--brand-accent-vivid)"><app-icon name="qr-code" [size]="18"></app-icon></span>
+          <h4>{{ t('regulation.standardsPillar2Title') }}</h4>
+          <span class="standards-pillar-standard">{{ t('regulation.standardsPillar2Standard') }}</span>
+          <p>{{ t('regulation.standardsPillar2Text') }}</p>
+        </li>
+        <li class="standards-pillar">
+          <span class="standards-pillar-icon icon-flat" style="--icon-color: var(--brand-accent-vivid)"><app-icon name="send" [size]="18"></app-icon></span>
+          <h4>{{ t('regulation.standardsPillar3Title') }}</h4>
+          <span class="standards-pillar-standard">{{ t('regulation.standardsPillar3Standard') }}</span>
+          <p>{{ t('regulation.standardsPillar3Text') }}</p>
+        </li>
+      </ul>
+
+      <p class="standards-footnote">{{ t('regulation.standardsFootnote') }}</p>
     </div>
 
     <div class="gs-stat-grid key-stats" appScrollReveal>
