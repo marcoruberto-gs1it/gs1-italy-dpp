@@ -1,7 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { provideSpartanHlm } from '@spartan-ng/helm/utils';
 import { provideOptimus } from '@openng/optimus-ui/config';
 
 import { routes } from './app.routes';
@@ -19,12 +18,6 @@ export const appConfig: ApplicationConfig = {
     // withFetch: usato solo dalla sezione admin (RenderMode.Client, vedi app.routes.server.ts)
     // per parlare con registry-api — nessun'altra pagina del sito fa chiamate HTTP client-side.
     provideHttpClient(withFetch()),
-    // Componenti Spartan/ui (select in /admin, vedi src/app/ui/): disattiva il popover CDK di
-    // default, che altrimenti renderebbe il menu del select sopra i nostri elementi
-    // position:fixed (toast, dialog di pubblicazione).
-    // TODO(migrazione Optimus UI): rimosso una volta sostituita l'ultima hlm-select (vedi
-    // Fase 2 del piano di migrazione).
-    provideSpartanHlm(),
     // darkModeSelector allineato a ThemeService (src/app/services/theme.service.ts), che
     // imposta [data-theme="dark"] su <html> — Optimus UI segue lo stesso attributo, nessuna
     // logica di tema duplicata. Niente `cssLayer`, di proposito: provato con

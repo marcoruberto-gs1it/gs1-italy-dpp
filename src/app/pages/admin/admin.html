@@ -186,17 +186,8 @@
 
             <div class="form-card-head">
               <div>
-                <label id="f-sector-label">Settore</label>
-                <hlm-select class="w-full" [value]="formValue().sectorId" [itemToString]="sectorItemToString" (valueChange)="onSectorChange($event)" aria-labelledby="f-sector-label">
-                  <hlm-select-trigger class="w-full">
-                    <hlm-select-value />
-                  </hlm-select-trigger>
-                  <hlm-select-content *hlmSelectPortal>
-                    @for (sector of sectors; track sector.id) {
-                      <hlm-select-item [value]="sector.id">{{ sector.name }}</hlm-select-item>
-                    }
-                  </hlm-select-content>
-                </hlm-select>
+                <label id="f-sector-label" for="f-sector">Settore</label>
+                <p-select inputId="f-sector" class="w-full" fluid formControlName="sectorId" [options]="sectors" optionLabel="name" optionValue="id" ariaLabelledBy="f-sector-label" />
               </div>
               <button type="button" class="gs-btn gs-btn--ghost demo-fill-btn" (click)="fillDemoData()">
                 <app-icon name="refresh" [size]="15"></app-icon>
@@ -234,19 +225,10 @@
             }
 
             <div class="field-label-row">
-              <label id="f-granularity-label">Granularity level</label>
+              <label id="f-granularity-label" for="f-granularity">Granularity level</label>
               <button type="button" class="field-demo-link" (click)="demoFillField('granularityLevel')">Usa demo</button>
             </div>
-            <hlm-select class="w-full" [value]="formValue().granularityLevel" (valueChange)="onGranularityChange($event)" aria-labelledby="f-granularity-label">
-              <hlm-select-trigger class="w-full">
-                <hlm-select-value />
-              </hlm-select-trigger>
-              <hlm-select-content *hlmSelectPortal>
-                @for (level of granularityLevels; track level) {
-                  <hlm-select-item [value]="level">{{ level }}</hlm-select-item>
-                }
-              </hlm-select-content>
-            </hlm-select>
+            <p-select inputId="f-granularity" class="w-full" fluid formControlName="granularityLevel" [options]="granularityLevels" ariaLabelledBy="f-granularity-label" />
             <p class="field-hint">MODEL: un passaporto per l'intera linea di prodotto. BATCH: uno per ogni lotto di produzione. ITEM: uno per ogni singolo esemplare, con numero seriale.</p>
 
             <div class="field-label-row">

@@ -3,49 +3,17 @@
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css';
 
-@import '@spartan-ng/brain/hlm-tailwind-preset.css';
 /* You can add global styles to this file, and also import other style files */
 
 @import './styles/tokens.css';
 
-/*
- * spartan/ui (componenti in src/app/ui/) si aspetta questi nomi di variabile per il proprio
- * CSS "helm" preconfezionato — qui NON li ridefiniamo con una propria palette (lo schematic
- * di init lo fa di default, con valori oklch neutri che duplicavano/scavalcavano i nostri:
- * --accent in particolare aveva lo STESSO nome del nostro token in tokens.css con un valore
- * diverso, e vinceva lui perché dichiarato dopo). Li alias invece ai nostri token esistenti:
- * zero palette duplicata, e temi chiaro/scuro già corretti da soli (i nostri token cambiano
- * già con [data-theme='dark'], vedi tokens.css — non serve replicare qui una seconda variante
- * scura agganciata a .dark, che questo progetto non usa comunque per il tema).
- */
-:root {
-  --radius: var(--radius-md);
-  --background: var(--bg-canvas);
-  --foreground: var(--text-primary);
-  --card: var(--bg-surface);
-  --card-foreground: var(--text-primary);
-  --popover: var(--bg-surface);
-  --popover-foreground: var(--text-primary);
-  --primary: var(--brand);
-  --primary-foreground: var(--text-on-accent);
-  --secondary: var(--bg-surface-sunken);
-  --secondary-foreground: var(--text-primary);
-  --muted: var(--bg-surface-sunken);
-  --muted-foreground: var(--text-tertiary);
-  /* --accent resta quello di tokens.css (var(--brand)): non ridichiarato qui di proposito. */
-  --accent-foreground: var(--text-on-accent);
-  --destructive: var(--warning);
-  --destructive-foreground: var(--text-on-accent);
-  --border: var(--border-default);
-  --input: var(--border-default);
-  --ring: var(--brand);
-}
-
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border-default);
+    outline-color: color-mix(in oklab, var(--brand) 50%, transparent);
   }
   body {
-    @apply bg-background text-foreground;
+    background: var(--bg-canvas);
+    color: var(--text-primary);
   }
 }

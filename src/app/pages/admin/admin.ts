@@ -7,7 +7,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { toSignal } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { QRCodeComponent } from 'angularx-qrcode';
-import { HlmSelectImports } from '@spartan-ng/helm/select';
+import { Select } from '@openng/optimus-ui/select';
 import { IconComponent } from '../../components/icon/icon';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
@@ -43,7 +43,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent, ...HlmSelectImports],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent, Select],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -470,17 +470,6 @@ export class Admin {
     }
   }
 
-  /** hlm-select emette `string | null | undefined` (nessuna selezione è uno stato valido per
-   * il componente) — i nostri controlli sono invece sempre valorizzati (required, con un
-   * default), da cui questo piccolo guard invece di un cast nel template. */
-  protected onSectorChange(value: string | null | undefined): void {
-    if (value) this.dppForm.controls.sectorId.setValue(value);
-  }
-
-  protected onGranularityChange(value: GranularityLevel | null | undefined): void {
-    if (value) this.dppForm.controls.granularityLevel.setValue(value);
-  }
-
   protected get attributesArray(): FormArray<FormGroup> {
     return this.dppForm.controls.attributes;
   }
@@ -603,8 +592,4 @@ export class Admin {
   protected sectorName(sectorId: string): string {
     return this.sectors.find((s) => s.id === sectorId)?.name ?? sectorId;
   }
-
-  /** hlm-select-value mostra di default il `value` grezzo (l'id di settore, es. "battery") —
-   * itemToString gli dice come renderizzare invece l'etichetta leggibile. */
-  protected sectorItemToString = (sectorId: string): string => this.sectorName(sectorId);
 }

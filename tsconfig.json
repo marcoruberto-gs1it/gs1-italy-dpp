@@ -12,15 +12,7 @@
     "target": "ES2022",
     "module": "preserve",
     "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "paths": {
-      "@spartan-ng/helm/select": [
-        "./src/app/ui/select/src/index.ts"
-      ],
-      "@spartan-ng/helm/utils": [
-        "./src/app/ui/utils/src/index.ts"
-      ]
-    }
+    "esModuleInterop": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

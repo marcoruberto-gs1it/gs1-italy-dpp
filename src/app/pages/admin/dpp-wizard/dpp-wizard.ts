@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, Signal, inject, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { IconComponent } from '../../../components/icon/icon';
 import { ScrollRevealDirective } from '../../../directives/scroll-reveal';
 import { Sector } from '../../../data/sectors';
@@ -63,7 +62,7 @@ const STEPS: WizardStep[] = [
  */
 @Component({
   selector: 'app-dpp-wizard',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, ScrollRevealDirective, ...HlmSelectImports],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, ScrollRevealDirective],
   templateUrl: './dpp-wizard.html',
   styleUrl: './dpp-wizard.css',
 })
