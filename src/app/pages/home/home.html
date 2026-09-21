@@ -125,30 +125,38 @@
       <p>{{ t('dpp.intro') }}</p>
     </div>
 
-    <ol class="dpp-steps" appScrollReveal="stagger">
-      <li class="dpp-step">
-        <span class="step-number">01</span>
-        <span class="step-icon icon-flat"><app-icon name="hash" [size]="20"></app-icon></span>
-        <h3>{{ t('dpp.step1Title') }}</h3>
-        <p>{{ t('dpp.step1Text') }}</p>
+    <ol class="dpp-flow" appScrollReveal="stagger">
+      <li class="dpp-flow-step">
+        <span class="dpp-flow-icon icon-flat"><app-icon name="hash" [size]="22"></app-icon></span>
+        <div class="dpp-flow-body">
+          <span class="dpp-flow-index">01</span>
+          <h3>{{ t('dpp.step1Title') }}</h3>
+          <p>{{ t('dpp.step1Text') }}</p>
+        </div>
       </li>
-      <li class="dpp-step">
-        <span class="step-number">02</span>
-        <span class="step-icon icon-flat"><app-icon name="qr-code" [size]="20"></app-icon></span>
-        <h3>{{ t('dpp.step2Title') }}</h3>
-        <p>{{ t('dpp.step2Text') }}</p>
+      <li class="dpp-flow-step">
+        <span class="dpp-flow-icon icon-flat"><app-icon name="qr-code" [size]="22"></app-icon></span>
+        <div class="dpp-flow-body">
+          <span class="dpp-flow-index">02</span>
+          <h3>{{ t('dpp.step2Title') }}</h3>
+          <p>{{ t('dpp.step2Text') }}</p>
+        </div>
       </li>
-      <li class="dpp-step">
-        <span class="step-number">03</span>
-        <span class="step-icon icon-flat"><app-icon name="link" [size]="20"></app-icon></span>
-        <h3>{{ t('dpp.step3Title') }}</h3>
-        <p>{{ t('dpp.step3Text') }}</p>
+      <li class="dpp-flow-step">
+        <span class="dpp-flow-icon icon-flat"><app-icon name="link" [size]="22"></app-icon></span>
+        <div class="dpp-flow-body">
+          <span class="dpp-flow-index">03</span>
+          <h3>{{ t('dpp.step3Title') }}</h3>
+          <p>{{ t('dpp.step3Text') }}</p>
+        </div>
       </li>
-      <li class="dpp-step">
-        <span class="step-number">04</span>
-        <span class="step-icon icon-flat"><app-icon name="shield-check" [size]="20"></app-icon></span>
-        <h3>{{ t('dpp.step4Title') }}</h3>
-        <p>{{ t('dpp.step4Text') }}</p>
+      <li class="dpp-flow-step dpp-flow-step--highlight">
+        <span class="dpp-flow-icon icon-flat"><app-icon name="shield-check" [size]="22"></app-icon></span>
+        <div class="dpp-flow-body">
+          <span class="dpp-flow-index">04</span>
+          <h3>{{ t('dpp.step4Title') }}</h3>
+          <p>{{ t('dpp.step4Text') }}</p>
+        </div>
       </li>
     </ol>
   </section>
@@ -351,15 +359,15 @@
 
     <ul class="sector-grid" appScrollReveal="stagger" [revealGrid]="true" [revealStagger]="0.06">
       @for (sector of sectors(); track sector.id) {
-        <li class="sector-card">
+        <li class="sector-card gs-card">
           <span class="sector-icon icon-flat" [style.--icon-color]="sector.brandColor">
             <app-icon [name]="sector.icon" [size]="20"></app-icon>
           </span>
           <div class="sector-body">
             <h3>{{ sector.name }}</h3>
-            <p>{{ sector.description }}</p>
-            <span class="gs-badge gs-badge--neutral sector-date">{{ sector.dateLabel }}</span>
+            <p [title]="sector.description">{{ sector.description }}</p>
           </div>
+          <span class="gs-badge gs-badge--neutral sector-date">{{ sector.dateLabel }}</span>
         </li>
       }
     </ul>
@@ -381,7 +389,7 @@
             <li class="spine-node spine-node--compact" [style.--dot-color]="node.item.brandColor">
               <span class="spine-dot"></span>
               <div class="spine-card">
-                <span class="spine-date">{{ node.item.dateLabel }}</span>
+                <span class="spine-date" [title]="node.item.dateLabel">{{ node.item.dateShort }}</span>
                 <span class="spine-sector-name">{{ node.item.shortName }}</span>
               </div>
             </li>

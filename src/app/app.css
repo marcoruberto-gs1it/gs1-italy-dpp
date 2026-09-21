@@ -47,16 +47,28 @@
   transform: scale(1.02);
 }
 
+/* Il PNG ufficiale gs1it.org ha uno sfondo bianco pieno (nessun canale alpha) e il wordmark
+   "GS1" è in blu scuro: su header a tema scuro sparirebbe contro lo sfondo altrettanto blu.
+   Il chip bianco fisso, indipendente dal tema, è la stessa soluzione che molte brand guideline
+   adottano per loghi a colori fissi su chrome scuro — non un compromesso solo di questo sito. */
 .logo-mark {
   display: flex;
-  width: 26px;
-  height: 26px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 3px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 19, 53, 0.18);
   flex-shrink: 0;
 }
 
-.logo-mark svg {
+.logo-mark img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .logo-text {

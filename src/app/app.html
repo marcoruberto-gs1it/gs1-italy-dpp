@@ -5,15 +5,7 @@
     <div class="header-left">
       <a routerLink="/" class="logo" [title]="t('nav.backToHome')" (click)="closeMobileNav()">
         <span class="logo-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 2.5l1.85 6.15L20 10.5l-6.15 1.85L12 18.5l-1.85-6.15L4 10.5l6.15-1.85L12 2.5z" fill="url(#logoSpark)"/>
-            <defs>
-              <linearGradient id="logoSpark" x1="4" y1="2.5" x2="20" y2="18.5" gradientUnits="userSpaceOnUse">
-                <stop stop-color="var(--brand)"/>
-                <stop offset="1" stop-color="var(--brand-accent)"/>
-              </linearGradient>
-            </defs>
-          </svg>
+          <img src="/images/gs1-italy-logo.png" alt="" width="180" height="180" />
         </span>
         <span class="logo-text">{{ t('hero.pageTitle') }}</span>
       </a>

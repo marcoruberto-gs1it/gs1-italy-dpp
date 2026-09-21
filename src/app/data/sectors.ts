@@ -14,6 +14,11 @@ export interface Sector {
   brandColor: string;
   /** Etichetta breve mostrata come badge sulla card, es. "Obbligo dal 18 febbraio 2027". */
   dateLabel: string;
+  /** Solo il frammento data di dateLabel (es. "18 feb 2027", "Q4 2026"), senza il prefisso
+   * "Obbligo dal"/"Atto delegato atteso" — quel prefisso è già leggibile una volta sola
+   * nell'intro della roadmap compatta in home.html; ripeterlo per ciascuno dei 9 nodi, in una
+   * colonna larga quanto 1/9 di 620px, è quello che li faceva andare a capo su 2-3 righe. */
+  dateShort: string;
   /** Stessa data di dateLabel, come numero (anno + frazione per il trimestre) — usato solo per
    * posizionare il settore sull'asse del grafico roadmap in home.html. Non tradotto (un
    * numero non ha lingua), non mostrato direttamente all'utente. */
@@ -52,6 +57,7 @@ export const SECTORS: Sector[] = [
       'Passaporto obbligatorio per batterie EV, LMT e industriali sopra i 2 kWh: origine dei materiali, impronta di carbonio, stato di salute e cicli di ricarica, accessibili da un QR code sulla batteria.',
     brandColor: '#0A84FF',
     dateLabel: 'Obbligo dal 18 febbraio 2027',
+    dateShort: '18 feb 2027',
     roadmapYear: 2027.13,
     regulationRef: 'Regolamento (UE) 2023/1542',
     status: 'coming-soon',
@@ -69,6 +75,7 @@ export const SECTORS: Sector[] = [
       "Composizione delle fibre, processi produttivi, tracciabilità di filiera e riciclabilità, a partire dal lotto di produzione — non dal singolo capo.",
     brandColor: '#AF96D4',
     dateLabel: 'Atto delegato atteso Q3-Q4 2027',
+    dateShort: 'Q3-Q4 2027',
     roadmapYear: 2027.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -87,6 +94,7 @@ export const SECTORS: Sector[] = [
       'Impronta di carbonio e contenuto riciclato per prodotti in ferro e acciaio — il primo settore del piano di lavoro ESPR dopo le batterie.',
     brandColor: '#FF9F0A',
     dateLabel: 'Atto delegato atteso Q4 2026',
+    dateShort: 'Q4 2026',
     roadmapYear: 2026.9,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -104,6 +112,7 @@ export const SECTORS: Sector[] = [
       'Materiali da costruzione con dati di sicurezza, conformità e fine vita, accessibili in cantiere e lungo tutta la filiera.',
     brandColor: '#FFD60A',
     dateLabel: 'Atto delegato atteso Q2 2027',
+    dateShort: 'Q2 2027',
     roadmapYear: 2027.4,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -121,6 +130,7 @@ export const SECTORS: Sector[] = [
       'Origine, contenuto riciclato e impronta di carbonio dei prodotti in alluminio immessi sul mercato europeo.',
     brandColor: '#8E8E93',
     dateLabel: 'Atto delegato atteso Q3-Q4 2027',
+    dateShort: 'Q3-Q4 2027',
     roadmapYear: 2027.6,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -138,6 +148,7 @@ export const SECTORS: Sector[] = [
       'Prestazioni, durabilità e tracciabilità dei materiali per i pneumatici venduti nell\'Unione Europea.',
     brandColor: '#48484A',
     dateLabel: 'Atto delegato atteso Q3-Q4 2027',
+    dateShort: 'Q3-Q4 2027',
     roadmapYear: 2027.7,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -155,6 +166,7 @@ export const SECTORS: Sector[] = [
       'Materiali, durabilità e riparabilità dei mobili, dal singolo pezzo alla filiera di produzione.',
     brandColor: '#AC8E68',
     dateLabel: 'Atto delegato atteso 2028',
+    dateShort: '2028',
     roadmapYear: 2028.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -171,6 +183,7 @@ export const SECTORS: Sector[] = [
     description: 'Composizione dei materiali e riciclabilità per i materassi immessi sul mercato europeo.',
     brandColor: '#FF375F',
     dateLabel: 'Atto delegato atteso 2029',
+    dateShort: '2029',
     roadmapYear: 2029.2,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -188,6 +201,7 @@ export const SECTORS: Sector[] = [
       'Riparabilità, disponibilità di ricambi e impronta ambientale per dispositivi elettronici e ICT.',
     brandColor: '#40C8E0',
     dateLabel: 'Atto delegato atteso 2029',
+    dateShort: '2029',
     roadmapYear: 2029.4,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
     status: 'coming-soon',
@@ -203,6 +217,7 @@ interface SectorTranslationEn {
   shortName: string;
   description: string;
   dateLabel: string;
+  dateShort: string;
   regulationRef: string;
   exampleName: string;
   exampleJourneyStep1: string;
@@ -216,6 +231,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     description:
       'Mandatory passport for EV, LMT and industrial batteries above 2 kWh: material origin, carbon footprint, state of health and charge cycles, accessible from a QR code on the battery.',
     dateLabel: 'Mandatory from 18 February 2027',
+    dateShort: '18 Feb 2027',
     regulationRef: 'Regulation (EU) 2023/1542',
     exampleName: 'EV battery module — example',
     exampleJourneyStep1: 'Cells assembled · Sweden',
@@ -227,6 +243,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     description:
       'Fibre composition, manufacturing processes, supply-chain traceability and recyclability, starting at production-batch level — not per garment.',
     dateLabel: 'Delegated act expected Q3-Q4 2027',
+    dateShort: 'Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Garment — example',
     exampleJourneyStep1: 'Fabric woven · Portugal',
@@ -238,6 +255,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     description:
       'Carbon footprint and recycled content for iron and steel products — the first sector on the ESPR working plan after batteries.',
     dateLabel: 'Delegated act expected Q4 2026',
+    dateShort: 'Q4 2026',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Steel profile — example',
     exampleJourneyStep1: 'Cast and rolled · Italy',
@@ -249,6 +267,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     description:
       'Construction materials with safety, compliance and end-of-life data, accessible on site and across the supply chain.',
     dateLabel: 'Delegated act expected Q2 2027',
+    dateShort: 'Q2 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Insulation panel — example',
     exampleJourneyStep1: 'Raw material · Germany',
@@ -259,6 +278,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     shortName: 'Aluminium',
     description: 'Origin, recycled content and carbon footprint of aluminium products placed on the EU market.',
     dateLabel: 'Delegated act expected Q3-Q4 2027',
+    dateShort: 'Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Aluminium profile — example',
     exampleJourneyStep1: 'Alloy smelted · Norway',
@@ -269,6 +289,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     shortName: 'Tyres',
     description: "Performance, durability and material traceability for tyres sold in the European Union.",
     dateLabel: 'Delegated act expected Q3-Q4 2027',
+    dateShort: 'Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Summer tyre — example',
     exampleJourneyStep1: 'Compound and moulding · Romania',
@@ -279,6 +300,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     shortName: 'Furniture',
     description: 'Materials, durability and repairability of furniture, from the single piece to the production chain.',
     dateLabel: 'Delegated act expected 2028',
+    dateShort: '2028',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Office chair — example',
     exampleJourneyStep1: 'Parts cut · Italy',
@@ -289,6 +311,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     shortName: 'Mattresses',
     description: 'Material composition and recyclability for mattresses placed on the European market.',
     dateLabel: 'Delegated act expected 2029',
+    dateShort: '2029',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Spring mattress — example',
     exampleJourneyStep1: 'Springs produced · Belgium',
@@ -299,6 +322,7 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     shortName: 'Electronics',
     description: 'Repairability, spare-parts availability and environmental footprint for electronic and ICT devices.',
     dateLabel: 'Delegated act expected 2029',
+    dateShort: '2029',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Home router — example',
     exampleJourneyStep1: 'Boards assembled · Taiwan',
