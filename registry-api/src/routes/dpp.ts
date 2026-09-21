@@ -69,11 +69,22 @@ dppRouter.put('/:id', async (req, res) => {
 });
 
 dppRouter.delete('/:id', async (req, res) => {
-  const deleted = await deleteDpp(req.params.id);
-  if (!deleted) {
+  const existing = await getDpp(req.params.id);
+  if (!existing) {
     res.status(404).json({ error: 'scheda non trovata' });
     return;
   }
+  // Stessa regola già in vigore per PUT sopra (una volta registrata su mock-eu-registry, il
+  // DPP Registry UE reale non offre un'operazione di cancellazione — solo una futura
+  // "deactivated", non implementata in questa demo): estenderla anche a DELETE evita che una
+  // scheda già pubblicata scompaia da qui pur restando registrata (e quindi "vera") sul
+  // registro esterno, con /01/:gtin che smetterebbe di funzionare per un identificativo che il
+  // registro crede ancora valido.
+  if (existing.status === 'published') {
+    res.status(409).json({ error: 'una scheda già pubblicata non è eliminabile in questa demo' });
+    return;
+  }
+  await deleteDpp(req.params.id);
   res.status(204).end();
 });
 

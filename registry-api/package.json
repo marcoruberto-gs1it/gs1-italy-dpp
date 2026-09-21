@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts"
+    "start": "tsx src/server.ts",
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
