@@ -2,6 +2,7 @@ import './env.ts';
 import express from 'express';
 
 import { loginHandler, logoutHandler, requireAuth } from './auth.ts';
+import { pingMockRegistry } from './mockRegistryClient.ts';
 import { dppRouter } from './routes/dpp.ts';
 import { publicRouter } from './routes/public.ts';
 
@@ -17,6 +18,15 @@ app.use(express.json());
 // così com'è, senza riscriverlo).
 const base = express.Router();
 base.get('/health', (_req, res) => res.json({ status: 'ok' }));
+// Chiamato dal frontend all'apertura della sezione admin (vedi admin.ts) per risvegliare in
+// anticipo mock-eu-registry — pubblico apposta (nessun requireAuth): serve solo a scaldare un
+// container Render prima ancora del login, non espone né richiede dati. Risponde subito, non
+// aspetta l'esito del ping (vedi pingMockRegistry): il chiamante non deve aspettare fino a un
+// minuto solo per aver aperto la pagina.
+base.get('/warmup', (_req, res) => {
+  pingMockRegistry();
+  res.status(202).json({ ok: true });
+});
 base.post('/login', loginHandler);
 base.post('/logout', logoutHandler);
 base.use('/public', publicRouter);

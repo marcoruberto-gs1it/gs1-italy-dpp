@@ -115,7 +115,22 @@ Deploy.
 `webshop`, `registry-api` e `mock-eu-registry` (quest'ultimo già su Render da
 REGISTRY-SETUP.md) si "addormentano" tutti dopo un periodo di inattività sul piano Free: la
 prima richiesta dopo una pausa può impiegare 30-60 secondi in più per il risveglio. Normale,
-non un errore.
+non un errore — e reso invisibile lato utente dal retry automatico (vedi
+`RegistryApiService`/`PUBLISH_RETRY_DELAYS_MS`), che nasconde l'attesa senza mostrare alcun
+messaggio sul risveglio in corso.
+
+Due meccanismi tengono i servizi svegli, in ordine di affidabilità:
+
+1. **Auto-risveglio dal traffico reale**: `App.wakeRegistryApi()` pinga `registry-api` a ogni
+   caricamento di pagina del sito, e l'apertura di `/admin` pinga anche `mock-eu-registry`
+   (`GET /registry-api/warmup`) — chi naviga il sito lo tiene sveglio da solo, senza dipendere
+   da nulla di esterno.
+2. **La GitHub Action `keep-render-awake.yml`**: pinga i tre servizi ogni 10 minuti per coprire
+   i periodi senza traffico reale (es. di notte). **Non è affidabile quanto sembra**: lo
+   `schedule` di GitHub Actions è "best effort" e può ritardare le esecuzioni di ore o saltarle
+   del tutto senza errore — verificato con gap reali di 2-5 ore contro i 10 minuti richiesti
+   (vedi cronologia delle Action). Utile come rete di sicurezza aggiuntiva, ma non basta da
+   sola a prevenire lo sleep in assenza di traffico.
 
 ## Dominio personalizzato (quando ne avrai uno)
 

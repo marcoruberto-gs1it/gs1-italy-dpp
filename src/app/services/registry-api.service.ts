@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
-import { Observable, finalize, retry, timer } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, retry, timer } from 'rxjs';
 
 export type GranularityLevel = 'MODEL' | 'BATCH' | 'ITEM';
 export type DppStatus = 'draft' | 'published';
@@ -48,7 +48,10 @@ const BASE = '/registry-api';
  * avviando: qui la ripetiamo da sola con un'attesa crescente invece di mostrare subito un
  * errore, cumulando circa un minuto — lo stesso margine già usato in admin.ts
  * (PUBLISH_RETRY_DELAYS_MS) per il risveglio di mock-eu-registry durante la pubblicazione, ma
- * applicato qui a livello di trasporto così copre ogni chiamata, non solo publish(). */
+ * applicato qui a livello di trasporto così copre ogni chiamata, non solo publish(). Il
+ * chiamante vede solo un'icona che gira (vedi 'loader' in IconComponent), mai un messaggio che
+ * spiega il perché — un risveglio a freddo è un dettaglio implementativo, non qualcosa su cui
+ * l'utente deve riflettere ad ogni salvataggio. */
 const COLD_START_RETRY_DELAYS_MS = [1000, 3000, 6000, 10000, 15000, 20000];
 
 function isColdStartError(error: unknown): boolean {
@@ -62,24 +65,15 @@ function isColdStartError(error: unknown): boolean {
 export class RegistryApiService {
   private http = inject(HttpClient);
 
-  /** true mentre una richiesta viene ripetuta per un risveglio a freddo (vedi
-   * withColdStartRetry() sotto) — admin.ts la legge per mostrare "il servizio si sta
-   * risvegliando…" invece di lasciare l'utente davanti a un pulsante "Salvataggio…" muto per
-   * fino a un minuto. Un solo segnale condiviso: più richieste contemporanee non sono un caso
-   * reale in questa sezione admin a singolo utente/singola scheda alla volta. */
-  readonly coldStartRetrying = signal(false);
-
   private withColdStartRetry<T>(source: Observable<T>): Observable<T> {
     return source.pipe(
       retry({
         count: COLD_START_RETRY_DELAYS_MS.length,
         delay: (error, retryCount) => {
           if (!isColdStartError(error)) throw error;
-          this.coldStartRetrying.set(true);
           return timer(COLD_START_RETRY_DELAYS_MS[retryCount - 1]);
         },
-      }),
-      finalize(() => this.coldStartRetrying.set(false))
+      })
     );
   }
 

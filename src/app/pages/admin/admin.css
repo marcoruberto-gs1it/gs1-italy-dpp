@@ -5,7 +5,10 @@
 }
 
 .admin-status {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   color: var(--text-tertiary);
   padding: 60px 0;
 }

@@ -48,10 +48,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
   styleUrl: './admin.css',
 })
 export class Admin {
-  /** protected (non private): il template legge api.coldStartRetrying() per mostrare "il
-   * servizio si sta risvegliando…" durante un risveglio a freddo di registry-api (vedi
-   * RegistryApiService) invece di un pulsante "Salvataggio…"/"Verifica accesso…" muto. */
-  protected api = inject(RegistryApiService);
+  private api = inject(RegistryApiService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private fb = inject(FormBuilder);
@@ -260,6 +257,14 @@ export class Admin {
       next: () => this.view.set('list'),
       error: (err: HttpErrorResponse) => this.view.set(err.status === 401 ? 'login' : 'list'),
     });
+
+    // mock-eu-registry serve solo qui (pubblicazione), mai sulle pagine pubbliche — vedi
+    // App.wakeRegistryApi() per il risveglio di registry-api stesso, già in corso su ogni
+    // pagina del sito da prima che l'utente arrivi qui. Un ping in anticipo appena si apre
+    // l'admin, così è già sveglio quando l'utente arriva al click su "Pubblica" invece di
+    // iniziare il risveglio solo in quel momento (il retry di PUBLISH_RETRY_DELAYS_MS resta
+    // comunque la rete di sicurezza se non bastasse).
+    if (this.isBrowser) fetch('/registry-api/warmup').catch(() => {});
 
     // Il toast (vedi admin.html/.css) resta a posizione fissa sullo schermo: si vede sempre,
     // anche dopo aver scorso una form lunga — non basta più mostrare l'errore solo in cima alla

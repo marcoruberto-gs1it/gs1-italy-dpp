@@ -9,7 +9,10 @@
 
   @switch (view()) {
     @case ('checking') {
-      <p class="admin-status">{{ api.coldStartRetrying() ? 'Il servizio si sta risvegliando — può richiedere fino a un minuto…' : 'Verifica accesso…' }}</p>
+      <p class="admin-status">
+        <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
+        Verifica accesso…
+      </p>
     }
 
     @case ('login') {
@@ -22,7 +25,12 @@
         <label for="admin-password">Password</label>
         <input id="admin-password" type="password" autocomplete="current-password" formControlName="password" />
         <button type="submit" class="gs-btn gs-btn--primary" [disabled]="loginPending()">
-          {{ loginPending() ? (api.coldStartRetrying() ? 'Il servizio si sta risvegliando…' : 'Verifica…') : 'Entra' }}
+          @if (loginPending()) {
+            <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
+            Verifica…
+          } @else {
+            Entra
+          }
         </button>
       </form>
     }
@@ -266,7 +274,12 @@
 
           <div class="form-actions">
             <button type="submit" class="gs-btn gs-btn--ghost" [disabled]="savePending()">
-              {{ savePending() ? (api.coldStartRetrying() ? 'Il servizio si sta risvegliando…' : 'Salvataggio…') : 'Salva bozza' }}
+              @if (savePending()) {
+                <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
+                Salvataggio…
+              } @else {
+                Salva bozza
+              }
             </button>
             @if (editingId()) {
               <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending() || !!publishedRecord()" (click)="publish()">

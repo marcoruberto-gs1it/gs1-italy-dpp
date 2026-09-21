@@ -7,3 +7,19 @@
   display: block;
   flex-shrink: 0;
 }
+
+.app-icon--spin {
+  animation: app-icon-spin 0.8s linear infinite;
+}
+
+@keyframes app-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-icon--spin {
+    animation: none;
+  }
+}

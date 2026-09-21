@@ -44,7 +44,8 @@ export type IconName =
   | 'sofa'
   | 'bed'
   | 'cpu'
-  | 'save';
+  | 'save'
+  | 'loader';
 
 @Component({
   selector: 'app-icon',
@@ -55,4 +56,8 @@ export type IconName =
 export class IconComponent {
   name = input.required<IconName>();
   size = input<number>(18);
+  /** Ruota continuamente l'icona (vedi .app-icon--spin in icon.css) — usata al posto di un
+   * testo che spiega perché un'azione sta impiegando più del solito (vedi RegistryApiService),
+   * così l'attesa resta un'icona che gira invece di un discorso da leggere. */
+  spin = input<boolean>(false);
 }

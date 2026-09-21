@@ -45,6 +45,7 @@ export class App {
       effect(() => {
         this.document.documentElement.lang = this.languageService.lang();
       });
+      this.wakeRegistryApi();
     } else {
       this.document.documentElement.lang = this.languageService.lang();
     }
@@ -69,6 +70,18 @@ export class App {
       const url = nav?.urlAfterRedirects ?? (isPlatformBrowser(this.platformId) ? this.relativePathFromLocation() : this.router.url);
       this.seoLinks.set('link-canonical', { rel: 'canonical', href: this.siteOrigin.value + this.canonicalPath(url) });
     });
+  }
+
+  /** Il piano gratuito di Render addormenta registry-api dopo un periodo di inattività (vedi
+   * RegistryApiService) — invece di aspettare che sia la sezione /admin a scoprirlo al primo
+   * salvataggio, ogni pagina del sito lo risveglia in anticipo appena caricata: da quando esiste
+   * questo ping, chiunque arrivi sul sito e poi navighi verso /admin (o verso una pagina
+   * prodotto che finisce su registry-api, vedi getPublicByGtin) lo trova già sveglio. Fetch
+   * diretta (non RegistryApiService/HttpClient): un ping silenzioso in background, mai un
+   * errore o un retry visibile — la vera richiesta che segue userà comunque il proprio retry se
+   * il container non fosse ancora pronto. */
+  private wakeRegistryApi(): void {
+    fetch('/registry-api/health').catch(() => {});
   }
 
   // A differenza di router.url (già relativo a <base href>), location.pathname è assoluto

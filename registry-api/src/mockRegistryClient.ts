@@ -172,6 +172,19 @@ function granularityFields(siteUrl: string, record: DppRecord): Record<string, u
   };
 }
 
+/** Ping "fire and forget" verso mock-eu-registry, sullo stesso endpoint pubblico /q/health già
+ * usato dalla GitHub Action di risveglio — nessun token Auth0 richiesto, non è una vera
+ * chiamata applicativa. Usato per risvegliare in anticipo il container Render quando si apre
+ * la sezione admin (vedi routes 'warmup' qui sotto e Admin in admin.ts), prima che un publish()
+ * vero lo richieda — così l'attesa del risveglio è già in corso mentre l'utente compila il
+ * form, invece di iniziare solo al click su "Pubblica". Non lancia mai: un fallimento qui non
+ * deve interrompere nulla, il retry vero resta quello di registerDpp()/TransientRegistryError. */
+export function pingMockRegistry(): void {
+  const registryUrl = process.env.MOCK_EU_REGISTRY_URL;
+  if (!registryUrl) return;
+  fetch(`${registryUrl.replace(/\/$/, '')}/q/health`).catch(() => {});
+}
+
 export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
   const config = requiredConfig();
   const siteUrl = process.env.SITE_URL || 'http://localhost:4200';
