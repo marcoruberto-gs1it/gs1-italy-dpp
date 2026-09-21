@@ -18,7 +18,7 @@
     @case ('login') {
       <form class="login-card" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
         <h1>Amministrazione DPP</h1>
-        <p>Sezione riservata: inserisci la password per creare o modificare una scheda.</p>
+        <p>Sezione riservata: inserisci la password per creare o modificare un DPP.</p>
         @if (loginError()) {
           <p class="form-error">{{ loginError() }}</p>
         }
@@ -38,13 +38,13 @@
     @case ('list') {
       <div class="admin-header">
         <div>
-          <h1>Schede DPP</h1>
-          <p>{{ records().length }} schede — bozze e registrate sul DPP Registry UE.</p>
+          <h1>I tuoi DPP</h1>
+          <p>{{ records().length }} DPP — in bozza o registrati sul DPP Registry UE.</p>
         </div>
         <div class="admin-header-actions">
           <button type="button" class="gs-btn gs-btn--primary" (click)="startCreate()">
             <app-icon name="box" [size]="16"></app-icon>
-            Nuova scheda
+            Crea DPP
           </button>
           <button type="button" class="gs-btn gs-btn--ghost" (click)="logout()">Esci</button>
         </div>
@@ -58,7 +58,7 @@
             placeholder="Cerca per nome o UPI (GTIN)…"
             [value]="searchQuery()"
             (input)="onSearchInput($event)"
-            aria-label="Cerca schede"
+            aria-label="Cerca DPP"
           />
         </div>
         <div class="status-filter" role="tablist" aria-label="Filtra per stato">
@@ -109,16 +109,24 @@
                 </td>
                 <td data-label="Azioni" class="record-actions">
                   <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="startEdit(record)">Apri</button>
-                  <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="deleteRecord(record)">Elimina</button>
+                  <button
+                    type="button"
+                    class="gs-btn gs-btn--ghost gs-btn--sm"
+                    [disabled]="record.status === 'published'"
+                    [title]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : ''"
+                    (click)="deleteRecord(record)"
+                  >
+                    Elimina
+                  </button>
                 </td>
               </tr>
             } @empty {
               <tr class="record-empty-row">
                 <td colspan="6">
                   @if (records().length === 0) {
-                    Nessuna scheda ancora. Crea la prima con "Nuova scheda".
+                    Nessun DPP ancora. Crea il primo con "Crea DPP".
                   } @else {
-                    Nessuna scheda corrisponde alla ricerca.
+                    Nessun DPP corrisponde alla ricerca.
                   }
                 </td>
               </tr>
@@ -131,8 +139,8 @@
     @case ('create-choice') {
       <div class="admin-header">
         <div>
-          <h1>Nuova scheda</h1>
-          <p>Come preferisci compilarla? Puoi passare dall'una all'altra modalità in qualsiasi momento, senza perdere quanto già inserito.</p>
+          <h1>Crea DPP</h1>
+          <p>Come preferisci compilarlo? Puoi passare dall'una all'altra modalità in qualsiasi momento, senza perdere quanto già inserito.</p>
         </div>
         <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
       </div>
@@ -147,7 +155,7 @@
         <button type="button" class="create-choice-card" (click)="chooseSinglePageForm()" appScrollReveal [revealDelay]="0.08">
           <span class="create-choice-icon icon-flat" style="--icon-color: var(--brand-accent)"><app-icon name="file-text" [size]="22"></app-icon></span>
           <h2>Form singola pagina</h2>
-          <p>Tutti i campi insieme, con anteprima del passaporto in tempo reale accanto — più rapido se sai già cosa inserire o stai modificando una scheda simile a un'altra.</p>
+          <p>Tutti i campi insieme, con anteprima del passaporto in tempo reale accanto — più rapido se sai già cosa inserire o stai modificando un DPP simile a un altro.</p>
           <span class="create-choice-cta">Apri il form <app-icon name="chevron-right" [size]="16"></app-icon></span>
         </button>
       </div>
@@ -161,10 +169,8 @@
         [previewGtin]="previewGtin"
         [previewUpi]="previewUpi"
         [previewJsonLd]="previewJsonLd"
-        [gtinSuggestion]="gtinSuggestion()"
         [attributesArray]="attributesArray"
         [savePending]="savePending()"
-        (applyGtinSuggestion)="applyGtinSuggestion()"
         (addAttribute)="addAttributeRow()"
         (removeAttribute)="removeAttributeRow($event)"
         (requestDemoFill)="fillDemoAttributes()"
@@ -179,7 +185,7 @@
     @case ('form') {
       <div class="admin-header">
         <div>
-          <h1>{{ editingId() ? 'Modifica scheda' : 'Nuova scheda' }}</h1>
+          <h1>{{ editingId() ? 'Modifica DPP' : 'Crea DPP' }}</h1>
           <p>Terminologia CEN/CENELEC (EN&nbsp;18219) e del DPP Registry UE — "Attributi" per i dati liberi di prodotto.</p>
         </div>
         <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
@@ -211,43 +217,33 @@
             @if (fieldError('name'); as msg) {
               <p class="field-hint field-hint--error">{{ msg }}</p>
             } @else {
-              <p class="field-hint">Il nome che comparirà nella scheda pubblica e nel DPP Registry UE.</p>
+              <p class="field-hint">Il nome che comparirà nel DPP pubblico e nel DPP Registry UE.</p>
             }
 
             <div class="field-label-row">
-              <label for="f-gtin">GTIN (8-14 cifre)</label>
-              <button type="button" class="field-demo-link" (click)="demoFillField('gtin')">Usa demo</button>
+              <label for="f-upi">UPI (GS1 Digital Link)</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('upi')">Usa demo</button>
             </div>
-            <input id="f-gtin" type="text" formControlName="gtin" placeholder="08000000000019" [class.field-invalid]="fieldError('gtin')" />
-            @if (fieldError('gtin'); as msg) {
-              <p class="field-hint field-hint--error">
-                {{ msg }}
-                @if (gtinSuggestion(); as suggestion) {
-                  <button type="button" class="field-hint-fix" (click)="applyGtinSuggestion()">Usa {{ suggestion }}</button>
+            <input
+              id="f-upi"
+              type="text"
+              inputmode="url"
+              formControlName="upi"
+              placeholder="https://id.gs1.org/01/09521234543213"
+              [class.field-invalid]="fieldError('upi')"
+            />
+            @if (fieldError('upi'); as msg) {
+              <p class="field-hint field-hint--error">{{ msg }}</p>
+            } @else if (previewGtin(); as gtin) {
+              <p class="field-hint">
+                GTIN <code>{{ gtin }}</code> · livello dedotto dal link
+                <span class="gs-badge gs-badge--neutral">{{ dppForm.controls.granularityLevel.value }}</span>
+                @if (dppForm.controls.batchOrSerial.value) {
+                  · <code>{{ dppForm.controls.batchOrSerial.value }}</code>
                 }
               </p>
-            } @else if (previewUpi(); as upi) {
-              <p class="field-hint">UPI che verrà registrato (URI GS1 Digital Link): <code>{{ upi }}</code></p>
             } @else {
-              <p class="field-hint">La cifra finale è calcolata dallo standard GS1 (GTIN) — se non torna, te lo segnaliamo subito.</p>
-            }
-
-            <div class="field-label-row">
-              <label id="f-granularity-label" for="f-granularity">Granularity level</label>
-              <button type="button" class="field-demo-link" (click)="demoFillField('granularityLevel')">Usa demo</button>
-            </div>
-            <p-select inputId="f-granularity" class="w-full" fluid formControlName="granularityLevel" [options]="granularityLevels" ariaLabelledBy="f-granularity-label" />
-            <p class="field-hint">MODEL: un passaporto per l'intera linea di prodotto. BATCH: uno per ogni lotto di produzione. ITEM: uno per ogni singolo esemplare, con numero seriale.</p>
-
-            <div class="field-label-row">
-              <label for="f-batch">Lotto o seriale — AI (10)/(21), livello batch/item</label>
-              <button type="button" class="field-demo-link" (click)="demoFillField('batchOrSerial')">Usa demo</button>
-            </div>
-            <input id="f-batch" type="text" formControlName="batchOrSerial" placeholder="es. (21) SN12345" [class.field-invalid]="fieldError('batchOrSerial')" />
-            @if (fieldError('batchOrSerial'); as msg) {
-              <p class="field-hint field-hint--error">{{ msg }}</p>
-            } @else {
-              <p class="field-hint">Diventa l'ultimo segmento dell'UPI — lascia vuoto se il livello scelto sopra è MODEL.</p>
+              <p class="field-hint">Incolla l'URI GS1 Digital Link completo del prodotto — GTIN e livello (modello, lotto o articolo) si deducono da soli dalla sintassi del link, verificati con il GS1 Barcode Syntax Engine.</p>
             }
           </div>
 
@@ -259,7 +255,7 @@
               <span>Attributi</span>
               <button type="button" class="attr-add" (click)="addAttributeRow()">+ Aggiungi</button>
             </div>
-            <p class="field-hint">Dati liberi specifici del settore (es. composizione, impronta di carbonio) — diventano proprietà <code>schema:additionalProperty</code> nel JSON-LD della scheda pubblica.</p>
+            <p class="field-hint">Dati liberi specifici del settore (es. composizione, impronta di carbonio) — diventano proprietà <code>schema:additionalProperty</code> nel JSON-LD del DPP pubblico.</p>
             @if (attributesArray.controls.length === 0) {
               <button type="button" class="field-demo-link" (click)="fillDemoAttributes()">Usa attributi demo per questo settore</button>
             }
@@ -273,7 +269,12 @@
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="gs-btn gs-btn--ghost" [disabled]="savePending()">
+            <button
+              type="submit"
+              class="gs-btn gs-btn--ghost"
+              [disabled]="savePending() || !!publishedRecord()"
+              [title]="publishedRecord() ? 'Già registrato sul DPP Registry UE: non modificabile in questa demo.' : ''"
+            >
               @if (savePending()) {
                 <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
                 Salvataggio…
@@ -328,7 +329,7 @@
                 <app-icon name="qr-code" [size]="36"></app-icon>
               </div>
             }
-            <p class="passport-qr-caption">GS1 Digital Link — inquadra per aprire questa scheda</p>
+            <p class="passport-qr-caption">GS1 Digital Link — inquadra per aprire questo DPP</p>
           </div>
 
           <div class="passport-facts" #passportFacts>
@@ -340,7 +341,7 @@
                 </div>
               }
             } @empty {
-              <p class="passport-empty">Aggiungi degli attributi per vederli qui come scheda visiva.</p>
+              <p class="passport-empty">Aggiungi degli attributi per vederli qui in anteprima.</p>
             }
           </div>
 

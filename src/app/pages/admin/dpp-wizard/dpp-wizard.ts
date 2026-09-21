@@ -5,7 +5,7 @@ import { IconComponent } from '../../../components/icon/icon';
 import { ScrollRevealDirective } from '../../../directives/scroll-reveal';
 import { Sector } from '../../../data/sectors';
 import { GranularityLevel } from '../../../services/registry-api.service';
-import { hasIncompleteAttributeRow, isValidBatchOrSerial, isValidGtin } from '../../../utils/gs1-validators';
+import { hasIncompleteAttributeRow, isValidGtin } from '../../../utils/gs1-validators';
 
 /** Duplicato apposta di ToastSeverity in admin.ts, non importato — stesso motivo di
  * DppFormGroup qui sotto: admin.ts importa questo componente come valore, quindi il Wizard non
@@ -20,13 +20,12 @@ export type ToastSeverity = 'error' | 'warning';
 export type DppFormGroup = FormGroup<{
   sectorId: FormControl<string>;
   name: FormControl<string>;
+  upi: FormControl<string>;
   gtin: FormControl<string>;
   granularityLevel: FormControl<GranularityLevel>;
   batchOrSerial: FormControl<string>;
   attributes: FormArray<FormGroup<{ key: FormControl<string>; value: FormControl<string> }>>;
 }>;
-
-const GRANULARITY_LEVELS: GranularityLevel[] = ['MODEL', 'BATCH', 'ITEM'];
 
 interface WizardStep {
   title: string;
@@ -37,7 +36,6 @@ interface WizardStep {
 const STEPS: WizardStep[] = [
   { title: 'A quale settore appartiene il prodotto?', short: 'Settore' },
   { title: 'Come si identifica il prodotto?', short: 'Identificazione' },
-  { title: 'A che livello serve il passaporto?', short: 'Granularità' },
   { title: 'Che dati di prodotto vuoi pubblicare?', short: 'Attributi' },
   { title: 'Riepilogo e pubblicazione', short: 'Riepilogo' },
 ];
@@ -73,22 +71,19 @@ export class DppWizardComponent {
   @Input({ required: true }) previewGtin!: Signal<string | null>;
   @Input({ required: true }) previewUpi!: Signal<string | null>;
   @Input({ required: true }) previewJsonLd!: Signal<Record<string, unknown> | null>;
-  @Input() gtinSuggestion: string | null = null;
   @Input({ required: true }) attributesArray!: FormArray<FormGroup>;
   @Input() savePending = false;
 
-  @Output() applyGtinSuggestion = new EventEmitter<void>();
   @Output() addAttribute = new EventEmitter<void>();
   @Output() removeAttribute = new EventEmitter<number>();
   @Output() requestDemoFill = new EventEmitter<void>();
-  @Output() requestFieldDemo = new EventEmitter<'name' | 'gtin' | 'granularityLevel' | 'batchOrSerial'>();
+  @Output() requestFieldDemo = new EventEmitter<'name' | 'upi'>();
   @Output() showToast = new EventEmitter<{ message: string; severity: ToastSeverity }>();
   @Output() saveDraft = new EventEmitter<void>();
   @Output() switchToFullForm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 
   protected steps = STEPS;
-  protected granularityLevels = GRANULARITY_LEVELS;
   protected currentStep = signal(0);
   protected lastReachedStep = signal(0);
 
@@ -110,7 +105,7 @@ export class DppWizardComponent {
       this.showToast.emit({ message: this.stepValidationMessage(step), severity: 'error' });
       return;
     }
-    if (step === 3 && hasIncompleteAttributeRow(this.form.getRawValue().attributes as { key: string; value: string }[])) {
+    if (step === 2 && hasIncompleteAttributeRow(this.form.getRawValue().attributes as { key: string; value: string }[])) {
       // Non bloccante: una riga con solo la chiave o solo il valore viene semplicemente
       // ignorata al salvataggio (vedi Admin.buildInput()) — un avviso, non un errore.
       this.showToast.emit({ message: 'Un attributo ha solo il nome o solo il valore compilato: verrà ignorato al salvataggio.', severity: 'warning' });
@@ -121,23 +116,16 @@ export class DppWizardComponent {
   }
 
   private markStepTouched(index: number): void {
-    switch (index) {
-      case 1:
-        this.form.controls.name.markAsTouched();
-        this.form.controls.gtin.markAsTouched();
-        break;
-      case 2:
-        this.form.controls.batchOrSerial.markAsTouched();
-        break;
+    if (index === 1) {
+      this.form.controls.name.markAsTouched();
+      this.form.controls.upi.markAsTouched();
     }
   }
 
   private stepValidationMessage(index: number): string {
     switch (index) {
       case 1:
-        return this.fieldError('name') ?? this.fieldError('gtin') ?? 'Controlla nome e GTIN prima di continuare.';
-      case 2:
-        return this.fieldError('batchOrSerial') ?? 'Controlla lotto/seriale prima di continuare.';
+        return this.fieldError('name') ?? this.fieldError('upi') ?? 'Controlla nome e UPI prima di continuare.';
       default:
         return 'Controlla i campi di questo passo prima di continuare.';
     }
@@ -147,6 +135,11 @@ export class DppWizardComponent {
     this.currentStep.set(Math.max(this.currentStep() - 1, 0));
   }
 
+  /** Il passo 1 (Identificazione) è valido quando `gtin` contiene un GTIN vero — non lo si
+   * ricava più controllando `upi.valid` perché gtin/granularityLevel/batchOrSerial sono
+   * dedotti da un effect asincrono in Admin (vedi il commento lì): controllare direttamente il
+   * loro esito, come già faceva questo stesso metodo prima di questa modifica, resta corretto
+   * anche ora che a monte c'è un URI Digital Link invece di un GTIN digitato a mano. */
   protected isStepValid(index: number): boolean {
     const f = this.form.getRawValue();
     switch (index) {
@@ -154,8 +147,6 @@ export class DppWizardComponent {
         return !!f.sectorId;
       case 1:
         return f.name.trim().length >= 2 && isValidGtin(f.gtin.trim());
-      case 2:
-        return isValidBatchOrSerial(f.batchOrSerial);
       default:
         return true;
     }
@@ -165,27 +156,12 @@ export class DppWizardComponent {
     this.form.controls.sectorId.setValue(sectorId);
   }
 
-  protected onGranularityChange(value: GranularityLevel | null | undefined): void {
-    if (value) this.form.controls.granularityLevel.setValue(value);
-  }
-
   /** Messaggio di errore leggibile per un campo — stessa logica di Admin.fieldError(), qui
    * self-contained per non dover passare un'altra funzione dal padre solo per questo. */
-  protected fieldError(name: 'name' | 'gtin' | 'batchOrSerial'): string | null {
+  protected fieldError(name: 'name' | 'upi'): string | null {
     const control = this.form.controls[name];
     if (!control.errors || !(control.dirty || control.touched)) return null;
     const firstError = Object.values(control.errors)[0] as { message?: string } | undefined;
     return firstError?.message ?? null;
-  }
-
-  protected granularityHelp(level: GranularityLevel): string {
-    switch (level) {
-      case 'MODEL':
-        return 'Un solo passaporto per tutti gli esemplari di questo modello/versione di prodotto — non distingue lotti o pezzi singoli.';
-      case 'BATCH':
-        return 'Un passaporto per ogni lotto di produzione — utile quando le caratteristiche (es. materiali, provenienza) possono variare da un lotto all\'altro.';
-      case 'ITEM':
-        return "Un passaporto per ogni singolo esemplare, identificato da un numero seriale — necessario quando serve tracciare lo stato di un pezzo specifico nel tempo (es. batterie, dispositivi riparabili).";
-    }
   }
 }

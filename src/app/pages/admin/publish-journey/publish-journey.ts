@@ -24,7 +24,7 @@ const DEMO_EO_ID = 'gs1-italy-dpp-demo';
 const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
 
 const STEPS: JourneyStep[] = [
-  { icon: 'save', title: 'Scheda salvata', standardTerm: 'Product data — presso l\'operatore economico' },
+  { icon: 'save', title: 'DPP salvato', standardTerm: 'Product data — presso l\'operatore economico' },
   { icon: 'send', title: 'Invio identificativi al Registro UE', standardTerm: 'UPI · EO (UOI) · Facility (UFI) · Granularity level' },
   { icon: 'link', title: 'Verifica del Digital Link', standardTerm: 'Risoluzione liveURL — calcolo hash del contenuto' },
   { icon: 'check-circle', title: 'Registrazione confermata', standardTerm: 'Registry ID assegnato dal DPP Registry' },

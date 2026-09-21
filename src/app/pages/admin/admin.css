@@ -689,23 +689,6 @@
   flex-wrap: wrap;
 }
 
-.field-hint-fix {
-  appearance: none;
-  border: 1px solid var(--warning);
-  background: none;
-  color: var(--warning);
-  font-size: 0.76rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.field-hint-fix:hover {
-  background: var(--warning-soft);
-}
-
 /* --- QR code GS1 Digital Link nell'anteprima --- */
 .passport-qr {
   display: flex;

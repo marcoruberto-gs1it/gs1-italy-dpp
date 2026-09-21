@@ -54,10 +54,10 @@
       <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
         <h2>{{ steps[1].title }}</h2>
         <p class="wizard-step-help">
-          Il <strong>GTIN</strong> (Global Trade Item Number) è l'identificativo numerico GS1 del prodotto — la base
-          da cui si costruisce l'UPI (Unique Product Identifier), l'URI GS1 Digital Link che finirà nel QR code e nel
-          Registro UE. Deve avere 8, 12, 13 o 14 cifre e una cifra di controllo valida: la verifichiamo subito,
-          con un suggerimento se qualcosa non torna.
+          L'<strong>UPI</strong> (Unique Product Identifier) è l'URI GS1 Digital Link che identifica il prodotto —
+          lo stesso link che finirà nel QR code e nel Registro UE. Incollalo per intero: GTIN e livello del
+          passaporto (modello, lotto o articolo) si deducono da soli dalla sua sintassi, verificati con il GS1
+          Barcode Syntax Engine.
         </p>
 
         <div class="wizard-field-label-row">
@@ -68,85 +68,36 @@
         @if (fieldError('name'); as msg) {
           <p class="wizard-field-error">{{ msg }}</p>
         } @else {
-          <p class="wizard-field-hint">Il nome che comparirà nella scheda pubblica e nel DPP Registry UE.</p>
+          <p class="wizard-field-hint">Il nome che comparirà nel DPP pubblico e nel DPP Registry UE.</p>
         }
 
         <div class="wizard-field-label-row">
-          <label for="w-gtin">GTIN (8-14 cifre)</label>
-          <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('gtin')">Usa demo</button>
+          <label for="w-upi">UPI (GS1 Digital Link)</label>
+          <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('upi')">Usa demo</button>
         </div>
-        <input id="w-gtin" type="text" inputmode="numeric" formControlName="gtin" placeholder="Es. 08000000000019" />
-        @if (fieldError('gtin'); as msg) {
-          <p class="wizard-field-error">
-            {{ msg }}
-            @if (gtinSuggestion) {
-              <button type="button" class="wizard-inline-fix" (click)="applyGtinSuggestion.emit()">Usa {{ gtinSuggestion }}</button>
+        <input id="w-upi" type="text" inputmode="url" formControlName="upi" placeholder="Es. https://id.gs1.org/01/09521234543213" />
+        @if (fieldError('upi'); as msg) {
+          <p class="wizard-field-error">{{ msg }}</p>
+        } @else if (previewGtin(); as gtin) {
+          <p class="wizard-field-hint">
+            GTIN <code>{{ gtin }}</code> · livello dedotto dal link
+            <span class="gs-badge gs-badge--neutral">{{ form.controls.granularityLevel.value }}</span>
+            @if (form.controls.batchOrSerial.value) {
+              · <code>{{ form.controls.batchOrSerial.value }}</code>
             }
           </p>
-        }
-        @if (previewUpi(); as upi) {
-          <p class="wizard-field-hint">UPI che verrà registrato: <code>{{ upi }}</code></p>
         }
       </div>
     }
 
-    <!-- Passo 3: Granularità -->
+    <!-- Passo 3: Attributi -->
     @if (currentStep() === 2) {
       <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
         <h2>{{ steps[2].title }}</h2>
         <p class="wizard-step-help">
-          La norma CEN/CENELEC EN&nbsp;18219 ammette tre livelli di dettaglio per il passaporto — scegli il più
-          fine di cui hai davvero bisogno: un livello più granulare (lotto invece di modello, articolo invece di
-          lotto) migliora la tracciabilità ma richiede un identificativo per ogni lotto/pezzo.
-        </p>
-
-        <div class="wizard-granularity-grid">
-          @for (level of granularityLevels; track level) {
-            <button
-              type="button"
-              class="wizard-granularity-card"
-              [class.is-selected]="form.controls.granularityLevel.value === level"
-              (click)="onGranularityChange(level)"
-            >
-              <strong>{{ level }}</strong>
-              <span>{{ granularityHelp(level) }}</span>
-            </button>
-          }
-        </div>
-
-        @if (form.controls.granularityLevel.value !== 'MODEL') {
-          <div class="wizard-field-label-row wizard-field-followup">
-            <label for="w-batch">
-              {{ form.controls.granularityLevel.value === 'ITEM' ? 'Numero seriale' : 'Lotto' }}
-              — AI ({{ form.controls.granularityLevel.value === 'ITEM' ? '21' : '10' }}) GS1
-            </label>
-            <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('batchOrSerial')">Usa demo</button>
-          </div>
-          <input
-            id="w-batch"
-            type="text"
-            formControlName="batchOrSerial"
-            [placeholder]="form.controls.granularityLevel.value === 'ITEM' ? 'Es. (21) SN12345' : 'Es. (10) LOTTO2027A'"
-          />
-          @if (fieldError('batchOrSerial'); as msg) {
-            <p class="wizard-field-error">{{ msg }}</p>
-          }
-          <p class="wizard-field-hint">
-            Diventa l'ultimo segmento dell'UPI (es. <code>.../{{ form.controls.granularityLevel.value === 'ITEM' ? '21' : '10' }}/valore</code>) —
-            puoi scrivere solo il valore, il prefisso AI si aggiunge da sé se non lo indichi.
-          </p>
-        }
-      </div>
-    }
-
-    <!-- Passo 4: Attributi -->
-    @if (currentStep() === 3) {
-      <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
-        <h2>{{ steps[3].title }}</h2>
-        <p class="wizard-step-help">
           Dati liberi specifici del prodotto — impronta di carbonio, contenuto riciclato, composizione, garanzia:
           tutto ciò che il tuo settore richiede e non rientra nei campi fissi qui sopra. Diventano proprietà
-          <code>schema:additionalProperty</code> nel JSON-LD della scheda pubblica.
+          <code>schema:additionalProperty</code> nel JSON-LD del DPP pubblico.
         </p>
 
         @if (attributesArray.controls.length === 0) {
@@ -169,10 +120,10 @@
       </div>
     }
 
-    <!-- Passo 5: Riepilogo -->
-    @if (currentStep() === 4) {
+    <!-- Passo 4: Riepilogo -->
+    @if (currentStep() === 3) {
       <div class="wizard-step" appScrollReveal [revealDuration]="0.3">
-        <h2>{{ steps[4].title }}</h2>
+        <h2>{{ steps[3].title }}</h2>
         <p class="wizard-step-help">Controlla l'anteprima e salva la bozza — potrai pubblicarla sul DPP Registry UE subito dopo.</p>
 
         <div class="wizard-summary">

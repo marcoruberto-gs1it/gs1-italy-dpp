@@ -16,14 +16,13 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
 import { DppWizardComponent } from './dpp-wizard/dpp-wizard';
-import { batchOrSerialValidator, gtinValidator, hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
+import { hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
+import { buildDigitalLinkUpi, parseDigitalLink } from '../../utils/gs1-digital-link';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
 type View = 'checking' | 'login' | 'list' | 'create-choice' | 'form' | 'wizard';
 
 export type ToastSeverity = 'error' | 'warning';
-
-const GRANULARITY_LEVELS: GranularityLevel[] = ['MODEL', 'BATCH', 'ITEM'];
 
 /** Attese tra un tentativo automatico e l'altro quando il registro UE sta ancora "svegliandosi"
  * (vedi retryable in registry-api/src/routes/dpp.ts) — cumulate, coprono circa un minuto, la
@@ -32,14 +31,14 @@ const GRANULARITY_LEVELS: GranularityLevel[] = ['MODEL', 'BATCH', 'ITEM'];
 const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
 
 /**
- * Sezione admin per creare/modificare schede DPP e pubblicarle su mock-eu-registry
- * (il registro puntatori UE — vedi registry-api/src/mockRegistryClient.ts per il perché
- * dell'architettura). Non prerenderizzata: vedi RenderMode.Client in app.routes.server.ts.
+ * Sezione admin per creare/modificare DPP e pubblicarli su mock-eu-registry (il registro
+ * puntatori UE — vedi registry-api/src/mockRegistryClient.ts per il perché dell'architettura).
+ * Non prerenderizzata: vedi RenderMode.Client in app.routes.server.ts.
  *
- * Form reattivi (ReactiveFormsModule): la validazione dei campi identificativi (UPI/GTIN,
- * lotto/seriale) segue gli algoritmi reali degli standard GS1 (vedi utils/gs1-validators.ts),
- * non un generico controllo di lunghezza — un GTIN con la cifra di controllo sbagliata viene
- * segnalato subito, con il valore corretto suggerito.
+ * Form reattivi (ReactiveFormsModule): l'identificazione del prodotto è un solo campo, l'UPI in
+ * formato URI GS1 Digital Link — GTIN e granularità (modello/lotto/articolo) si deducono dalla
+ * sua sintassi tramite il GS1 Barcode Syntax Engine (vedi utils/gs1-digital-link.ts) invece di
+ * essere chiesti come campi separati.
  */
 @Component({
   selector: 'app-admin',
@@ -59,7 +58,6 @@ export class Admin {
   protected isBrowser = isPlatformBrowser(this.platformId);
 
   protected sectors = SECTORS;
-  protected granularityLevels = GRANULARITY_LEVELS;
 
   protected view = signal<View>('checking');
   protected records = signal<DppRecord[]>([]);
@@ -97,12 +95,18 @@ export class Admin {
   protected loginPending = signal(false);
 
   protected editingId = signal<string | null>(null);
+  /** gtin/granularityLevel/batchOrSerial non sono più compilati direttamente: si deducono da
+   * `upi` (vedi l'effect nel costruttore che li popola via parseDigitalLink) — restano nel
+   * FormGroup solo perché il resto dell'app (buildInput(), l'anteprima, il Wizard) li legge già
+   * così, e cambiare anche quel contratto avrebbe un raggio d'azione molto più ampio di questa
+   * modifica. Nessun validator diretto su di loro: la validità si gioca tutta su `upi`. */
   protected dppForm = this.fb.nonNullable.group({
     sectorId: [SECTORS[0].id, Validators.required],
     name: ['', [Validators.required, Validators.minLength(2)]],
-    gtin: ['', [Validators.required, gtinValidator()]],
-    granularityLevel: ['ITEM' as GranularityLevel, Validators.required],
-    batchOrSerial: ['', batchOrSerialValidator()],
+    upi: ['', Validators.required],
+    gtin: [''],
+    granularityLevel: ['MODEL' as GranularityLevel],
+    batchOrSerial: [''],
     attributes: this.fb.array<FormGroup>([]),
   });
   /** L'intero valore del form come signal — la reattività di Angular Forms è basata su
@@ -148,29 +152,40 @@ export class Admin {
   /** Il settore attualmente scelto nel form — pilota il pulsante dati demo, l'anteprima
    * infografica del passaporto e il QR code GS1 Digital Link qui sotto. */
   protected currentSector = computed<Sector>(() => this.sectors.find((s) => s.id === this.formValue().sectorId) ?? this.sectors[0]);
+
+  /** gtin/granularityLevel/batchOrSerial dedotti dall'ultimo parsing riuscito di `upi` (vedi
+   * l'effect nel costruttore, che scrive qui E sui controlli omonimi del FormGroup). Segnale
+   * separato apposta: quei tre controlli vengono aggiornati con `emitEvent: false` (per non far
+   * ripartire lo stesso effect che li scrive), quindi `formValue()` — che segue le sole
+   * valueChanges — non li vedrebbe mai cambiare. I computed sotto che ne hanno bisogno per
+   * l'anteprima (previewGtin e a cascata previewUpi/previewJsonLd) leggono questo invece. */
+  protected derivedIdentity = signal<{ gtin: string; granularityLevel: GranularityLevel; batchOrSerial: string }>({
+    gtin: '',
+    granularityLevel: 'MODEL',
+    batchOrSerial: '',
+  });
   /** GTIN corrente, solo se valido — l'anteprima e il QR code mostrano un GTIN solo quando è
    * un UPI reale, non una stringa a metà digitazione. Controllo diretto con isValidGtin() (la
-   * stessa funzione pura usata dal validatore reattivo) invece di leggere `control.valid`: un
-   * computed() deve dipendere solo da signal veri, non da un getter imperativo del FormControl
-   * che può aggiornarsi con un giro di reattività diverso da `formValue`. */
+   * stessa funzione pura usata dal validatore reattivo) come ulteriore rete di sicurezza, anche
+   * se derivedIdentity().gtin arriva già da un parsing riuscito del GS1 Barcode Syntax Engine. */
   protected previewGtin = computed(() => {
-    const gtin = this.formValue().gtin;
+    const gtin = this.derivedIdentity().gtin;
     return gtin && isValidGtin(gtin) ? gtin : null;
   });
   /** L'UPI — Unique Product Identifier — che verrà davvero inviato al DPP Registry UE al
    * momento della pubblicazione: un URI GS1 Digital Link, non il GTIN da solo (che è solo
-   * l'identificativo numerico da cui l'UPI si costruisce — vedi l'etichetta del campo GTIN
-   * qui sopra). Stessa identica logica di registry-api/src/mockRegistryClient.ts#buildUpi,
+   * l'identificativo numerico da cui l'UPI si costruisce — vedi l'etichetta del campo UPI qui
+   * sopra). Stessa identica logica di registry-api/src/mockRegistryClient.ts#buildUpi,
    * duplicata qui solo per l'anteprima (due servizi separati, come il resto del contratto). */
   protected previewUpi = computed<string | null>(() => {
     const gtin = this.previewGtin();
     if (!gtin) return null;
     const base = `${this.siteOrigin.value}/01/${gtin}`;
-    const f = this.formValue();
-    if (f.granularityLevel === 'MODEL' || !f.batchOrSerial) return base;
-    const value = f.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+    const identity = this.derivedIdentity();
+    if (identity.granularityLevel === 'MODEL' || !identity.batchOrSerial) return base;
+    const value = identity.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
     if (!value) return base;
-    const ai = /^\(21\)/.test(f.batchOrSerial) || f.granularityLevel === 'ITEM' ? '21' : '10';
+    const ai = identity.granularityLevel === 'ITEM' ? '21' : '10';
     return `${base}/${ai}/${encodeURIComponent(value)}`;
   });
   /** URI GS1 Digital Link codificato nel QR — lo stesso UPI che finirà nel Registro UE, non
@@ -187,6 +202,7 @@ export class Admin {
     const gtin = this.previewGtin();
     if (!gtin) return null;
     const f = this.formValue();
+    const identity = this.derivedIdentity();
     // Se stiamo modificando una scheda già salvata, usiamo i suoi valori reali (id, stato,
     // ultimo aggiornamento) invece di segnaposto — stessa idea di registry-api/src/jsonld.ts.
     const existing = this.records().find((r) => r.id === this.editingId());
@@ -206,16 +222,16 @@ export class Admin {
       uniqueProductIdentifier: this.previewUpi(),
       name: f.name || null,
       gtin,
-      granularity: (f.granularityLevel ?? 'MODEL').toLowerCase(),
+      granularity: identity.granularityLevel.toLowerCase(),
       dppSchemaVersion: 'EN18223:2026',
       dppStatus: existing?.status === 'published' ? 'active' : 'inactive',
       lastUpdate: existing?.updatedAt ?? new Date().toISOString(),
       economicOperatorId: 'gs1-italy-dpp-demo',
     };
 
-    if (f.batchOrSerial) {
-      const value = f.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
-      if (/^\(21\)/.test(f.batchOrSerial) || f.granularityLevel === 'ITEM') {
+    if (identity.batchOrSerial) {
+      const value = identity.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+      if (identity.granularityLevel === 'ITEM') {
         doc['gs1:hasSerialNumber'] = value;
       } else {
         doc['gs1:hasBatchLotNumber'] = value;
@@ -251,7 +267,7 @@ export class Admin {
   }
 
   constructor() {
-    this.titleService.setTitle('Amministrazione DPP | GS1 DPP');
+    this.titleService.setTitle('Amministrazione DPP | GS1 Italy DPP');
     this.metaService.updateTag({ name: 'robots', content: 'noindex, nofollow' });
     this.loadRecords().subscribe({
       next: () => this.view.set('list'),
@@ -265,6 +281,50 @@ export class Admin {
     // iniziare il risveglio solo in quel momento (il retry di PUBLISH_RETRY_DELAYS_MS resta
     // comunque la rete di sicurezza se non bastasse).
     if (this.isBrowser) fetch('/registry-api/warmup').catch(() => {});
+
+    // Unico punto in cui gtin/granularityLevel/batchOrSerial vengono scritti: si deducono da
+    // `upi` tramite il GS1 Barcode Syntax Engine (vedi utils/gs1-digital-link.ts) ogni volta che
+    // cambia. Scritti in DUE posti — il FormGroup (patchValue, con emitEvent:false per non far
+    // ripartire questo stesso effect, che dipende da formValue()) per buildInput()/getRawValue()
+    // al salvataggio, e derivedIdentity (un signal separato) perché i computed dell'anteprima
+    // (previewGtin e a cascata previewUpi/previewJsonLd) possano reagirci — emitEvent:false li
+    // renderebbe altrimenti ciechi a questo cambiamento, dato che dipendono da formValue().
+    // La guardia sul valore corrente prima di applicare l'esito, sotto in entrambi i
+    // .then()/.catch(), scarta un risultato ormai superato se l'utente ha continuato a digitare
+    // nel frattempo (il parsing è asincrono — inizializza il modulo Wasm al primo utilizzo —
+    // quindi due chiamate in rapida sequenza possono risolversi fuori ordine).
+    effect(() => {
+      const raw = this.formValue().upi ?? '';
+      const value = raw.trim();
+      const upiControl = this.dppForm.controls.upi;
+      if (!value) {
+        // Vuoto: basta l'errore 'required' dei validatori sincroni del controllo, già
+        // ricalcolato da Angular prima che questo effect leggesse formValue() — qui serve solo
+        // a ripulire un eventuale upiInvalid rimasto da un tentativo precedente.
+        upiControl.setErrors({ required: true });
+        this.dppForm.patchValue({ gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' }, { emitEvent: false });
+        this.derivedIdentity.set({ gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' });
+        return;
+      }
+      parseDigitalLink(value).then(
+        (parsed) => {
+          if (this.dppForm.controls.upi.value.trim() !== value) return;
+          upiControl.setErrors(null);
+          this.dppForm.patchValue(
+            { gtin: parsed.gtin, granularityLevel: parsed.granularityLevel, batchOrSerial: parsed.batchOrSerial },
+            { emitEvent: false }
+          );
+          this.derivedIdentity.set(parsed);
+        },
+        (err: unknown) => {
+          if (this.dppForm.controls.upi.value.trim() !== value) return;
+          const message = err instanceof Error ? err.message : 'URI GS1 Digital Link non valido.';
+          upiControl.setErrors({ upiInvalid: { message } });
+          this.dppForm.patchValue({ gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' }, { emitEvent: false });
+          this.derivedIdentity.set({ gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' });
+        }
+      );
+    });
 
     // Il toast (vedi admin.html/.css) resta a posizione fissa sullo schermo: si vede sempre,
     // anche dopo aver scorso una form lunga — non basta più mostrare l'errore solo in cima alla
@@ -284,7 +344,8 @@ export class Admin {
     let prevFactsKey: string | null = null;
     effect(() => {
       const f = this.formValue();
-      const identityKey = `${f.gtin}|${f.granularityLevel}|${f.batchOrSerial}`;
+      const identity = this.derivedIdentity();
+      const identityKey = `${identity.gtin}|${identity.granularityLevel}|${identity.batchOrSerial}`;
       const factsKey = JSON.stringify(f.attributes);
       if (!this.isBrowser || (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
         prevIdentityKey = identityKey;
@@ -327,21 +388,11 @@ export class Admin {
   private buildValidationSummary(): string {
     const labels: Partial<Record<keyof typeof this.dppForm.controls, string>> = {
       name: 'Nome prodotto',
-      gtin: 'GTIN',
-      batchOrSerial: 'Lotto/seriale',
+      upi: 'UPI (GS1 Digital Link)',
     };
     const invalidFields = (Object.keys(labels) as (keyof typeof labels)[]).filter((key) => this.dppForm.controls[key as keyof typeof this.dppForm.controls].invalid).map((key) => labels[key]);
     if (!invalidFields.length) return 'Controlla i campi evidenziati prima di continuare.';
     return `Controlla: ${invalidFields.join(', ')}.`;
-  }
-
-  protected gtinSuggestion(): string | null {
-    return (this.dppForm.controls.gtin.errors?.['gtinCheckDigit']?.suggestion as string | undefined) ?? null;
-  }
-
-  protected applyGtinSuggestion(): void {
-    const suggestion = this.gtinSuggestion();
-    if (suggestion) this.dppForm.controls.gtin.setValue(suggestion);
   }
 
   protected submitLogin(): void {
@@ -366,12 +417,12 @@ export class Admin {
     this.api.logout().subscribe(() => this.view.set('login'));
   }
 
-  /** "Nuova scheda" non apre più il form direttamente: prima chiede quale modalità di
+  /** "Crea DPP" non apre più il form direttamente: prima chiede quale modalità di
    * compilazione usare (vedi 'create-choice' in admin.html) — Wizard guidato o form a pagina
    * singola, sugli stessi identici campi di dppForm, nessuna duplicazione di dati. */
   protected startCreate(): void {
     this.editingId.set(null);
-    this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', gtin: '', granularityLevel: 'ITEM', batchOrSerial: '' });
+    this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', upi: '', gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' });
     this.attributesArray.clear();
     this.toast.set(null);
     this.view.set('create-choice');
@@ -395,6 +446,11 @@ export class Admin {
     this.editingId.set(record.id);
     this.dppForm.reset({
       sectorId: record.sectorId,
+      // upi è l'unico campo che l'utente vede/modifica: lo ricostruiamo dai valori già scomposti
+      // del record salvato (vedi buildDigitalLinkUpi) — l'effect nel costruttore lo riparserà
+      // subito dopo, ridando gtin/granularityLevel/batchOrSerial (qui sotto solo come stato
+      // iniziale, in attesa di quel primo giro).
+      upi: buildDigitalLinkUpi(this.siteOrigin.value, record.gtin, record.granularityLevel, record.batchOrSerial ?? ''),
       gtin: record.gtin,
       name: record.name,
       granularityLevel: record.granularityLevel,
@@ -422,10 +478,8 @@ export class Admin {
     const demo = DEMO_DATA[sector.id];
     if (!demo) return;
     this.dppForm.patchValue({
-      gtin: sector.exampleGtin,
+      upi: buildDigitalLinkUpi(this.siteOrigin.value, sector.exampleGtin, demo.granularityLevel, demo.batchOrSerial),
       name: demo.name,
-      granularityLevel: demo.granularityLevel,
-      batchOrSerial: demo.batchOrSerial,
     });
     this.fillDemoAttributes();
   }
@@ -446,33 +500,16 @@ export class Admin {
 
   /** Come fillDemoData(), ma per un solo campo scalare — il piccolo link "Usa demo" accanto a
    * ciascun campo (admin.html/dpp-wizard.html), per chi vuole solo un esempio veloce per QUEL
-   * campo invece di sovrascrivere tutta la scheda. */
-  protected demoFillField(field: 'name' | 'gtin' | 'granularityLevel' | 'batchOrSerial'): void {
+   * campo invece di sovrascrivere tutto il DPP. */
+  protected demoFillField(field: 'name' | 'upi'): void {
     const sector = this.currentSector();
     const demo = DEMO_DATA[sector.id];
     if (!demo) return;
-    if (field === 'batchOrSerial') {
-      // Il lotto/seriale demo del dataset del settore può appartenere a un livello di
-      // granularità diverso da quello scelto ora nel form (es. il dataset demo è ITEM ma
-      // l'utente ha già scelto BATCH) — riadattiamo il prefisso AI al livello attuale invece di
-      // copiare alla lettera, altrimenti l'AI mostrerebbe un livello diverso da quello scelto.
-      const currentLevel = this.dppForm.controls.granularityLevel.value;
-      const rawValue = demo.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim() || 'DEMO001';
-      const ai = currentLevel === 'ITEM' ? '21' : '10';
-      this.dppForm.controls.batchOrSerial.setValue(`(${ai}) ${rawValue}`);
+    if (field === 'upi') {
+      this.dppForm.controls.upi.setValue(buildDigitalLinkUpi(this.siteOrigin.value, sector.exampleGtin, demo.granularityLevel, demo.batchOrSerial));
       return;
     }
-    switch (field) {
-      case 'name':
-        this.dppForm.controls.name.setValue(demo.name);
-        break;
-      case 'gtin':
-        this.dppForm.controls.gtin.setValue(sector.exampleGtin);
-        break;
-      case 'granularityLevel':
-        this.dppForm.controls.granularityLevel.setValue(demo.granularityLevel);
-        break;
-    }
+    this.dppForm.controls.name.setValue(demo.name);
   }
 
   protected get attributesArray(): FormArray<FormGroup> {
@@ -587,7 +624,7 @@ export class Admin {
   }
 
   protected deleteRecord(record: DppRecord): void {
-    if (!confirm(`Eliminare la scheda "${record.name}"?`)) return;
+    if (!confirm(`Eliminare il DPP "${record.name}"?`)) return;
     this.api.delete(record.id).subscribe({
       next: () => this.loadRecords().subscribe(),
       error: (err: HttpErrorResponse) => this.showToast(err.error?.error ?? 'Errore durante l\'eliminazione.', 'error'),

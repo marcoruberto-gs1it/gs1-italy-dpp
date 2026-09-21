@@ -191,19 +191,6 @@
   border-radius: 4px;
 }
 
-.wizard-inline-fix {
-  appearance: none;
-  border: none;
-  background: none;
-  color: var(--brand);
-  font-weight: 700;
-  font-size: 0.78rem;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  margin-left: 6px;
-}
-
 /* --- Passo Settore --- */
 .wizard-sector-grid {
   display: grid;
@@ -242,50 +229,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-/* --- Passo Granularità --- */
-.wizard-granularity-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 6px;
-}
-
-.wizard-granularity-card {
-  appearance: none;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px;
-  background: var(--bg-surface-sunken);
-  border: 1.5px solid transparent;
-  border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  text-align: left;
-  transition: border-color var(--dur-base) var(--ease-out);
-}
-
-.wizard-granularity-card.is-selected {
-  border-color: var(--brand);
-  background: var(--brand-soft);
-}
-
-.wizard-granularity-card strong {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--brand);
-}
-
-.wizard-granularity-card span {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
-}
-
-.wizard-field-followup {
-  margin-top: 20px !important;
 }
 
 /* --- Passo Attributi --- */
@@ -430,8 +373,7 @@
     padding: 22px;
   }
 
-  .wizard-sector-grid,
-  .wizard-granularity-grid {
+  .wizard-sector-grid {
     grid-template-columns: 1fr;
   }
 
