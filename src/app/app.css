@@ -285,10 +285,16 @@
   flex: 1;
 }
 
-/* --- Footer --- */
+/* --- Footer ---
+   Prima era una sola riga di testo minuscolo ("GS1 DPP"), sproporzionata rispetto al resto del
+   sito dopo il rebrand: nessun logo, nessun chiarimento che questa è una demo indipendente e
+   non un servizio ufficiale GS1 Italy — un punto importante da rendere esplicito proprio perché
+   l'header usa il logo GS1 Italy vero (vedi .logo-mark qui sotto, stesso chip bianco fisso).
+   Link a gs1it.org perché "GS1 Italy" viene nominato: chi legge deve poter arrivare al sito
+   ufficiale con un solo clic, invece di doverlo cercare. */
 .site-footer {
   background: var(--bg-surface);
-  padding: 24px 0;
+  padding: 36px 0;
   margin-top: 60px;
   border-top: 1px solid var(--border-subtle);
 }
@@ -298,14 +304,46 @@
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   text-align: center;
 }
 
-.footer-legal {
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.footer-brand-text {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.footer-tagline {
   margin: 0;
+  max-width: 480px;
   font-size: 0.82rem;
   color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.footer-official-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+.footer-official-link:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 600px) {

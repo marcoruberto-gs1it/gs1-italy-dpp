@@ -82,6 +82,16 @@
 
 <footer class="site-footer">
   <div class="footer-container">
-    <p class="footer-legal">{{ t('hero.pageTitle') }}</p>
+    <a routerLink="/" class="footer-brand" [title]="t('nav.backToHome')">
+      <span class="logo-mark" aria-hidden="true">
+        <img src="/images/gs1-italy-logo.png" alt="" width="180" height="180" />
+      </span>
+      <span class="footer-brand-text">{{ t('hero.pageTitle') }}</span>
+    </a>
+    <p class="footer-tagline">{{ t('footer.tagline') }}</p>
+    <a class="footer-official-link" href="https://www.gs1it.org" target="_blank" rel="noopener">
+      {{ t('footer.officialSiteLabel') }}
+      <app-icon name="external-link" [size]="13"></app-icon>
+    </a>
   </div>
 </footer>

@@ -15,6 +15,10 @@ export const TRANSLATIONS = {
       switchToItalian: 'Passa all\'italiano',
       switchToEnglish: 'Passa all\'inglese',
     },
+    footer: {
+      tagline: 'Progetto dimostrativo costruito sugli standard GS1 per illustrare il Digital Product Passport — non un servizio ufficiale GS1 Italy.',
+      officialSiteLabel: 'Sito ufficiale GS1 Italy',
+    },
     hero: {
       titleLine1: 'Ogni prodotto, ogni settore.',
       titleHighlight: "Un'identità digitale.",
@@ -243,6 +247,10 @@ export const TRANSLATIONS = {
       switchToDark: 'Switch to dark theme',
       switchToItalian: 'Switch to Italian',
       switchToEnglish: 'Switch to English',
+    },
+    footer: {
+      tagline: 'A demo project built on GS1 standards to illustrate the Digital Product Passport — not an official GS1 Italy service.',
+      officialSiteLabel: 'Official GS1 Italy website',
     },
     hero: {
       titleLine1: 'Every product, every sector.',
