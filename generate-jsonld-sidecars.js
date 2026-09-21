@@ -4,6 +4,11 @@
 // HTML prerenderizzata (vedi webshop/nginx.conf, blocco /01/). È la content negotiation che
 // rende ogni GS1 Digital Link del sito leggibile da un motore di ricerca, un resolver GS1 o un
 // agente AI senza dover fare parsing di HTML.
+//
+// Genera anche il sidecar "linkset" (RFC 9264, richiesto con ?linkType=linkset o
+// Accept: application/linkset+json — vedi registry-api/src/jsonld.ts#dppToLinkset per la
+// stessa rappresentazione lato schede DPP pubblicate): la terza rappresentazione che uno
+// standard resolver GS1 conforme deve offrire, non solo HTML e JSON-LD.
 const fs = require('fs');
 const path = require('path');
 
@@ -20,6 +25,24 @@ const PLACEHOLDER_ORIGIN = 'https://tuodominio-produzione.it';
 const resolveOrigin = (id) => (id.startsWith(PLACEHOLDER_ORIGIN) ? SITE_URL + id.slice(PLACEHOLDER_ORIGIN.length) : id);
 /** "images/x.jpg" → "https://dominio/images/x.jpg"; un URL già assoluto resta com'è. */
 const absoluteUrl = (u) => (/^https?:\/\//i.test(u) ? u : `${SITE_URL}/${u.replace(/^\//, '')}`);
+
+/** Stesse tre relazioni di registry-api/src/jsonld.ts#dppToLinkset, per un GTIN del catalogo
+ * statico invece che di una scheda DPP pubblicata — vedi lì per il perché delle tre voci. */
+function writeLinkset(dir, id, name) {
+  const doc = {
+    linkset: [
+      {
+        anchor: id,
+        'https://ref.gs1.org/voc/defaultLink': [{ href: id, title: name }],
+        'https://ref.gs1.org/voc/pip': [{ href: id, title: name, type: 'text/html' }],
+        'https://ref.gs1.org/voc/masterData': [
+          { href: `${id}?linkType=masterData`, title: `${name} — JSON-LD`, type: 'application/ld+json' },
+        ],
+      },
+    ],
+  };
+  fs.writeFileSync(path.join(dir, 'index.linkset'), JSON.stringify(doc));
+}
 
 if (!fs.existsSync(BROWSER_DIR)) {
   console.error(`generate-jsonld-sidecars: ${BROWSER_DIR} non trovato — esegui dopo "ng build".`);
@@ -67,6 +90,7 @@ for (const p of products) {
   const dir = path.join(BROWSER_DIR, '01', p.gtin);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'index.jsonld'), JSON.stringify(doc));
+  writeLinkset(dir, doc['hasGS1DigitalLink'], p.name);
   written++;
 }
 
@@ -183,6 +207,7 @@ for (const p of products) {
     const dir = path.join(BROWSER_DIR, '01', level.gtin);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.jsonld'), JSON.stringify(doc));
+    writeLinkset(dir, doc['@id'], doc.name);
     levelsWritten++;
     produced++;
   }

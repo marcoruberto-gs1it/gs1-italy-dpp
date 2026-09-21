@@ -123,3 +123,32 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
 
   return doc;
 }
+
+/**
+ * Linkset GS1 Digital Link (RFC 9264, application/linkset+json) — la terza rappresentazione
+ * che uno standard resolver conforme deve offrire oltre a HTML e JSON-LD, richiesta con
+ * `?linkType=linkset` o `Accept: application/linkset+json` (vedi ref.gs1.org/standards/resolver,
+ * verificato contro un resolver pubblico di riferimento prima di scrivere questa funzione).
+ * Invece di rispondere con un solo redirect, elenca ESPLICITAMENTE le rappresentazioni
+ * disponibili per lo stesso identificativo — utile a un client che non vuole indovinare cosa
+ * c'è dietro un URL prima di seguirlo. Tre relazioni, tutte già risolvibili su questo sito:
+ *   gs1:defaultLink  — dove porta una richiesta senza content negotiation (la pagina HTML)
+ *   gs1:pip          — Product Information Page, la stessa pagina HTML, nominata esplicitamente
+ *   gs1:masterData   — il JSON-LD di dppToJsonLd(), raggiungibile anche con ?linkType=masterData
+ *                       (vedi webshop/nginx.conf) invece di dover rimandare Accept: application/ld+json
+ */
+export function dppToLinkset(record: DppRecord, siteUrl: string): Record<string, unknown> {
+  const id = digitalLinkUrl(siteUrl, record.gtin);
+  return {
+    linkset: [
+      {
+        anchor: id,
+        'https://ref.gs1.org/voc/defaultLink': [{ href: id, title: record.name }],
+        'https://ref.gs1.org/voc/pip': [{ href: id, title: record.name, type: 'text/html' }],
+        'https://ref.gs1.org/voc/masterData': [
+          { href: `${id}?linkType=masterData`, title: `${record.name} — JSON-LD`, type: 'application/ld+json' },
+        ],
+      },
+    ],
+  };
+}
