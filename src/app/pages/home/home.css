@@ -666,62 +666,183 @@
   border: 1px solid var(--border-subtle);
 }
 
-/* --- Quadro normativo: timeline --- */
-.reg-timeline {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
+/* --- Timeline "a spina" (ispirata a origovero.com): una linea orizzontale, un pallino per
+   nodo, un marcatore "oggi" tratteggiato posizionato per interpolazione tra i due nodi reali
+   più vicini (vedi buildSpine in home.ts) — usata sia per i 4 momenti normativi (nodi ricchi,
+   con testo) sia, in versione compatta, per i 9 settori (sostituisce il precedente grafico
+   SVG). Nodi distribuiti con flexbox space-between: a larghezza naturale, non forzati alla
+   stessa larghezza — le card normative hanno testi di lunghezza diversa. */
+.spine-timeline-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  /* Margine orizzontale negativo compensato da altrettanto padding: il contenitore scorrevole
+     resta alla stessa larghezza visibile, ma l'area di scroll guadagna un po' di respiro ai
+     bordi — senza, l'etichetta "OGGI" del marcatore si taglia quando il marcatore stesso cade
+     proprio sul primo o sull'ultimo nodo (translateX(-50%) la fa sporgere oltre il bordo).
+     24px, non di più: deve restare dentro il padding più stretto tra i contenitori che lo
+     ospitano (.info-section--alt, 24px) senza sporgere oltre i suoi angoli arrotondati. */
+  margin: 0 -24px;
+  padding: 0 24px 4px;
+}
+
+.spine-timeline {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
   list-style: none;
   margin: 0 0 40px;
-  padding: 0;
+  padding: 44px 0 0;
+  min-width: 720px;
 }
 
-.reg-item {
+/* Linea orizzontale dietro ai pallini — un singolo elemento decorativo condiviso da tutti i
+   nodi, non un bordo per nodo (che si spezzerebbe visivamente a ogni gap tra le card). */
+.spine-timeline::before {
+  content: '';
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border-default);
+}
+
+.spine-node {
+  position: relative;
+  flex: 0 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 24px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-}
-
-.reg-item-head {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  text-align: center;
+  max-width: 220px;
 }
 
-.reg-item-icon {
-  width: 38px;
-  height: 38px;
+.spine-dot {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--text-tertiary);
+  border: 3px solid var(--bg-page, var(--bg-canvas));
+  box-shadow: 0 0 0 1px var(--border-default);
+  z-index: 1;
+}
+
+.spine-node--done .spine-dot { background: var(--success); box-shadow: 0 0 0 1px var(--success); }
+.spine-node--soon .spine-dot { background: var(--warning); box-shadow: 0 0 0 1px var(--warning); }
+.spine-node--later .spine-dot { background: var(--text-tertiary); box-shadow: 0 0 0 1px var(--border-default); }
+
+.spine-card {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.spine-icon {
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.reg-date {
-  display: block;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--brand-accent-strong);
   margin-bottom: 4px;
 }
 
-.reg-item h3 {
-  font-size: 1.05rem;
+.spine-date {
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 8px;
+  color: var(--text-tertiary);
 }
 
-.reg-item p {
-  font-size: 0.9rem;
+.spine-card h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 2px 0 0;
+}
+
+.spine-card p {
+  font-size: 0.84rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.55;
   margin: 0;
+}
+
+/* Marcatore "oggi": linea tratteggiata verticale + etichetta, sovrapposta alla linea
+   orizzontale — vedi buildSpine() in home.ts per come viene calcolato `left`. */
+.spine-today {
+  position: absolute;
+  /* Si ferma poco sotto la linea (top:50px in .spine-timeline::before), non scende fino in
+     fondo alle card: è un marcatore sulla linea del tempo, non un divisorio tra le colonne —
+     attraversare il testo delle descrizioni sotto sarebbe solo rumore visivo. */
+  top: 20px;
+  height: 62px;
+  width: 0;
+  border-left: 2px dashed var(--brand-accent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.spine-today-label {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  transform: translateX(-50%);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-accent);
+  background: var(--bg-page, var(--bg-canvas));
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+/* --- Variante compatta (roadmap dei 9 settori): niente icona né descrizione, solo data e
+   nome — la scheda per-settore sopra ha già il resto. Colore del pallino per settore invece
+   che per stato (qui non è "urgenza", è "quale settore"). */
+.spine-timeline--compact {
+  /* Più spazio in alto della versione ricca (vedi .spine-timeline) — qui il marcatore "oggi"
+     cade spesso vicino al primo nodo (i settori partono a ridosso di oggi), e la sua
+     etichetta deve stare dentro questo padding invece di contare sul margine della sezione
+     sopra, che può non bastare quando il testo introduttivo va a capo su più righe. */
+  padding-top: 56px;
+  margin-bottom: 0;
+  min-width: 620px;
+}
+
+.spine-timeline--compact::before {
+  top: 61px;
+}
+
+.spine-node--compact .spine-dot {
+  width: 11px;
+  height: 11px;
+  background: var(--dot-color);
+  box-shadow: 0 0 0 1px var(--dot-color);
+}
+
+.spine-node--compact .spine-card {
+  margin-top: 12px;
+  gap: 2px;
+}
+
+.spine-node--compact .spine-date {
+  font-size: 0.68rem;
+}
+
+.spine-node--compact .spine-sector-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.spine-timeline-wrap--compact .spine-today {
+  top: 20px;
+  height: 41px;
 }
 
 /* --- Pannello "risposta GS1": stesso trattamento scuro a griglia+glow dell'hero (vedi
@@ -825,6 +946,102 @@
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.55;
   margin: 4px 0 0;
+}
+
+/* --- Pillar "Identificazione": riga dei tre livelli di granularità (Modello/Lotto/Articolo),
+   la stessa piramide "una chiave, più granularità" della guida GS1 sul DPP — qui come mini
+   percorso invece che come tabella, per restare leggero dentro la card. */
+.granularity-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.granularity-row app-icon {
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.granularity-tag {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.granularity-tag strong {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.granularity-tag em {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* --- Pillar "Cattura": tre supporti (QR/NFC/RAIN RFID) invece di una riga sola — l'unico dei
+   tre pillar con un elenco interno, quindi naturalmente più alto: le colonne della griglia
+   sono per default in stretch, così le altre due card restano allineate alla sua altezza
+   invece di apparire "tagliate corte" accanto a lei. */
+.standards-pillar--capture {
+  gap: 4px;
+}
+
+.capture-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.capture-item {
+  display: flex;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.capture-item:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.capture-item app-icon {
+  color: var(--brand-accent-vivid);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.capture-title {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.capture-standard {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--brand-accent-vivid);
+  margin: 2px 0 4px;
+}
+
+.capture-item p {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  margin: 0;
 }
 
 .standards-footnote {
@@ -965,7 +1182,10 @@
 }
 
 .roadmap-chart-head {
-  margin-bottom: 8px;
+  /* Spazio sufficiente per l'etichetta "OGGI" del marcatore (vedi .spine-today-label), che può
+     sporgere sopra la linea della timeline quando cade sul primo nodo — senza, si sovrappone
+     al testo introduttivo qui sopra invece di limitarsi a "sembrare tagliata". */
+  margin-bottom: 24px;
 }
 
 .roadmap-chart-head h3 {
@@ -981,89 +1201,6 @@
   margin: 0;
   max-width: 560px;
   line-height: 1.5;
-}
-
-.roadmap-svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.roadmap-axis {
-  stroke: var(--border-default);
-  stroke-width: 1.5;
-}
-
-/* Marcatore "OGGI": stessa idea del pattern usato altrove per timeline normative — una linea
-   verticale tratteggiata che mostra a che punto siamo davvero, calcolata dalla data reale
-   (vedi roadmapChart() in home.ts), non posizionata a mano. */
-.roadmap-today-line {
-  stroke: var(--brand-accent);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 4;
-}
-
-.roadmap-today-label {
-  fill: var(--brand-accent);
-  font-family: var(--font-sans);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  text-anchor: middle;
-}
-
-.roadmap-line {
-  fill: none;
-  stroke: var(--brand-accent);
-  stroke-width: 2;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  opacity: 0.55;
-}
-
-.roadmap-dot {
-  fill: var(--dot-color, var(--brand));
-  stroke: var(--bg-surface);
-  stroke-width: 3;
-}
-
-.roadmap-legend {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px 20px;
-  list-style: none;
-  margin: 20px 0 0;
-  padding: 20px 0 0;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.roadmap-legend-item {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 6px 0;
-  font-size: 0.82rem;
-}
-
-.roadmap-legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: var(--radius-full);
-  background: var(--dot-color, var(--brand));
-  flex-shrink: 0;
-  align-self: center;
-}
-
-.roadmap-legend-name {
-  font-weight: 700;
-  color: var(--text-primary);
-  flex-shrink: 0;
-}
-
-.roadmap-legend-date {
-  color: var(--text-tertiary);
-  font-size: 0.78rem;
 }
 
 /* ---------------------------------------------------------------------------
@@ -1109,9 +1246,12 @@
 }
 
 @media (max-width: 700px) {
-  .reg-timeline {
-    grid-template-columns: 1fr;
-    gap: 32px;
+  /* Sotto i 700px la spina non si comprime oltre un certo punto senza schiacciare le card
+     (min-width sul contenitore, vedi sopra): resta scorrevole in orizzontale con lo scroll
+     nativo del touch invece di forzare un layout verticale che romperebbe l'allineamento
+     visivo dei pallini sulla linea. */
+  .spine-timeline-wrap {
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -1188,10 +1328,6 @@
 
   .roadmap-chart {
     padding: 20px;
-  }
-
-  .roadmap-legend {
-    grid-template-columns: 1fr 1fr;
   }
 }
 

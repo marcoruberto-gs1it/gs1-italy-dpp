@@ -13,12 +13,12 @@ import { setSocialMeta } from '../../utils/social-meta';
 
 const AUTOPLAY_INTERVAL_MS = 5000;
 
-/** Stato "urgenza" (colore + etichetta, vedi regulation.status* in translations.ts) per i
- * quattro momenti della sezione #normativa — calcolato dalla data vera di ognuno rispetto a
- * oggi, non scritto a mano: resta corretto da solo col passare del tempo (un "In preparazione"
- * diventa "In vigore" da sé quando la data passa, senza dover ritoccare il sito). Le date qui
- * sono quelle vere citate nel testo (regulation.item1Date ecc. in translations.ts) — se una
- * cambia, va aggiornata in entrambi i posti. */
+/** Date vere dei quattro momenti della sezione #normativa — le stesse citate nel testo
+ * (regulation.item1Date ecc. in translations.ts, se una cambia va aggiornata in entrambi i
+ * posti) — usate per calcolare da sole, rispetto a oggi, sia lo stato "urgenza" di ogni nodo
+ * sia la posizione del marcatore "oggi" sulla timeline (vedi buildSpine/toDecimalYear più
+ * sotto): un "In preparazione" diventa "In vigore" da sé quando la data passa, niente da
+ * ritoccare a mano col passare del tempo. */
 const REGULATION_MILESTONES: { key: 1 | 2 | 3 | 4; date: Date }[] = [
   { key: 1, date: new Date('2024-07-18') },
   { key: 2, date: new Date('2026-07-20') },
@@ -30,10 +30,64 @@ const REGULATION_MILESTONES: { key: 1 | 2 | 3 | 4; date: Date }[] = [
 
 type MilestoneStatus = 'done' | 'soon' | 'later';
 
-function milestoneStatus(date: Date, now: Date): MilestoneStatus {
-  const monthsAway = (date.getTime() - now.getTime()) / (30.44 * 24 * 3600 * 1000);
+/** Stato "urgenza" di un nodo timeline dalla distanza in mesi da oggi (entrambi in anni
+ * decimali, vedi toDecimalYear) — condiviso tra la timeline normativa (4 nodi) e quella dei
+ * settori (9 nodi, vedi sectorsSpine): stessa soglia dei 12 mesi per entrambe. */
+function statusFromMonthsAway(monthsAway: number): MilestoneStatus {
   if (monthsAway <= 0) return 'done';
   return monthsAway <= 12 ? 'soon' : 'later';
+}
+
+/** "2026-09-21T..." → 2026.72 circa: anno più la frazione dell'anno trascorsa. Unità comune a
+ * REGULATION_MILESTONES (Date vere) e Sector.roadmapYear (già un anno decimale in sectors.ts)
+ * così buildSpine può posizionare entrambe le timeline con la stessa matematica. */
+function toDecimalYear(date: Date): number {
+  return date.getFullYear() + (date.getTime() - new Date(date.getFullYear(), 0, 1).getTime()) / (365.25 * 24 * 3600 * 1000);
+}
+
+interface SpineNode<T> {
+  item: T;
+  /** Posizione orizzontale del nodo lungo la linea, 0-100 — nodi equidistanti (non
+   * proporzionali alla data reale): con scarti molto diversi (mesi tra un settore e l'altro,
+   * anni tra un momento normativo e l'altro) una scala proporzionale schiaccerebbe i nodi
+   * vicini fino a farli sovrapporre. Solo il marcatore "oggi" resta proporzionale, interpolato
+   * *localmente* tra i due nodi che lo racchiudono (vedi sotto) — stessa idea di origovero.com,
+   * il riferimento visivo da cui parte questo componente. */
+  percent: number;
+}
+
+/** Costruisce una timeline "a spina" (vedi .spine-timeline in home.css) da una lista già
+ * ordinata cronologicamente: nodi equidistanti sulla linea, marcatore "oggi" posizionato per
+ * interpolazione lineare tra i due nodi reali che racchiudono la data odierna — o, se oggi cade
+ * prima del primo nodo (caso comune: la timeline mostra anche il prossimo futuro), estrapolato
+ * all'indietro con la stessa pendenza del primo tratto, così il marcatore compare comunque
+ * invece di sparire subito prima dell'inizio della linea. Oltre `maxExtrapolationYears` dal
+ * primo nodo, o dopo l'ultimo, il marcatore semplicemente non c'è: la timeline è già "chiusa". */
+function buildSpine<T>(items: T[], valueOf: (item: T) => number, todayYear: number, maxExtrapolationYears = 1): { nodes: SpineNode<T>[]; todayPercent: number | null } {
+  const n = items.length;
+  const nodes: SpineNode<T>[] = items.map((item, i) => ({ item, percent: n <= 1 ? 50 : (i / (n - 1)) * 100 }));
+  if (n < 2) return { nodes, todayPercent: null };
+
+  const values = items.map(valueOf);
+  let todayPercent: number | null = null;
+
+  if (todayYear < values[0]) {
+    if (values[0] - todayYear <= maxExtrapolationYears) {
+      const slope = (nodes[1].percent - nodes[0].percent) / (values[1] - values[0]);
+      todayPercent = Math.max(0, nodes[0].percent - (values[0] - todayYear) * slope);
+    }
+  } else if (todayYear <= values[n - 1]) {
+    for (let i = 0; i < n - 1; i++) {
+      if (todayYear >= values[i] && todayYear <= values[i + 1]) {
+        const frac = values[i + 1] === values[i] ? 0 : (todayYear - values[i]) / (values[i + 1] - values[i]);
+        todayPercent = nodes[i].percent + frac * (nodes[i + 1].percent - nodes[i].percent);
+        break;
+      }
+    }
+  }
+  // todayYear > values[n - 1]: resta null, la timeline è già conclusa.
+
+  return { nodes, todayPercent };
 }
 
 @Component({
@@ -58,13 +112,6 @@ export class Home implements OnDestroy {
    * carosello di anteprima nella hero (un settore = una card), niente dati duplicati. */
   sectors = computed<Sector[]>(() => SECTORS.map((s) => localizeSector(s, this.languageService.lang())));
 
-  /** Stato di ognuno dei 4 momenti normativi (vedi REGULATION_MILESTONES sopra), come mappa
-   * chiave→stato per una lettura diretta nel template (regulationStatus()[1] ecc.). */
-  protected regulationStatus = computed<Record<number, MilestoneStatus>>(() => {
-    const now = new Date();
-    return Object.fromEntries(REGULATION_MILESTONES.map((m) => [m.key, milestoneStatus(m.date, now)]));
-  });
-
   private static readonly STATUS_KEY: Record<MilestoneStatus, string> = { done: 'Done', soon: 'Soon', later: 'Later' };
 
   protected statusLabel(status: MilestoneStatus): string {
@@ -75,30 +122,36 @@ export class Home implements OnDestroy {
     return this.t(`regulation.status${Home.STATUS_KEY[status]}Hint`);
   }
 
-  /** Marker + percorso del grafico "roadmap normativa" (sezione #settori in home.html):
-   * posiziona ogni settore lungo un asse temporale REALE (`roadmapYear` in sectors.ts, che
-   * riflette lo stesso `dateLabel` mostrato per esteso sulla card) — non un layout decorativo.
-   * viewBox fisso 0 0 1000 170, coordinate già in unità SVG (nessun calcolo nel template).
-   * Niente etichette incollate ai punti (vedi .roadmap-legend sotto nel template): con 9
-   * settori, alcuni a poche settimane di distanza, si sovrapporrebbero. */
-  protected roadmapChart = computed(() => {
-    const xMin = 2026.6;
-    const xMax = 2029.7;
-    const toX = (year: number) => 40 + ((year - xMin) / (xMax - xMin)) * 920;
+  /** Oggi, in anni decimali — calcolato una sola volta per rendering invece che dentro ogni
+   * computed che ne ha bisogno (regulationSpine, sectorsSpine): stessa istantanea per
+   * entrambe le timeline della pagina. */
+  private todayYear = computed(() => toDecimalYear(new Date()));
+
+  /** Timeline "a spina" dei 4 momenti normativi (sezione #normativa in home.html) — vedi
+   * buildSpine per la posizione dei nodi e del marcatore "oggi", statusFromMonthsAway per lo
+   * stato di ciascuno. */
+  protected regulationSpine = computed(() => {
+    const today = this.todayYear();
+    const { nodes, todayPercent } = buildSpine(REGULATION_MILESTONES, (m) => toDecimalYear(m.date), today);
+    return {
+      nodes: nodes.map((n) => ({ ...n, status: statusFromMonthsAway((toDecimalYear(n.item.date) - today) * 12) })),
+      todayPercent,
+    };
+  });
+
+  /** Stessa timeline "a spina", questa volta per i 9 settori (sezione #settori) — sostituisce
+   * il precedente grafico SVG con lo stesso componente HTML/CSS già usato per la normativa,
+   * solo con nodi più compatti (vedi .spine-timeline--compact in home.css). Posizionata su
+   * `roadmapYear` (anno decimale, stesso significato di toDecimalYear ma già pronto in
+   * sectors.ts) invece che su una Date vera. */
+  protected sectorsSpine = computed(() => {
+    const today = this.todayYear();
     const sorted = [...this.sectors()].sort((a, b) => a.roadmapYear - b.roadmapYear);
-    const points = sorted.map((sector) => {
-      const t = (sector.roadmapYear - xMin) / (xMax - xMin);
-      return { sector, x: toX(sector.roadmapYear), y: 130 - t * 110 };
-    });
-    const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-    // "OGGI": stessa trasformazione data→coordinata SVG dei punti settore, sulla data vera
-    // di oggi invece di un roadmapYear fisso — resta corretta da sola col passare del tempo,
-    // niente da aggiornare a mano. Nascosto se cade fuori da [xMin, xMax] (asse tarato sulla
-    // finestra dei settori, non pensato per estendersi al passato/futuro remoto).
-    const now = new Date();
-    const todayYear = now.getFullYear() + (now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / (365.25 * 24 * 3600 * 1000);
-    const todayX = todayYear >= xMin && todayYear <= xMax ? toX(todayYear) : null;
-    return { points, path, todayX };
+    const { nodes, todayPercent } = buildSpine(sorted, (s) => s.roadmapYear, today);
+    return {
+      nodes: nodes.map((n) => ({ ...n, status: statusFromMonthsAway((n.item.roadmapYear - today) * 12) })),
+      todayPercent,
+    };
   });
 
   protected activeIndex = signal(0);

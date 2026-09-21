@@ -203,44 +203,34 @@
       </span>
     </div>
 
-    <ol class="reg-timeline" appScrollReveal="stagger">
-      <li class="reg-item">
-        <div class="reg-item-head">
-          <span class="reg-item-icon icon-flat"><app-icon name="flag" [size]="18"></app-icon></span>
-          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[1]">{{ statusLabel(regulationStatus()[1]) }}</span>
-        </div>
-        <span class="reg-date">{{ t('regulation.item1Date') }}</span>
-        <h3>{{ t('regulation.item1Title') }}</h3>
-        <p>{{ t('regulation.item1Text') }}</p>
-      </li>
-      <li class="reg-item">
-        <div class="reg-item-head">
-          <span class="reg-item-icon icon-flat"><app-icon name="globe" [size]="18"></app-icon></span>
-          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[2]">{{ statusLabel(regulationStatus()[2]) }}</span>
-        </div>
-        <span class="reg-date">{{ t('regulation.item2Date') }}</span>
-        <h3>{{ t('regulation.item2Title') }}</h3>
-        <p>{{ t('regulation.item2Text') }}</p>
-      </li>
-      <li class="reg-item">
-        <div class="reg-item-head">
-          <span class="reg-item-icon icon-flat"><app-icon name="battery" [size]="18"></app-icon></span>
-          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[3]">{{ statusLabel(regulationStatus()[3]) }}</span>
-        </div>
-        <span class="reg-date">{{ t('regulation.item3Date') }}</span>
-        <h3>{{ t('regulation.item3Title') }}</h3>
-        <p>{{ t('regulation.item3Text') }}</p>
-      </li>
-      <li class="reg-item">
-        <div class="reg-item-head">
-          <span class="reg-item-icon icon-flat"><app-icon name="layers" [size]="18"></app-icon></span>
-          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[4]">{{ statusLabel(regulationStatus()[4]) }}</span>
-        </div>
-        <span class="reg-date">{{ t('regulation.item4Date') }}</span>
-        <h3>{{ t('regulation.item4Title') }}</h3>
-        <p>{{ t('regulation.item4Text') }}</p>
-      </li>
-    </ol>
+    <div class="spine-timeline-wrap" appScrollReveal>
+      <ol class="spine-timeline">
+        @if (regulationSpine().todayPercent !== null) {
+          <li class="spine-today" [style.left.%]="regulationSpine().todayPercent">
+            <span class="spine-today-label">{{ t('sectorsSection.today') }}</span>
+          </li>
+        }
+        @for (node of regulationSpine().nodes; track node.item.key) {
+          <li class="spine-node" [class]="'spine-node--' + node.status">
+            <span class="spine-dot"></span>
+            <div class="spine-card">
+              <span class="spine-icon icon-flat">
+                @switch (node.item.key) {
+                  @case (1) { <app-icon name="flag" [size]="16"></app-icon> }
+                  @case (2) { <app-icon name="globe" [size]="16"></app-icon> }
+                  @case (3) { <app-icon name="battery" [size]="16"></app-icon> }
+                  @case (4) { <app-icon name="layers" [size]="16"></app-icon> }
+                }
+              </span>
+              <span class="spine-date">{{ t('regulation.item' + node.item.key + 'Date') }}</span>
+              <span class="status-pill" [class]="'status-pill--' + node.status">{{ statusLabel(node.status) }}</span>
+              <h3>{{ t('regulation.item' + node.item.key + 'Title') }}</h3>
+              <p>{{ t('regulation.item' + node.item.key + 'Text') }}</p>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
 
     <div class="standards-panel gs-grid-glow" appScrollReveal>
       <div class="standards-panel-head">
@@ -255,13 +245,56 @@
           <h4>{{ t('regulation.standardsPillar1Title') }}</h4>
           <span class="standards-pillar-standard">{{ t('regulation.standardsPillar1Standard') }}</span>
           <p>{{ t('regulation.standardsPillar1Text') }}</p>
+          <div class="granularity-row">
+            <span class="granularity-tag">
+              <strong>{{ t('regulation.standardsPillar1Granularity1') }}</strong>
+              <em>{{ t('regulation.standardsPillar1Granularity1Detail') }}</em>
+            </span>
+            <app-icon name="chevron-right" [size]="12"></app-icon>
+            <span class="granularity-tag">
+              <strong>{{ t('regulation.standardsPillar1Granularity2') }}</strong>
+              <em>{{ t('regulation.standardsPillar1Granularity2Detail') }}</em>
+            </span>
+            <app-icon name="chevron-right" [size]="12"></app-icon>
+            <span class="granularity-tag">
+              <strong>{{ t('regulation.standardsPillar1Granularity3') }}</strong>
+              <em>{{ t('regulation.standardsPillar1Granularity3Detail') }}</em>
+            </span>
+          </div>
         </li>
-        <li class="standards-pillar">
+
+        <li class="standards-pillar standards-pillar--capture">
           <span class="standards-pillar-icon icon-flat" style="--icon-color: var(--brand-accent-vivid)"><app-icon name="qr-code" [size]="18"></app-icon></span>
           <h4>{{ t('regulation.standardsPillar2Title') }}</h4>
-          <span class="standards-pillar-standard">{{ t('regulation.standardsPillar2Standard') }}</span>
-          <p>{{ t('regulation.standardsPillar2Text') }}</p>
+          <p>{{ t('regulation.standardsPillar2Intro') }}</p>
+          <ul class="capture-list">
+            <li class="capture-item">
+              <app-icon name="qr-code" [size]="15"></app-icon>
+              <div>
+                <span class="capture-title">{{ t('regulation.capture1Title') }}</span>
+                <span class="capture-standard">{{ t('regulation.capture1Standard') }}</span>
+                <p>{{ t('regulation.capture1Text') }}</p>
+              </div>
+            </li>
+            <li class="capture-item">
+              <app-icon name="zap" [size]="15"></app-icon>
+              <div>
+                <span class="capture-title">{{ t('regulation.capture2Title') }}</span>
+                <span class="capture-standard">{{ t('regulation.capture2Standard') }}</span>
+                <p>{{ t('regulation.capture2Text') }}</p>
+              </div>
+            </li>
+            <li class="capture-item">
+              <app-icon name="cpu" [size]="15"></app-icon>
+              <div>
+                <span class="capture-title">{{ t('regulation.capture3Title') }}</span>
+                <span class="capture-standard">{{ t('regulation.capture3Standard') }}</span>
+                <p>{{ t('regulation.capture3Text') }}</p>
+              </div>
+            </li>
+          </ul>
         </li>
+
         <li class="standards-pillar">
           <span class="standards-pillar-icon icon-flat" style="--icon-color: var(--brand-accent-vivid)"><app-icon name="send" [size]="18"></app-icon></span>
           <h4>{{ t('regulation.standardsPillar3Title') }}</h4>
@@ -336,29 +369,25 @@
         <h3>{{ t('sectorsSection.roadmapTitle') }}</h3>
         <p>{{ t('sectorsSection.roadmapIntro') }}</p>
       </div>
-      <svg class="roadmap-svg" viewBox="0 0 1000 170" preserveAspectRatio="xMidYMid meet" role="img" [attr.aria-label]="t('sectorsSection.roadmapTitle')">
-        <line x1="40" y1="142" x2="960" y2="142" class="roadmap-axis" />
-        @if (roadmapChart().todayX; as todayX) {
-          <line [attr.x1]="todayX" y1="18" [attr.x2]="todayX" y2="142" class="roadmap-today-line" />
-          <text [attr.x]="todayX" y="12" class="roadmap-today-label">{{ t('sectorsSection.today') }}</text>
-        }
-        <path [attr.d]="roadmapChart().path" class="roadmap-line" />
-        @for (p of roadmapChart().points; track p.sector.id) {
-          <circle [attr.cx]="p.x" [attr.cy]="p.y" r="7" class="roadmap-dot" [style.--dot-color]="p.sector.brandColor" />
-        }
-      </svg>
-      <!-- Legenda: un punto sulla curva sopra ha lo stesso colore di una voce qui — niente
-           etichette incollate ai punti (con 9 settori, alcuni a distanza di poche settimane,
-           si sovrapporrebbero) -->
-      <ul class="roadmap-legend">
-        @for (p of roadmapChart().points; track p.sector.id) {
-          <li class="roadmap-legend-item">
-            <span class="roadmap-legend-dot" [style.--dot-color]="p.sector.brandColor"></span>
-            <span class="roadmap-legend-name">{{ p.sector.shortName }}</span>
-            <span class="roadmap-legend-date">{{ p.sector.dateLabel }}</span>
-          </li>
-        }
-      </ul>
+
+      <div class="spine-timeline-wrap spine-timeline-wrap--compact">
+        <ol class="spine-timeline spine-timeline--compact">
+          @if (sectorsSpine().todayPercent !== null) {
+            <li class="spine-today" [style.left.%]="sectorsSpine().todayPercent">
+              <span class="spine-today-label">{{ t('sectorsSection.today') }}</span>
+            </li>
+          }
+          @for (node of sectorsSpine().nodes; track node.item.id) {
+            <li class="spine-node spine-node--compact" [style.--dot-color]="node.item.brandColor">
+              <span class="spine-dot"></span>
+              <div class="spine-card">
+                <span class="spine-date">{{ node.item.dateLabel }}</span>
+                <span class="spine-sector-name">{{ node.item.shortName }}</span>
+              </div>
+            </li>
+          }
+        </ol>
+      </div>
     </div>
   </section>
 </div>
