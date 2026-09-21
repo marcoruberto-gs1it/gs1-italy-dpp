@@ -464,15 +464,4 @@ export class ProductService {
     return this.products.find((p) => p.brandOwner?.gln === gln)?.brandOwner;
   }
 
-  /** Ricerca istantanea su nome, marchio e GTIN (sui dati nella lingua corrente). */
-  search(query: string): Product[] {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return this.getAllProducts().filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      p.gtin.includes(q) ||
-      p.sectorName.toLowerCase().includes(q)
-    );
-  }
 }

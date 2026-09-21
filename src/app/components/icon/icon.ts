@@ -45,7 +45,8 @@ export type IconName =
   | 'bed'
   | 'cpu'
   | 'save'
-  | 'loader';
+  | 'loader'
+  | 'external-link';
 
 @Component({
   selector: 'app-icon',

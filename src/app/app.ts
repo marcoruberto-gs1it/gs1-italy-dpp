@@ -3,8 +3,6 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { SearchPaletteComponent } from './components/search-palette/search-palette';
-import { UiStateService } from './services/ui-state.service';
 import { ThemeService } from './services/theme.service';
 import { LanguageService } from './services/language.service';
 import { I18nService } from './services/i18n.service';
@@ -13,13 +11,12 @@ import { SiteOriginService } from './services/site-origin.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SearchPaletteComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('gs1-catalog');
-  protected uiState = inject(UiStateService);
   protected languageService = inject(LanguageService);
   protected themeService = inject(ThemeService);
   protected t = inject(I18nService).t;

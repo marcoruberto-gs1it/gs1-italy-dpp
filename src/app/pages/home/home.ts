@@ -57,6 +57,10 @@ export class Home implements OnDestroy {
   protected activeCard = computed(() => this.sectors()[this.activeIndex()]);
   protected autoplay = signal(true);
   protected qrValue = computed(() => `${this.siteOrigin.value}/01/${this.activeCard().exampleGtin}`);
+  /** Stessa URL del QR, senza protocollo — per la barra indirizzi decorativa sopra il
+   * carosello di anteprima (vedi .preview-chrome in home.css): i browser reali nascondono
+   * "https://" di default, replichiamo la stessa convenzione invece di mostrarlo per intero. */
+  protected previewUrlDisplay = computed(() => this.qrValue().replace(/^https?:\/\//, ''));
   /** Element string GS1 mostrato nella card — AI (01) più l'eventuale AI aggiuntivo (es. lotto). */
   protected elementString = computed(() => {
     const card = this.activeCard();

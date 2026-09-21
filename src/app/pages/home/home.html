@@ -18,6 +18,15 @@
       </div>
 
       <div class="hero-preview">
+        <div class="preview-chrome" aria-hidden="true">
+          <span class="preview-chrome-dot"></span>
+          <span class="preview-chrome-dot"></span>
+          <span class="preview-chrome-dot"></span>
+          <span class="preview-chrome-url">
+            <app-icon name="shield-check" [size]="11"></app-icon>
+            {{ previewUrlDisplay() }}
+          </span>
+        </div>
         <div class="preview-card">
           <div class="preview-top">
             <div class="preview-image icon-flat" [style.--icon-color]="activeCard().brandColor">
@@ -223,6 +232,22 @@
       </ul>
 
       <p class="standards-footnote">{{ t('regulation.standardsFootnote') }}</p>
+
+      <div class="references-row">
+        <span class="references-label">{{ t('regulation.referencesTitle') }}</span>
+        <a class="reference-chip" href="https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02024R1781-20240628" target="_blank" rel="noopener noreferrer">
+          {{ t('regulation.reference1') }}
+          <app-icon name="external-link" [size]="12"></app-icon>
+        </a>
+        <a class="reference-chip" href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport_en" target="_blank" rel="noopener noreferrer">
+          {{ t('regulation.reference2') }}
+          <app-icon name="external-link" [size]="12"></app-icon>
+        </a>
+        <a class="reference-chip" href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport/dpp-registry_en" target="_blank" rel="noopener noreferrer">
+          {{ t('regulation.reference3') }}
+          <app-icon name="external-link" [size]="12"></app-icon>
+        </a>
+      </div>
     </div>
 
     <div class="gs-stat-grid key-stats" appScrollReveal>

@@ -21,11 +21,6 @@
       <nav class="header-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
         <a routerLink="/admin" routerLinkActive="active">{{ t('nav.demo') }}</a>
-        <button type="button" class="nav-search-trigger" (click)="uiState.openSearch()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <span>{{ t('nav.searchPlaceholder') }}</span>
-          <span class="gs-kbd">/</span>
-        </button>
       </nav>
     </div>
 
@@ -63,10 +58,6 @@
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
       </button>
 
-      <button type="button" class="icon-btn mobile-search-trigger" (click)="uiState.openSearch()" [attr.aria-label]="t('nav.searchAria')">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </button>
-
       <button type="button" class="icon-btn mobile-nav-trigger" (click)="toggleMobileNav()" [attr.aria-label]="t('nav.menuAria')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
@@ -102,5 +93,3 @@
     <p class="footer-legal">{{ t('hero.pageTitle') }}</p>
   </div>
 </footer>
-
-<app-search-palette></app-search-palette>

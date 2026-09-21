@@ -20,7 +20,7 @@ scheda pubblicata da `/admin` quando esiste.
 ```
 src/app/
   pages/       home, product, brand, admin
-  components/  icon, star-rating, json-ld-drawer, search-palette
+  components/  icon, star-rating, json-ld-drawer
   services/    product, registry-api, language, i18n, structured-data, site-origin
   data/        sectors.ts, products.json (catalogo statico, oggi vuoto)
   i18n/        dizionario IT/EN

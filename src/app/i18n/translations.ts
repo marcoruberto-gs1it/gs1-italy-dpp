@@ -6,8 +6,6 @@ export const TRANSLATIONS = {
       home: 'Home',
       demo: 'Demo',
       backToHome: 'Torna alla Home',
-      searchPlaceholder: 'Cerca prodotti…',
-      searchAria: 'Cerca prodotti',
       menuAria: 'Apri menu',
       closeMenuAria: 'Chiudi menu',
       languageLabel: 'Lingua',
@@ -82,6 +80,10 @@ export const TRANSLATIONS = {
       standardsPillar3Standard: 'GS1 Web Vocabulary',
       standardsPillar3Text: 'Un vocabolario comune per descrivere i dati di prodotto, leggibile da persone e sistemi.',
       standardsFootnote: 'Nessuna ruota da reinventare: gli stessi standard usati ogni giorno da un supermercato, da un ospedale e da un impianto industriale.',
+      referencesTitle: 'Riferimenti ufficiali',
+      reference1: 'Testo del regolamento ESPR su EUR-Lex',
+      reference2: 'Pagina ufficiale della Commissione europea',
+      reference3: 'Registro europeo del DPP',
     },
     keyStats: {
       stat1Value: '9',
@@ -203,17 +205,6 @@ export const TRANSLATIONS = {
       explainer:
         "Questo è il formato \"leggibile dalle macchine\" della scheda: lo stesso testo che un motore di ricerca o un altro sistema legge automaticamente. \"gtin\" è il codice prodotto; \"uniqueProductIdentifier\" è l'indirizzo web che lo rappresenta (standard GS1 Digital Link); \"digitalProductPassportId\" identifica questo passaporto digitale in sé, distinto dal prodotto; \"granularity\" indica se la scheda vale per l'intero modello, un lotto o un singolo esemplare.",
     },
-    search: {
-      dialogAria: 'Ricerca prodotti',
-      placeholder: 'Cerca per nome, marchio o GTIN…',
-      closeAria: 'Chiudi ricerca',
-      esc: 'esc',
-      noResults: 'Nessun prodotto trovato per "{query}".',
-      hint: 'Digita per cercare tra tutti i prodotti del catalogo.',
-      navigate: 'naviga',
-      open: 'apri',
-      close: 'chiudi',
-    },
   },
   en: {
     nav: {
@@ -221,8 +212,6 @@ export const TRANSLATIONS = {
       home: 'Home',
       demo: 'Demo',
       backToHome: 'Back to Home',
-      searchPlaceholder: 'Search products…',
-      searchAria: 'Search products',
       menuAria: 'Open menu',
       closeMenuAria: 'Close menu',
       languageLabel: 'Language',
@@ -297,6 +286,10 @@ export const TRANSLATIONS = {
       standardsPillar3Standard: 'GS1 Web Vocabulary',
       standardsPillar3Text: 'A shared vocabulary for describing product data, readable by people and systems alike.',
       standardsFootnote: "No wheel to reinvent: the same standards used every day by a supermarket, a hospital and an industrial plant.",
+      referencesTitle: 'Official references',
+      reference1: 'ESPR regulation text on EUR-Lex',
+      reference2: 'Official European Commission page',
+      reference3: 'EU Digital Product Passport Registry',
     },
     keyStats: {
       stat1Value: '9',
@@ -417,17 +410,6 @@ export const TRANSLATIONS = {
       copied: 'Copied!',
       explainer:
         'This is the "machine-readable" version of the record: the same text a search engine or another system reads automatically. "gtin" is the product code; "uniqueProductIdentifier" is the web address that resolves to it (GS1 Digital Link standard); "digitalProductPassportId" identifies this digital passport itself, separate from the product; "granularity" says whether the record covers the whole model, a batch, or a single item.',
-    },
-    search: {
-      dialogAria: 'Product search',
-      placeholder: 'Search by name, brand or GTIN…',
-      closeAria: 'Close search',
-      esc: 'esc',
-      noResults: 'No products found for "{query}".',
-      hint: 'Type to search across all products in the catalogue.',
-      navigate: 'navigate',
-      open: 'open',
-      close: 'close',
     },
   },
 } as const;
