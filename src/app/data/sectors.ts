@@ -28,6 +28,12 @@ export interface Sector {
   exampleGtin: string;
   /** Riga aggiuntiva dell'element string GS1 (es. AI (10) per un lotto) — solo dove serve. */
   exampleExtraElement?: string;
+  /** Due tappe di filiera plausibili ("passo · luogo", dato dimostrativo) per il mini percorso
+   * mostrato nella card di anteprima della hero — insieme alla scansione dell'utente stesso
+   * (terza tappa, generica, vedi heroPreview.scannedNow) suggeriscono cosa un vero DPP
+   * mostrerebbe: non solo i dati del prodotto, ma la sua storia verificabile. */
+  exampleJourneyStep1: string;
+  exampleJourneyStep2: string;
 }
 
 // Il sito riparte da zero sul Digital Product Passport (ESPR, Regolamento (UE) 2024/1781):
@@ -51,6 +57,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Modulo batteria EV — esempio',
     exampleGtin: '08000000000019',
+    exampleJourneyStep1: 'Celle assemblate · Svezia',
+    exampleJourneyStep2: 'Collaudo e imballo · Germania',
   },
   {
     id: 'apparel',
@@ -67,6 +75,8 @@ export const SECTORS: Sector[] = [
     exampleName: 'Capo — esempio',
     exampleGtin: '08000000000026',
     exampleExtraElement: '(10) LOTTO2027A',
+    exampleJourneyStep1: 'Tessuto tessuto · Portogallo',
+    exampleJourneyStep2: 'Confezionato · Italia',
   },
   {
     id: 'steel',
@@ -82,6 +92,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Profilato in acciaio — esempio',
     exampleGtin: '08000000000033',
+    exampleJourneyStep1: 'Colata e laminazione · Italia',
+    exampleJourneyStep2: 'Certificazione qualità · Italia',
   },
   {
     id: 'construction',
@@ -97,6 +109,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Pannello isolante — esempio',
     exampleGtin: '08000000000040',
+    exampleJourneyStep1: 'Materia prima · Germania',
+    exampleJourneyStep2: 'Produzione pannelli · Polonia',
   },
   {
     id: 'aluminium',
@@ -112,6 +126,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Profilo in alluminio — esempio',
     exampleGtin: '08000000000057',
+    exampleJourneyStep1: 'Fusione lega · Norvegia',
+    exampleJourneyStep2: 'Estrusione profilo · Italia',
   },
   {
     id: 'tyres',
@@ -127,6 +143,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Pneumatico estivo — esempio',
     exampleGtin: '08000000000064',
+    exampleJourneyStep1: 'Mescola e stampaggio · Romania',
+    exampleJourneyStep2: 'Collaudo su strada · Germania',
   },
   {
     id: 'furniture',
@@ -142,6 +160,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Sedia da ufficio — esempio',
     exampleGtin: '08000000000071',
+    exampleJourneyStep1: 'Taglio componenti · Italia',
+    exampleJourneyStep2: 'Assemblaggio finale · Italia',
   },
   {
     id: 'mattresses',
@@ -156,6 +176,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Materasso a molle — esempio',
     exampleGtin: '08000000000088',
+    exampleJourneyStep1: 'Produzione molle · Belgio',
+    exampleJourneyStep2: 'Imbottitura e confezione · Italia',
   },
   {
     id: 'ict',
@@ -171,6 +193,8 @@ export const SECTORS: Sector[] = [
     status: 'coming-soon',
     exampleName: 'Router domestico — esempio',
     exampleGtin: '08000000000095',
+    exampleJourneyStep1: 'Assemblaggio schede · Taiwan',
+    exampleJourneyStep2: 'Collaudo finale · Paesi Bassi',
   },
 ];
 
@@ -181,6 +205,8 @@ interface SectorTranslationEn {
   dateLabel: string;
   regulationRef: string;
   exampleName: string;
+  exampleJourneyStep1: string;
+  exampleJourneyStep2: string;
 }
 
 const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
@@ -192,6 +218,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Mandatory from 18 February 2027',
     regulationRef: 'Regulation (EU) 2023/1542',
     exampleName: 'EV battery module — example',
+    exampleJourneyStep1: 'Cells assembled · Sweden',
+    exampleJourneyStep2: 'Tested and packed · Germany',
   },
   apparel: {
     name: 'Textiles & apparel',
@@ -201,6 +229,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Garment — example',
+    exampleJourneyStep1: 'Fabric woven · Portugal',
+    exampleJourneyStep2: 'Sewn and packed · Italy',
   },
   steel: {
     name: 'Iron & steel',
@@ -210,6 +240,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected Q4 2026',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Steel profile — example',
+    exampleJourneyStep1: 'Cast and rolled · Italy',
+    exampleJourneyStep2: 'Quality certification · Italy',
   },
   construction: {
     name: 'Construction',
@@ -219,6 +251,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected Q2 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Insulation panel — example',
+    exampleJourneyStep1: 'Raw material · Germany',
+    exampleJourneyStep2: 'Panel production · Poland',
   },
   aluminium: {
     name: 'Aluminium',
@@ -227,6 +261,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Aluminium profile — example',
+    exampleJourneyStep1: 'Alloy smelted · Norway',
+    exampleJourneyStep2: 'Profile extrusion · Italy',
   },
   tyres: {
     name: 'Tyres',
@@ -235,6 +271,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected Q3-Q4 2027',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Summer tyre — example',
+    exampleJourneyStep1: 'Compound and moulding · Romania',
+    exampleJourneyStep2: 'Road-tested · Germany',
   },
   furniture: {
     name: 'Furniture',
@@ -243,6 +281,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected 2028',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Office chair — example',
+    exampleJourneyStep1: 'Parts cut · Italy',
+    exampleJourneyStep2: 'Final assembly · Italy',
   },
   mattresses: {
     name: 'Mattresses',
@@ -251,6 +291,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected 2029',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Spring mattress — example',
+    exampleJourneyStep1: 'Springs produced · Belgium',
+    exampleJourneyStep2: 'Upholstery and packing · Italy',
   },
   ict: {
     name: 'Electronics & ICT',
@@ -259,6 +301,8 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     dateLabel: 'Delegated act expected 2029',
     regulationRef: 'ESPR — Regulation (EU) 2024/1781',
     exampleName: 'Home router — example',
+    exampleJourneyStep1: 'Boards assembled · Taiwan',
+    exampleJourneyStep2: 'Final testing · Netherlands',
   },
 };
 

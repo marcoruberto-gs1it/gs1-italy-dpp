@@ -68,6 +68,21 @@
             </div>
           </div>
 
+          <ul class="preview-journey">
+            <li class="preview-journey-step preview-journey-step--done">
+              <span class="preview-journey-dot"><app-icon name="check-circle" [size]="12"></app-icon></span>
+              {{ activeCard().exampleJourneyStep1 }}
+            </li>
+            <li class="preview-journey-step preview-journey-step--done">
+              <span class="preview-journey-dot"><app-icon name="check-circle" [size]="12"></app-icon></span>
+              {{ activeCard().exampleJourneyStep2 }}
+            </li>
+            <li class="preview-journey-step preview-journey-step--live">
+              <span class="preview-journey-dot preview-journey-dot--live"></span>
+              {{ t('heroPreview.scannedNow') }}
+            </li>
+          </ul>
+
           <div class="preview-footer">
             <span class="preview-counter">{{ activeIndex() + 1 }} / {{ sectors().length }}</span>
             <div class="preview-controls">
@@ -176,27 +191,51 @@
       <p>{{ t('regulation.intro') }}</p>
     </div>
 
+    <div class="status-legend">
+      <span class="status-legend-item status-legend-item--done">
+        <span class="status-dot"></span>{{ t('regulation.statusDoneLabel') }} <em>{{ t('regulation.statusDoneHint') }}</em>
+      </span>
+      <span class="status-legend-item status-legend-item--soon">
+        <span class="status-dot"></span>{{ t('regulation.statusSoonLabel') }} <em>{{ t('regulation.statusSoonHint') }}</em>
+      </span>
+      <span class="status-legend-item status-legend-item--later">
+        <span class="status-dot"></span>{{ t('regulation.statusLaterLabel') }} <em>{{ t('regulation.statusLaterHint') }}</em>
+      </span>
+    </div>
+
     <ol class="reg-timeline" appScrollReveal="stagger">
       <li class="reg-item">
-        <span class="reg-item-icon icon-flat"><app-icon name="flag" [size]="18"></app-icon></span>
+        <div class="reg-item-head">
+          <span class="reg-item-icon icon-flat"><app-icon name="flag" [size]="18"></app-icon></span>
+          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[1]">{{ statusLabel(regulationStatus()[1]) }}</span>
+        </div>
         <span class="reg-date">{{ t('regulation.item1Date') }}</span>
         <h3>{{ t('regulation.item1Title') }}</h3>
         <p>{{ t('regulation.item1Text') }}</p>
       </li>
       <li class="reg-item">
-        <span class="reg-item-icon icon-flat"><app-icon name="globe" [size]="18"></app-icon></span>
+        <div class="reg-item-head">
+          <span class="reg-item-icon icon-flat"><app-icon name="globe" [size]="18"></app-icon></span>
+          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[2]">{{ statusLabel(regulationStatus()[2]) }}</span>
+        </div>
         <span class="reg-date">{{ t('regulation.item2Date') }}</span>
         <h3>{{ t('regulation.item2Title') }}</h3>
         <p>{{ t('regulation.item2Text') }}</p>
       </li>
       <li class="reg-item">
-        <span class="reg-item-icon icon-flat"><app-icon name="battery" [size]="18"></app-icon></span>
+        <div class="reg-item-head">
+          <span class="reg-item-icon icon-flat"><app-icon name="battery" [size]="18"></app-icon></span>
+          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[3]">{{ statusLabel(regulationStatus()[3]) }}</span>
+        </div>
         <span class="reg-date">{{ t('regulation.item3Date') }}</span>
         <h3>{{ t('regulation.item3Title') }}</h3>
         <p>{{ t('regulation.item3Text') }}</p>
       </li>
       <li class="reg-item">
-        <span class="reg-item-icon icon-flat"><app-icon name="layers" [size]="18"></app-icon></span>
+        <div class="reg-item-head">
+          <span class="reg-item-icon icon-flat"><app-icon name="layers" [size]="18"></app-icon></span>
+          <span class="status-pill" [class]="'status-pill--' + regulationStatus()[4]">{{ statusLabel(regulationStatus()[4]) }}</span>
+        </div>
         <span class="reg-date">{{ t('regulation.item4Date') }}</span>
         <h3>{{ t('regulation.item4Title') }}</h3>
         <p>{{ t('regulation.item4Text') }}</p>
@@ -299,6 +338,10 @@
       </div>
       <svg class="roadmap-svg" viewBox="0 0 1000 170" preserveAspectRatio="xMidYMid meet" role="img" [attr.aria-label]="t('sectorsSection.roadmapTitle')">
         <line x1="40" y1="142" x2="960" y2="142" class="roadmap-axis" />
+        @if (roadmapChart().todayX; as todayX) {
+          <line [attr.x1]="todayX" y1="18" [attr.x2]="todayX" y2="142" class="roadmap-today-line" />
+          <text [attr.x]="todayX" y="12" class="roadmap-today-label">{{ t('sectorsSection.today') }}</text>
+        }
         <path [attr.d]="roadmapChart().path" class="roadmap-line" />
         @for (p of roadmapChart().points; track p.sector.id) {
           <circle [attr.cx]="p.x" [attr.cy]="p.y" r="7" class="roadmap-dot" [style.--dot-color]="p.sector.brandColor" />
