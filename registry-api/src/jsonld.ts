@@ -9,7 +9,7 @@ function digitalLinkUrl(siteUrl: string, gtin: string, ai?: '10' | '21', value?:
   return ai && value ? `${base}/${ai}/${encodeURIComponent(value)}` : base;
 }
 
-/** UPI — Unique Product Identifier, FprEN 18219 §3.1.25 — come URI GS1 Digital Link, al livello
+/** UPI — Unique Product Identifier, EN 18219 §3.1.25 — come URI GS1 Digital Link, al livello
  * di granularità più fine dichiarato dalla scheda (requisito 4.4.2(1) dello stesso standard:
  * "unique at least at the smallest granularity level it serves"). Stessa identica funzione di
  * mockRegistryClient.ts#buildUpi (il valore inviato come `upi` al DPP Registry UE): lo stesso
@@ -23,7 +23,7 @@ function buildUpi(siteUrl: string, record: DppRecord): string {
   return digitalLinkUrl(siteUrl, record.gtin, ai, value);
 }
 
-/** FprEN 18219 §4.4 (granularity) e FprEN 18223 §4.1.2.2 definiscono i tre livelli in minuscolo
+/** EN 18219 §4.4 (granularity) e EN 18223 §4.1.2.2 definiscono i tre livelli in minuscolo
  * ("model", "batch", "item"): il nostro database usa MAIUSCOLO per motivi interni (è anche il
  * valore richiesto dallo schema di mock-eu-registry, verificato dal vivo — vedi
  * mockRegistryClient.ts), ma il JSON-LD pubblico, per dichiararsi davvero conforme allo
@@ -32,7 +32,7 @@ function toStandardGranularity(level: GranularityLevel): 'model' | 'batch' | 'it
   return level.toLowerCase() as 'model' | 'batch' | 'item';
 }
 
-/** FprEN 18223 §4.1.2.1 (Table 1, "dppStatus") elenca come esempio i valori "active, inactive,
+/** EN 18223 §4.1.2.1 (Table 1, "dppStatus") elenca come esempio i valori "active, inactive,
  * archived, invalid". Il nostro stato interno (bozza/pubblicata) non è lo stesso concetto ma si
  * mappa senza forzature: una scheda pubblicata è "active" per chi la consulta; una bozza (che il
  * pubblico non vede mai, tranne nella brevissima finestra in cui mock-eu-registry scarica questo
@@ -55,7 +55,7 @@ function toStandardDppStatus(status: DppRecord['status']): 'active' | 'inactive'
  *    dati arbitrari — non un'invenzione nostra.
  *
  * 2) Il modello semantico del "digital product passport" vero e proprio, definito da
- *    FprEN 18223:2026 (CEN/CENELEC) §4.1.2.1, Tabella 1 — i nomi di campo qui sotto
+ *    EN 18223:2026 (CEN/CENELEC) §4.1.2.1, Tabella 1 — i nomi di campo qui sotto
  *    (digitalProductPassportId, uniqueProductIdentifier, granularity, dppSchemaVersion,
  *    dppStatus, lastUpdate, economicOperatorId) sono ESATTAMENTE quelli richiesti dalla
  *    tabella normativa, non nomi inventati o riadattati dal nostro modello dati interno.
@@ -75,12 +75,12 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     },
     '@type': ['schema:Product', 'gs1:Product'],
     '@id': id,
-    // Identificativo dell'istanza di passaporto (FprEN 18223 §4.1.2.1) — distinto dal GTIN e
+    // Identificativo dell'istanza di passaporto (EN 18223 §4.1.2.1) — distinto dal GTIN e
     // dall'UPI: quelli identificano il PRODOTTO, questo identifica IL PASSAPORTO STESSO.
     // Formato URN (RFC 4122), non un URL: lo standard non richiede che sia risolvibile via web
     // (quel compito spetta a uniqueProductIdentifier).
     digitalProductPassportId: `urn:uuid:${record.id}`,
-    // UPI — l'identificativo del prodotto che permette di raggiungere questa scheda (FprEN 18219
+    // UPI — l'identificativo del prodotto che permette di raggiungere questa scheda (EN 18219
     // §3.1.25): lo stesso URI GS1 Digital Link registrato presso il DPP Registry UE come "upi"
     // (vedi mockRegistryClient.ts#buildUpi) — stesso valore, nome di campo allineato allo
     // standard invece che allo schema specifico del registro.
@@ -88,7 +88,7 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     name: record.name,
     gtin: record.gtin,
     granularity: toStandardGranularity(record.granularityLevel),
-    dppSchemaVersion: 'FprEN18223:2026',
+    dppSchemaVersion: 'EN18223:2026',
     dppStatus: toStandardDppStatus(record.status),
     lastUpdate: record.updatedAt,
     // Identificativo demo dell'operatore economico — stesso valore inviato come "reoId" al DPP
@@ -116,7 +116,7 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
   }
 
   if (record.registryId) {
-    // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2, Tabella 8): il DPP
+    // Nome allineato all'output di RegisterProductDPP (EN 18222 §5.2, Tabella 8): il DPP
     // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
     doc['registrationId'] = record.registryId;
   }

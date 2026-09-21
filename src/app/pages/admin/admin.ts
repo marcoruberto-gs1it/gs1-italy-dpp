@@ -200,14 +200,14 @@ export class Admin {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': `${this.siteOrigin.value}/01/${gtin}`,
-      // Nomi di campo e struttura allineati a FprEN 18223:2026 §4.1.2.1 (Tabella 1) — vedi il
+      // Nomi di campo e struttura allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) — vedi il
       // commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
       digitalProductPassportId: existing ? `urn:uuid:${existing.id}` : 'urn:uuid:(assegnato al salvataggio)',
       uniqueProductIdentifier: this.previewUpi(),
       name: f.name || null,
       gtin,
       granularity: (f.granularityLevel ?? 'MODEL').toLowerCase(),
-      dppSchemaVersion: 'FprEN18223:2026',
+      dppSchemaVersion: 'EN18223:2026',
       dppStatus: existing?.status === 'published' ? 'active' : 'inactive',
       lastUpdate: existing?.updatedAt ?? new Date().toISOString(),
       economicOperatorId: 'gs1-italy-dpp-demo',
@@ -232,7 +232,7 @@ export class Admin {
     }
 
     if (existing?.registryId) {
-      // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2, Tabella 8): il DPP
+      // Nome allineato all'output di RegisterProductDPP (EN 18222 §5.2, Tabella 8): il DPP
       // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
       doc['registrationId'] = existing.registryId;
     }
