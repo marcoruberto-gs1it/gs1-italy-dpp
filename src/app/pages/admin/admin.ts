@@ -18,6 +18,7 @@ import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish
 import { DppWizardComponent } from './dpp-wizard/dpp-wizard';
 import { hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
 import { buildDigitalLinkUpi, parseDigitalLink } from '../../utils/gs1-digital-link';
+import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
 type View = 'checking' | 'login' | 'list' | 'create-choice' | 'form' | 'wizard';
@@ -216,17 +217,19 @@ export class Admin {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': `${this.siteOrigin.value}/01/${gtin}`,
-      // Nomi di campo e struttura allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) — vedi il
-      // commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
+      // Nomi di campo, formati ed enumerazioni allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) —
+      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
       digitalProductPassportId: existing ? `urn:uuid:${existing.id}` : 'urn:uuid:(assegnato al salvataggio)',
       uniqueProductIdentifier: this.previewUpi(),
       name: f.name || null,
       gtin,
-      granularity: identity.granularityLevel.toLowerCase(),
-      dppSchemaVersion: 'EN18223:2026',
-      dppStatus: existing?.status === 'published' ? 'active' : 'inactive',
-      lastUpdate: existing?.updatedAt ?? new Date().toISOString(),
-      economicOperatorId: 'gs1-italy-dpp-demo',
+      granularity: toStandardGranularity(identity.granularityLevel),
+      dppSchemaVersion: DPP_SCHEMA_VERSION,
+      dppStatus: toStandardDppStatus(existing?.status ?? 'draft'),
+      lastUpdated: existing?.updatedAt ?? new Date().toISOString(),
+      economicOperatorId: DEMO_ECONOMIC_OPERATOR_ID,
+      facilityId: DEMO_FACILITY_ID,
+      contentSpecificationIds: [this.currentSector().contentSpecificationId],
     };
 
     if (identity.batchOrSerial) {

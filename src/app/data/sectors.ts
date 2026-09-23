@@ -25,6 +25,11 @@ export interface Sector {
   roadmapYear: number;
   /** Riferimento normativo breve per la card di anteprima nella hero. */
   regulationRef: string;
+  /** Stesso riferimento normativo di regulationRef, come identificativo macchina — valorizza
+   * "contentSpecificationIds" nel JSON-LD del DPP (EN 18223 §4.1.2.1, Tabella 1: "references to
+   * delegated/implementing acts or other content specifications"). Non tradotto (un
+   * identificativo non ha lingua, esattamente come roadmapYear qui sopra). */
+  contentSpecificationId: string;
   /** 'coming-soon': settore annunciato in homepage ma senza ancora prodotti pubblicati. */
   status: 'live' | 'coming-soon';
   /** Nome del prodotto di esempio nella card di anteprima — dato dimostrativo, non un prodotto reale. */
@@ -60,6 +65,7 @@ export const SECTORS: Sector[] = [
     dateShort: '18 feb 2027',
     roadmapYear: 2027.13,
     regulationRef: 'Regolamento (UE) 2023/1542',
+    contentSpecificationId: 'EU_BATTERY_REGULATION_2023_1542',
     status: 'coming-soon',
     exampleName: 'Modulo batteria EV — esempio',
     exampleGtin: '08000000000019',
@@ -78,6 +84,7 @@ export const SECTORS: Sector[] = [
     dateShort: 'Q3-Q4 2027',
     roadmapYear: 2027.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Capo — esempio',
     exampleGtin: '08000000000026',
@@ -97,6 +104,7 @@ export const SECTORS: Sector[] = [
     dateShort: 'Q4 2026',
     roadmapYear: 2026.9,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Profilato in acciaio — esempio',
     exampleGtin: '08000000000033',
@@ -115,6 +123,7 @@ export const SECTORS: Sector[] = [
     dateShort: 'Q2 2027',
     roadmapYear: 2027.4,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Pannello isolante — esempio',
     exampleGtin: '08000000000040',
@@ -133,6 +142,7 @@ export const SECTORS: Sector[] = [
     dateShort: 'Q3-Q4 2027',
     roadmapYear: 2027.6,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Profilo in alluminio — esempio',
     exampleGtin: '08000000000057',
@@ -151,6 +161,7 @@ export const SECTORS: Sector[] = [
     dateShort: 'Q3-Q4 2027',
     roadmapYear: 2027.7,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Pneumatico estivo — esempio',
     exampleGtin: '08000000000064',
@@ -169,6 +180,7 @@ export const SECTORS: Sector[] = [
     dateShort: '2028',
     roadmapYear: 2028.5,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Sedia da ufficio — esempio',
     exampleGtin: '08000000000071',
@@ -186,6 +198,7 @@ export const SECTORS: Sector[] = [
     dateShort: '2029',
     roadmapYear: 2029.2,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Materasso a molle — esempio',
     exampleGtin: '08000000000088',
@@ -204,6 +217,7 @@ export const SECTORS: Sector[] = [
     dateShort: '2029',
     roadmapYear: 2029.4,
     regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
     status: 'coming-soon',
     exampleName: 'Router domestico — esempio',
     exampleGtin: '08000000000095',

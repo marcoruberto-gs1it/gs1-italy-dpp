@@ -17,18 +17,27 @@
  *
  * ATTENZIONE (importante per chi legge questo file conoscendo lo standard CEN/CENELEC): mockeu-registry è l'implementazione di riferimento CIRPASS-2, con un proprio schema JSON — NON è
  * la stessa cosa del metodo astratto "RegisterProductDPP" descritto in EN 18222:2026 §5.2
- * (Tabella 8), che definisce un oggetto "DppRegistryEntry" con nomi di campo diversi. I due non
- * sono intercambiabili: lo standard descrive il CONCETTO, mock-eu-registry è un'implementazione
- * concreta con le sue scelte di naming. Corrispondenza concettuale, campo per campo, tra ciò che
- * inviamo davvero (a sinistra) e il nome equivalente nello standard (a destra):
- *   upi            ~ DppRegistryEntry.uniqueProductIdentifier
- *   reoId          ~ DppRegistryEntry.uniqueEconomicOperatorIdentifier
- *   liveURL        ~ DppRegistryEntry.dppApiEndPoint
- *   (nessun campo) ~ DppRegistryEntry.digitalProductPassportId (non richiesto da mock-eu-registry;
- *                    esposto comunque nel nostro JSON-LD pubblico, vedi jsonld.ts)
- * commodityCode, facilitiesId, granularityLevel, modelUpi, batchUpi, deactivated, backupURL sono
- * campi propri dello schema di mock-eu-registry, senza equivalente nella Tabella 8 dello
- * standard (che lascia i dettagli del payload di registrazione all'implementazione del registro).
+ * (Tabella 8), che definisce un oggetto "DppRegistryEntry" con nomi di campo diversi (schema
+ * completo in dpp-api-specification.md §6.2, la sintesi da cui è stata riverificata questa
+ * tabella). I due non sono intercambiabili: lo standard descrive il CONCETTO, mock-eu-registry è
+ * un'implementazione concreta con le sue scelte di naming. NON "correggere" i nomi qui sotto per
+ * farli combaciare con lo standard: romperebbe le richieste vere contro il registro live.
+ * Corrispondenza concettuale, campo per campo, tra ciò che inviamo davvero (a sinistra) e il
+ * nome/formato equivalente nello standard (a destra):
+ *   upi              ~ DppRegistryEntry.uniqueProductIdentifier
+ *   reoId            ~ DppRegistryEntry.uniqueEconomicOperatorIdentifier
+ *   liveURL          ~ DppRegistryEntry.dppApiEndpoint
+ *   granularityLevel ~ DppRegistryEntry.granularity — stesso concetto, casing diverso:
+ *                      MODEL/BATCH/ITEM qui, "Model"/"Batch"/"Item" nello standard (vedi
+ *                      toStandardGranularity in jsonld.ts, che usa il casing corretto per il
+ *                      JSON-LD pubblico — questo file invece deve restare MAIUSCOLO, il valore
+ *                      verificato dal vivo contro lo schema di mock-eu-registry)
+ *   (nessun campo)   ~ DppRegistryEntry.digitalProductPassportId (non richiesto da mock-eu-registry;
+ *                      esposto comunque nel nostro JSON-LD pubblico, vedi jsonld.ts)
+ * commodityCode, facilitiesId, modelUpi, batchUpi, deactivated, backupURL sono campi propri
+ * dello schema di mock-eu-registry, senza equivalente nella Tabella 8 dello standard (che lascia
+ * i dettagli del payload di registrazione all'implementazione del registro) — productGroup di
+ * DppRegistryEntry, viceversa, non ha equivalente qui: mock-eu-registry non lo richiede.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import type { SectorId } from './sectors.ts';

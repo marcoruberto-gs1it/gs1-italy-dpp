@@ -17,16 +17,11 @@ import { StructuredDataService } from '../../services/structured-data.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
+import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 
 // Stesso placeholder salvato in products.json per gli @id coniati (rawGs1Data.brand['@id']),
 // vedi generate-agent-feed.js: risolto qui verso l'origine reale con lo stesso principio.
 const PLACEHOLDER_ORIGIN = SSR_FALLBACK_ORIGIN;
-
-// Stessi identificativi demo hardcoded in registry-api/src/mockRegistryClient.ts — duplicati
-// qui solo per mostrarli sulla scheda pubblica (EO/UOI e Facility/UFI viaggiano davvero verso
-// il DPP Registry UE ad ogni pubblicazione), non letti da lì.
-const DEMO_EO_ID = 'gs1-italy-dpp-demo';
-const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
 
 // gs1:AllergenTypeCode-* / gs1:LevelOfContainmentCode-* → chiave di traduzione in product.*
 // (vedi src/app/i18n/translations.ts). Copre solo i codici realmente usati da add-gs1-jsonld.js
@@ -157,7 +152,7 @@ export class ProductComponent implements OnDestroy {
   });
 
   dppAttributeEntries = computed(() => Object.entries(this.dppRecord()?.attributes ?? {}));
-  protected economicOperatorId = DEMO_EO_ID;
+  protected economicOperatorId = DEMO_ECONOMIC_OPERATOR_ID;
   protected facilityId = DEMO_FACILITY_ID;
 
   images = computed<string[]>(() => {
@@ -251,17 +246,21 @@ export class ProductComponent implements OnDestroy {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': id,
-      // Nomi di campo e struttura allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) — vedi il
-      // commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
+      // Nomi di campo, formati ed enumerazioni allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) —
+      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
       digitalProductPassportId: `urn:uuid:${dpp.id}`,
       uniqueProductIdentifier: upi,
       name: dpp.name,
       gtin: dpp.gtin,
-      granularity: dpp.granularityLevel.toLowerCase(),
-      dppSchemaVersion: 'EN18223:2026',
-      dppStatus: dpp.status === 'published' ? 'active' : 'inactive',
-      lastUpdate: dpp.updatedAt,
-      economicOperatorId: DEMO_EO_ID,
+      granularity: toStandardGranularity(dpp.granularityLevel),
+      dppSchemaVersion: DPP_SCHEMA_VERSION,
+      dppStatus: toStandardDppStatus(dpp.status),
+      lastUpdated: dpp.updatedAt,
+      economicOperatorId: DEMO_ECONOMIC_OPERATOR_ID,
+      facilityId: DEMO_FACILITY_ID,
+      // dppSector() ricade sempre su un settore valido (vedi il computed poco sopra) quando
+      // dppRecord() è valorizzato, come lo è qui: mai vuoto in pratica.
+      contentSpecificationIds: this.dppSector() ? [this.dppSector()!.contentSpecificationId] : [],
     };
 
     if (dpp.batchOrSerial) {

@@ -1,4 +1,5 @@
 import type { DppRecord, GranularityLevel } from './db.ts';
+import type { SectorId } from './sectors.ts';
 
 /** URI GS1 Digital Link della scheda: base "/01/{gtin}", con l'eventuale AI (10) lotto o
  * (21) seriale in coda — stessa funzione di mockRegistryClient.ts#digitalLinkUrl, duplicata qui
@@ -23,23 +24,46 @@ function buildUpi(siteUrl: string, record: DppRecord): string {
   return digitalLinkUrl(siteUrl, record.gtin, ai, value);
 }
 
-/** EN 18219 §4.4 (granularity) e EN 18223 §4.1.2.2 definiscono i tre livelli in minuscolo
- * ("model", "batch", "item"): il nostro database usa MAIUSCOLO per motivi interni (è anche il
- * valore richiesto dallo schema di mock-eu-registry, verificato dal vivo — vedi
- * mockRegistryClient.ts), ma il JSON-LD pubblico, per dichiararsi davvero conforme allo
+/** EN 18223 §4.1.2.1 (Table 1, "granularity") elenca l'enumerazione con l'iniziale maiuscola —
+ * "Model", "Batch", "Item" — non tutto minuscolo: il nostro database usa MAIUSCOLO per motivi
+ * interni (è anche il valore richiesto dallo schema di mock-eu-registry, verificato dal vivo —
+ * vedi mockRegistryClient.ts), ma il JSON-LD pubblico, per dichiararsi davvero conforme allo
  * standard, deve usare l'enumerazione esatta del testo normativo. */
-function toStandardGranularity(level: GranularityLevel): 'model' | 'batch' | 'item' {
-  return level.toLowerCase() as 'model' | 'batch' | 'item';
+function toStandardGranularity(level: GranularityLevel): 'Model' | 'Batch' | 'Item' {
+  const map: Record<GranularityLevel, 'Model' | 'Batch' | 'Item'> = { MODEL: 'Model', BATCH: 'Batch', ITEM: 'Item' };
+  return map[level];
 }
 
-/** EN 18223 §4.1.2.1 (Table 1, "dppStatus") elenca come esempio i valori "active, inactive,
- * archived, invalid". Il nostro stato interno (bozza/pubblicata) non è lo stesso concetto ma si
- * mappa senza forzature: una scheda pubblicata è "active" per chi la consulta; una bozza (che il
- * pubblico non vede mai, tranne nella brevissima finestra in cui mock-eu-registry scarica questo
- * JSON-LD PRIMA di confermare la registrazione — vedi getAnyByGtin in db.ts) è "inactive". */
-function toStandardDppStatus(status: DppRecord['status']): 'active' | 'inactive' {
-  return status === 'published' ? 'active' : 'inactive';
+/** EN 18223 §4.1.2.1 (Table 1, "dppStatus") elenca l'enumerazione "Active, Inactive, Archived,
+ * Invalid" — iniziale maiuscola. Il nostro stato interno (bozza/pubblicata) non è lo stesso
+ * concetto ma si mappa senza forzature: una scheda pubblicata è "Active" per chi la consulta;
+ * una bozza (che il pubblico non vede mai, tranne nella brevissima finestra in cui
+ * mock-eu-registry scarica questo JSON-LD PRIMA di confermare la registrazione — vedi
+ * getAnyByGtin in db.ts) è "Inactive". "Archived"/"Invalid" non hanno un equivalente nel nostro
+ * modello a due stati, quindi non compaiono mai qui. */
+function toStandardDppStatus(status: DppRecord['status']): 'Active' | 'Inactive' {
+  return status === 'published' ? 'Active' : 'Inactive';
 }
+
+/** Identificativo demo dello stabilimento produttivo — stesso valore inviato come
+ * "facilitiesId" al DPP Registry UE (vedi mockRegistryClient.ts). */
+const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
+
+/** "contentSpecificationIds" (EN 18223 §4.1.2.1, Table 1): riferimenti all'atto delegato o alla
+ * specifica di contenuto applicabile, come identificativo macchina — non un URL, non testo
+ * libero. Derivato da Sector.contentSpecificationId (src/app/data/sectors.ts, duplicato qui
+ * come già COMMODITY_CODES in mockRegistryClient.ts: due progetti separati). */
+const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
+  battery: 'EU_BATTERY_REGULATION_2023_1542',
+  apparel: 'EU_ESPR_REGULATION_2024_1781',
+  steel: 'EU_ESPR_REGULATION_2024_1781',
+  construction: 'EU_ESPR_REGULATION_2024_1781',
+  aluminium: 'EU_ESPR_REGULATION_2024_1781',
+  tyres: 'EU_ESPR_REGULATION_2024_1781',
+  furniture: 'EU_ESPR_REGULATION_2024_1781',
+  mattresses: 'EU_ESPR_REGULATION_2024_1781',
+  ict: 'EU_ESPR_REGULATION_2024_1781',
+};
 
 /**
  * JSON-LD di una scheda DPP pubblicata: unisce due vocabolari distinti, entrambi verificati
@@ -57,11 +81,14 @@ function toStandardDppStatus(status: DppRecord['status']): 'active' | 'inactive'
  * 2) Il modello semantico del "digital product passport" vero e proprio, definito da
  *    EN 18223:2026 (CEN/CENELEC) §4.1.2.1, Tabella 1 — i nomi di campo qui sotto
  *    (digitalProductPassportId, uniqueProductIdentifier, granularity, dppSchemaVersion,
- *    dppStatus, lastUpdate, economicOperatorId) sono ESATTAMENTE quelli richiesti dalla
- *    tabella normativa, non nomi inventati o riadattati dal nostro modello dati interno.
- *    Questi campi non hanno un prefisso "gs1:" perché non fanno parte del GS1 Web Vocabulary:
- *    sono un vocabolario CEN/CENELEC a sé, qui esposto senza namespace dedicato (lo standard
- *    stesso non ne definisce uno per JSON-LD) ma con i nomi letterali della tabella normativa.
+ *    dppStatus, lastUpdated, economicOperatorId, facilityId, contentSpecificationIds) sono
+ *    ESATTAMENTE quelli richiesti dalla tabella normativa — inclusi il tipo di dato e
+ *    l'enumerazione esatta (granularity/dppStatus con l'iniziale maiuscola, non tutto minuscolo;
+ *    dppSchemaVersion nel formato "<norma>:v<major>.<minor>", non l'anno nudo) — non nomi o
+ *    formati inventati o riadattati dal nostro modello dati interno. Questi campi non hanno un
+ *    prefisso "gs1:" perché non fanno parte del GS1 Web Vocabulary: sono un vocabolario
+ *    CEN/CENELEC a sé, qui esposto senza namespace dedicato (lo standard stesso non ne definisce
+ *    uno per JSON-LD) ma con i nomi letterali della tabella normativa.
  */
 export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, unknown> {
   const id = digitalLinkUrl(siteUrl, record.gtin);
@@ -88,12 +115,16 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     name: record.name,
     gtin: record.gtin,
     granularity: toStandardGranularity(record.granularityLevel),
-    dppSchemaVersion: 'EN18223:2026',
+    // "<norma>:v<major>.<minor>" — non l'anno della norma: quello identifica QUALE versione di
+    // EN 18223 si applica (2026), questo identifica la versione DELLO SCHEMA JSON qui prodotto.
+    dppSchemaVersion: 'EN18223:v1.0',
     dppStatus: toStandardDppStatus(record.status),
-    lastUpdate: record.updatedAt,
+    lastUpdated: record.updatedAt,
     // Identificativo demo dell'operatore economico — stesso valore inviato come "reoId" al DPP
     // Registry UE (vedi mockRegistryClient.ts): non abbiamo ancora un modello multi-tenant reale.
     economicOperatorId: 'gs1-italy-dpp-demo',
+    facilityId: DEMO_FACILITY_ID,
+    contentSpecificationIds: [CONTENT_SPECIFICATION_IDS[record.sectorId]],
   };
 
   if (record.batchOrSerial) {
