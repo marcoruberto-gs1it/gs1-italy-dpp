@@ -8,7 +8,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { Select } from '@openng/optimus-ui/select';
-import { IconComponent } from '../../components/icon/icon';
+import { IconComponent, IconName } from '../../components/icon/icon';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
 import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryApiService } from '../../services/registry-api.service';
@@ -633,5 +633,15 @@ export class Admin {
 
   protected sectorName(sectorId: string): string {
     return this.sectors.find((s) => s.id === sectorId)?.name ?? sectorId;
+  }
+
+  /** Icona/colore del settore per la colonna "Prodotto" dell'elenco — stesso .icon-flat usato
+   * per le card settore e l'anteprima passaporto, qui in miniatura accanto al nome. */
+  protected sectorIcon(sectorId: string): IconName {
+    return this.sectors.find((s) => s.id === sectorId)?.icon ?? 'box';
+  }
+
+  protected sectorBrandColor(sectorId: string): string {
+    return this.sectors.find((s) => s.id === sectorId)?.brandColor ?? 'var(--brand)';
   }
 }

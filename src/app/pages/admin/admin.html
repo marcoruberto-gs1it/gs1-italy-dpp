@@ -80,10 +80,8 @@
         <table class="record-table">
           <thead>
             <tr>
-              <th scope="col">Nome</th>
-              <th scope="col">Settore</th>
+              <th scope="col">Prodotto</th>
               <th scope="col">UPI (GTIN)</th>
-              <th scope="col">Granularità</th>
               <th scope="col">Stato</th>
               <th scope="col"><span class="sr-only">Azioni</span></th>
             </tr>
@@ -91,12 +89,18 @@
           <tbody appScrollReveal="stagger" revealSelector="tr" [revealStagger]="0.04" [revealDuration]="0.3" [revealDistance]="10">
             @for (record of filteredRecords(); track record.id) {
               <tr>
-                <td data-label="Nome">
-                  <span class="record-name">{{ record.name }}</span>
+                <td data-label="Prodotto">
+                  <div class="record-product">
+                    <span class="record-icon icon-flat" [style.--icon-color]="sectorBrandColor(record.sectorId)">
+                      <app-icon [name]="sectorIcon(record.sectorId)" [size]="16"></app-icon>
+                    </span>
+                    <div>
+                      <span class="record-name">{{ record.name }}</span>
+                      <span class="record-sector">{{ sectorName(record.sectorId) }} · {{ record.granularityLevel }}</span>
+                    </div>
+                  </div>
                 </td>
-                <td data-label="Settore">{{ sectorName(record.sectorId) }}</td>
                 <td data-label="UPI (GTIN)"><code>{{ record.gtin }}</code></td>
-                <td data-label="Granularità"><span class="gs-badge gs-badge--neutral">{{ record.granularityLevel }}</span></td>
                 <td data-label="Stato">
                   @if (record.status === 'published') {
                     <span class="gs-badge gs-badge--verified">
@@ -108,21 +112,24 @@
                   }
                 </td>
                 <td data-label="Azioni" class="record-actions">
-                  <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm" (click)="startEdit(record)">Apri</button>
+                  <button type="button" class="gs-icon-btn" title="Apri" aria-label="Apri" (click)="startEdit(record)">
+                    <app-icon name="edit" [size]="15"></app-icon>
+                  </button>
                   <button
                     type="button"
-                    class="gs-btn gs-btn--ghost gs-btn--sm"
+                    class="gs-icon-btn gs-icon-btn--danger"
                     [disabled]="record.status === 'published'"
-                    [title]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : ''"
+                    [title]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
+                    [attr.aria-label]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
                     (click)="deleteRecord(record)"
                   >
-                    Elimina
+                    <app-icon name="trash" [size]="15"></app-icon>
                   </button>
                 </td>
               </tr>
             } @empty {
               <tr class="record-empty-row">
-                <td colspan="6">
+                <td colspan="4">
                   @if (records().length === 0) {
                     Nessun DPP ancora. Crea il primo con "Crea DPP".
                   } @else {

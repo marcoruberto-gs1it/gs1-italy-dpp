@@ -46,7 +46,9 @@ export type IconName =
   | 'cpu'
   | 'save'
   | 'loader'
-  | 'external-link';
+  | 'external-link'
+  | 'edit'
+  | 'trash';
 
 @Component({
   selector: 'app-icon',

@@ -373,9 +373,37 @@
   font-size: 0.84rem;
 }
 
+.record-product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.record-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.record-product > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
 .record-name {
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.record-sector {
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
 }
 
 .record-actions {
@@ -383,6 +411,40 @@
   gap: 6px;
   justify-content: flex-end;
   white-space: nowrap;
+}
+
+/* Bottoni azione compatti, solo icona — sostituiscono i precedenti "Apri"/"Elimina" testuali:
+   una tabella con molte righe legge meglio con azioni piccole e uniformi, il significato resta
+   chiaro dall'icona + il title/aria-label per chi usa uno screen reader. */
+.gs-icon-btn {
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+
+.gs-icon-btn:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.gs-icon-btn--danger:hover:not(:disabled) {
+  border-color: #c0362c;
+  color: #c0362c;
+  background: rgba(192, 54, 44, 0.08);
+}
+
+.gs-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .record-empty-row td {

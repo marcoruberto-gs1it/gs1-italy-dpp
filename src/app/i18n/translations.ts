@@ -20,9 +20,9 @@ export const TRANSLATIONS = {
       officialSiteLabel: 'Sito ufficiale GS1 Italy',
     },
     hero: {
-      titleLine1: 'Ogni prodotto, ogni settore.',
+      titleLine1: 'Ogni prodotto, un settore alla volta.',
       titleHighlight: "Un'identità digitale.",
-      subtitle: "Un solo QR code, letto da consumatori, riparatori, autorità e agenti AI: il Digital Product Passport di GS1 Italy, pronto per il regolamento ESPR in ogni settore — dalle batterie all'elettronica.",
+      subtitle: "Un solo QR code, letto da consumatori, riparatori, autorità e agenti AI: il Digital Product Passport di GS1 Italy, pronto per il regolamento ESPR settore dopo settore — dalle batterie, già obbligatorie, all'elettronica.",
       pageTitle: 'GS1 Italy DPP',
       primaryCta: "Cos'è il DPP",
       secondaryCta: 'Esplora i settori',
@@ -259,9 +259,9 @@ export const TRANSLATIONS = {
       officialSiteLabel: 'Official GS1 Italy website',
     },
     hero: {
-      titleLine1: 'Every product, every sector.',
+      titleLine1: 'Every product, one sector at a time.',
       titleHighlight: 'One digital identity.',
-      subtitle: "One QR code, read by consumers, repairers, authorities and AI agents: GS1 Italy's Digital Product Passport, ready for the ESPR regulation across every sector — from batteries to electronics.",
+      subtitle: "One QR code, read by consumers, repairers, authorities and AI agents: GS1 Italy's Digital Product Passport, ready for the ESPR regulation sector by sector — from batteries, already mandatory, to electronics.",
       pageTitle: 'GS1 Italy DPP',
       primaryCta: 'What is the DPP',
       secondaryCta: 'Explore the sectors',
