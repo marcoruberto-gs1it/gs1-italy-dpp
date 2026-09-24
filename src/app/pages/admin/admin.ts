@@ -59,6 +59,13 @@ export class Admin {
   protected isBrowser = isPlatformBrowser(this.platformId);
 
   protected sectors = SECTORS;
+  /** Esposti così com'è (funzioni importate, non wrapper) per poterli chiamare anche dal
+   * template — vedi la sezione "Campi assegnati automaticamente" in admin.html, che deve
+   * mostrare lo stesso valore/formato che finisce davvero nel JSON-LD (previewJsonLd usa le
+   * stesse funzioni), non un secondo calcolo ad hoc che potrebbe disallinearsi. */
+  protected toStandardGranularity = toStandardGranularity;
+  protected toStandardDppStatus = toStandardDppStatus;
+  protected dppSchemaVersion = DPP_SCHEMA_VERSION;
 
   protected view = signal<View>('checking');
   protected records = signal<DppRecord[]>([]);

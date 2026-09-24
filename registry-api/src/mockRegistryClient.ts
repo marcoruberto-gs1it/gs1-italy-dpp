@@ -28,10 +28,11 @@
  *   reoId            ~ DppRegistryEntry.uniqueEconomicOperatorIdentifier
  *   liveURL          ~ DppRegistryEntry.dppApiEndpoint
  *   granularityLevel ~ DppRegistryEntry.granularity — stesso concetto, casing diverso:
- *                      MODEL/BATCH/ITEM qui, "Model"/"Batch"/"Item" nello standard (vedi
- *                      toStandardGranularity in jsonld.ts, che usa il casing corretto per il
- *                      JSON-LD pubblico — questo file invece deve restare MAIUSCOLO, il valore
- *                      verificato dal vivo contro lo schema di mock-eu-registry)
+ *                      MODEL/BATCH/ITEM qui, "model"/"batch"/"item" nel JSON-LD pubblico (vedi
+ *                      toStandardGranularity in jsonld.ts — minuscolo per scelta, allineato a
+ *                      openepcis/openepcis-dpp-ready, non un refuso) — questo file invece deve
+ *                      restare MAIUSCOLO, il valore verificato dal vivo contro lo schema di
+ *                      mock-eu-registry)
  *   (nessun campo)   ~ DppRegistryEntry.digitalProductPassportId (non richiesto da mock-eu-registry;
  *                      esposto comunque nel nostro JSON-LD pubblico, vedi jsonld.ts)
  * commodityCode, facilitiesId, modelUpi, batchUpi, deactivated, backupURL sono campi propri

@@ -427,6 +427,30 @@ mano romperebbe un vincolo che lo standard stesso pone (es. `dppSchemaVersion` �
 di conformità di QUESTA implementazione) — ma sono comunque mostrati nel form, con spiegazione e
 citazione, non solo nell'anteprima JSON-LD.
 
+**Divergenza dichiarata sui VALORI (non sui nomi) di `granularity`, `dppStatus`,
+`dppSchemaVersion` ed `economicOperatorId`/`facilityId`.** Lo JSON Schema qui sopra (§6.1) — così
+come l'abbiamo ricevuto — richiede `granularity`/`dppStatus` con l'iniziale maiuscola
+("Model"/"Batch"/"Item", "Active"/"Inactive"/…) e `dppSchemaVersion` nel formato
+`"<norma>:v<major>.<minor>"` (pattern regex incluso). Confrontando questo documento con
+[`openepcis/openepcis-dpp-ready`](https://github.com/openepcis/openepcis-dpp-ready) (Apache-2.0,
+framework OpenEPCIS per EN 18223 — vedi i suoi esempi "operational" reali, es.
+`extensions/eu/battery/examples/battery-product.operational.jsonld`), quel repository usa
+consistentemente valori minuscoli ("model"/"batch"/"item", "active"/"inactive") e
+`dppSchemaVersion: "EN 18223:2026"` (norma + anno, non v-major.minor) — **in contraddizione
+diretta con il pattern regex qui sopra**. Anche `economicOperatorId`/`facilityId` divergono: qui
+sopra un URN (`"urn:gs1:gln:8012345000008"`), in OpenEPCIS un URL GS1 Digital Link
+(`"https://id.gs1.org/417/9521234000006"`, AI 417 per l'operatore economico, AI 414 per lo
+stabilimento).
+
+Nessuno dei due è il testo normativo ufficiale di EN 18223:2026 (a pagamento, non liberamente
+consultabile) — sono due sintesi/implementazioni indipendenti di uno standard ancora "preview".
+**Scelta esplicita di questo progetto: allineato a OpenEPCIS** (minuscolo per
+granularity/dppStatus, `"EN 18223:2026"` per dppSchemaVersion, URL GS1 Digital Link con AI
+417/414 per economicOperatorId/facilityId) — il che significa che il JSON-LD qui prodotto **non
+valida più** contro il pattern regex di `dppSchemaVersion` nello schema §6.1 sopra, per scelta
+consapevole, non per errore. Vedi `toStandardGranularity()`/`toStandardDppStatus()` in
+`registry-api/src/jsonld.ts` e `src/app/utils/dpp-jsonld.ts` per il dettaglio.
+
 Le rotte REST del §3 sono implementate in `registry-api/src/routes/v1.ts`, sotto
 `/registry-api/v1/dpps*` — path, verbi (inclusa la PATCH con semantica JSON Merge Patch, RFC 7396,
 per UpdateDPPById) e forma del payload in ingresso/uscita, verificati uno per uno dal vivo contro

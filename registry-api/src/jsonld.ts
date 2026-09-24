@@ -24,25 +24,34 @@ function buildUpi(siteUrl: string, record: DppRecord): string {
   return digitalLinkUrl(siteUrl, record.gtin, ai, value);
 }
 
-/** EN 18223 §4.1.2.1 (Table 1, "granularity") elenca l'enumerazione con l'iniziale maiuscola —
- * "Model", "Batch", "Item" — non tutto minuscolo: il nostro database usa MAIUSCOLO per motivi
- * interni (è anche il valore richiesto dallo schema di mock-eu-registry, verificato dal vivo —
- * vedi mockRegistryClient.ts), ma il JSON-LD pubblico, per dichiararsi davvero conforme allo
- * standard, deve usare l'enumerazione esatta del testo normativo. */
-function toStandardGranularity(level: GranularityLevel): 'Model' | 'Batch' | 'Item' {
-  const map: Record<GranularityLevel, 'Model' | 'Batch' | 'Item'> = { MODEL: 'Model', BATCH: 'Batch', ITEM: 'Item' };
+/** EN 18223 §4.1.2.1 (Table 1, "granularity"): due fonti reali in disaccordo sulla
+ * capitalizzazione dell'enumerazione. Il documento sintesi da cui questo progetto è partito
+ * (docs/dpp-api-specification.md §6.1) la riporta con l'iniziale maiuscola ("Model"/"Batch"/
+ * "Item"); openepcis/openepcis-dpp-ready (Apache-2.0, framework OpenEPCIS per EN 18223 — vedi
+ * i suoi esempi "operational" reali, es. extensions/eu/battery/examples/battery-product.
+ * operational.jsonld) la usa tutta minuscola ("model"/"batch"/"item") in modo coerente in tutti
+ * i suoi esempi e nella sua stessa documentazione. Nessuno dei due è il testo normativo
+ * ufficiale pubblicato (a pagamento, non liberamente consultabile): allineato qui a OpenEPCIS
+ * per scelta esplicita, non perché l'altra fonte fosse sbagliata — vedi la Nota di
+ * implementazione in docs/dpp-api-specification.md per la stessa divergenza dichiarata anche
+ * lì. Il nostro database interno resta MAIUSCOLO (è anche il valore richiesto dallo schema di
+ * mock-eu-registry, verificato dal vivo — vedi mockRegistryClient.ts): solo il JSON-LD pubblico
+ * cambia qui. */
+function toStandardGranularity(level: GranularityLevel): 'model' | 'batch' | 'item' {
+  const map: Record<GranularityLevel, 'model' | 'batch' | 'item'> = { MODEL: 'model', BATCH: 'batch', ITEM: 'item' };
   return map[level];
 }
 
-/** EN 18223 §4.1.2.1 (Table 1, "dppStatus") elenca l'enumerazione "Active, Inactive, Archived,
- * Invalid" — iniziale maiuscola. Il nostro stato interno (bozza/pubblicata) non è lo stesso
- * concetto ma si mappa senza forzature: una scheda pubblicata è "Active" per chi la consulta;
- * una bozza (che il pubblico non vede mai, tranne nella brevissima finestra in cui
- * mock-eu-registry scarica questo JSON-LD PRIMA di confermare la registrazione — vedi
- * getAnyByGtin in db.ts) è "Inactive". "Archived"/"Invalid" non hanno un equivalente nel nostro
- * modello a due stati, quindi non compaiono mai qui. */
-function toStandardDppStatus(status: DppRecord['status']): 'Active' | 'Inactive' {
-  return status === 'published' ? 'Active' : 'Inactive';
+/** EN 18223 §4.1.2.1 (Table 1, "dppStatus"): stessa divergenza di toStandardGranularity() sopra,
+ * stessa scelta — allineato a OpenEPCIS DPP-Ready (minuscolo) invece che al documento sintesi
+ * originale (maiuscolo). Il nostro stato interno (bozza/pubblicata) non è lo stesso concetto ma
+ * si mappa senza forzature: una scheda pubblicata è "active" per chi la consulta; una bozza (che
+ * il pubblico non vede mai, tranne nella brevissima finestra in cui mock-eu-registry scarica
+ * questo JSON-LD PRIMA di confermare la registrazione — vedi getAnyByGtin in db.ts) è
+ * "inactive". "archived"/"invalid" non hanno un equivalente nel nostro modello a due stati,
+ * quindi non compaiono mai qui. */
+function toStandardDppStatus(status: DppRecord['status']): 'active' | 'inactive' {
+  return status === 'published' ? 'active' : 'inactive';
 }
 
 /** "contentSpecificationIds" (EN 18223 §4.1.2.1, Table 1): riferimenti all'atto delegato o alla
@@ -75,16 +84,17 @@ const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
  *    dati arbitrari — non un'invenzione nostra.
  *
  * 2) Il modello semantico del "digital product passport" vero e proprio, definito da
- *    EN 18223:2026 (CEN/CENELEC) §4.1.2.1, Tabella 1 — i nomi di campo qui sotto
+ *    EN 18223:2026 (CEN/CENELEC) §4.1.2.1, Tabella 1 — i NOMI di campo qui sotto
  *    (digitalProductPassportId, uniqueProductIdentifier, granularity, dppSchemaVersion,
  *    dppStatus, lastUpdated, economicOperatorId, facilityId, contentSpecificationIds) sono
- *    ESATTAMENTE quelli richiesti dalla tabella normativa — inclusi il tipo di dato e
- *    l'enumerazione esatta (granularity/dppStatus con l'iniziale maiuscola, non tutto minuscolo;
- *    dppSchemaVersion nel formato "<norma>:v<major>.<minor>", non l'anno nudo) — non nomi o
- *    formati inventati o riadattati dal nostro modello dati interno. Questi campi non hanno un
- *    prefisso "gs1:" perché non fanno parte del GS1 Web Vocabulary: sono un vocabolario
- *    CEN/CENELEC a sé, qui esposto senza namespace dedicato (lo standard stesso non ne definisce
- *    uno per JSON-LD) ma con i nomi letterali della tabella normativa.
+ *    quelli della tabella normativa. I VALORI di granularity/dppStatus/dppSchemaVersion seguono
+ *    invece la convenzione di openepcis/openepcis-dpp-ready (Apache-2.0), non quella del
+ *    documento sintesi originale — vedi il commento su toStandardGranularity()/
+ *    toStandardDppStatus() più sotto e la Nota di implementazione in
+ *    docs/dpp-api-specification.md per il perché. Questi campi non hanno un prefisso "gs1:"
+ *    perché non fanno parte del GS1 Web Vocabulary: sono un vocabolario CEN/CENELEC a sé, qui
+ *    esposto senza namespace dedicato (lo standard stesso non ne definisce uno per JSON-LD) ma
+ *    con i nomi letterali della tabella normativa.
  */
 export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, unknown> {
   const id = digitalLinkUrl(siteUrl, record.gtin);
@@ -111,9 +121,10 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     name: record.name,
     gtin: record.gtin,
     granularity: toStandardGranularity(record.granularityLevel),
-    // "<norma>:v<major>.<minor>" — non l'anno della norma: quello identifica QUALE versione di
-    // EN 18223 si applica (2026), questo identifica la versione DELLO SCHEMA JSON qui prodotto.
-    dppSchemaVersion: 'EN18223:v1.0',
+    // "EN 18223:2026" — formato openepcis/openepcis-dpp-ready (norma + anno), non
+    // "EN18223:v1.0" (norma + v-major.minor) del documento sintesi originale: stessa scelta di
+    // toStandardGranularity()/toStandardDppStatus() sopra, stesso motivo.
+    dppSchemaVersion: 'EN 18223:2026',
     dppStatus: toStandardDppStatus(record.status),
     lastUpdated: record.updatedAt,
     // Compilati dall'utente nel form admin (colonne economic_operator_id/facility_id, vedi
