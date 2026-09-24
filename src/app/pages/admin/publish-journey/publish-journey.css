@@ -242,6 +242,24 @@
   margin-top: 24px;
 }
 
+.journey-cancel-row {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.journey-cancel-hint {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.journey-cancel-row .journey-dismiss {
+  width: 100%;
+  margin-top: 0;
+}
+
 @keyframes journey-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }

@@ -141,6 +141,17 @@ export class PublishJourneyComponent {
   private staged = signal(0);
   private timers: ReturnType<typeof setTimeout>[] = [];
 
+  /** true 20s dopo l'apertura del percorso se `phase` è ancora 'running' — indipendente da
+   * `_longWait` (che segue i tentativi automatici e può scattare molto più tardi: con i timeout
+   * lato server/client aggiunti in mockRegistryClient.ts/registry-api.service.ts, un primo
+   * tentativo davvero bloccato può restare "in corso" fino a 90-150s prima di produrre anche
+   * solo il primo errore che fa scattare un retry). Questo timer parte da solo all'apertura,
+   * niente a che vedere con quanti tentativi sono già avvenuti: garantisce che l'utente abbia
+   * comunque un modo di uscire entro un tempo breve e prevedibile, qualunque cosa stia
+   * succedendo sotto. */
+  private _canCancel = signal(false);
+  protected canCancel = computed(() => this._canCancel());
+
   constructor() {
     effect(() => {
       const isOpen = this._open();
@@ -148,14 +159,17 @@ export class PublishJourneyComponent {
       this.clearTimers();
       if (!isOpen || phase !== 'running') {
         this.staged.set(phase === 'running' ? 0 : STEPS.length - 1);
+        this._canCancel.set(false);
         return;
       }
       this.staged.set(0);
+      this._canCancel.set(false);
       this.technicalOpen.set({});
       this.timers.push(setTimeout(() => this.staged.set(1), 350));
       this.timers.push(setTimeout(() => this.staged.set(2), 1100));
       // Il passo 3 (registrazione confermata) lo sblocca solo l'arrivo vero della risposta
       // (vedi stepStatus): qui l'animazione coreografata si ferma di proposito.
+      this.timers.push(setTimeout(() => this._canCancel.set(true), 20_000));
     });
   }
 
@@ -175,16 +189,27 @@ export class PublishJourneyComponent {
     return 'pending';
   }
 
+  /** Chiudibile sempre, tranne nei primi 20s di un tentativo genuinamente "in corso" — lì la
+   * chiusura è bloccata apposta per non far pensare a un annullamento che questa UI non fa
+   * davvero (la richiesta prosegue comunque in background). Oltre i 20s (vedi `canCancel` sopra)
+   * l'attesa non è più "normale": l'utente deve poter uscire anche senza un esito, invece di
+   * restare bloccato per sempre se una chiamata esterna non risponde mai (vedi i timeout
+   * aggiunti in mockRegistryClient.ts/registry-api.service.ts — dovrebbero già evitarlo, questa
+   * è la rete di sicurezza in più). */
+  private canClose(): boolean {
+    return this._phase() !== 'running' || this._canCancel();
+  }
+
   close(): void {
-    this.closed.emit();
+    if (this.canClose()) this.closed.emit();
   }
 
   onBackdropClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget && this._phase() !== 'running') this.close();
+    if (event.target === event.currentTarget) this.close();
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.isOpen() && this._phase() !== 'running') this.close();
+    if (this.isOpen()) this.close();
   }
 }

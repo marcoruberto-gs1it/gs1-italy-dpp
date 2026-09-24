@@ -113,6 +113,17 @@ dppRouter.post('/:id/publish', async (req, res) => {
       res.status(503).json({ error: 'Il servizio sta impiegando più tempo del solito.', retryable: true });
       return;
     }
-    res.status(502).json({ error: err instanceof Error ? err.message : 'errore sconosciuto durante la pubblicazione' });
+    // 422, non 502: quel codice qui significherebbe "mock-eu-registry ha rifiutato questa
+    // registrazione per un motivo concreto" (es. il liveURL non è raggiungibile, lo schema del
+    // payload non torna...), non "il servizio sta dormendo". 502 è ESATTAMENTE lo status che
+    // isColdStartError() (registry-api.service.ts, lato client) tratta come sintomo di
+    // risveglio a freddo e riprova da sola in silenzio, con ritardi crescenti fino a ~55s totali
+    // (COLD_START_RETRY_DELAYS_MS) — usarlo anche qui faceva ripetere 6 volte una richiesta
+    // destinata a fallire sempre allo stesso modo, PRIMA che admin.ts vedesse anche solo il
+    // primo errore: da fuori sembrava che "si bloccasse" su "Verifica del Digital Link" per un
+    // minuto buono, quando in realtà stava fallendo (bene, con un messaggio chiaro) al primo
+    // tentativo, in meno di un secondo — verificato dal vivo con una chiamata diretta a
+    // registerDpp() (891ms) contro la stessa richiesta che nell'interfaccia sembrava sospesa.
+    res.status(422).json({ error: err instanceof Error ? err.message : 'errore sconosciuto durante la pubblicazione' });
   }
 });

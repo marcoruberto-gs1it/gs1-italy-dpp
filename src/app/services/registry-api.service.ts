@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, retry, timer } from 'rxjs';
+import { Observable, retry, timeout, timer, TimeoutError } from 'rxjs';
 
 export type GranularityLevel = 'MODEL' | 'BATCH' | 'ITEM';
 export type DppStatus = 'draft' | 'published';
@@ -54,10 +54,23 @@ const BASE = '/registry-api';
  * l'utente deve riflettere ad ogni salvataggio. */
 const COLD_START_RETRY_DELAYS_MS = [1000, 3000, 6000, 10000, 15000, 20000];
 
+/** Solo per publish(): quella chiamata può legittimamente restare in sospeso più a lungo delle
+ * altre (registry-api al suo interno aspetta Auth0 + mock-eu-registry, che a sua volta scarica
+ * il nostro liveURL — un risveglio a freddo doppio, vedi mockRegistryClient.ts). Con i timeout
+ * lato server aggiunti lì (90s per la registrazione) una risposta arriva sempre entro quel
+ * tempo, in un modo o nell'altro; questo timeout lato client è solo una rete di sicurezza in
+ * più, nel caso si blocchi la connessione stessa tra browser e server invece che una delle
+ * chiamate esterne. Prima non c'era ALCUN limite qui: una connessione rimasta sospesa lasciava
+ * l'animazione "Verifica del Digital Link" ferma per sempre, senza che scattasse mai il retry
+ * sotto (che ha bisogno di un errore vero per attivarsi). */
+const PUBLISH_HTTP_TIMEOUT_MS = 150_000;
+
 function isColdStartError(error: unknown): boolean {
   // status 0 = la richiesta non ha nemmeno raggiunto un server (connessione rifiutata/TLS
   // fallito) — lo stesso sintomo di un container che non sta ancora ascoltando sulla porta.
-  return error instanceof HttpErrorResponse && (error.status === 0 || error.status === 502 || error.status === 503 || error.status === 504);
+  // TimeoutError: solo publish() lo può generare (vedi PUBLISH_HTTP_TIMEOUT_MS) — stesso
+  // trattamento, "il servizio è lento a rispondere", non un errore applicativo.
+  return (error instanceof HttpErrorResponse && (error.status === 0 || error.status === 502 || error.status === 503 || error.status === 504)) || error instanceof TimeoutError;
 }
 
 /** Client verso registry-api — usato solo dalla sezione admin (RenderMode.Client). */
@@ -106,7 +119,9 @@ export class RegistryApiService {
   }
 
   publish(id: string): Observable<DppRecord & { technical?: PublishTechnicalTrace }> {
-    return this.withColdStartRetry(this.http.post<DppRecord & { technical?: PublishTechnicalTrace }>(`${BASE}/dpp/${id}/publish`, {}, { withCredentials: true }));
+    return this.withColdStartRetry(
+      this.http.post<DppRecord & { technical?: PublishTechnicalTrace }>(`${BASE}/dpp/${id}/publish`, {}, { withCredentials: true }).pipe(timeout(PUBLISH_HTTP_TIMEOUT_MS))
+    );
   }
 
   /** Lettura pubblica (nessun cookie, nessuna password) usata dalla pagina prodotto `/01/:gtin`

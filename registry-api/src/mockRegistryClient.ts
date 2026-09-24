@@ -68,6 +68,27 @@ class RegistryNotConfiguredError extends Error {
  * dire al frontend "riprova da solo", invece di mostrare un errore tecnico all'utente. */
 export class TransientRegistryError extends Error {}
 
+/** Nessuna delle tre chiamate esterne qui sotto (Auth0, registrazione, proof) aveva mai un
+ * limite di tempo: se un servizio accettava la connessione TCP ma non rispondeva mai (non un
+ * 502/503/504 — quello è già gestito — ma un silenzio totale), la Promise restava sospesa per
+ * sempre. Da qui il pubblicazione "che si blocca": l'animazione in admin resta ferma sul passo
+ * "Verifica del Digital Link" perché sta davvero aspettando una risposta che non arriverà mai, e
+ * senza un errore non scatta nemmeno il retry automatico lato client (admin.ts). AbortSignal.timeout
+ * trasforma quel silenzio in un errore concreto entro un tempo massimo — 90s per la
+ * registrazione vera e propria (deve tollerare un risveglio a freddo doppio: sia mock-eu-registry
+ * sia, dentro la sua stessa richiesta, il nostro sito che scarica per calcolare l'hash), meno per
+ * le chiamate che non hanno lo stesso motivo di essere lente. */
+const AUTH0_TIMEOUT_MS = 20_000;
+const REGISTER_TIMEOUT_MS = 90_000;
+const PROOF_TIMEOUT_MS = 15_000;
+
+/** Un timeout scaduto (AbortSignal.timeout) rifiuta con una DOMException 'TimeoutError' —
+ * un'interruzione manuale (AbortController.abort() senza motivo) darebbe invece 'AbortError'.
+ * Qui trattiamo entrambe come "il servizio non ha risposto in tempo", non un errore applicativo. */
+function isAbortOrTimeout(err: unknown): boolean {
+  return err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError');
+}
+
 /** Codice merceologico (HS/TARIC, 4-10 cifre — obbligatorio nello schema di mock-eu-registry,
  * che rifiuta stringhe libere) plausibile per settore. Solo per la demo: non è una
  * classificazione doganale verificata prodotto per prodotto. */
@@ -100,16 +121,23 @@ function requiredConfig() {
  * il volume atteso (pubblicazioni manuali dall'admin) non giustifica la complessità di una
  * cache con scadenza. */
 async function fetchAccessToken(config: ReturnType<typeof requiredConfig>): Promise<string> {
-  const response = await fetch(`https://${config.auth0Domain}/oauth/token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grant_type: 'client_credentials',
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      audience: config.audience,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`https://${config.auth0Domain}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'client_credentials',
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        audience: config.audience,
+      }),
+      signal: AbortSignal.timeout(AUTH0_TIMEOUT_MS),
+    });
+  } catch (err) {
+    if (isAbortOrTimeout(err)) throw new TransientRegistryError(`Auth0 non ha risposto entro ${AUTH0_TIMEOUT_MS / 1000}s.`);
+    throw err;
+  }
   if (!response.ok) {
     throw new Error(`Auth0 non ha rilasciato un token (${response.status}): ${await response.text()}`);
   }
@@ -213,14 +241,23 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     ...granularityFields(siteUrl, record),
   };
 
-  const registerResponse = await fetch(`${config.registryUrl}/metadata/v1`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(requestBody),
-  });
+  let registerResponse: Response;
+  try {
+    registerResponse = await fetch(`${config.registryUrl}/metadata/v1`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(REGISTER_TIMEOUT_MS),
+    });
+  } catch (err) {
+    if (isAbortOrTimeout(err)) {
+      throw new TransientRegistryError(`mock-eu-registry non ha risposto entro ${REGISTER_TIMEOUT_MS / 1000}s.`);
+    }
+    throw err;
+  }
   if (!registerResponse.ok) {
     if ([502, 503, 504].includes(registerResponse.status)) {
       throw new TransientRegistryError(await registerResponse.text());
@@ -246,6 +283,7 @@ async function tryFetchProof(config: ReturnType<typeof requiredConfig>, token: s
   try {
     const proofResponse = await fetch(`${config.registryUrl}/metadata/v1/${registryId}/proof`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(PROOF_TIMEOUT_MS),
     });
     if (!proofResponse.ok) {
       console.warn(`mock-eu-registry: proof non disponibile per ${registryId} (${proofResponse.status})`);
