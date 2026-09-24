@@ -1,13 +1,10 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, PLATFORM_ID, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { gsap } from 'gsap';
+import { Component, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
-import { QRCodeComponent } from 'angularx-qrcode';
-import { Select } from '@openng/optimus-ui/select';
 import { IconComponent, IconName } from '../../components/icon/icon';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
@@ -21,7 +18,7 @@ import { buildDigitalLinkUpi, parseDigitalLink } from '../../utils/gs1-digital-l
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
-type View = 'checking' | 'login' | 'list' | 'create-choice' | 'form' | 'wizard';
+type View = 'checking' | 'login' | 'list' | 'wizard';
 
 export type ToastSeverity = 'error' | 'warning';
 
@@ -43,7 +40,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, QRCodeComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent, Select],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -59,13 +56,6 @@ export class Admin {
   protected isBrowser = isPlatformBrowser(this.platformId);
 
   protected sectors = SECTORS;
-  /** Esposti così com'è (funzioni importate, non wrapper) per poterli chiamare anche dal
-   * template — vedi la sezione "Campi assegnati automaticamente" in admin.html, che deve
-   * mostrare lo stesso valore/formato che finisce davvero nel JSON-LD (previewJsonLd usa le
-   * stesse funzioni), non un secondo calcolo ad hoc che potrebbe disallinearsi. */
-  protected toStandardGranularity = toStandardGranularity;
-  protected toStandardDppStatus = toStandardDppStatus;
-  protected dppSchemaVersion = DPP_SCHEMA_VERSION;
 
   protected view = signal<View>('checking');
   protected records = signal<DppRecord[]>([]);
@@ -127,12 +117,6 @@ export class Admin {
    * Observable (valueChanges), qui ponte verso i signal usati dal resto del componente
    * (anteprima infografica, QR code, settore corrente). */
   protected formValue = toSignal(this.dppForm.valueChanges, { initialValue: this.dppForm.getRawValue() });
-
-  /** Riferimenti ai blocchi dell'anteprima passaporto che si "illuminano" per un istante quando
-   * il valore che rappresentano cambia (vedi l'effect nel costruttore) — puro feedback visivo,
-   * il valore mostrato viene già, a prescindere, dai signal/computed qui sopra. */
-  private passportIdentityEl = viewChild<ElementRef<HTMLElement>>('passportIdentity');
-  private passportFactsEl = viewChild<ElementRef<HTMLElement>>('passportFacts');
 
   /** Un solo toast alla volta, con severità: 'error' per problemi bloccanti (campo non valido,
    * salvataggio/pubblicazione falliti), 'warning' per avvisi non bloccanti (es. un attributo con
@@ -370,32 +354,6 @@ export class Admin {
       onCleanup(() => clearTimeout(timer));
     });
 
-    // Anteprima passaporto "viva": un breve richiamo visivo (flash del colore di sfondo, non
-    // un ridisegno) sui blocchi identità/attributi quando il loro valore cambia davvero —
-    // mai al primo render (prevKey vuota) e mai sotto prefers-reduced-motion, stesso
-    // trattamento di ScrollRevealDirective (directives/scroll-reveal.ts).
-    let prevIdentityKey: string | null = null;
-    let prevFactsKey: string | null = null;
-    effect(() => {
-      const f = this.formValue();
-      const identity = this.derivedIdentity();
-      const identityKey = `${identity.gtin}|${identity.granularityLevel}|${identity.batchOrSerial}`;
-      const factsKey = JSON.stringify(f.attributes);
-      if (!this.isBrowser || (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
-        prevIdentityKey = identityKey;
-        prevFactsKey = factsKey;
-        return;
-      }
-      const flashColor = getComputedStyle(document.documentElement).getPropertyValue('--brand-soft').trim();
-      const pulse = (el: HTMLElement | undefined) => {
-        if (!el) return;
-        gsap.fromTo(el, { backgroundColor: flashColor }, { backgroundColor: 'transparent', duration: 0.7, ease: 'power1.out' });
-      };
-      if (prevIdentityKey !== null && identityKey !== prevIdentityKey) pulse(this.passportIdentityEl()?.nativeElement);
-      if (prevFactsKey !== null && factsKey !== prevFactsKey) pulse(this.passportFactsEl()?.nativeElement);
-      prevIdentityKey = identityKey;
-      prevFactsKey = factsKey;
-    });
   }
 
   /** Ricarica l'elenco (`records`) e lo restituisce come Observable, senza toccare `view` —
@@ -468,9 +426,9 @@ export class Admin {
     this.journeyTechnical.set(null);
   }
 
-  /** "Crea DPP" non apre più il form direttamente: prima chiede quale modalità di
-   * compilazione usare (vedi 'create-choice' in admin.html) — Wizard guidato o form a pagina
-   * singola, sugli stessi identici campi di dppForm, nessuna duplicazione di dati. */
+  /** Unica modalità di compilazione (il form a pagina singola e la schermata di scelta
+   * 'create-choice' sono stati rimossi su richiesta esplicita): "Crea DPP" apre direttamente
+   * il Wizard guidato. */
   protected startCreate(): void {
     this.editingId.set(null);
     this.dppForm.reset({
@@ -486,21 +444,7 @@ export class Admin {
     this.attributesArray.clear();
     this.toast.set(null);
     this.resetJourney();
-    this.view.set('create-choice');
-  }
-
-  protected chooseWizard(): void {
     this.view.set('wizard');
-  }
-
-  protected chooseSinglePageForm(): void {
-    this.view.set('form');
-  }
-
-  /** Passa dal Wizard alla vista completa senza perdere nulla: stesso dppForm, cambia solo
-   * quale template lo mostra. */
-  protected switchToSinglePageForm(): void {
-    this.view.set('form');
   }
 
   protected startEdit(record: DppRecord): void {
@@ -525,7 +469,7 @@ export class Admin {
     }
     this.toast.set(null);
     this.resetJourney();
-    this.view.set('form');
+    this.view.set('wizard');
   }
 
   protected cancelForm(): void {
@@ -638,7 +582,7 @@ export class Admin {
       next: (record) => {
         this.savePending.set(false);
         this.editingId.set(record.id);
-        this.view.set('form');
+        this.view.set('wizard');
         this.loadRecords().subscribe();
       },
       error: (err: HttpErrorResponse) => {

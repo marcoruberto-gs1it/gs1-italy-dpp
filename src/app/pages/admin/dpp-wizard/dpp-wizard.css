@@ -3,11 +3,36 @@
   margin: 0 auto;
 }
 
+/* Stessa scelta monocroma del resto della sezione admin (vedi admin.css) — qui ripetuta perché
+   l'incapsulamento dei componenti Angular impedisce alla regola scoped di admin.css di
+   raggiungere i bottoni renderizzati dal template DI QUESTO componente, anche se entrambi
+   vivono dentro .admin-container nel DOM finale. Il Wizard è ora l'unica modalità di
+   compilazione: deve avere lo stesso linguaggio visivo, non quello blu istituzionale di
+   default. */
+.wizard .gs-btn--primary {
+  background: var(--text-primary);
+  color: var(--bg-surface);
+  box-shadow: none;
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
+}
+
+.wizard .gs-btn--primary:hover:not(:disabled) {
+  opacity: 0.82;
+}
+
+.wizard .gs-btn--ghost {
+  background: transparent;
+}
+
+.wizard .gs-btn--ghost:hover:not(:disabled) {
+  background: var(--bg-surface-sunken);
+}
+
 /* --- Indicatore di avanzamento --- */
 .wizard-progress {
   display: flex;
   list-style: none;
-  margin: 0 0 28px;
+  margin: 0 0 20px;
   padding: 0;
   counter-reset: step;
 }
@@ -83,12 +108,6 @@
   100% { transform: scale(1); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .wizard-progress-item.is-done .wizard-progress-dot {
-    animation: none;
-  }
-}
-
 .wizard-progress-label {
   font-size: 0.74rem;
   font-weight: 600;
@@ -99,9 +118,28 @@
   color: var(--text-primary);
 }
 
+/* --- Azioni di navigazione: in cima, non in fondo — su richiesta esplicita, così restano
+   raggiungibili senza scorrere qualunque sia l'altezza del passo corrente. */
+.wizard-actions--top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.wizard-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 /* --- Pannello del passo corrente --- */
 .wizard-panel {
   padding: 32px;
+  overflow: hidden;
 }
 
 .wizard-step h2 {
@@ -129,6 +167,34 @@
 
 .wizard-step label:first-of-type {
   margin-top: 0;
+}
+
+/* --- Scorrimento orizzontale tra un passo e l'altro: sinistra↔destra, mai dall'alto in basso
+   (su richiesta esplicita) — la direzione la decide slideDirection() in dpp-wizard.ts. */
+.wizard-step.slide-forward {
+  animation: wizard-slide-from-right 0.32s var(--ease-out);
+}
+
+.wizard-step.slide-back {
+  animation: wizard-slide-from-left 0.32s var(--ease-out);
+}
+
+@keyframes wizard-slide-from-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes wizard-slide-from-left {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-progress-item.is-done .wizard-progress-dot,
+  .wizard-step.slide-forward,
+  .wizard-step.slide-back {
+    animation: none;
+  }
 }
 
 /* Riga label + link "Usa demo" per un singolo campo — stesso pattern di admin.css
@@ -203,6 +269,23 @@
   background: var(--bg-surface-sunken);
   padding: 1px 5px;
   border-radius: 4px;
+}
+
+/* Link inline verso lo standard GS1 citato in un field-hint — stesso ruolo dei "reference-chip"
+   della home ma in scala di testo, per stare dentro una riga di spiegazione. Duplicato di
+   admin.css (stesso motivo dei .gs-btn override in cima al file: incapsulamento per componente). */
+.field-standard-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.field-standard-link:hover {
+  text-decoration: underline;
 }
 
 /* --- Passo Settore --- */
@@ -312,6 +395,35 @@
   margin-bottom: 14px;
 }
 
+.wizard-summary-head-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wizard-summary-qr {
+  flex-shrink: 0;
+}
+
+.wizard-summary-qr svg {
+  display: block;
+  border-radius: var(--radius-sm);
+}
+
+.wizard-summary-qr-fallback {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+}
+
+.wizard-summary-jsonld-btn {
+  margin-top: 14px;
+}
+
 .wizard-summary-icon {
   width: 46px;
   height: 46px;
@@ -360,36 +472,284 @@
   gap: 8px;
 }
 
-.wizard-save-btn {
+/* Campi che il sistema assegna da solo (digitalProductPassportId, dppSchemaVersion…) — mostrati
+   come definizione, non come input: niente bordo/sfondo da campo editabile, solo etichetta +
+   valore + una nota, per restare visivamente distinti dai campi che invece si compilano
+   davvero. Duplicato di admin.css (stesso motivo dei .gs-btn override in cima al file). */
+.wizard-auto-fields-head {
+  margin: 28px 0 14px;
+}
+
+.auto-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.auto-fields dt {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0 0 3px;
+}
+
+.auto-fields dd {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.auto-fields dd code {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  background: var(--bg-surface-sunken);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.auto-field-note {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* --- Stepper dei tre momenti del percorso (salva → conferma e invia → conferma di
+   registrazione) — vedi PublishJourneyComponent per il dettaglio passo-passo del momento 2.
+   Duplicato di admin.css (stesso motivo dei .gs-btn override in cima al file). */
+.phase-stepper {
+  display: flex;
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+}
+
+.phase-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.phase-step:last-child {
+  flex: 0 0 auto;
+}
+
+.phase-step-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.phase-dot {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface-sunken);
+  color: var(--text-tertiary);
+  border: 2px solid var(--border-subtle);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.phase-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.phase-connector {
+  flex: 1;
+  height: 2px;
+  margin: 0 14px;
+  min-width: 24px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.phase-connector-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--text-primary);
+  transition: width 0.5s var(--ease-out);
+}
+
+.phase-step.is-done .phase-dot {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--bg-surface);
+  animation: phase-dot-pop 0.4s var(--ease-spring);
+}
+
+.phase-step.is-done .phase-label {
+  color: var(--text-primary);
+}
+
+.phase-step.is-done .phase-connector-fill {
   width: 100%;
 }
 
-/* --- Navigazione --- */
-.wizard-actions {
+.phase-step.is-current .phase-dot {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  animation: phase-pulse 1.6s ease-in-out infinite;
+}
+
+.phase-step.is-current .phase-label {
+  color: var(--text-primary);
+}
+
+@keyframes phase-dot-pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes phase-pulse {
+  0% { box-shadow: 0 0 0 0 var(--accent-soft); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phase-step.is-done .phase-dot,
+  .phase-step.is-current .phase-dot {
+    animation: none;
+  }
+}
+
+.wizard-save-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wizard-save-btn {
+  flex: 1;
+  min-width: 220px;
+}
+
+.publish-result {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-top: 28px;
-  padding-top: 20px;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.publish-result strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.publish-result span {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.publish-result code {
+  font-family: var(--font-mono);
+}
+
+/* --- Riepilogo di conferma prima dell'invio al Registro UE: un momento distinto, non
+   automatico, tra "Pubblica" e il vero avvio della richiesta — così il secondo momento del
+   percorso ("conferma e invia") è un'azione deliberata, non solo un'etichetta sullo stepper
+   sopra. Duplicato di admin.css (stesso motivo dei .gs-btn override in cima al file). */
+.publish-confirm {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+  animation: publish-confirm-in 0.3s var(--ease-out);
+}
+
+@keyframes publish-confirm-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.publish-confirm-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.publish-confirm-head app-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.publish-confirm-head h3 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.publish-confirm-head p {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.publish-confirm-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 16px;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
   border-top: 1px solid var(--border-subtle);
 }
 
-.wizard-actions-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.publish-confirm-facts dt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 2px;
 }
 
-.wizard-switch-link {
-  appearance: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-tertiary);
+.publish-confirm-facts dd {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  word-break: break-word;
+}
+
+.publish-confirm-facts code {
+  font-family: var(--font-mono);
+  font-weight: 500;
   font-size: 0.82rem;
-  text-decoration: underline;
-  padding: 0;
+}
+
+.publish-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
 }
 
 @media (max-width: 640px) {
@@ -403,5 +763,47 @@
 
   .wizard-progress-label {
     display: none;
+  }
+
+  .wizard-actions--top {
+    flex-wrap: wrap;
+  }
+
+  .phase-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .phase-step {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .phase-connector {
+    width: 2px;
+    height: 18px;
+    margin: 2px 0 2px 13px;
+  }
+
+  .phase-connector-fill {
+    width: 100%;
+    height: 0%;
+    transition: height 0.5s var(--ease-out);
+  }
+
+  .phase-step.is-done .phase-connector-fill {
+    height: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .publish-confirm-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-save-btn {
+    min-width: 0;
   }
 }
