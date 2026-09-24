@@ -45,10 +45,6 @@ function toStandardDppStatus(status: DppRecord['status']): 'Active' | 'Inactive'
   return status === 'published' ? 'Active' : 'Inactive';
 }
 
-/** Identificativo demo dello stabilimento produttivo — stesso valore inviato come
- * "facilitiesId" al DPP Registry UE (vedi mockRegistryClient.ts). */
-const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
-
 /** "contentSpecificationIds" (EN 18223 §4.1.2.1, Table 1): riferimenti all'atto delegato o alla
  * specifica di contenuto applicabile, come identificativo macchina — non un URL, non testo
  * libero. Derivato da Sector.contentSpecificationId (src/app/data/sectors.ts, duplicato qui
@@ -120,10 +116,11 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     dppSchemaVersion: 'EN18223:v1.0',
     dppStatus: toStandardDppStatus(record.status),
     lastUpdated: record.updatedAt,
-    // Identificativo demo dell'operatore economico — stesso valore inviato come "reoId" al DPP
-    // Registry UE (vedi mockRegistryClient.ts): non abbiamo ancora un modello multi-tenant reale.
-    economicOperatorId: 'gs1-italy-dpp-demo',
-    facilityId: DEMO_FACILITY_ID,
+    // Compilati dall'utente nel form admin (colonne economic_operator_id/facility_id, vedi
+    // db.ts) — non più una costante fissa: due schede diverse possono avere un GLN diverso.
+    // Stesso valore inviato come "reoId"/"facilitiesId" al DPP Registry UE, vedi mockRegistryClient.ts.
+    economicOperatorId: record.economicOperatorId,
+    facilityId: record.facilityId,
     contentSpecificationIds: [CONTENT_SPECIFICATION_IDS[record.sectorId]],
   };
 

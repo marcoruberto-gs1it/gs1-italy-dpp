@@ -259,6 +259,10 @@
                 Popola con dati demo
               </button>
             </div>
+            <p class="field-hint">
+              Non è un campo dello schema standard: determina <code>contentSpecificationIds</code> (EN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — il
+              riferimento all'atto delegato ESPR/regolamento di settore applicabile, dedotto qui invece di essere un campo libero.
+            </p>
 
             <div class="field-label-row">
               <label for="f-name">Nome prodotto</label>
@@ -268,7 +272,7 @@
             @if (fieldError('name'); as msg) {
               <p class="field-hint field-hint--error">{{ msg }}</p>
             } @else {
-              <p class="field-hint">Il nome che comparirà nel DPP pubblico e nel DPP Registry UE.</p>
+              <p class="field-hint">Il nome che comparirà nel DPP pubblico e nel DPP Registry UE — diventa il campo <code>name</code> (<code>schema:name</code>) del JSON-LD.</p>
             }
 
             <div class="field-label-row">
@@ -296,6 +300,55 @@
             } @else {
               <p class="field-hint">Incolla l'URI GS1 Digital Link completo del prodotto — GTIN e livello (modello, lotto o articolo) si deducono da soli dalla sintassi del link, verificati con il GS1 Barcode Syntax Engine.</p>
             }
+            <p class="field-hint">
+              Diventa <code>uniqueProductIdentifier</code> (EN&nbsp;18219 §3.1.25 · EN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — deve essere un URI GS1
+              Digital Link secondo lo standard:
+              <a class="field-standard-link" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
+                GS1 Digital Link <app-icon name="external-link" [size]="11"></app-icon>
+              </a>
+              — il GTIN al suo interno segue lo standard
+              <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gtin/" target="_blank" rel="noopener noreferrer">
+                GTIN <app-icon name="external-link" [size]="11"></app-icon>
+              </a>.
+            </p>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-eyebrow">Identificativi dell'operatore economico</span>
+            </div>
+
+            <div class="field-label-row">
+              <label for="f-eo">EO — Economic Operator (UOI)</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('economicOperatorId')">Usa demo</button>
+            </div>
+            <input id="f-eo" type="text" formControlName="economicOperatorId" placeholder="urn:gs1:gln:8012345000008" [class.field-invalid]="fieldError('economicOperatorId')" />
+            @if (fieldError('economicOperatorId'); as msg) {
+              <p class="field-hint field-hint--error">{{ msg }}</p>
+            } @else {
+              <p class="field-hint">
+                Campo <code>economicOperatorId</code>, <strong>obbligatorio</strong> (EN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — identifica chi mette il
+                prodotto sul mercato, conforme a EN&nbsp;18219: nella pratica GS1 è un
+                <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gln/" target="_blank" rel="noopener noreferrer">
+                  GLN <app-icon name="external-link" [size]="11"></app-icon>
+                </a>
+                (Global Location Number). Inviato al DPP Registry UE come <code>reoId</code>.
+              </p>
+            }
+
+            <div class="field-label-row">
+              <label for="f-facility">Facility — Stabilimento (UFI)</label>
+              <button type="button" class="field-demo-link" (click)="demoFillField('facilityId')">Usa demo</button>
+            </div>
+            <input id="f-facility" type="text" formControlName="facilityId" placeholder="urn:gs1:gln:8012345000015" />
+            <p class="field-hint">
+              Campo <code>facilityId</code>, facoltativo per lo standard (EN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — lo stabilimento produttivo, anche
+              questo tipicamente un
+              <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gln/" target="_blank" rel="noopener noreferrer">
+                GLN <app-icon name="external-link" [size]="11"></app-icon>
+              </a>
+              GS1. Inviato al DPP Registry UE come <code>facilitiesId</code>.
+            </p>
           </div>
 
           <div class="form-section" formArrayName="attributes">
@@ -306,7 +359,14 @@
               <span>Attributi</span>
               <button type="button" class="attr-add" (click)="addAttributeRow()">+ Aggiungi</button>
             </div>
-            <p class="field-hint">Dati liberi specifici del settore (es. composizione, impronta di carbonio) — diventano proprietà <code>schema:additionalProperty</code> nel JSON-LD del DPP pubblico.</p>
+            <p class="field-hint">
+              Dati liberi specifici del settore (es. composizione, impronta di carbonio) — non hanno un campo o un vocabolario GS1 dedicato:
+              diventano proprietà <code>schema:additionalProperty</code>/<code>PropertyValue</code>, il meccanismo che
+              <a class="field-standard-link" href="https://schema.org/PropertyValue" target="_blank" rel="noopener noreferrer">
+                schema.org <app-icon name="external-link" [size]="11"></app-icon>
+              </a>
+              prevede apposta per dati arbitrari, nel JSON-LD del DPP pubblico.
+            </p>
             @if (attributesArray.controls.length === 0) {
               <button type="button" class="field-demo-link" (click)="fillDemoAttributes()">Usa attributi demo per questo settore</button>
             }
@@ -317,6 +377,60 @@
                 <button type="button" class="attr-remove" (click)="removeAttributeRow($index)" aria-label="Rimuovi attributo">✕</button>
               </div>
             }
+          </div>
+
+          <!-- Campi dello schema §6.1 che il sistema assegna da solo — mostrati (non compilabili:
+               editarli romperebbe la dichiarazione di conformità o un vincolo che lo standard
+               stesso pone) così il form fa vedere DAVVERO tutto il JSON, non solo la parte
+               editabile. -->
+          <div class="form-section">
+            <div class="form-section-head">
+              <span class="form-section-eyebrow">Campi assegnati automaticamente (EN 18223 §4.1.2.1, Table 1)</span>
+            </div>
+            <dl class="auto-fields">
+              <div>
+                <dt>digitalProductPassportId</dt>
+                <dd>
+                  <code>{{ editingId() ? 'urn:uuid:' + editingId() : 'assegnato al primo salvataggio' }}</code>
+                  <span class="auto-field-note">Identificativo dell'istanza del passaporto (URN, RFC 4122) — distinto da UPI/GTIN, che identificano il prodotto.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>granularity</dt>
+                <dd>
+                  <code>{{ dppForm.controls.granularityLevel.value }}</code>
+                  <span class="auto-field-note">Dedotta dalla sintassi dell'UPI sopra (Model/Batch/Item) — non un campo separato da compilare.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>dppSchemaVersion</dt>
+                <dd>
+                  <code>EN18223:v1.0</code>
+                  <span class="auto-field-note">Versione dello schema JSON qui implementato — fissa per questo sito: cambiarla a mano ne comprometterebbe la dichiarazione di conformità.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>dppStatus</dt>
+                <dd>
+                  <code>{{ publishedRecord() ? 'Active' : 'Inactive' }}</code>
+                  <span class="auto-field-note">Rispecchia lo stato bozza/registrato (vedi lo stepper sopra) — lo standard lo vincola a un'enumerazione (Active/Inactive/Archived/Invalid), qui i due soli valori che questo sito rappresenta davvero.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>lastUpdated</dt>
+                <dd>
+                  <code>ISO 8601, UTC</code>
+                  <span class="auto-field-note">Impostato automaticamente a ogni salvataggio.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>contentSpecificationIds</dt>
+                <dd>
+                  <code>{{ currentSector().contentSpecificationId }}</code>
+                  <span class="auto-field-note">Dedotto dal Settore scelto sopra — riferimento all'atto delegato/regolamento applicabile, non testo libero.</span>
+                </dd>
+              </div>
+            </dl>
           </div>
 
           <div class="form-actions">
@@ -360,11 +474,11 @@
                 </div>
                 <div>
                   <dt>EO (UOI)</dt>
-                  <dd><code>{{ demoEoId }}</code></dd>
+                  <dd><code>{{ dppForm.controls.economicOperatorId.value || '—' }}</code></dd>
                 </div>
                 <div>
                   <dt>Facility (UFI)</dt>
-                  <dd><code>{{ demoFacilityId }}</code></dd>
+                  <dd><code>{{ dppForm.controls.facilityId.value || '—' }}</code></dd>
                 </div>
               </dl>
               <div class="publish-confirm-actions">

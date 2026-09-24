@@ -24,6 +24,15 @@ function validateInput(body: unknown): string | null {
       if (typeof value !== 'string') return 'ogni valore di attributes deve essere una stringa';
     }
   }
+  // economicOperatorId/facilityId (EN 18223 §4.1.2.1 Table 1): opzionali qui (db.ts ha un
+  // default demo se omessi, vedi createDpp) — validati solo se presenti, non richiesti, per non
+  // rompere un client che non li manda ancora.
+  if (b.economicOperatorId !== undefined && (typeof b.economicOperatorId !== 'string' || !b.economicOperatorId.trim())) {
+    return 'economicOperatorId, se presente, deve essere una stringa non vuota';
+  }
+  if (b.facilityId !== undefined && (typeof b.facilityId !== 'string' || !b.facilityId.trim())) {
+    return 'facilityId, se presente, deve essere una stringa non vuota';
+  }
   return null;
 }
 

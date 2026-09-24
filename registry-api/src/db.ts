@@ -20,6 +20,16 @@ export interface DppRecord {
   registryId: string | null;
   proofJwt: string | null;
   registeredAt: string | null;
+  /** EN 18223 §4.1.2.1 (Table 1, "economicOperatorId") — campo OBBLIGATORIO dello schema,
+   * prima hardcoded a una costante demo: compilato dall'utente nel form admin come GLN GS1
+   * (es. "urn:gs1:gln:8012345000008"), non più un valore fisso. NOT NULL con default demo per
+   * compatibilità con le righe create prima di questa colonna. */
+  economicOperatorId: string;
+  /** EN 18223 §4.1.2.1 (Table 1, "facilityId") — opzionale per lo standard, ma qui NOT NULL con
+   * default demo per lo stesso motivo di economicOperatorId sopra E perché mock-eu-registry
+   * (vedi mockRegistryClient.ts) richiede sempre facilitiesId nel payload di registrazione:
+   * lasciarlo vuoto romperebbe una pubblicazione vera, non solo la conformità EN 18223. */
+  facilityId: string;
 }
 
 /** Riga così com'è restituita da Postgres (snake_case, timestamp come Date). */
@@ -37,6 +47,8 @@ interface DppRow {
   registry_id: string | null;
   proof_jwt: string | null;
   registered_at: Date | null;
+  economic_operator_id: string;
+  facility_id: string;
 }
 
 /** Postgres condiviso con mock-eu-registry (stesso progetto Supabase, tabella separata —
@@ -63,9 +75,18 @@ await pool.query(`
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     registry_id TEXT,
     proof_jwt TEXT,
-    registered_at TIMESTAMPTZ
+    registered_at TIMESTAMPTZ,
+    economic_operator_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo',
+    facility_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo-facility'
   )
 `);
+// Le due colonne sopra sono arrivate dopo la prima CREATE TABLE — su un database già esistente
+// (Render/Supabase in produzione, non ricreato da zero) CREATE TABLE IF NOT EXISTS non le
+// aggiungerebbe da sola alle righe già presenti. ADD COLUMN IF NOT EXISTS con lo stesso default
+// è idempotente: non fa nulla se la colonna c'è già (deploy successivi), la crea con lo stesso
+// valore demo di sempre se manca (prima esecuzione dopo questo cambiamento).
+await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS economic_operator_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo'");
+await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS facility_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo-facility'");
 await pool.query('CREATE INDEX IF NOT EXISTS gs1_dpp_records_gtin_idx ON gs1_dpp_records (gtin)');
 
 function fromRow(row: DppRow): DppRecord {
@@ -83,6 +104,8 @@ function fromRow(row: DppRow): DppRecord {
     registryId: row.registry_id,
     proofJwt: row.proof_jwt,
     registeredAt: row.registered_at ? row.registered_at.toISOString() : null,
+    economicOperatorId: row.economic_operator_id,
+    facilityId: row.facility_id,
   };
 }
 
@@ -141,15 +164,36 @@ export interface CreateDppInput {
   granularityLevel: GranularityLevel;
   batchOrSerial?: string | null;
   attributes?: Record<string, string>;
+  /** EN 18223 §4.1.2.1 Table 1 — obbligatorio per lo schema, facoltativo qui (default demo se
+   * omesso) per non rompere i chiamanti esistenti (routes/v1.ts, seed.ts) scritti prima di
+   * questa colonna. */
+  economicOperatorId?: string;
+  facilityId?: string;
 }
+
+/** Stessi due valori demo del default NOT NULL della colonna (vedi CREATE TABLE/ADD COLUMN più
+ * sopra) — ripetuti qui in JS perché "DEFAULT" come parola chiave SQL può comparire solo come
+ * intero elemento di una VALUES list, non dentro un'espressione come COALESCE($n, DEFAULT). */
+const FALLBACK_ECONOMIC_OPERATOR_ID = 'gs1-italy-dpp-demo';
+const FALLBACK_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
 
 export async function createDpp(input: CreateDppInput): Promise<DppRecord> {
   const id = randomUUID();
   const { rows } = await pool.query<DppRow>(
-    `INSERT INTO gs1_dpp_records (id, sector_id, gtin, name, granularity_level, batch_or_serial, attributes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO gs1_dpp_records (id, sector_id, gtin, name, granularity_level, batch_or_serial, attributes, economic_operator_id, facility_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      RETURNING *`,
-    [id, input.sectorId, input.gtin, input.name, input.granularityLevel, input.batchOrSerial ?? null, JSON.stringify(input.attributes ?? {})]
+    [
+      id,
+      input.sectorId,
+      input.gtin,
+      input.name,
+      input.granularityLevel,
+      input.batchOrSerial ?? null,
+      JSON.stringify(input.attributes ?? {}),
+      input.economicOperatorId ?? FALLBACK_ECONOMIC_OPERATOR_ID,
+      input.facilityId ?? FALLBACK_FACILITY_ID,
+    ]
   );
   return fromRow(rows[0]);
 }
@@ -167,14 +211,26 @@ export async function updateDpp(id: string, input: UpdateDppInput): Promise<DppR
     granularityLevel: input.granularityLevel ?? existing.granularityLevel,
     batchOrSerial: input.batchOrSerial !== undefined ? input.batchOrSerial : existing.batchOrSerial,
     attributes: input.attributes ?? existing.attributes,
+    economicOperatorId: input.economicOperatorId ?? existing.economicOperatorId,
+    facilityId: input.facilityId ?? existing.facilityId,
   };
   const { rows } = await pool.query<DppRow>(
     `UPDATE gs1_dpp_records SET
       sector_id = $2, gtin = $3, name = $4, granularity_level = $5,
-      batch_or_serial = $6, attributes = $7, updated_at = now()
+      batch_or_serial = $6, attributes = $7, economic_operator_id = $8, facility_id = $9, updated_at = now()
      WHERE id = $1
      RETURNING *`,
-    [id, merged.sectorId, merged.gtin, merged.name, merged.granularityLevel, merged.batchOrSerial, JSON.stringify(merged.attributes)]
+    [
+      id,
+      merged.sectorId,
+      merged.gtin,
+      merged.name,
+      merged.granularityLevel,
+      merged.batchOrSerial,
+      JSON.stringify(merged.attributes),
+      merged.economicOperatorId,
+      merged.facilityId,
+    ]
   );
   return rows[0] ? fromRow(rows[0]) : undefined;
 }

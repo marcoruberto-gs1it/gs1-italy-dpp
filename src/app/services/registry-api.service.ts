@@ -20,6 +20,8 @@ export interface DppRecord {
   registryId: string | null;
   proofJwt: string | null;
   registeredAt: string | null;
+  economicOperatorId: string;
+  facilityId: string;
 }
 
 /** Il payload/risposta reali scambiati con mock-eu-registry durante una pubblicazione — solo
@@ -36,6 +38,8 @@ export interface DppInput {
   granularityLevel: GranularityLevel;
   batchOrSerial?: string | null;
   attributes?: Record<string, string>;
+  economicOperatorId?: string;
+  facilityId?: string;
 }
 
 const BASE = '/registry-api';

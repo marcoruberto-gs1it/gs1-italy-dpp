@@ -283,13 +283,15 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
 
   const requestBody = {
     upi: buildUpi(siteUrl, record),
-    // Identificativo demo dell'operatore economico — non abbiamo ancora un modello
-    // multi-tenant reale, vedi "Esplicitamente fuori scope" nel piano di progetto.
-    reoId: 'gs1-italy-dpp-demo',
+    // Compilato dall'utente nel form admin (colonna economic_operator_id, vedi db.ts) — non più
+    // una costante fissa: non abbiamo comunque un modello multi-tenant reale (un solo cancello
+    // password per tutto l'admin, vedi auth.ts), ma almeno il valore inviato è quello che
+    // l'operatore ha davvero dichiarato, non un segnaposto uguale per ogni scheda.
+    reoId: record.economicOperatorId,
     liveURL: liveUrl,
     backupURL: liveUrl,
     commodityCode: COMMODITY_CODES[record.sectorId],
-    facilitiesId: ['gs1-italy-dpp-demo-facility'],
+    facilitiesId: [record.facilityId],
     granularityLevel: record.granularityLevel,
     ...granularityFields(siteUrl, record),
   };

@@ -24,6 +24,8 @@ export type DppFormGroup = FormGroup<{
   gtin: FormControl<string>;
   granularityLevel: FormControl<GranularityLevel>;
   batchOrSerial: FormControl<string>;
+  economicOperatorId: FormControl<string>;
+  facilityId: FormControl<string>;
   attributes: FormArray<FormGroup<{ key: FormControl<string>; value: FormControl<string> }>>;
 }>;
 

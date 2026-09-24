@@ -162,6 +162,8 @@ interface DppPayloadBody {
   name?: unknown;
   attributes?: unknown; // scorciatoia nostra, alternativa a schema:additionalProperty (vedi sotto)
   'schema:additionalProperty'?: unknown;
+  economicOperatorId?: unknown;
+  facilityId?: unknown;
 }
 
 /** schema:additionalProperty (schema.org PropertyValue, §6.1/jsonld.ts) O, in alternativa più
@@ -222,6 +224,13 @@ v1Router.post('/dpps', requireAuth, async (req, res) => {
     granularityLevel: parsed.granularityLevel,
     batchOrSerial: parsed.batchOrSerial,
     attributes: extractAttributes(body),
+    // economicOperatorId/facilityId (§6.1, il primo obbligatorio nello schema): letti dal body
+    // se il chiamante li manda (un chiamante esterno che segue lo standard alla lettera lo fa),
+    // altrimenti createDpp() ricade sul valore demo — vedi FALLBACK_* in db.ts. Non un 400 se
+    // mancante: renderlo bloccante qui romperebbe un client che invia solo i campi che questa
+    // rotta richiedeva finora.
+    economicOperatorId: typeof body.economicOperatorId === 'string' ? body.economicOperatorId : undefined,
+    facilityId: typeof body.facilityId === 'string' ? body.facilityId : undefined,
   });
   res.status(201).json({ statusCode: 'SuccessCreated', digitalProductPassportId: `urn:uuid:${record.id}` });
 });
@@ -271,6 +280,20 @@ v1Router.patch('/dpps/:dppId', requireAuth, async (req, res) => {
   }
   if (body.attributes !== undefined || body['schema:additionalProperty'] !== undefined) {
     patch.attributes = extractAttributes(body);
+  }
+  if (body.economicOperatorId !== undefined) {
+    if (typeof body.economicOperatorId !== 'string' || !body.economicOperatorId.trim()) {
+      res.status(400).json({ error: 'economicOperatorId non può essere vuoto' });
+      return;
+    }
+    patch.economicOperatorId = body.economicOperatorId.trim();
+  }
+  if (body.facilityId !== undefined) {
+    if (typeof body.facilityId !== 'string' || !body.facilityId.trim()) {
+      res.status(400).json({ error: 'facilityId non può essere vuoto' });
+      return;
+    }
+    patch.facilityId = body.facilityId.trim();
   }
   if (typeof req.query.sectorId === 'string') {
     if (!isValidSectorId(req.query.sectorId)) {

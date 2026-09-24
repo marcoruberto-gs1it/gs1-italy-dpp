@@ -108,6 +108,12 @@ export class Admin {
     gtin: [''],
     granularityLevel: ['MODEL' as GranularityLevel],
     batchOrSerial: [''],
+    // EN 18223 §4.1.2.1 Table 1 — economicOperatorId è obbligatorio nello schema,
+    // facilityId facoltativo: entrambi compilabili qui come GLN GS1 (vedi il link allo standard
+    // GLN in admin.html), precompilati con l'identificativo demo così il form resta utilizzabile
+    // subito anche senza un GLN vero a portata di mano.
+    economicOperatorId: [DEMO_ECONOMIC_OPERATOR_ID, Validators.required],
+    facilityId: [DEMO_FACILITY_ID],
     attributes: this.fb.array<FormGroup>([]),
   });
   /** L'intero valore del form come signal — la reattività di Angular Forms è basata su
@@ -152,8 +158,6 @@ export class Admin {
    * aziendali (solo identificativi e hash, mai i dati di prodotto) e si deve confermare davvero.
    * Vedi requestPublish/cancelPublishConfirm/confirmPublish più sotto. */
   protected showPublishConfirm = signal(false);
-  protected readonly demoEoId = DEMO_ECONOMIC_OPERATOR_ID;
-  protected readonly demoFacilityId = DEMO_FACILITY_ID;
 
   /** Il percorso animato verso il DPP Registry UE (vedi PublishJourneyComponent) — apparso al
    * click su "Pubblica", chiuso solo dall'utente una volta arrivato l'esito vero. */
@@ -247,8 +251,8 @@ export class Admin {
       dppSchemaVersion: DPP_SCHEMA_VERSION,
       dppStatus: toStandardDppStatus(existing?.status ?? 'draft'),
       lastUpdated: existing?.updatedAt ?? new Date().toISOString(),
-      economicOperatorId: DEMO_ECONOMIC_OPERATOR_ID,
-      facilityId: DEMO_FACILITY_ID,
+      economicOperatorId: f.economicOperatorId || DEMO_ECONOMIC_OPERATOR_ID,
+      facilityId: f.facilityId || DEMO_FACILITY_ID,
       contentSpecificationIds: [this.currentSector().contentSpecificationId],
     };
 
@@ -462,7 +466,16 @@ export class Admin {
    * singola, sugli stessi identici campi di dppForm, nessuna duplicazione di dati. */
   protected startCreate(): void {
     this.editingId.set(null);
-    this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', upi: '', gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' });
+    this.dppForm.reset({
+      sectorId: SECTORS[0].id,
+      name: '',
+      upi: '',
+      gtin: '',
+      granularityLevel: 'MODEL',
+      batchOrSerial: '',
+      economicOperatorId: DEMO_ECONOMIC_OPERATOR_ID,
+      facilityId: DEMO_FACILITY_ID,
+    });
     this.attributesArray.clear();
     this.toast.set(null);
     this.resetJourney();
@@ -496,6 +509,8 @@ export class Admin {
       name: record.name,
       granularityLevel: record.granularityLevel,
       batchOrSerial: record.batchOrSerial ?? '',
+      economicOperatorId: record.economicOperatorId,
+      facilityId: record.facilityId,
     });
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(record.attributes)) {
@@ -544,7 +559,15 @@ export class Admin {
   /** Come fillDemoData(), ma per un solo campo scalare — il piccolo link "Usa demo" accanto a
    * ciascun campo (admin.html/dpp-wizard.html), per chi vuole solo un esempio veloce per QUEL
    * campo invece di sovrascrivere tutto il DPP. */
-  protected demoFillField(field: 'name' | 'upi'): void {
+  protected demoFillField(field: 'name' | 'upi' | 'economicOperatorId' | 'facilityId'): void {
+    if (field === 'economicOperatorId') {
+      this.dppForm.controls.economicOperatorId.setValue(DEMO_ECONOMIC_OPERATOR_ID);
+      return;
+    }
+    if (field === 'facilityId') {
+      this.dppForm.controls.facilityId.setValue(DEMO_FACILITY_ID);
+      return;
+    }
     const sector = this.currentSector();
     const demo = DEMO_DATA[sector.id];
     if (!demo) return;
@@ -583,6 +606,8 @@ export class Admin {
       name: f.name.trim(),
       granularityLevel: f.granularityLevel,
       batchOrSerial: f.batchOrSerial.trim() || null,
+      economicOperatorId: f.economicOperatorId.trim() || DEMO_ECONOMIC_OPERATOR_ID,
+      facilityId: f.facilityId.trim() || DEMO_FACILITY_ID,
       attributes,
     };
   }

@@ -417,6 +417,16 @@ stesso contratto tenuto a mano tra i tre). Tutti i 7 campi obbligatori sono pres
 `facilityId` e `contentSpecificationIds` tra gli opzionali (`documentation` è omesso: la demo non
 ha documenti reali da collegare, e il campo è facoltativo).
 
+`economicOperatorId`/`facilityId` sono compilabili nel form admin (colonne `economic_operator_id`/
+`facility_id` in `db.ts`, con un default demo se lasciati vuoti) — non più costanti fisse:
+l'utente può inserire un GLN GS1 vero, coerente con la descrizione del campo nello schema §6.1
+("conforme a EN 18219, es. GLN GS1"). Gli altri campi obbligatori/opzionali che lo standard
+assegna al sistema (`digitalProductPassportId`, `granularity`, `dppSchemaVersion`, `dppStatus`,
+`lastUpdated`, `contentSpecificationIds`) restano non editabili per costruzione — modificarli a
+mano romperebbe un vincolo che lo standard stesso pone (es. `dppSchemaVersion` è la dichiarazione
+di conformità di QUESTA implementazione) — ma sono comunque mostrati nel form, con spiegazione e
+citazione, non solo nell'anteprima JSON-LD.
+
 Le rotte REST del §3 sono implementate in `registry-api/src/routes/v1.ts`, sotto
 `/registry-api/v1/dpps*` — path, verbi (inclusa la PATCH con semantica JSON Merge Patch, RFC 7396,
 per UpdateDPPById) e forma del payload in ingresso/uscita, verificati uno per uno dal vivo contro
