@@ -420,6 +420,22 @@ export class Admin {
     this.api.logout().subscribe(() => this.view.set('login'));
   }
 
+  /** Azzera lo stato del percorso di pubblicazione (vedi i segnali journey* qui sopra) — va
+   * richiamato ogni volta che si lascia il form di un DPP per aprirne un altro (nuovo o in
+   * modifica) o tornare all'elenco: journeyOpen/journeyRecord ecc. restano valorizzati finché
+   * l'utente non chiude esplicitamente il percorso (vedi closeJourney), quindi senza questo
+   * reset il percorso della registrazione PRECEDENTE riappariva — con il suo JSON e il suo
+   * registryId — non appena si tornava sulla vista 'form' per crearne una nuova. */
+  private resetJourney(): void {
+    this.journeyOpen.set(false);
+    this.journeyPhase.set('running');
+    this.journeyRecord.set(null);
+    this.journeyError.set(null);
+    this.journeyRegistryId.set(null);
+    this.journeyLongWait.set(false);
+    this.journeyTechnical.set(null);
+  }
+
   /** "Crea DPP" non apre più il form direttamente: prima chiede quale modalità di
    * compilazione usare (vedi 'create-choice' in admin.html) — Wizard guidato o form a pagina
    * singola, sugli stessi identici campi di dppForm, nessuna duplicazione di dati. */
@@ -428,6 +444,7 @@ export class Admin {
     this.dppForm.reset({ sectorId: SECTORS[0].id, name: '', upi: '', gtin: '', granularityLevel: 'MODEL', batchOrSerial: '' });
     this.attributesArray.clear();
     this.toast.set(null);
+    this.resetJourney();
     this.view.set('create-choice');
   }
 
@@ -464,10 +481,12 @@ export class Admin {
       this.attributesArray.push(this.attributeGroup(key, value));
     }
     this.toast.set(null);
+    this.resetJourney();
     this.view.set('form');
   }
 
   protected cancelForm(): void {
+    this.resetJourney();
     this.view.set('list');
   }
 
