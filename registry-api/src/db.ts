@@ -20,15 +20,15 @@ export interface DppRecord {
   registryId: string | null;
   proofJwt: string | null;
   registeredAt: string | null;
-  /** EN 18223 §4.1.2.1 (Table 1, "economicOperatorId") — campo OBBLIGATORIO dello schema,
+  /** FprEN 18223 §4.1.2.1 (Table 1, "economicOperatorId") — campo OBBLIGATORIO dello schema,
    * prima hardcoded a una costante demo: compilato dall'utente nel form admin come GLN GS1
    * (es. "urn:gs1:gln:8012345000008"), non più un valore fisso. NOT NULL con default demo per
    * compatibilità con le righe create prima di questa colonna. */
   economicOperatorId: string;
-  /** EN 18223 §4.1.2.1 (Table 1, "facilityId") — opzionale per lo standard, ma qui NOT NULL con
+  /** FprEN 18223 §4.1.2.1 (Table 1, "facilityId") — opzionale per lo standard, ma qui NOT NULL con
    * default demo per lo stesso motivo di economicOperatorId sopra E perché mock-eu-registry
    * (vedi mockRegistryClient.ts) richiede sempre facilitiesId nel payload di registrazione:
-   * lasciarlo vuoto romperebbe una pubblicazione vera, non solo la conformità EN 18223. */
+   * lasciarlo vuoto romperebbe una pubblicazione vera, non solo la conformità FprEN 18223. */
   facilityId: string;
 }
 
@@ -142,7 +142,7 @@ export async function getAnyByGtin(gtin: string): Promise<DppRecord | undefined>
 }
 
 /** Stesso identificativo di prodotto esatto (GTIN + eventuale AI (10)/(21)), non solo lo stesso
- * GTIN — usata da routes/v1.ts#POST /dpps (EN 18222 §3.5, CreateDPP) per il 409 Conflict su una
+ * GTIN — usata da routes/v1.ts#POST /dpps (FprEN 18222 §3.5, CreateDPP) per il 409 Conflict su una
  * ricreazione, verificato contro il comportamento reale di un'implementazione di riferimento
  * (eclipse-basyx/basyx-go-components, esempio BaSyxDPPAPIExample): creare due volte lo stesso
  * passaporto deve fallire, non produrre un duplicato silenzioso. Un MODEL e un BATCH/ITEM con lo
@@ -164,7 +164,7 @@ export interface CreateDppInput {
   granularityLevel: GranularityLevel;
   batchOrSerial?: string | null;
   attributes?: Record<string, string>;
-  /** EN 18223 §4.1.2.1 Table 1 — obbligatorio per lo schema, facoltativo qui (default demo se
+  /** FprEN 18223 §4.1.2.1 Table 1 — obbligatorio per lo schema, facoltativo qui (default demo se
    * omesso) per non rompere i chiamanti esistenti (routes/v1.ts, seed.ts) scritti prima di
    * questa colonna. */
   economicOperatorId?: string;

@@ -26,7 +26,7 @@ export interface Sector {
   /** Riferimento normativo breve per la card di anteprima nella hero. */
   regulationRef: string;
   /** Stesso riferimento normativo di regulationRef, come identificativo macchina — valorizza
-   * "contentSpecificationIds" nel JSON-LD del DPP (EN 18223 §4.1.2.1, Tabella 1: "references to
+   * "contentSpecificationIds" nel JSON-LD del DPP (FprEN 18223 §4.1.2.1, Tabella 1: "references to
    * delegated/implementing acts or other content specifications"). Non tradotto (un
    * identificativo non ha lingua, esattamente come roadmapYear qui sopra). */
   contentSpecificationId: string;

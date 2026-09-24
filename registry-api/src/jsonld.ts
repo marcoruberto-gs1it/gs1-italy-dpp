@@ -10,7 +10,7 @@ function digitalLinkUrl(siteUrl: string, gtin: string, ai?: '10' | '21', value?:
   return ai && value ? `${base}/${ai}/${encodeURIComponent(value)}` : base;
 }
 
-/** UPI — Unique Product Identifier, EN 18219 §3.1.25 — come URI GS1 Digital Link, al livello
+/** UPI — Unique Product Identifier, FprEN 18219 §3.1.25 — come URI GS1 Digital Link, al livello
  * di granularità più fine dichiarato dalla scheda (requisito 4.4.2(1) dello stesso standard:
  * "unique at least at the smallest granularity level it serves"). Stessa identica funzione di
  * mockRegistryClient.ts#buildUpi (il valore inviato come `upi` al DPP Registry UE): lo stesso
@@ -24,37 +24,35 @@ function buildUpi(siteUrl: string, record: DppRecord): string {
   return digitalLinkUrl(siteUrl, record.gtin, ai, value);
 }
 
-/** EN 18223 §4.1.2.1 (Table 1, "granularity"): due fonti reali in disaccordo sulla
- * capitalizzazione dell'enumerazione. Il documento sintesi da cui questo progetto è partito
- * (docs/dpp-api-specification.md §6.1) la riporta con l'iniziale maiuscola ("Model"/"Batch"/
- * "Item"); openepcis/openepcis-dpp-ready (Apache-2.0, framework OpenEPCIS per EN 18223 — vedi
- * i suoi esempi "operational" reali, es. extensions/eu/battery/examples/battery-product.
- * operational.jsonld) la usa tutta minuscola ("model"/"batch"/"item") in modo coerente in tutti
- * i suoi esempi e nella sua stessa documentazione. Nessuno dei due è il testo normativo
- * ufficiale pubblicato (a pagamento, non liberamente consultabile): allineato qui a OpenEPCIS
- * per scelta esplicita, non perché l'altra fonte fosse sbagliata — vedi la Nota di
- * implementazione in docs/dpp-api-specification.md per la stessa divergenza dichiarata anche
- * lì. Il nostro database interno resta MAIUSCOLO (è anche il valore richiesto dallo schema di
+/** FprEN 18223:2026 §4.1.2.2 (Enumeration): "The values allowed for the 'granularity' attribute
+ * are: model, batch, item" — minuscolo, testo normativo. Il §5.2.4 EXAMPLE e l'Annex B XML dello
+ * stesso documento scrivono invece "Model" (maiuscolo): §4.1.1 risolve esplicitamente questo
+ * tipo di discrepanza a favore del testo/tabelle della Clausola 4 ("If there are discrepancies
+ * between the UML diagrams, text and JSON representations the prose text of Clause 4, including
+ * the tables, is authoritative"), quindi minuscolo è quello corretto — non una scelta nostra
+ * discrezionale (era stata, prima di avere il testo ufficiale in mano — vedi git blame). Il
+ * nostro database interno resta MAIUSCOLO (è il valore richiesto dallo schema di
  * mock-eu-registry, verificato dal vivo — vedi mockRegistryClient.ts): solo il JSON-LD pubblico
- * cambia qui. */
+ * usa l'enumerazione dello standard. */
 function toStandardGranularity(level: GranularityLevel): 'model' | 'batch' | 'item' {
   const map: Record<GranularityLevel, 'model' | 'batch' | 'item'> = { MODEL: 'model', BATCH: 'batch', ITEM: 'item' };
   return map[level];
 }
 
-/** EN 18223 §4.1.2.1 (Table 1, "dppStatus"): stessa divergenza di toStandardGranularity() sopra,
- * stessa scelta — allineato a OpenEPCIS DPP-Ready (minuscolo) invece che al documento sintesi
- * originale (maiuscolo). Il nostro stato interno (bozza/pubblicata) non è lo stesso concetto ma
- * si mappa senza forzature: una scheda pubblicata è "active" per chi la consulta; una bozza (che
- * il pubblico non vede mai, tranne nella brevissima finestra in cui mock-eu-registry scarica
- * questo JSON-LD PRIMA di confermare la registrazione — vedi getAnyByGtin in db.ts) è
- * "inactive". "archived"/"invalid" non hanno un equivalente nel nostro modello a due stati,
- * quindi non compaiono mai qui. */
+/** FprEN 18223:2026 Table 1 (attributo "dppStatus"): "EXAMPLE Example values for the 'dppStatus'
+ * attribute are: active, inactive, archived, invalid" — minuscolo, dentro la tabella normativa
+ * stessa (non un semplice esempio JSON a parte): stessa autorevolezza di
+ * toStandardGranularity() sopra, stesso motivo. Il nostro stato interno (bozza/pubblicata) non è
+ * lo stesso concetto ma si mappa senza forzature: una scheda pubblicata è "active" per chi la
+ * consulta; una bozza (che il pubblico non vede mai, tranne nella brevissima finestra in cui
+ * mock-eu-registry scarica questo JSON-LD PRIMA di confermare la registrazione — vedi
+ * getAnyByGtin in db.ts) è "inactive". "archived"/"invalid" non hanno un equivalente nel nostro
+ * modello a due stati, quindi non compaiono mai qui. */
 function toStandardDppStatus(status: DppRecord['status']): 'active' | 'inactive' {
   return status === 'published' ? 'active' : 'inactive';
 }
 
-/** "contentSpecificationIds" (EN 18223 §4.1.2.1, Table 1): riferimenti all'atto delegato o alla
+/** "contentSpecificationIds" (FprEN 18223 §4.1.2.1, Table 1): riferimenti all'atto delegato o alla
  * specifica di contenuto applicabile, come identificativo macchina — non un URL, non testo
  * libero. Derivato da Sector.contentSpecificationId (src/app/data/sectors.ts, duplicato qui
  * come già COMMODITY_CODES in mockRegistryClient.ts: due progetti separati). */
@@ -71,30 +69,44 @@ const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
 };
 
 /**
- * JSON-LD di una scheda DPP pubblicata: unisce due vocabolari distinti, entrambi verificati
- * contro la fonte primaria (non scritti a memoria), non inventati.
+ * JSON-LD di una scheda DPP pubblicata — verificato campo per campo contro il testo ufficiale
+ * FprEN 18223:2026 "Digital Product Passport — System interoperability" (Final Draft, febbraio
+ * 2026, CEN/CLC/JTC 24), non più solo contro sintesi/implementazioni terze. Due parti distinte:
  *
- * 1) GS1 Web Vocabulary (per l'identificazione del prodotto), verificato scaricando e
- *    controllando https://ref.gs1.org/voc/data/gs1Voc.jsonld:
- *      - gs1:gtin, gs1:Product — dominio/range confermati
- *      - gs1:hasBatchLotNumber — AI (10), dominio gs1:Product/schema:Product
- *      - gs1:hasSerialNumber   — AI (21), dominio gs1:Product/schema:Product
- *    Gli attributi liberi di settore (chimica, capacità…) non hanno un termine GS1 dedicato:
- *    schema:additionalProperty/PropertyValue è il meccanismo che schema.org prevede apposta per
- *    dati arbitrari — non un'invenzione nostra.
+ * 1) Il nucleo DigitalProductPassport, FprEN 18223 §4.1.2.1 Table 1 — ESATTAMENTE i 9 attributi
+ *    lì elencati, nomi E VALORI (non solo i nomi):
+ *      - digitalProductPassportId, uniqueProductIdentifier, granularity, dppSchemaVersion,
+ *        dppStatus, lastUpdate (senza "d" finale — vedi nota sotto), economicOperatorId,
+ *        facilityId, contentSpecificationIds.
+ *      - granularity/dppStatus in minuscolo: vedi toStandardGranularity()/toStandardDppStatus()
+ *        sopra, entrambe citano la clausola esatta.
+ *      - dppSchemaVersion nel formato "<norma>:v<major>.<minor>" — l'unico formato che il
+ *        documento stesso usa nei propri esempi (§5.2.4: "ENXXX:v1.0"; Annex B:
+ *        "prEN18223:v1.0"), quindi "EN18223:v1.0" qui (senza spazio, senza l'anno).
+ *      - "lastUpdate", non "lastUpdated": la Table 1 nomina l'attributo "lastUpdate" — gli
+ *        esempi JSON/XML dello stesso documento (§5.2.4, Annex B) scrivono però "lastUpdated",
+ *        in contraddizione con la propria tabella. §4.1.1 risolve esplicitamente le discrepanze
+ *        tra tabelle/testo ed esempi a favore delle tabelle ("the prose text of Clause 4,
+ *        including the tables, is authoritative"): "lastUpdate" è quindi la forma corretta,
+ *        anche se è quella che appare MENO spesso nel documento.
+ *    "{DataElement}" (Table 1, ultima riga) è il meccanismo con cui lo standard ammette
+ *    esplicitamente contenuto aggiuntivo oltre ai 9 attributi fissi — non serve dichiarare
+ *    ulteriori campi come deviazione, sono già previsti.
  *
- * 2) Il modello semantico del "digital product passport" vero e proprio, definito da
- *    EN 18223:2026 (CEN/CENELEC) §4.1.2.1, Tabella 1 — i NOMI di campo qui sotto
- *    (digitalProductPassportId, uniqueProductIdentifier, granularity, dppSchemaVersion,
- *    dppStatus, lastUpdated, economicOperatorId, facilityId, contentSpecificationIds) sono
- *    quelli della tabella normativa. I VALORI di granularity/dppStatus/dppSchemaVersion seguono
- *    invece la convenzione di openepcis/openepcis-dpp-ready (Apache-2.0), non quella del
- *    documento sintesi originale — vedi il commento su toStandardGranularity()/
- *    toStandardDppStatus() più sotto e la Nota di implementazione in
- *    docs/dpp-api-specification.md per il perché. Questi campi non hanno un prefisso "gs1:"
- *    perché non fanno parte del GS1 Web Vocabulary: sono un vocabolario CEN/CENELEC a sé, qui
- *    esposto senza namespace dedicato (lo standard stesso non ne definisce uno per JSON-LD) ma
- *    con i nomi letterali della tabella normativa.
+ * 2) Contenuto aggiuntivo, appoggiato al meccanismo "{DataElement}" del punto 1 sopra — non
+ *    fanno parte del nucleo Table 1, ma non lo contraddicono nemmeno:
+ *      a) name/gtin/gs1:hasBatchLotNumber/gs1:hasSerialNumber, dentro un involucro JSON-LD
+ *         GS1 Web Vocabulary (@context/@type/@id) — verificato scaricando e controllando
+ *         https://ref.gs1.org/voc/data/gs1Voc.jsonld (gs1:gtin/gs1:Product: dominio/range
+ *         confermati; gs1:hasBatchLotNumber AI (10); gs1:hasSerialNumber AI (21)). Nostra
+ *         estensione deliberata per l'interoperabilità con schema.org/motori di ricerca — non
+ *         richiesta da FprEN 18223, non in contraddizione con esso.
+ *      b) gli Attributi liberi di settore (chimica, capacità…): FprEN 18223 §5.2.6 EXAMPLE 1
+ *         mostra un SingleValuedDataElement autonomo serializzato come coppia chiave-valore
+ *         DIRETTA sull'oggetto DPP ("manufacturerName": "ExampleCorp") — non avvolto in un
+ *         array come avevamo fatto prima con schema:additionalProperty/PropertyValue (nostra
+ *         invenzione, non richiesta né suggerita dal testo): ora ogni attributo diventa una
+ *         chiave di primo livello, coerente con l'esempio ufficiale.
  */
 export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, unknown> {
   const id = digitalLinkUrl(siteUrl, record.gtin);
@@ -108,12 +120,12 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     },
     '@type': ['schema:Product', 'gs1:Product'],
     '@id': id,
-    // Identificativo dell'istanza di passaporto (EN 18223 §4.1.2.1) — distinto dal GTIN e
-    // dall'UPI: quelli identificano il PRODOTTO, questo identifica IL PASSAPORTO STESSO.
-    // Formato URN (RFC 4122), non un URL: lo standard non richiede che sia risolvibile via web
-    // (quel compito spetta a uniqueProductIdentifier).
+    // Identificativo dell'istanza di passaporto (FprEN 18223 §4.1.2.1 Table 1) — distinto dal
+    // GTIN e dall'UPI: quelli identificano il PRODOTTO, questo identifica IL PASSAPORTO STESSO.
+    // Formato URN (RFC 4122): la tabella richiede solo "String", ma la prosa subito sotto la
+    // tabella precisa "should be based on a URI/URL structure" — un URN è una URI valida.
     digitalProductPassportId: `urn:uuid:${record.id}`,
-    // UPI — l'identificativo del prodotto che permette di raggiungere questa scheda (EN 18219
+    // UPI — l'identificativo del prodotto che permette di raggiungere questa scheda (FprEN 18219
     // §3.1.25): lo stesso URI GS1 Digital Link registrato presso il DPP Registry UE come "upi"
     // (vedi mockRegistryClient.ts#buildUpi) — stesso valore, nome di campo allineato allo
     // standard invece che allo schema specifico del registro.
@@ -121,12 +133,9 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     name: record.name,
     gtin: record.gtin,
     granularity: toStandardGranularity(record.granularityLevel),
-    // "EN 18223:2026" — formato openepcis/openepcis-dpp-ready (norma + anno), non
-    // "EN18223:v1.0" (norma + v-major.minor) del documento sintesi originale: stessa scelta di
-    // toStandardGranularity()/toStandardDppStatus() sopra, stesso motivo.
-    dppSchemaVersion: 'EN 18223:2026',
+    dppSchemaVersion: 'EN18223:v1.0',
     dppStatus: toStandardDppStatus(record.status),
-    lastUpdated: record.updatedAt,
+    lastUpdate: record.updatedAt,
     // Compilati dall'utente nel form admin (colonne economic_operator_id/facility_id, vedi
     // db.ts) — non più una costante fissa: due schede diverse possono avere un GLN diverso.
     // Stesso valore inviato come "reoId"/"facilitiesId" al DPP Registry UE, vedi mockRegistryClient.ts.
@@ -146,16 +155,23 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     }
   }
 
-  if (Object.keys(record.attributes).length > 0) {
-    doc['schema:additionalProperty'] = Object.entries(record.attributes).map(([propName, value]) => ({
-      '@type': 'schema:PropertyValue',
-      name: propName,
-      value,
-    }));
+  // Ogni attributo libero come SingleValuedDataElement autonomo (FprEN 18223 §5.2.6 EXAMPLE 1) —
+  // chiave di primo livello sull'oggetto DPP, valore diretto: non più avvolti in un array
+  // schema:additionalProperty/PropertyValue (vedi il commento sopra la funzione per il perché).
+  // Un attributo il cui nome coincide con un campo dell'intestazione DPP (es. l'utente scrive
+  // "name" o "granularity" come chiave) andrebbe altrimenti a sovrascrivere in silenzio quel
+  // campo, dato che qui sono tutte chiavi dello stesso oggetto piatto: ignorato con un avviso
+  // in log invece che corrompere l'intestazione.
+  for (const [propName, value] of Object.entries(record.attributes)) {
+    if (propName in doc) {
+      console.warn(`dppToJsonLd: attributo "${propName}" ignorato — coincide con un campo dell'intestazione DPP (record ${record.id}).`);
+      continue;
+    }
+    doc[propName] = value;
   }
 
   if (record.registryId) {
-    // Nome allineato all'output di RegisterProductDPP (EN 18222 §5.2, Tabella 8): il DPP
+    // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2 Table 8): il DPP
     // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
     doc['registrationId'] = record.registryId;
   }

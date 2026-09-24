@@ -105,7 +105,7 @@ export class Admin {
     gtin: [''],
     granularityLevel: ['MODEL' as GranularityLevel],
     batchOrSerial: [''],
-    // EN 18223 §4.1.2.1 Table 1 — economicOperatorId è obbligatorio nello schema,
+    // FprEN 18223 §4.1.2.1 Table 1 — economicOperatorId è obbligatorio nello schema,
     // facilityId facoltativo: entrambi compilabili qui come GLN GS1 (vedi il link allo standard
     // GLN in admin.html), precompilati con l'identificativo demo così il form resta utilizzabile
     // subito anche senza un GLN vero a portata di mano.
@@ -232,8 +232,9 @@ export class Admin {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': `${this.siteOrigin.value}/01/${gtin}`,
-      // Nomi di campo, formati ed enumerazioni allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) —
-      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
+      // Nomi di campo, formati ed enumerazioni allineati a FprEN 18223:2026 §4.1.2.1 (Table 1) —
+      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo
+      // (incluso il perché "lastUpdate" e non "lastUpdated" più sotto).
       digitalProductPassportId: existing ? `urn:uuid:${existing.id}` : 'urn:uuid:(assegnato al salvataggio)',
       uniqueProductIdentifier: this.previewUpi(),
       name: f.name || null,
@@ -241,7 +242,7 @@ export class Admin {
       granularity: toStandardGranularity(identity.granularityLevel),
       dppSchemaVersion: DPP_SCHEMA_VERSION,
       dppStatus: toStandardDppStatus(existing?.status ?? 'draft'),
-      lastUpdated: existing?.updatedAt ?? new Date().toISOString(),
+      lastUpdate: existing?.updatedAt ?? new Date().toISOString(),
       economicOperatorId: f.economicOperatorId || DEMO_ECONOMIC_OPERATOR_ID,
       facilityId: f.facilityId || DEMO_FACILITY_ID,
       contentSpecificationIds: [this.currentSector().contentSpecificationId],
@@ -256,17 +257,19 @@ export class Admin {
       }
     }
 
+    // Ogni attributo come chiave di primo livello (FprEN 18223 §5.2.6 EXAMPLE 1), non più
+    // avvolti in schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa
+    // guardia anti-collisione: un attributo che si chiama come un campo dell'intestazione (es.
+    // "name") viene ignorato invece di sovrascriverlo in silenzio.
     const attrs = (f.attributes as { key: string; value: string }[]).filter((row) => row.key?.trim());
-    if (attrs.length) {
-      doc['schema:additionalProperty'] = attrs.map((row) => ({
-        '@type': 'schema:PropertyValue',
-        name: row.key.trim(),
-        value: row.value,
-      }));
+    for (const row of attrs) {
+      const key = row.key.trim();
+      if (key in doc) continue;
+      doc[key] = row.value;
     }
 
     if (existing?.registryId) {
-      // Nome allineato all'output di RegisterProductDPP (EN 18222 §5.2, Tabella 8): il DPP
+      // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2 Table 8): il DPP
       // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
       doc['registrationId'] = existing.registryId;
     }

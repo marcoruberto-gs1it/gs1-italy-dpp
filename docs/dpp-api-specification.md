@@ -9,11 +9,11 @@ La presente guida definisce le specifiche tecniche, gli endpoint API, i formati 
 
 ### 1.1 Standard Tecnici di Riferimento
 L'architettura software deve implementare in modo stringente le seguenti 8 norme europee armonizzate:
-1. **EN 18219:2026** – *Unique Identifiers*: Gestione di identificativi univoci di prodotto (UPI: GS1 Digital Link, SGTIN), operatore (UOI: GLN, EORI) e stabilimento (UFI: GLN).
+1. **FprEN 18219:2026** – *Unique Identifiers*: Gestione di identificativi univoci di prodotto (UPI: GS1 Digital Link, SGTIN), operatore (UOI: GLN, EORI) e stabilimento (UFI: GLN).
 2. **EN 18220:2026** – *Data Carriers*: Codifica vettori fisici AIDC (QR code con GS1 Digital Link, RFID/NFC con EPC TDS 2.3).
 3. **EN 18216:2026** – *Data Exchange Protocols*: Protocolli di rete sicuri (HTTPS / TLS 1.2+ / HTTP/2+) e Content Negotiation (JSON, JSON-LD, HTML).
-4. **EN 18222:2026** – *APIs for Lifecycle Management*: Interfacce RESTful per lettura, creazione, aggiornamento, cancellazione e notifica dei passaporti.
-5. **EN 18223:2026** – *System Interoperability*: Modello dati concettuale UML, classi `DigitalProductPassport` e `DataElement`, e dizionari esterni (`dictionaryReference` / GS1 Web Vocabulary).
+4. **FprEN 18222:2026** – *APIs for Lifecycle Management*: Interfacce RESTful per lettura, creazione, aggiornamento, cancellazione e notifica dei passaporti.
+5. **FprEN 18223:2026** – *System Interoperability*: Modello dati concettuale UML, classi `DigitalProductPassport` e `DataElement`, e dizionari esterni (`dictionaryReference` / GS1 Web Vocabulary).
 6. **EN 18221:2026** – *Data Storage, Archiving and Persistence*: Archiviazione storica OAIS (ISO 14721), registro modifiche inalterabile e replica verso il *Back-up Service Provider*.
 7. **EN 18239:2026** – *Access Rights Management and Security*: Profilazione RBAC dei diritti d'accesso sui dati controllati e riservatezza commerciale.
 8. **EN 18246:2026** – *Data Authentication and Integrity*: Firme digitali al livello del dato (ESDC, W3C Verifiable Credentials, QSeal eIDAS).
@@ -36,7 +36,7 @@ Il server deve supportare la negoziazione del contenuto tramite l'intestazione H
 
 ---
 
-## 3. Specifiche delle API del Ciclo di Vita (EN 18222 Main Methods)
+## 3. Specifiche delle API del Ciclo di Vita (FprEN 18222 Main Methods)
 
 Tutti gli endpoint API utilizzano il prefisso di versione `/v1/` e sono definiti secondo lo stile RESTful.
 
@@ -46,7 +46,7 @@ Restituisce il passaporto completo o filtrato in base ai diritti d'accesso dell'
 * **HTTP Method:** `GET`
 * **Path:** `/v1/dpps/{dppId}` (Percent-encoding obbligatorio per `dppId`)
 * **Query Parameters:**
-  * `representation` (opzionale): `compressed` (default, conforme EN 18223 Cl. 5.2) oppure `full` (conforme EN 18223 Allegato A).
+  * `representation` (opzionale): `compressed` (default, conforme FprEN 18223 Cl. 5.2) oppure `full` (conforme FprEN 18223 Allegato A).
 * **Headers:**
   * `Accept`: `application/json`, `application/ld+json` oppure `text/html`
   * `Authorization`: `Bearer <token>` (Opzionale per dati pubblici; obbligatorio per dati controllati)
@@ -56,10 +56,10 @@ Restituisce il passaporto completo o filtrato in base ai diritti d'accesso dell'
 {
   "digitalProductPassportId": "https://dpp.company.com/dpp/EV-BATT-2026-987654",
   "uniqueProductIdentifier": "https://id.company.com/01/08012345678901/21/SN-2026-XYZ987",
-  "granularity": "Item",
+  "granularity": "item",
   "dppSchemaVersion": "EN18223:v1.0",
-  "dppStatus": "Active",
-  "lastUpdated": "2026-09-23T10:30:00Z",
+  "dppStatus": "active",
+  "lastUpdate": "2026-09-23T10:30:00Z",
   "economicOperatorId": "urn:gs1:gln:8012345000008",
   "facilityId": "urn:gs1:gln:8012345000015",
   "contentSpecificationIds": [
@@ -163,7 +163,7 @@ Aggiorna parzialmente il passaporto registrando le modifiche storicizzate (confo
 * **Payload Richiesta:**
 ```json
 {
-  "dppStatus": "Active",
+  "dppStatus": "active",
   "batteryTechnicalSpecs": {
     "stateOfHealthSoHPercentage": 96.5,
     "completedChargeCycles": 142
@@ -199,7 +199,7 @@ Endpoint esposto dal server del Registro Centrale della Commissione Europea (`ht
   "uniqueEconomicOperatorIdentifier": "urn:gs1:gln:8012345000008",
   "uniqueEconomicOperatorIdentifierBackup": "urn:gs1:gln:8099999000001",
   "dppApiEndpoint": "https://dpp.company.com/v1/dpps/EV-BATT-2026-987654",
-  "granularity": "Item",
+  "granularity": "item",
   "productGroup": "Batteries"
 }
 ```
@@ -250,7 +250,7 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://standards.cen.eu/dpp/schemas/v1.0/dpp-payload.schema.json",
   "title": "DigitalProductPassport",
-  "description": "Schema di validazione JSON ufficiale per il Passaporto Digitale di Prodotto secondo la EN 18223:2026.",
+  "description": "Schema di validazione JSON ufficiale per il Passaporto Digitale di Prodotto secondo la FprEN 18223:2026.",
   "type": "object",
   "required": [
     "digitalProductPassportId",
@@ -258,7 +258,7 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
     "granularity",
     "dppSchemaVersion",
     "dppStatus",
-    "lastUpdated",
+    "lastUpdate",
     "economicOperatorId"
   ],
   "properties": {
@@ -270,12 +270,12 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
     "uniqueProductIdentifier": {
       "type": "string",
       "format": "uri",
-      "description": "Identificativo univoco di prodotto conforme alla norma EN 18219 (es. GS1 Digital Link)."
+      "description": "Identificativo univoco di prodotto conforme alla norma FprEN 18219 (es. GS1 Digital Link)."
     },
     "granularity": {
       "type": "string",
-      "enum": ["Model", "Batch", "Item"],
-      "description": "Livello di granularità della registrazione."
+      "enum": ["model", "batch", "item"],
+      "description": "Livello di granularità della registrazione (FprEN 18223 §4.1.2.2)."
     },
     "dppSchemaVersion": {
       "type": "string",
@@ -284,17 +284,17 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
     },
     "dppStatus": {
       "type": "string",
-      "enum": ["Active", "Inactive", "Archived", "Invalid"],
-      "description": "Stato operativo della risorsa passaporto."
+      "enum": ["active", "inactive", "archived", "invalid"],
+      "description": "Stato operativo della risorsa passaporto (FprEN 18223 Table 1)."
     },
-    "lastUpdated": {
+    "lastUpdate": {
       "type": "string",
       "format": "date-time",
-      "description": "Timestamp UTC dell'ultimo aggiornamento conforme a ISO 8601-1."
+      "description": "Timestamp UTC dell'ultimo aggiornamento conforme a ISO 8601-1 (FprEN 18223 Table 1: \"lastUpdate\")."
     },
     "economicOperatorId": {
       "type": "string",
-      "description": "Identificativo dell'operatore economico conforme a EN 18219 (es. GLN GS1)."
+      "description": "Identificativo dell'operatore economico conforme a FprEN 18219 (es. GLN GS1)."
     },
     "facilityId": {
       "type": "string",
@@ -381,7 +381,7 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
     },
     "granularity": {
       "type": "string",
-      "enum": ["Model", "Batch", "Item"]
+      "enum": ["model", "batch", "item"]
     },
     "productGroup": {
       "type": "string"
@@ -420,36 +420,51 @@ ha documenti reali da collegare, e il campo è facoltativo).
 `economicOperatorId`/`facilityId` sono compilabili nel form admin (colonne `economic_operator_id`/
 `facility_id` in `db.ts`, con un default demo se lasciati vuoti) — non più costanti fisse:
 l'utente può inserire un GLN GS1 vero, coerente con la descrizione del campo nello schema §6.1
-("conforme a EN 18219, es. GLN GS1"). Gli altri campi obbligatori/opzionali che lo standard
+("conforme a FprEN 18219, es. GLN GS1"). Gli altri campi obbligatori/opzionali che lo standard
 assegna al sistema (`digitalProductPassportId`, `granularity`, `dppSchemaVersion`, `dppStatus`,
-`lastUpdated`, `contentSpecificationIds`) restano non editabili per costruzione — modificarli a
+`lastUpdate`, `contentSpecificationIds`) restano non editabili per costruzione — modificarli a
 mano romperebbe un vincolo che lo standard stesso pone (es. `dppSchemaVersion` è la dichiarazione
 di conformità di QUESTA implementazione) — ma sono comunque mostrati nel form, con spiegazione e
 citazione, non solo nell'anteprima JSON-LD.
 
-**Divergenza dichiarata sui VALORI (non sui nomi) di `granularity`, `dppStatus`,
-`dppSchemaVersion` ed `economicOperatorId`/`facilityId`.** Lo JSON Schema qui sopra (§6.1) — così
-come l'abbiamo ricevuto — richiede `granularity`/`dppStatus` con l'iniziale maiuscola
-("Model"/"Batch"/"Item", "Active"/"Inactive"/…) e `dppSchemaVersion` nel formato
-`"<norma>:v<major>.<minor>"` (pattern regex incluso). Confrontando questo documento con
-[`openepcis/openepcis-dpp-ready`](https://github.com/openepcis/openepcis-dpp-ready) (Apache-2.0,
-framework OpenEPCIS per EN 18223 — vedi i suoi esempi "operational" reali, es.
-`extensions/eu/battery/examples/battery-product.operational.jsonld`), quel repository usa
-consistentemente valori minuscoli ("model"/"batch"/"item", "active"/"inactive") e
-`dppSchemaVersion: "EN 18223:2026"` (norma + anno, non v-major.minor) — **in contraddizione
-diretta con il pattern regex qui sopra**. Anche `economicOperatorId`/`facilityId` divergono: qui
-sopra un URN (`"urn:gs1:gln:8012345000008"`), in OpenEPCIS un URL GS1 Digital Link
-(`"https://id.gs1.org/417/9521234000006"`, AI 417 per l'operatore economico, AI 414 per lo
-stabilimento).
+**Nomi e valori allineati al testo ufficiale FprEN 18222:2026/18223:2026 (Final Draft, febbraio
+2026, sottoposto a voto formale CEN).** Le sezioni precedenti di questo documento erano state
+scritte prima che il testo dei due Final Draft fosse disponibile a questo progetto, basandosi su
+fonti secondarie indipendenti (in particolare
+[`openepcis/openepcis-dpp-ready`](https://github.com/openepcis/openepcis-dpp-ready), Apache-2.0).
+Con il testo ufficiale ora disponibile, i punti che quella prima stesura descriveva come
+"divergenza dichiarata" (in favore di OpenEPCIS, rispetto allo schema §6.1 qui sopra) sono stati
+verificati e corretti direttamente contro le Tabelle normative:
+- **`granularity`/`dppStatus` minuscoli** (`"model"/"batch"/"item"`, `"active"/"inactive"/
+  "archived"/"invalid"`): confermato da FprEN 18223 §4.1.2.2 (prosa normativa) e dalla nota
+  EXAMPLE della Table 1 — non una scelta di stile, è quanto richiede il testo. Lo schema §6.1 qui
+  sopra è stato corretto di conseguenza (era "Model"/"Active" con iniziale maiuscola, errato).
+- **`dppSchemaVersion` in formato `"<norma>:v<major>.<minor>"`** (es. `"EN18223:v1.0"`): confermato
+  dall'esempio dello stesso §5.2.4 del documento (`"ENXXX:v1.0"`) e dall'esempio XML in Annex B
+  (`"prEN18223:v1.0"`) — il pattern regex nello schema §6.1 qui sopra era già corretto; era la
+  scelta di OpenEPCIS (`"FprEN 18223:2026"`, norma+anno) a non essere quella del testo ufficiale.
+- **`lastUpdate`, non `lastUpdated`**: la Table 1 (§4.1.2.1) nomina l'attributo `lastUpdate` — gli
+  esempi JSON/XML dello stesso documento (§5.2.4, Annex B) scrivono però `lastUpdated`, in
+  contraddizione con la propria tabella. Per la regola di precedenza esplicita del documento
+  stesso (§4.1.1: "If there are discrepancies between the UML diagrams, text and JSON
+  representations the prose text of Clause 4, including the tables, is authoritative"), vince
+  `lastUpdate` — corretto qui e nel codice (era `lastUpdated` in entrambi).
+- **`economicOperatorId`/`facilityId` come URN GLN** (`"urn:gs1:gln:8012345000008"`, non URL GS1
+  Digital Link con AI 417/414): il testo ufficiale non impone un formato URI specifico per questi
+  due campi oltre "identificativo conforme a FprEN 18219" — l'URN resta una scelta valida, non
+  corretta né invalidata da questa revisione.
 
-Nessuno dei due è il testo normativo ufficiale di EN 18223:2026 (a pagamento, non liberamente
-consultabile) — sono due sintesi/implementazioni indipendenti di uno standard ancora "preview".
-**Scelta esplicita di questo progetto: allineato a OpenEPCIS** (minuscolo per
-granularity/dppStatus, `"EN 18223:2026"` per dppSchemaVersion, URL GS1 Digital Link con AI
-417/414 per economicOperatorId/facilityId) — il che significa che il JSON-LD qui prodotto **non
-valida più** contro il pattern regex di `dppSchemaVersion` nello schema §6.1 sopra, per scelta
-consapevole, non per errore. Vedi `toStandardGranularity()`/`toStandardDppStatus()` in
-`registry-api/src/jsonld.ts` e `src/app/utils/dpp-jsonld.ts` per il dettaglio.
+Vedi `toStandardGranularity()`/`toStandardDppStatus()` in `registry-api/src/jsonld.ts` e
+`src/app/utils/dpp-jsonld.ts` per il dettaglio, con citazione di clausola/tabella esatta in
+ciascun commento.
+
+**Serializzazione degli attributi liberi di settore**: non più avvolti in un array
+`schema:additionalProperty`/`PropertyValue` (scelta di questo progetto, non richiesta dallo
+standard) — FprEN 18223 §5.2.6 EXAMPLE 1 mostra i Data Element liberi come chiavi piatte di primo
+livello sull'oggetto DPP stesso (es. `"manufacturerName": "ExampleCorp"`), ed è quello che
+`dppToJsonLd()` produce ora, con un controllo di collisione contro i 9 campi di Table 1 (un
+attributo che si chiamasse per esempio `"granularity"` viene scartato con un avviso, invece di
+sovrascrivere silenziosamente l'intestazione del DPP).
 
 Le rotte REST del §3 sono implementate in `registry-api/src/routes/v1.ts`, sotto
 `/registry-api/v1/dpps*` — path, verbi (inclusa la PATCH con semantica JSON Merge Patch, RFC 7396,

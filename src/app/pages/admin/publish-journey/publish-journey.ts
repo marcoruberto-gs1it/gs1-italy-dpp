@@ -13,7 +13,7 @@ interface JourneyStep {
   icon: IconName;
   title: string;
   /** Termine tecnico CEN/CENELEC o del registro, mostrato come sottotitolo — vedi
-   * EN 18219 (identificativi) e CIRPASS-2/mock-eu-registry per i nomi di campo reali. */
+   * FprEN 18219 (identificativi) e CIRPASS-2/mock-eu-registry per i nomi di campo reali. */
   standardTerm: string;
 }
 

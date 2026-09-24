@@ -16,7 +16,7 @@
  * mancante se omesso. Dove i due divergono vince il comportamento verificato dal vivo.
  *
  * ATTENZIONE (importante per chi legge questo file conoscendo lo standard CEN/CENELEC): mockeu-registry è l'implementazione di riferimento CIRPASS-2, con un proprio schema JSON — NON è
- * la stessa cosa del metodo astratto "RegisterProductDPP" descritto in EN 18222:2026 §5.2
+ * la stessa cosa del metodo astratto "RegisterProductDPP" descritto in FprEN 18222:2026 §5.2
  * (Tabella 8), che definisce un oggetto "DppRegistryEntry" con nomi di campo diversi (schema
  * completo in dpp-api-specification.md §6.2, la sintesi da cui è stata riverificata questa
  * tabella). I due non sono intercambiabili: lo standard descrive il CONCETTO, mock-eu-registry è

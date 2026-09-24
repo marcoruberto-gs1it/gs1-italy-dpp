@@ -152,8 +152,8 @@ export class ProductComponent implements OnDestroy {
   });
 
   dppAttributeEntries = computed(() => Object.entries(this.dppRecord()?.attributes ?? {}));
-  protected economicOperatorId = DEMO_ECONOMIC_OPERATOR_ID;
-  protected facilityId = DEMO_FACILITY_ID;
+  protected economicOperatorId = computed(() => this.dppRecord()?.economicOperatorId || DEMO_ECONOMIC_OPERATOR_ID);
+  protected facilityId = computed(() => this.dppRecord()?.facilityId || DEMO_FACILITY_ID);
 
   images = computed<string[]>(() => {
     const prod = this.product();
@@ -227,7 +227,7 @@ export class ProductComponent implements OnDestroy {
     const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
     // UPI: stesso URI GS1 Digital Link registrato come "upi" presso il DPP Registry UE (vedi
     // mockRegistryClient.ts#buildUpi) — al livello di granularità più fine dichiarato dalla
-    // scheda (EN 18219 §4.4.2(1)), quindi con l'AI (10)/(21) in coda quando presente.
+    // scheda (FprEN 18219 §4.4.2(1)), quindi con l'AI (10)/(21) in coda quando presente.
     const upi =
       dpp.granularityLevel === 'MODEL' || !dpp.batchOrSerial
         ? id
@@ -246,8 +246,9 @@ export class ProductComponent implements OnDestroy {
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': id,
-      // Nomi di campo, formati ed enumerazioni allineati a EN 18223:2026 §4.1.2.1 (Tabella 1) —
-      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo.
+      // Nomi di campo, formati ed enumerazioni allineati a FprEN 18223:2026 §4.1.2.1 (Table 1) —
+      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo
+      // (incluso il perché "lastUpdate" e non "lastUpdated" più sotto).
       digitalProductPassportId: `urn:uuid:${dpp.id}`,
       uniqueProductIdentifier: upi,
       name: dpp.name,
@@ -255,9 +256,14 @@ export class ProductComponent implements OnDestroy {
       granularity: toStandardGranularity(dpp.granularityLevel),
       dppSchemaVersion: DPP_SCHEMA_VERSION,
       dppStatus: toStandardDppStatus(dpp.status),
-      lastUpdated: dpp.updatedAt,
-      economicOperatorId: DEMO_ECONOMIC_OPERATOR_ID,
-      facilityId: DEMO_FACILITY_ID,
+      lastUpdate: dpp.updatedAt,
+      // Valori reali del record (compilati dall'utente nel form admin), non più le costanti
+      // demo fisse: erano rimaste qui da prima che economicOperatorId/facilityId diventassero
+      // campi compilabili per-scheda (vedi db.ts) — bug, non una scelta voluta: due schede
+      // diverse possono avere un GLN diverso, e questa era l'unica JSON-LD del progetto a non
+      // rifletterlo ancora.
+      economicOperatorId: dpp.economicOperatorId || DEMO_ECONOMIC_OPERATOR_ID,
+      facilityId: dpp.facilityId || DEMO_FACILITY_ID,
       // dppSector() ricade sempre su un settore valido (vedi il computed poco sopra) quando
       // dppRecord() è valorizzato, come lo è qui: mai vuoto in pratica.
       contentSpecificationIds: this.dppSector() ? [this.dppSector()!.contentSpecificationId] : [],
@@ -272,15 +278,15 @@ export class ProductComponent implements OnDestroy {
       }
     }
 
-    if (Object.keys(dpp.attributes).length > 0) {
-      doc['schema:additionalProperty'] = Object.entries(dpp.attributes).map(([propName, value]) => ({
-        '@type': 'schema:PropertyValue',
-        name: propName,
-        value,
-      }));
+    // Ogni attributo come chiave di primo livello (FprEN 18223 §5.2.6 EXAMPLE 1), non più
+    // avvolti in schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa
+    // guardia anti-collisione degli altri due costruttori di questo stesso documento.
+    for (const [propName, value] of Object.entries(dpp.attributes)) {
+      if (propName in doc) continue;
+      doc[propName] = value;
     }
 
-    // Nome allineato all'output di RegisterProductDPP (EN 18222 §5.2, Tabella 8): il DPP
+    // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2 Table 8): il DPP
     // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
     if (dpp.registryId) doc['registrationId'] = dpp.registryId;
 

@@ -5,15 +5,15 @@ import { requireAuth } from '../auth.ts';
 import { isValidSectorId, type SectorId } from '../sectors.ts';
 
 /**
- * Superficie REST conforme a EN 18222:2026 §5 (Main Methods) — docs/dpp-api-specification.md
+ * Superficie REST conforme a FprEN 18222:2026 §5 (Main Methods) — docs/dpp-api-specification.md
  * §3, verificata metodo per metodo contro quel documento, path e nomi compresi. Affianca, senza
  * sostituirle, le rotte interne già esistenti (routes/dpp.ts, sotto /registry-api/dpp): quelle
  * restano il contratto con cui l'admin di QUESTO sito crea/modifica un DPP (un solo campo UPI,
  * niente utenti terzi da autenticare) — non hanno mai preteso di essere "l'API dello standard",
  * solo lo strumento interno con cui questo sito popola il proprio database. Questa qui sotto è
  * invece la superficie che un sistema ESTERNO (un altro DPP service provider, un integratore, un
- * validatore di conformità) troverebbe seguendo alla lettera EN 18222 — payload in ingresso e
- * uscita nella forma esatta di EN 18223 §4.1.2.1 (dpp-payload.schema.json, §6.1 del documento),
+ * validatore di conformità) troverebbe seguendo alla lettera FprEN 18222 — payload in ingresso e
+ * uscita nella forma esatta di FprEN 18223 §4.1.2.1 (dpp-payload.schema.json, §6.1 del documento),
  * non nel formato interno semplificato (DppInput) che usa il resto di questo servizio.
  *
  * Sicurezza (EN 18239, §7.1 del documento): le letture sono pubbliche e senza autenticazione,
@@ -166,10 +166,13 @@ interface DppPayloadBody {
   facilityId?: unknown;
 }
 
-/** schema:additionalProperty (schema.org PropertyValue, §6.1/jsonld.ts) O, in alternativa più
- * comoda per chi integra senza passare dal JSON-LD completo, un oggetto piatto `attributes`:
- * entrambi finiscono nello stesso posto internamente. additionalProperties:true nello schema
- * (§6.1) permette entrambe le forme, nessuna delle due è "quella sbagliata". */
+/** In uscita (dppToJsonLd, jsonld.ts) ogni attributo libero è ormai una chiave piatta di primo
+ * livello (FprEN 18223 §5.2.6 EXAMPLE 1) — non più avvolto in schema:additionalProperty/
+ * PropertyValue, che era una nostra invenzione, non richiesta dallo standard. In INGRESSO qui
+ * accettiamo ancora entrambe le forme (l'oggetto piatto `attributes`, più comodo, o il vecchio
+ * array schema:additionalProperty, per compatibilità con chi lo mandava già): additionalProperties
+ * true nello schema (§6.1) non vieta nessuna delle due, ma solo `attributes` rispecchia davvero
+ * come i dati vengono poi serializzati. */
 function extractAttributes(body: DppPayloadBody): Record<string, string> {
   if (body.attributes && typeof body.attributes === 'object' && !Array.isArray(body.attributes)) {
     return body.attributes as Record<string, string>;
@@ -200,7 +203,7 @@ v1Router.post('/dpps', requireAuth, async (req, res) => {
     res.status(400).json({ error: 'uniqueProductIdentifier non è un URI GS1 Digital Link riconoscibile (atteso .../01/<gtin>[/10|21/<valore>])' });
     return;
   }
-  // sectorId: non è un campo dello schema EN 18223 (contentSpecificationIds non basta a
+  // sectorId: non è un campo dello schema FprEN 18223 (contentSpecificationIds non basta a
   // distinguerlo — 8 dei 9 settori demo condividono lo stesso atto delegato ESPR, vedi
   // src/app/data/sectors.ts#contentSpecificationId) — query param invece di un'estensione nel
   // body, così il corpo della richiesta resta ESATTAMENTE lo schema §6.1, senza campi nostri

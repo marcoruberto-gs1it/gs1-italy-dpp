@@ -117,7 +117,7 @@
           <p class="wizard-field-hint">Incolla l'URI GS1 Digital Link completo del prodotto — GTIN e livello si deducono da soli dalla sua sintassi.</p>
         }
         <p class="wizard-field-hint">
-          Diventa <code>uniqueProductIdentifier</code> (EN&nbsp;18219 §3.1.25 · EN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — un URI
+          Diventa <code>uniqueProductIdentifier</code> (FprEN&nbsp;18219 §3.1.25 · FprEN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — un URI
           <a class="field-standard-link" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
             GS1 Digital Link <app-icon name="external-link" [size]="11"></app-icon>
           </a>
@@ -147,7 +147,7 @@
           <p class="wizard-field-error">{{ msg }}</p>
         } @else {
           <p class="wizard-field-hint">
-            Campo <code>economicOperatorId</code>, <strong>obbligatorio</strong> (EN&nbsp;18223 §4.1.2.1, Table&nbsp;1), conforme a EN&nbsp;18219 — nella
+            Campo <code>economicOperatorId</code>, <strong>obbligatorio</strong> (FprEN&nbsp;18223 §4.1.2.1, Table&nbsp;1), conforme a FprEN&nbsp;18219 — nella
             pratica GS1 un
             <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gln/" target="_blank" rel="noopener noreferrer">
               GLN <app-icon name="external-link" [size]="11"></app-icon>
@@ -262,7 +262,7 @@
              (editarli romperebbe la dichiarazione di conformità o un vincolo dello standard
              stesso), mostrati comunque così questo riepilogo fa vedere DAVVERO tutto il JSON. -->
         <div class="wizard-auto-fields-head">
-          <span class="form-section-eyebrow">Campi assegnati automaticamente (EN 18223 §4.1.2.1, Table 1)</span>
+          <span class="form-section-eyebrow">Campi assegnati automaticamente (FprEN 18223 §4.1.2.1, Table 1)</span>
         </div>
         <dl class="auto-fields">
           <div>
@@ -294,7 +294,7 @@
             </dd>
           </div>
           <div>
-            <dt>lastUpdated</dt>
+            <dt>lastUpdate</dt>
             <dd>
               <code>ISO 8601, UTC</code>
               <span class="auto-field-note">Impostato automaticamente a ogni salvataggio.</span>
