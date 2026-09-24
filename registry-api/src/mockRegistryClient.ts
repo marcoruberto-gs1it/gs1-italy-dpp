@@ -161,6 +161,42 @@ async function fetchAccessToken(config: ReturnType<typeof requiredConfig>): Prom
   return body.access_token;
 }
 
+/** In locale (o ovunque SITE_URL non sia pubblicamente raggiungibile) mock-eu-registry PROVA
+ * comunque a scaricare il liveURL, impiega decine di secondi a scoprire che l'host non risponde
+ * e alla fine restituisce un 500 generico senza dettagli — verificato dal vivo: ~76s, poi
+ * "Error id ...-1" senza altro. Dal punto di vista dell'utente l'animazione in admin resta ferma
+ * sul passo "Verifica del Digital Link" per oltre un minuto e poi fallisce con un messaggio che
+ * non spiega nulla — esattamente il "si blocca" segnalato più volte, distinto dal vero blocco già
+ * risolto (route publish che rispondeva 502, vedi il commento su isColdStartError in
+ * routes/dpp.ts): qui la richiesta a mock-eu-registry parte davvero e riceve davvero una
+ * risposta, solo dopo un'attesa lunga quanto inutile, perché il fallimento è già certo PRIMA di
+ * fare qualunque chiamata di rete (né questa né tantomeno quella ad Auth0, evitata anche lei).
+ * Bloccarla qui trasforma quell'attesa in un errore immediato e comprensibile — non elimina il
+ * limite strutturale in sé (serve comunque un SITE_URL pubblico, es. un tunnel ngrok, per
+ * completare davvero una pubblicazione in locale, vedi docs/REGISTRY-SETUP.md §5), ma non lascia
+ * più l'utente a fissare l'animazione per un minuto intero senza sapere perché. */
+function assertSiteUrlReachableFromRegistry(siteUrl: string): void {
+  let hostname: string;
+  try {
+    hostname = new URL(siteUrl).hostname;
+  } catch {
+    throw new Error(`SITE_URL non è un URL valido: "${siteUrl}".`);
+  }
+  const isLocalOrPrivate =
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local') ||
+    /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+    /^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+    /^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname);
+  if (isLocalOrPrivate) {
+    throw new Error(
+      `mock-eu-registry (che gira nel cloud) non può raggiungere "${siteUrl}" per scaricare il liveURL e calcolarne l'hash — è un limite noto del test in locale (vedi docs/REGISTRY-SETUP.md §5), non un errore di configurazione. Serve un SITE_URL pubblicamente raggiungibile: il dominio reale in produzione, oppure un tunnel come ngrok puntato a questa macchina per provare in locale.`
+    );
+  }
+}
+
 /** Costruisce l'URL pubblico GS1 Digital Link della scheda — stesso pattern già usato dal
  * resto del sito per le pagine prodotto (`/01/{gtin}`, vedi src/app/pages/product), con
  * l'eventuale AI (10) lotto o (21) seriale in coda (`/01/{gtin}/10/{lotto}` o
@@ -241,6 +277,7 @@ export function pingMockRegistry(): void {
 export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
   const config = requiredConfig();
   const siteUrl = process.env.SITE_URL || 'http://localhost:4200';
+  assertSiteUrlReachableFromRegistry(siteUrl);
   const token = await fetchAccessToken(config);
   const liveUrl = digitalLinkUrl(siteUrl, record.gtin);
 

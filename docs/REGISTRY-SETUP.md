@@ -190,6 +190,17 @@ volta che `SITE_URL` sarà il dominio reale del sito in produzione; per
 provarlo prima, serve un tunnel pubblico verso il tuo locale (es. ngrok)
 puntato come `SITE_URL` temporaneo.
 
+`registry-api` riconosce da solo un `SITE_URL` locale/privato (localhost,
+`127.0.0.1`, IP di rete privata) e rifiuta subito con un errore chiaro,
+**prima** di contattare mock-eu-registry — altrimenti quest'ultimo prova
+comunque a scaricare il `liveURL`, impiega circa un minuto a scoprire che
+non risponde e restituisce infine un `500` generico: da `/admin` sembrava
+che la pubblicazione "si bloccasse" sul passo "Verifica del Digital Link".
+Ora lo stesso tentativo fallisce in meno di un secondo con un messaggio che
+spiega il limite (vedi `assertSiteUrlReachableFromRegistry` in
+`registry-api/src/mockRegistryClient.ts`) — resta comunque vero che, senza
+un `SITE_URL` pubblico, la pubblicazione in locale non può completarsi.
+
 Con un `SITE_URL` raggiungibile, una pubblicazione riuscita restituisce un
 `registryId` reale (verificato: `HTTP 201`, `registryId` popolato). Nota che
 l'endpoint della "proof of registration" (`GET .../proof`) può restituire
