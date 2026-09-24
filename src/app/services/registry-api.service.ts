@@ -22,6 +22,9 @@ export interface DppRecord {
   registeredAt: string | null;
   economicOperatorId: string;
   facilityId: string;
+  /** true solo per i 9 DPP di esempio del carosello home — non modificabili né eliminabili
+   * (l'admin nasconde le relative azioni, vedi admin.html/admin.ts). */
+  isStatic: boolean;
 }
 
 /** Il payload/risposta reali scambiati con mock-eu-registry durante una pubblicazione — solo

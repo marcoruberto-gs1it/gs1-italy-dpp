@@ -456,6 +456,18 @@
   cursor: not-allowed;
 }
 
+/* Sostituisce i due gs-icon-btn (Apri/Elimina) sulle righe statiche: niente azione da offrire,
+   solo un'icona muta col motivo al passaggio del mouse (title) — stessa area occupata, la
+   colonna non "salta" tra righe statiche e non. */
+.record-static-note {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--text-tertiary);
+}
+
 .record-empty-row td {
   text-align: center;
   color: var(--text-tertiary);

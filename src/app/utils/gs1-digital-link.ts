@@ -77,6 +77,45 @@ export async function parseDigitalLink(uri: string): Promise<ParsedDigitalLink> 
   return { gtin, granularityLevel: 'MODEL', batchOrSerial: '' };
 }
 
+/** Valida un URI GS1 Digital Link che identifica un GLN (Global Location Number) tramite un
+ * Application Identifier specifico — AI (417) per il GLN di un operatore economico (persona
+ * giuridica), AI (414) per il GLN di uno stabilimento/sede fisica. Usa lo stesso motore di
+ * gs1encoder di parseDigitalLink() sopra, così un GLN col prefisso reale GS1 dell'azienda ma con
+ * una cifra di controllo sbagliata viene respinto qui esattamente come lo sarebbe da un vero
+ * lettore di codici a barre GS1, non solo da un controllo di formato superficiale. Restituisce il
+ * GLN nudo se valido, per messaggi d'errore/conferma leggibili — il valore salvato resta comunque
+ * l'URI completo, non solo il GLN. */
+export async function parseGlnDigitalLink(uri: string, ai: '417' | '414'): Promise<string> {
+  const value = uri.trim();
+  const example = ai === '417' ? 'https://id.gs1.org/417/9521234000006' : 'https://id.gs1.org/414/9521234000112';
+  if (!isHttpUrl(value)) {
+    throw new Error(`Deve essere un URI GS1 Digital Link completo, che inizia con http:// o https:// (es. ${example}).`);
+  }
+
+  const encoder = await getEncoder();
+  let hri: string[];
+  try {
+    encoder.dataStr = value;
+    hri = encoder.hri;
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    throw new Error(`Non è un GS1 Digital Link valido: ${detail}`);
+  }
+
+  const ais = new Map<string, string>();
+  for (const line of hri) {
+    const match = /^\((\d{2,4})\)\s*(.*)$/.exec(line.trim());
+    if (match) ais.set(match[1], match[2]);
+  }
+
+  const gln = ais.get(ai);
+  if (!gln) {
+    const label = ai === '417' ? "il GLN dell'operatore economico, con Application Identifier (417)" : 'il GLN dello stabilimento, con Application Identifier (414)';
+    throw new Error(`Il link deve identificare ${label} — questo non ne contiene uno (es. ${example}).`);
+  }
+  return gln;
+}
+
 /** Ricostruisce l'URI GS1 Digital Link a partire da GTIN + granularità + lotto/seriale già noti
  * — stessa logica di Admin.previewUpi(), qui utilizzabile anche fuori dal form: per precompilare
  * il campo `upi` con i dati demo di un settore ("Usa demo") o con quelli di un DPP già salvato

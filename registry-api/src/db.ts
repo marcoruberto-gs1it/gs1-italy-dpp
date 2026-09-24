@@ -20,16 +20,22 @@ export interface DppRecord {
   registryId: string | null;
   proofJwt: string | null;
   registeredAt: string | null;
-  /** FprEN 18223 §4.1.2.1 (Table 1, "economicOperatorId") — campo OBBLIGATORIO dello schema,
-   * prima hardcoded a una costante demo: compilato dall'utente nel form admin come GLN GS1
-   * (es. "urn:gs1:gln:8012345000008"), non più un valore fisso. NOT NULL con default demo per
-   * compatibilità con le righe create prima di questa colonna. */
+  /** Identificativo dell'operatore economico che immette il prodotto sul mercato — campo
+   * obbligatorio, compilato dall'utente nel form admin come URI GS1 Digital Link con GLN (vedi
+   * utils/gs1-digital-link.ts lato frontend). NOT NULL con default demo per compatibilità con le
+   * righe create prima di questa colonna. */
   economicOperatorId: string;
-  /** FprEN 18223 §4.1.2.1 (Table 1, "facilityId") — opzionale per lo standard, ma qui NOT NULL con
-   * default demo per lo stesso motivo di economicOperatorId sopra E perché mock-eu-registry
-   * (vedi mockRegistryClient.ts) richiede sempre facilitiesId nel payload di registrazione:
-   * lasciarlo vuoto romperebbe una pubblicazione vera, non solo la conformità FprEN 18223. */
+  /** Identificativo dello stabilimento che produce il prodotto — facoltativo per lo standard, ma
+   * qui NOT NULL con default demo per lo stesso motivo di economicOperatorId sopra E perché
+   * mock-eu-registry (vedi mockRegistryClient.ts) richiede sempre facilitiesId nel payload di
+   * registrazione: lasciarlo vuoto romperebbe una pubblicazione vera. */
   facilityId: string;
+  /** true solo per i 9 DPP di esempio del carosello della home (creati da seed.ts, stessi GTIN
+   * di src/app/data/sectors.ts): non modificabili né eliminabili da /admin, perché la home li
+   * linka come "scansionabili" — cancellarli o alterarli romperebbe quegli esempi per chiunque li
+   * apra. Ogni altro DPP creato da un utente vero resta libero. Applicato dalle rotte
+   * (routes/dpp.ts, routes/v1.ts), non qui: questo modulo resta un semplice accesso ai dati. */
+  isStatic: boolean;
 }
 
 /** Riga così com'è restituita da Postgres (snake_case, timestamp come Date). */
@@ -49,6 +55,7 @@ interface DppRow {
   registered_at: Date | null;
   economic_operator_id: string;
   facility_id: string;
+  is_static: boolean;
 }
 
 /** Postgres condiviso con mock-eu-registry (stesso progetto Supabase, tabella separata —
@@ -76,17 +83,19 @@ await pool.query(`
     registry_id TEXT,
     proof_jwt TEXT,
     registered_at TIMESTAMPTZ,
-    economic_operator_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo',
-    facility_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo-facility'
+    economic_operator_id TEXT NOT NULL DEFAULT 'https://id.gs1.org/417/9521234000006',
+    facility_id TEXT NOT NULL DEFAULT 'https://id.gs1.org/414/9521234000112',
+    is_static BOOLEAN NOT NULL DEFAULT false
   )
 `);
-// Le due colonne sopra sono arrivate dopo la prima CREATE TABLE — su un database già esistente
+// Le colonne sopra sono arrivate dopo la prima CREATE TABLE — su un database già esistente
 // (Render/Supabase in produzione, non ricreato da zero) CREATE TABLE IF NOT EXISTS non le
 // aggiungerebbe da sola alle righe già presenti. ADD COLUMN IF NOT EXISTS con lo stesso default
 // è idempotente: non fa nulla se la colonna c'è già (deploy successivi), la crea con lo stesso
-// valore demo di sempre se manca (prima esecuzione dopo questo cambiamento).
-await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS economic_operator_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo'");
-await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS facility_id TEXT NOT NULL DEFAULT 'gs1-italy-dpp-demo-facility'");
+// valore demo/false di sempre se manca (prima esecuzione dopo questo cambiamento).
+await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS economic_operator_id TEXT NOT NULL DEFAULT 'https://id.gs1.org/417/9521234000006'");
+await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS facility_id TEXT NOT NULL DEFAULT 'https://id.gs1.org/414/9521234000112'");
+await pool.query('ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS is_static BOOLEAN NOT NULL DEFAULT false');
 await pool.query('CREATE INDEX IF NOT EXISTS gs1_dpp_records_gtin_idx ON gs1_dpp_records (gtin)');
 
 function fromRow(row: DppRow): DppRecord {
@@ -106,6 +115,7 @@ function fromRow(row: DppRow): DppRecord {
     registeredAt: row.registered_at ? row.registered_at.toISOString() : null,
     economicOperatorId: row.economic_operator_id,
     facilityId: row.facility_id,
+    isStatic: row.is_static,
   };
 }
 
@@ -142,8 +152,8 @@ export async function getAnyByGtin(gtin: string): Promise<DppRecord | undefined>
 }
 
 /** Stesso identificativo di prodotto esatto (GTIN + eventuale AI (10)/(21)), non solo lo stesso
- * GTIN — usata da routes/v1.ts#POST /dpps (FprEN 18222 §3.5, CreateDPP) per il 409 Conflict su una
- * ricreazione, verificato contro il comportamento reale di un'implementazione di riferimento
+ * GTIN — usata da routes/v1.ts#POST /dpps (CreateDPP) per il 409 Conflict su una ricreazione,
+ * verificato contro il comportamento reale di un'implementazione di riferimento
  * (eclipse-basyx/basyx-go-components, esempio BaSyxDPPAPIExample): creare due volte lo stesso
  * passaporto deve fallire, non produrre un duplicato silenzioso. Un MODEL e un BATCH/ITEM con lo
  * stesso GTIN restano identità di prodotto distinte (granularità diversa) e non collidono qui —
@@ -164,24 +174,27 @@ export interface CreateDppInput {
   granularityLevel: GranularityLevel;
   batchOrSerial?: string | null;
   attributes?: Record<string, string>;
-  /** FprEN 18223 §4.1.2.1 Table 1 — obbligatorio per lo schema, facoltativo qui (default demo se
-   * omesso) per non rompere i chiamanti esistenti (routes/v1.ts, seed.ts) scritti prima di
-   * questa colonna. */
+  /** Obbligatorio per lo standard, facoltativo qui (default demo se omesso) per non rompere i
+   * chiamanti esistenti (routes/v1.ts) scritti prima di questa colonna. */
   economicOperatorId?: string;
   facilityId?: string;
+  /** Solo seed.ts la passa true, per i 9 esempi del carosello home — vedi il commento su
+   * DppRecord.isStatic sopra. Ogni altro chiamante (routes/dpp.ts, routes/v1.ts) la lascia
+   * implicita (false): un DPP creato da un utente vero non è mai statico. */
+  isStatic?: boolean;
 }
 
 /** Stessi due valori demo del default NOT NULL della colonna (vedi CREATE TABLE/ADD COLUMN più
  * sopra) — ripetuti qui in JS perché "DEFAULT" come parola chiave SQL può comparire solo come
  * intero elemento di una VALUES list, non dentro un'espressione come COALESCE($n, DEFAULT). */
-const FALLBACK_ECONOMIC_OPERATOR_ID = 'gs1-italy-dpp-demo';
-const FALLBACK_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
+const FALLBACK_ECONOMIC_OPERATOR_ID = 'https://id.gs1.org/417/9521234000006';
+const FALLBACK_FACILITY_ID = 'https://id.gs1.org/414/9521234000112';
 
 export async function createDpp(input: CreateDppInput): Promise<DppRecord> {
   const id = randomUUID();
   const { rows } = await pool.query<DppRow>(
-    `INSERT INTO gs1_dpp_records (id, sector_id, gtin, name, granularity_level, batch_or_serial, attributes, economic_operator_id, facility_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `INSERT INTO gs1_dpp_records (id, sector_id, gtin, name, granularity_level, batch_or_serial, attributes, economic_operator_id, facility_id, is_static)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING *`,
     [
       id,
@@ -193,12 +206,15 @@ export async function createDpp(input: CreateDppInput): Promise<DppRecord> {
       JSON.stringify(input.attributes ?? {}),
       input.economicOperatorId ?? FALLBACK_ECONOMIC_OPERATOR_ID,
       input.facilityId ?? FALLBACK_FACILITY_ID,
+      input.isStatic ?? false,
     ]
   );
   return fromRow(rows[0]);
 }
 
-export type UpdateDppInput = Partial<CreateDppInput>;
+/** isStatic esclusa apposta: non è un campo che un aggiornamento possa cambiare (vedi
+ * DppRecord.isStatic) — assegnata una sola volta, alla creazione. */
+export type UpdateDppInput = Partial<Omit<CreateDppInput, 'isStatic'>>;
 
 export async function updateDpp(id: string, input: UpdateDppInput): Promise<DppRecord | undefined> {
   const existing = await getDpp(id);

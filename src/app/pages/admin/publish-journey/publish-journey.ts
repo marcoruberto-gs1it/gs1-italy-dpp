@@ -12,31 +12,27 @@ type StepStatus = 'done' | 'active' | 'pending' | 'error';
 interface JourneyStep {
   icon: IconName;
   title: string;
-  /** Termine tecnico CEN/CENELEC o del registro, mostrato come sottotitolo — vedi
-   * FprEN 18219 (identificativi) e CIRPASS-2/mock-eu-registry per i nomi di campo reali. */
+  /** Termine tecnico mostrato come sottotitolo — vedi CIRPASS-2/mock-eu-registry per i nomi di
+   * campo reali. */
   standardTerm: string;
 }
 
-/** Stessi identificativi demo hardcoded in registry-api/src/mockRegistryClient.ts — duplicati
- * qui solo per mostrarli nell'animazione, non letti da lì (due servizi separati, come il resto
- * del contratto DppRecord). */
-const DEMO_EO_ID = 'gs1-italy-dpp-demo';
-const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
-
 const STEPS: JourneyStep[] = [
   { icon: 'save', title: 'Salvato nei sistemi aziendali', standardTerm: 'Product data — presso l\'operatore economico' },
-  { icon: 'send', title: 'Invio identificativi al Registro UE', standardTerm: 'UPI · EO (UOI) · Facility (UFI) · Granularity level' },
+  { icon: 'send', title: 'Invio identificativi al Registro UE', standardTerm: 'UPI · EO · Facility · livello di granularità' },
   { icon: 'link', title: 'Verifica del Digital Link', standardTerm: 'Risoluzione liveURL — calcolo hash del contenuto' },
   { icon: 'check-circle', title: 'Registrazione confermata', standardTerm: 'Registry ID assegnato dal DPP Registry' },
 ];
 
 /**
- * Visualizza il percorso reale di una pubblicazione, inline nella pagina (non una modale): il
- * DPP viene prima salvato nei sistemi aziendali — presso l'operatore economico, dato che resta
- * decentralizzato (vedi la sezione "Cos'è il DPP" in home.ts) — e solo dopo i suoi identificativi
- * e l'hash del Digital Link vengono inviati per la registrazione al Registro UE. È il punto che
- * la home spiega in teoria e questo percorso mostra in pratica, con il JSON reale di ogni passo
- * visibile accanto ad esso, non dietro un click.
+ * Mostra il percorso reale di una pubblicazione — incorporato nel passo "Registrazione" del
+ * Wizard (dpp-wizard.html), non più un blocco a parte che compare sotto pagina dopo un click su
+ * "Pubblica": il DPP viene prima salvato nei sistemi aziendali — presso l'operatore economico,
+ * dato che resta decentralizzato (vedi la sezione "Cos'è il DPP" in home.ts) — e solo dopo i suoi
+ * identificativi e l'hash del Digital Link vengono inviati per la registrazione al Registro UE.
+ * È il punto che la home spiega in teoria e questo percorso mostra in pratica, con il JSON reale
+ * del passo attivo visibile a lato (colonna destra del passo, vedi dpp-wizard.html), non dietro
+ * un click.
  *
  * I passi 1-2 sono quasi istantanei (costruiamo e inviamo la richiesta), il passo 3 resta in
  * corso finché non arriva davvero la risposta di registry-api — non è coreografia finta:
@@ -53,10 +49,7 @@ export class PublishJourneyComponent {
   private sanitizer = inject(DomSanitizer);
 
   protected steps = STEPS;
-  protected eoId = DEMO_EO_ID;
-  protected facilityId = DEMO_FACILITY_ID;
 
-  private _open = signal(false);
   private _phase = signal<JourneyPhase>('running');
   private _record = signal<DppRecord | null>(null);
   private _errorMessage = signal<string | null>(null);
@@ -64,9 +57,6 @@ export class PublishJourneyComponent {
   private _technical = signal<PublishTechnicalTrace | null>(null);
   private _liveUrlJsonLd = signal<Record<string, unknown> | null>(null);
 
-  @Input() set open(v: boolean) {
-    this._open.set(!!v);
-  }
   @Input() set phase(v: JourneyPhase) {
     this._phase.set(v);
   }
@@ -88,12 +78,10 @@ export class PublishJourneyComponent {
   @Input() set liveUrlJsonLd(v: Record<string, unknown> | null) {
     this._liveUrlJsonLd.set(v ?? null);
   }
-  @Output() closed = new EventEmitter<void>();
 
   private _longWait = signal(false);
   isLongWait = computed(() => this._longWait());
 
-  isOpen = computed(() => this._open());
   activeRecord = computed(() => this._record());
   activeError = computed(() => this._errorMessage());
   activeRegistryId = computed(() => this._registryId());
@@ -135,34 +123,23 @@ export class PublishJourneyComponent {
   private staged = signal(0);
   private timers: ReturnType<typeof setTimeout>[] = [];
 
-  /** true 20s dopo l'apertura del percorso se `phase` è ancora 'running' — indipendente da
-   * `_longWait` (che segue i tentativi automatici e può scattare molto più tardi: con i timeout
-   * lato server/client aggiunti in mockRegistryClient.ts/registry-api.service.ts, un primo
-   * tentativo davvero bloccato può restare "in corso" fino a 90-150s prima di produrre anche
-   * solo il primo errore che fa scattare un retry). Questo timer parte da solo all'apertura,
-   * niente a che vedere con quanti tentativi sono già avvenuti: garantisce che l'utente abbia
-   * comunque un modo di uscire entro un tempo breve e prevedibile, qualunque cosa stia
-   * succedendo sotto. */
-  private _canCancel = signal(false);
-  protected canCancel = computed(() => this._canCancel());
-
   constructor() {
+    // Nessun bisogno di un modo per "uscire" da qui: la barra di navigazione del Wizard
+    // (Indietro/Torna all'elenco, sempre in cima) resta cliccabile anche mentre questo passo è
+    // aperto — a differenza di quando questo componente era un pannello sovrapposto, non c'è più
+    // nulla da nascondere esplicitamente.
     effect(() => {
-      const isOpen = this._open();
       const phase = this._phase();
       this.clearTimers();
-      if (!isOpen || phase !== 'running') {
-        this.staged.set(phase === 'running' ? 0 : STEPS.length - 1);
-        this._canCancel.set(false);
+      if (phase !== 'running') {
+        this.staged.set(STEPS.length - 1);
         return;
       }
       this.staged.set(0);
-      this._canCancel.set(false);
       this.timers.push(setTimeout(() => this.staged.set(1), 350));
       this.timers.push(setTimeout(() => this.staged.set(2), 1100));
       // Il passo 3 (registrazione confermata) lo sblocca solo l'arrivo vero della risposta
       // (vedi stepStatus): qui l'animazione coreografata si ferma di proposito.
-      this.timers.push(setTimeout(() => this._canCancel.set(true), 20_000));
     });
   }
 
@@ -201,18 +178,21 @@ export class PublishJourneyComponent {
     return Math.round((done / STEPS.length) * 100);
   });
 
-  /** Chiudibile sempre, tranne nei primi 20s di un tentativo genuinamente "in corso" — lì la
-   * chiusura è bloccata apposta per non far pensare a un annullamento che questa UI non fa
-   * davvero (la richiesta prosegue comunque in background). Oltre i 20s (vedi `canCancel` sopra)
-   * l'attesa non è più "normale": l'utente deve poter uscire anche senza un esito, invece di
-   * restare bloccato per sempre se una chiamata esterna non risponde mai (vedi i timeout
-   * aggiunti in mockRegistryClient.ts/registry-api.service.ts — dovrebbero già evitarlo, questa
-   * è la rete di sicurezza in più). */
-  private canClose(): boolean {
-    return this._phase() !== 'running' || this._canCancel();
-  }
-
-  close(): void {
-    if (this.canClose()) this.closed.emit();
-  }
+  /** Il JSON del passo attivo (o, a percorso concluso, dell'ultimo raggiunto) — un solo pannello
+   * a destra nel layout del Wizard, non più quattro blocchi impilati uno per riga: cambia da solo
+   * mentre l'animazione avanza. */
+  protected activeStepJson = computed<SafeHtml | null>(() => {
+    const phase = this._phase();
+    const index = phase === 'running' ? this.staged() : phase === 'error' ? 2 : 3;
+    switch (index) {
+      case 0:
+        return this.localRecordJson();
+      case 1:
+        return this.requestJson();
+      case 2:
+        return this.liveUrlJson();
+      default:
+        return this.responseJson();
+    }
+  });
 }

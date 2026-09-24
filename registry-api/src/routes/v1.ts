@@ -5,28 +5,28 @@ import { requireAuth } from '../auth.ts';
 import { isValidSectorId, type SectorId } from '../sectors.ts';
 
 /**
- * Superficie REST conforme a FprEN 18222:2026 §5 (Main Methods) — docs/dpp-api-specification.md
- * §3, verificata metodo per metodo contro quel documento, path e nomi compresi. Affianca, senza
- * sostituirle, le rotte interne già esistenti (routes/dpp.ts, sotto /registry-api/dpp): quelle
- * restano il contratto con cui l'admin di QUESTO sito crea/modifica un DPP (un solo campo UPI,
- * niente utenti terzi da autenticare) — non hanno mai preteso di essere "l'API dello standard",
- * solo lo strumento interno con cui questo sito popola il proprio database. Questa qui sotto è
- * invece la superficie che un sistema ESTERNO (un altro DPP service provider, un integratore, un
- * validatore di conformità) troverebbe seguendo alla lettera FprEN 18222 — payload in ingresso e
- * uscita nella forma esatta di FprEN 18223 §4.1.2.1 (dpp-payload.schema.json, §6.1 del documento),
- * non nel formato interno semplificato (DppInput) che usa il resto di questo servizio.
+ * Superficie REST conforme al metodo di gestione del ciclo di vita del passaporto descritto dallo
+ * standard — verificata metodo per metodo contro docs/dpp-api-specification.md, path e nomi
+ * compresi. Affianca, senza sostituirle, le rotte interne già esistenti (routes/dpp.ts, sotto
+ * /registry-api/dpp): quelle restano il contratto con cui l'admin di QUESTO sito crea/modifica un
+ * DPP (un solo campo UPI, niente utenti terzi da autenticare) — non hanno mai preteso di essere
+ * "l'API dello standard", solo lo strumento interno con cui questo sito popola il proprio
+ * database. Questa qui sotto è invece la superficie che un sistema ESTERNO (un altro DPP service
+ * provider, un integratore, un validatore di conformità) troverebbe seguendo alla lettera lo
+ * standard — payload in ingresso e uscita nella forma esatta di dpp-payload.schema.json, non nel
+ * formato interno semplificato (DppInput) che usa il resto di questo servizio.
  *
- * Sicurezza (EN 18239, §7.1 del documento): le letture sono pubbliche e senza autenticazione,
- * ma SOLO su schede già pubblicate — un DPP ancora in bozza non è "dato pubblico" finché non
- * pubblicato, coerente con getPublishedByGtin già usato altrove (routes/public.ts). Scrittura
- * (Create/Update/Delete) autenticata con lo stesso cancello a cookie dell'admin (auth.ts): non
- * abbiamo un vero modello multi-tenant "service provider" con credenziali Auth0/eIDAS separate
- * (esplicitamente fuori scope per questa demo), quindi qui "terza parte autorizzata" coincide
- * con "l'unico admin che già gestisce questo sito" — la spec userebbe `Authorization: Bearer
- * <token>` (OAuth2/OIDC), noi il cookie di sessione già in uso: stesso concetto (autenticazione
- * di un attore autorizzato), meccanismo di trasporto diverso.
+ * Sicurezza: le letture sono pubbliche e senza autenticazione, ma SOLO su schede già pubblicate —
+ * un DPP ancora in bozza non è "dato pubblico" finché non pubblicato, coerente con
+ * getPublishedByGtin già usato altrove (routes/public.ts). Scrittura (Create/Update/Delete)
+ * autenticata con lo stesso cancello a cookie dell'admin (auth.ts): non abbiamo un vero modello
+ * multi-tenant "service provider" con credenziali Auth0/eIDAS separate (esplicitamente fuori
+ * scope per questa demo), quindi qui "terza parte autorizzata" coincide con "l'unico admin che già
+ * gestisce questo sito" — lo standard userebbe `Authorization: Bearer <token>` (OAuth2/OIDC), noi
+ * il cookie di sessione già in uso: stesso concetto (autenticazione di un attore autorizzato),
+ * meccanismo di trasporto diverso.
  *
- * Non implementato, e dichiarato tale invece di far finta: §5 (Fine Granular API, RFC 9535
+ * Non implementata, e dichiarata tale invece di far finta: la Fine Granular API (RFC 9535
  * JSONPath) — nessun campo del nostro modello dati è abbastanza grande da giustificare
  * un'interfaccia di lettura/scrittura "chirurgica" per singolo campo, in una demo con poche
  * decine di schede al più.
@@ -65,16 +65,16 @@ function normalizeDppId(raw: string | string[]): string {
 // ---------------------------------------------------------------------------
 v1Router.get('/dpps/:dppId', async (req, res) => {
   const record = await getDpp(normalizeDppId(req.params.dppId));
-  // "o filtrato in base ai diritti d'accesso" (§3.1): qui il filtro è binario, non granulare —
+  // "o filtrato in base ai diritti d'accesso": qui il filtro è binario, non granulare —
   // pubblicata è pubblica, bozza non esiste per chi non è autenticato (vedi il commento in cima
   // al file sul perché non implementiamo Bearer/OIDC per questa lettura).
   if (!record || record.status !== 'published') {
     res.status(404).json({ error: 'nessun DPP pubblicato con questo identificativo' });
     return;
   }
-  // "representation=compressed|full" (§3.1): questa demo produce un solo formato — lo stesso
-  // per entrambi i valori, invece di implementare l'Allegato A (rappresentazione estesa) che EN
-  // 18223 lascia comunque facoltativo per un service provider.
+  // "representation=compressed|full": questa demo produce un solo formato — lo stesso per
+  // entrambi i valori, invece di implementare la rappresentazione estesa che lo standard lascia
+  // comunque facoltativa per un service provider.
   res.type('application/ld+json').json(dppToJsonLd(record, siteUrl()));
 });
 
@@ -109,12 +109,11 @@ v1Router.get('/dppsByIdAndDate/:dppId', async (req, res) => {
     res.status(404).json({ error: 'nessun DPP pubblicato con questo identificativo' });
     return;
   }
-  // Limite dichiarato: questo servizio non tiene uno storico delle versioni (EN 18221, mai
-  // implementato in questa demo — vedi la nota di sicurezza/tracciabilità in cima al file). C'è
-  // sempre e solo la versione corrente: la restituiamo se la data richiesta cade dopo la sua
-  // creazione (l'unica versione "valida" a quella data sarebbe stata questa), altrimenti 404 —
-  // onesto sul non avere nulla da restituire, invece di fingere una versione che non abbiamo mai
-  // conservato.
+  // Limite dichiarato: questo servizio non tiene uno storico delle versioni (l'archiviazione
+  // storica non è implementata in questa demo). C'è sempre e solo la versione corrente: la
+  // restituiamo se la data richiesta cade dopo la sua creazione (l'unica versione "valida" a
+  // quella data sarebbe stata questa), altrimenti 404 — onesto sul non avere nulla da restituire,
+  // invece di fingere una versione che non abbiamo mai conservato.
   if (Date.parse(dateParam) < Date.parse(record.createdAt)) {
     res.status(404).json({ error: 'nessuna versione esisteva a questa data — questo servizio non conserva uno storico, solo la versione corrente' });
     return;
@@ -167,12 +166,11 @@ interface DppPayloadBody {
 }
 
 /** In uscita (dppToJsonLd, jsonld.ts) ogni attributo libero è ormai una chiave piatta di primo
- * livello (FprEN 18223 §5.2.6 EXAMPLE 1) — non più avvolto in schema:additionalProperty/
- * PropertyValue, che era una nostra invenzione, non richiesta dallo standard. In INGRESSO qui
- * accettiamo ancora entrambe le forme (l'oggetto piatto `attributes`, più comodo, o il vecchio
- * array schema:additionalProperty, per compatibilità con chi lo mandava già): additionalProperties
- * true nello schema (§6.1) non vieta nessuna delle due, ma solo `attributes` rispecchia davvero
- * come i dati vengono poi serializzati. */
+ * livello — non più avvolto in schema:additionalProperty/PropertyValue, che era una nostra
+ * invenzione, non richiesta dallo standard. In INGRESSO qui accettiamo ancora entrambe le forme
+ * (l'oggetto piatto `attributes`, più comodo, o il vecchio array schema:additionalProperty, per
+ * compatibilità con chi lo mandava già): lo schema non vieta nessuna delle due, ma solo
+ * `attributes` rispecchia davvero come i dati vengono poi serializzati. */
 function extractAttributes(body: DppPayloadBody): Record<string, string> {
   if (body.attributes && typeof body.attributes === 'object' && !Array.isArray(body.attributes)) {
     return body.attributes as Record<string, string>;
@@ -203,11 +201,11 @@ v1Router.post('/dpps', requireAuth, async (req, res) => {
     res.status(400).json({ error: 'uniqueProductIdentifier non è un URI GS1 Digital Link riconoscibile (atteso .../01/<gtin>[/10|21/<valore>])' });
     return;
   }
-  // sectorId: non è un campo dello schema FprEN 18223 (contentSpecificationIds non basta a
+  // sectorId: non è un campo dello schema dello standard (contentSpecificationIds non basta a
   // distinguerlo — 8 dei 9 settori demo condividono lo stesso atto delegato ESPR, vedi
   // src/app/data/sectors.ts#contentSpecificationId) — query param invece di un'estensione nel
-  // body, così il corpo della richiesta resta ESATTAMENTE lo schema §6.1, senza campi nostri
-  // mescolati dentro.
+  // body, così il corpo della richiesta resta ESATTAMENTE lo schema dello standard, senza campi
+  // nostri mescolati dentro.
   const sectorId = req.query.sectorId;
   if (!isValidSectorId(sectorId)) {
     res.status(400).json({ error: 'query param "sectorId" obbligatorio e valido (vedi src/sectors.ts)' });
@@ -227,8 +225,8 @@ v1Router.post('/dpps', requireAuth, async (req, res) => {
     granularityLevel: parsed.granularityLevel,
     batchOrSerial: parsed.batchOrSerial,
     attributes: extractAttributes(body),
-    // economicOperatorId/facilityId (§6.1, il primo obbligatorio nello schema): letti dal body
-    // se il chiamante li manda (un chiamante esterno che segue lo standard alla lettera lo fa),
+    // economicOperatorId/facilityId (il primo obbligatorio nello schema): letti dal body se il
+    // chiamante li manda (un chiamante esterno che segue lo standard alla lettera lo fa),
     // altrimenti createDpp() ricade sul valore demo — vedi FALLBACK_* in db.ts. Non un 400 se
     // mancante: renderlo bloccante qui romperebbe un client che invia solo i campi che questa
     // rotta richiedeva finora.
@@ -251,6 +249,10 @@ v1Router.patch('/dpps/:dppId', requireAuth, async (req, res) => {
   const existing = await getDpp(id);
   if (!existing) {
     res.status(404).json({ error: 'nessun DPP con questo identificativo' });
+    return;
+  }
+  if (existing.isStatic) {
+    res.status(403).json({ error: 'questo DPP è un esempio statico del carosello home e non è modificabile' });
     return;
   }
   if (existing.status === 'published') {
@@ -318,6 +320,10 @@ v1Router.delete('/dpps/:dppId', requireAuth, async (req, res) => {
   const existing = await getDpp(id);
   if (!existing) {
     res.status(404).json({ error: 'nessun DPP con questo identificativo' });
+    return;
+  }
+  if (existing.isStatic) {
+    res.status(403).json({ error: 'questo DPP è un esempio statico del carosello home e non è eliminabile' });
     return;
   }
   // Stessa regola di routes/dpp.ts#DELETE /dpp/:id (vedi lì per il perché): un DPP registrato

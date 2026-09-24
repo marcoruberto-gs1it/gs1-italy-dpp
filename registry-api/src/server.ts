@@ -11,10 +11,10 @@ const app = express();
 // Di default express.json() analizza solo "application/json" — scarterebbe silenziosamente
 // (req.body resta vuoto, 500 a valle) una PATCH inviata con "application/merge-patch+json", il
 // media type RFC 7396 registrato apposta per il JSON Merge Patch che routes/v1.ts usa per
-// UpdateDPPById (§3.6). "application/ld+json" per lo stesso motivo su richieste che inviano
-// direttamente un documento JSON-LD. Verificato dal vivo: senza questa lista, una richiesta
-// identica a quella dell'esempio ufficiale BaSyx (Content-Type: application/merge-patch+json)
-// falliva con 500, non con l'errore di validazione atteso.
+// UpdateDPPById. "application/ld+json" per lo stesso motivo su richieste che inviano direttamente
+// un documento JSON-LD. Verificato dal vivo: senza questa lista, una richiesta identica a quella
+// dell'esempio ufficiale BaSyx (Content-Type: application/merge-patch+json) falliva con 500, non
+// con l'errore di validazione atteso.
 app.use(express.json({ type: ['application/json', 'application/merge-patch+json', 'application/ld+json'] }));
 
 // Nessun CORS da configurare: in sviluppo Angular vi arriva tramite proxy.conf.json (stessa

@@ -1,53 +1,14 @@
-@if (isOpen()) {
-  <section class="pj" [class.is-success]="activeRegistryId() !== null && activeError() === null" aria-label="Percorso di pubblicazione del DPP">
+<div class="pj">
+  <div class="pj-left">
     <div class="pj-progress-track" [class.is-error]="activeError() !== null">
       <div class="pj-progress-fill" [style.width.%]="progressPercent()"></div>
     </div>
 
-    <header class="pj-header">
-      <div>
-        <span class="gs-badge gs-badge--vocab">DPP Registry UE</span>
-        <h2>Percorso di pubblicazione</h2>
-        @if (activeRecord(); as r) {
-          <p>{{ r.name }} — UPI <code>{{ r.gtin }}</code></p>
-        }
-      </div>
-      @if (activeError() !== null || canCancel()) {
-        <button type="button" class="pj-close" (click)="close()" aria-label="Nascondi il dettaglio">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      }
-    </header>
-
     <p class="pj-explainer">
       Solo gli identificativi e l'hash del link viaggiano verso il registro — i dati di prodotto
-      restano qui, presso l'operatore economico (vedi "Cos'è il DPP" in home).
+      restano qui, presso l'operatore economico.
     </p>
 
-    <!-- Flusso compatto: dal salvataggio in azienda (A) alla registrazione confermata (D) — una
-         vista d'insieme di dove si è arrivati, prima del dettaglio riga per riga sotto. -->
-    <ol class="pj-flow">
-      @for (step of steps; track step.title; let i = $index) {
-        <li class="pj-flow-item" [class]="'is-' + stepStatus(i)">
-          <span class="pj-flow-dot">
-            @if (stepStatus(i) === 'done') {
-              <app-icon name="check-circle" [size]="14"></app-icon>
-            } @else if (stepStatus(i) === 'error') {
-              <app-icon name="alert-triangle" [size]="14"></app-icon>
-            } @else {
-              {{ i + 1 }}
-            }
-          </span>
-          <span class="pj-flow-label">{{ step.title }}</span>
-          @if (i < steps.length - 1) {
-            <span class="pj-flow-connector"><span class="pj-flow-connector-fill"></span></span>
-          }
-        </li>
-      }
-    </ol>
-
-    <!-- Dettaglio riga per riga: il JSON reale di ogni passo è visibile a lato, sempre —
-         non più dietro un "Mostra JSON" da cliccare. -->
     <ol class="pj-detail">
       @for (step of steps; track step.title; let i = $index) {
         <li class="pj-row" [class]="'is-' + stepStatus(i)">
@@ -71,9 +32,6 @@
             } @else {
               <span class="pj-term">{{ step.standardTerm }}</span>
             }
-            @if (i === 1 && stepStatus(i) !== 'pending') {
-              <span class="pj-row-detail">EO (UOI): <code>{{ eoId }}</code> · Facility (UFI): <code>{{ facilityId }}</code></span>
-            }
             @if (i === 2 && stepStatus(i) === 'error') {
               <span class="pj-row-detail pj-row-detail--error">{{ activeError() }}</span>
             }
@@ -81,28 +39,16 @@
               <span class="pj-row-detail pj-row-detail--success">Registry ID: <code>{{ activeRegistryId() }}</code></span>
             }
           </div>
-
-          <div class="pj-row-json">
-            @let stepJson = i === 0 ? localRecordJson() : i === 1 ? requestJson() : i === 2 ? liveUrlJson() : responseJson();
-            @if (stepJson) {
-              <pre class="pj-json gs-code-block"><code [innerHTML]="stepJson"></code></pre>
-            } @else {
-              <div class="pj-json-placeholder">In attesa…</div>
-            }
-          </div>
         </li>
       }
     </ol>
+  </div>
 
-    @if (activeError() !== null) {
-      <button type="button" class="gs-btn gs-btn--ghost pj-dismiss" (click)="close()">Chiudi</button>
-    } @else if (activeRegistryId()) {
-      <button type="button" class="gs-btn gs-btn--primary pj-dismiss" (click)="close()">Fatto</button>
-    } @else if (canCancel()) {
-      <div class="pj-cancel-row">
-        <p class="pj-cancel-hint">Puoi continuare a usare la pagina — se la registrazione arriva comunque, la trovi nell'elenco.</p>
-        <button type="button" class="gs-btn gs-btn--ghost pj-dismiss" (click)="close()">Nascondi</button>
-      </div>
+  <div class="pj-right">
+    @if (activeStepJson(); as json) {
+      <pre class="pj-json gs-code-block"><code [innerHTML]="json"></code></pre>
+    } @else {
+      <div class="pj-json-placeholder">In attesa…</div>
     }
-  </section>
-}
+  </div>
+</div>

@@ -11,10 +11,10 @@ import { SECTORS, Sector } from '../../data/sectors';
 import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryApiService } from '../../services/registry-api.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { DEMO_DATA } from './demo-data';
-import { JourneyPhase, PublishJourneyComponent } from './publish-journey/publish-journey';
+import { JourneyPhase } from './publish-journey/publish-journey';
 import { DppWizardComponent } from './dpp-wizard/dpp-wizard';
 import { hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
-import { buildDigitalLinkUpi, parseDigitalLink } from '../../utils/gs1-digital-link';
+import { buildDigitalLinkUpi, parseDigitalLink, parseGlnDigitalLink } from '../../utils/gs1-digital-link';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 
@@ -40,7 +40,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
  */
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, PublishJourneyComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, JsonLdDrawerComponent, ScrollRevealDirective, DppWizardComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -105,10 +105,10 @@ export class Admin {
     gtin: [''],
     granularityLevel: ['MODEL' as GranularityLevel],
     batchOrSerial: [''],
-    // FprEN 18223 §4.1.2.1 Table 1 — economicOperatorId è obbligatorio nello schema,
-    // facilityId facoltativo: entrambi compilabili qui come GLN GS1 (vedi il link allo standard
-    // GLN in admin.html), precompilati con l'identificativo demo così il form resta utilizzabile
-    // subito anche senza un GLN vero a portata di mano.
+    // economicOperatorId è obbligatorio nello schema, facilityId facoltativo: entrambi
+    // compilabili qui come URI GS1 Digital Link con GLN (vedi dpp-wizard.html), precompilati con
+    // l'identificativo demo così il form resta utilizzabile subito anche senza un GLN vero a
+    // portata di mano.
     economicOperatorId: [DEMO_ECONOMIC_OPERATOR_ID, Validators.required],
     facilityId: [DEMO_FACILITY_ID],
     attributes: this.fb.array<FormGroup>([]),
@@ -132,26 +132,22 @@ export class Admin {
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
 
-  /** I tre momenti del percorso, nell'ordine in cui accadono davvero — non tre passi di un
-   * unico wizard "crea DPP", ma tre azioni distinte e separate nel tempo: si salva il DPP nei
-   * propri sistemi (può restare così indefinitamente), solo in un secondo momento si conferma
-   * l'invio al Registro UE (vedi showPublishConfirm sotto), e solo dopo arriva la conferma di
-   * registrazione vera. L'indicatore in admin.html mostra sempre a che punto siamo, anche
-   * prima di aver toccato "Pubblica". */
+  /** I tre momenti del percorso, nell'ordine in cui accadono davvero: si salva il DPP nei propri
+   * sistemi (può restare così indefinitamente, passo 5 del Wizard), solo in un secondo momento si
+   * conferma l'invio al Registro UE (passo 6, vedi journeyOpen sotto), e solo dopo arriva la
+   * conferma di registrazione vera. */
   protected formPhase = computed<1 | 2 | 3>(() => {
     if (this.publishedRecord()) return 3;
     if (this.editingId()) return 2;
     return 1;
   });
 
-  /** true tra il click su "Pubblica" e la conferma esplicita dell'utente — l'invio al Registro
-   * UE non parte al primo click: prima si vede un riepilogo di cosa sta per lasciare i sistemi
-   * aziendali (solo identificativi e hash, mai i dati di prodotto) e si deve confermare davvero.
-   * Vedi requestPublish/cancelPublishConfirm/confirmPublish più sotto. */
-  protected showPublishConfirm = signal(false);
-
-  /** Il percorso animato verso il DPP Registry UE (vedi PublishJourneyComponent) — apparso al
-   * click su "Pubblica", chiuso solo dall'utente una volta arrivato l'esito vero. */
+  /** true dal click su "Conferma e invia al Registro UE" (passo 6 del Wizard) in poi — prima di
+   * allora quel passo mostra solo un riepilogo di cosa sta per lasciare i sistemi aziendali (solo
+   * identificativi e hash, mai i dati di prodotto) con l'azione di conferma; una volta vero,
+   * mostra il percorso animato verso il Registro UE (vedi PublishJourneyComponent), fino
+   * all'esito. Resta true anche a esito ottenuto — resetJourney() lo riporta a false solo
+   * quando si lascia la scheda per aprirne un'altra. */
   protected journeyOpen = signal(false);
   protected journeyPhase = signal<JourneyPhase>('running');
   protected journeyRecord = signal<DppRecord | null>(null);
@@ -180,6 +176,13 @@ export class Admin {
     granularityLevel: 'MODEL',
     batchOrSerial: '',
   });
+  /** Esito dell'ultima validazione asincrona di economicOperatorId/facilityId (vedi i due effect
+   * nel costruttore, stesso motivo di derivedIdentity qui sopra: il Wizard legge questi invece di
+   * `.valid` sul controllo, che un metodo imperativo come isStepValid() non può osservare in modo
+   * reattivo). facilityValid parte true perché il campo è facoltativo: vuoto è valido, non "non
+   * ancora validato". */
+  protected economicOperatorValid = signal(false);
+  protected facilityValid = signal(true);
   /** GTIN corrente, solo se valido — l'anteprima e il QR code mostrano un GTIN solo quando è
    * un UPI reale, non una stringa a metà digitazione. Controllo diretto con isValidGtin() (la
    * stessa funzione pura usata dal validatore reattivo) come ulteriore rete di sicurezza, anche
@@ -224,21 +227,18 @@ export class Admin {
     const existing = this.records().find((r) => r.id === this.editingId());
 
     const doc: Record<string, unknown> = {
+      // gs1/schema come prefissi bastano da soli — vedi il commento nello stesso punto di
+      // registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo di questo oggetto.
       '@context': {
         gs1: 'https://ref.gs1.org/voc/',
         schema: 'http://schema.org/',
-        name: 'schema:name',
-        gtin: 'gs1:gtin',
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': `${this.siteOrigin.value}/01/${gtin}`,
-      // Nomi di campo, formati ed enumerazioni allineati a FprEN 18223:2026 §4.1.2.1 (Table 1) —
-      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo
-      // (incluso il perché "lastUpdate" e non "lastUpdated" più sotto).
       digitalProductPassportId: existing ? `urn:uuid:${existing.id}` : 'urn:uuid:(assegnato al salvataggio)',
       uniqueProductIdentifier: this.previewUpi(),
-      name: f.name || null,
-      gtin,
+      'schema:name': f.name || null,
+      'gs1:gtin': gtin,
       granularity: toStandardGranularity(identity.granularityLevel),
       dppSchemaVersion: DPP_SCHEMA_VERSION,
       dppStatus: toStandardDppStatus(existing?.status ?? 'draft'),
@@ -257,10 +257,10 @@ export class Admin {
       }
     }
 
-    // Ogni attributo come chiave di primo livello (FprEN 18223 §5.2.6 EXAMPLE 1), non più
-    // avvolti in schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa
-    // guardia anti-collisione: un attributo che si chiama come un campo dell'intestazione (es.
-    // "name") viene ignorato invece di sovrascriverlo in silenzio.
+    // Ogni attributo come chiave di primo livello, non più avvolti in
+    // schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa guardia
+    // anti-collisione: un attributo che si chiama come un campo dell'intestazione (es.
+    // "granularity") viene ignorato invece di sovrascriverlo in silenzio.
     const attrs = (f.attributes as { key: string; value: string }[]).filter((row) => row.key?.trim());
     for (const row of attrs) {
       const key = row.key.trim();
@@ -269,8 +269,8 @@ export class Admin {
     }
 
     if (existing?.registryId) {
-      // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2 Table 8): il DPP
-      // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
+      // Il DPP Registry UE restituisce "registrationId", non "registryId" (nome solo nostro,
+      // interno).
       doc['registrationId'] = existing.registryId;
     }
 
@@ -347,6 +347,56 @@ export class Admin {
       );
     });
 
+    // economicOperatorId/facilityId: stessa idea dell'effect su upi qui sopra, ma senza dover
+    // dedurre altri campi — qui basta sapere se il link è un GLN valido col giusto Application
+    // Identifier (417 per l'operatore, 414 per lo stabilimento), vedi utils/gs1-digital-link.ts.
+    effect(() => {
+      const value = (this.formValue().economicOperatorId ?? '').trim();
+      const control = this.dppForm.controls.economicOperatorId;
+      if (!value) {
+        control.setErrors({ required: true });
+        this.economicOperatorValid.set(false);
+        return;
+      }
+      parseGlnDigitalLink(value, '417').then(
+        () => {
+          if (this.dppForm.controls.economicOperatorId.value.trim() !== value) return;
+          control.setErrors(null);
+          this.economicOperatorValid.set(true);
+        },
+        (err: unknown) => {
+          if (this.dppForm.controls.economicOperatorId.value.trim() !== value) return;
+          const message = err instanceof Error ? err.message : 'URI GS1 Digital Link non valido.';
+          control.setErrors({ glnInvalid: { message } });
+          this.economicOperatorValid.set(false);
+        }
+      );
+    });
+
+    effect(() => {
+      const value = (this.formValue().facilityId ?? '').trim();
+      const control = this.dppForm.controls.facilityId;
+      if (!value) {
+        // Facoltativo per lo standard: vuoto è un valore valido, non un errore.
+        control.setErrors(null);
+        this.facilityValid.set(true);
+        return;
+      }
+      parseGlnDigitalLink(value, '414').then(
+        () => {
+          if (this.dppForm.controls.facilityId.value.trim() !== value) return;
+          control.setErrors(null);
+          this.facilityValid.set(true);
+        },
+        (err: unknown) => {
+          if (this.dppForm.controls.facilityId.value.trim() !== value) return;
+          const message = err instanceof Error ? err.message : 'URI GS1 Digital Link non valido.';
+          control.setErrors({ glnInvalid: { message } });
+          this.facilityValid.set(false);
+        }
+      );
+    });
+
     // Il toast (vedi admin.html/.css) resta a posizione fissa sullo schermo: si vede sempre,
     // anche dopo aver scorso una form lunga — non basta più mostrare l'errore solo in cima alla
     // pagina, l'utente non è detto ci torni con lo sguardo. Si chiude da solo dopo un po' o col
@@ -412,14 +462,12 @@ export class Admin {
     this.api.logout().subscribe(() => this.view.set('login'));
   }
 
-  /** Azzera lo stato del percorso di pubblicazione (vedi i segnali journey* qui sopra) — va
+  /** Azzera lo stato del percorso di registrazione (vedi i segnali journey* qui sopra) — va
    * richiamato ogni volta che si lascia il form di un DPP per aprirne un altro (nuovo o in
-   * modifica) o tornare all'elenco: journeyOpen/journeyRecord ecc. restano valorizzati finché
-   * l'utente non chiude esplicitamente il percorso (vedi closeJourney), quindi senza questo
-   * reset il percorso della registrazione PRECEDENTE riappariva — con il suo JSON e il suo
-   * registryId — non appena si tornava sulla vista 'form' per crearne una nuova. */
+   * modifica) o tornare all'elenco: journeyOpen/journeyRecord ecc. restano valorizzati finché non
+   * richiamato, quindi senza questo reset il percorso della registrazione PRECEDENTE riappariva —
+   * con il suo JSON e il suo registryId — non appena si apriva un altro DPP. */
   private resetJourney(): void {
-    this.showPublishConfirm.set(false);
     this.journeyOpen.set(false);
     this.journeyPhase.set('running');
     this.journeyRecord.set(null);
@@ -451,6 +499,11 @@ export class Admin {
   }
 
   protected startEdit(record: DppRecord): void {
+    // Rete di sicurezza oltre a quella già in admin.html (che nasconde il pulsante "Apri" per
+    // queste righe): niente dipende SOLO dal template per una regola che conta anche lato server
+    // (routes/dpp.ts/routes/v1.ts rifiutano comunque la scrittura, ma qui evitiamo anche di aprire
+    // un wizard che finirebbe per fallire al salvataggio).
+    if (record.isStatic) return;
     this.editingId.set(record.id);
     this.dppForm.reset({
       sectorId: record.sectorId,
@@ -595,22 +648,10 @@ export class Admin {
     });
   }
 
-  /** Click su "Pubblica": apre il riepilogo di conferma (admin.html), non invia ancora nulla —
-   * vedi il commento su showPublishConfirm più sopra. */
-  protected requestPublish(): void {
-    if (!this.editingId()) return;
-    this.showPublishConfirm.set(true);
-  }
-
-  protected cancelPublishConfirm(): void {
-    this.showPublishConfirm.set(false);
-  }
-
-  /** Click su "Conferma e invia" nel riepilogo: da qui in poi è la stessa richiesta di sempre. */
+  /** Click su "Conferma e invia al Registro UE" nel passo 6 del Wizard. */
   protected confirmPublish(): void {
     const id = this.editingId();
     if (!id) return;
-    this.showPublishConfirm.set(false);
     this.toast.set(null);
     this.publishPending.set(true);
 
@@ -654,11 +695,8 @@ export class Admin {
     });
   }
 
-  protected closeJourney(): void {
-    this.journeyOpen.set(false);
-  }
-
   protected deleteRecord(record: DppRecord): void {
+    if (record.isStatic) return;
     if (!confirm(`Eliminare il DPP "${record.name}"?`)) return;
     this.api.delete(record.id).subscribe({
       next: () => this.loadRecords().subscribe(),

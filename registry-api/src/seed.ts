@@ -164,6 +164,9 @@ async function main(): Promise<void> {
       granularityLevel: entry.granularityLevel,
       batchOrSerial: entry.batchOrSerial,
       attributes: entry.attributes,
+      // Questi 9 DPP sono gli esempi "scansionabili" della home: non modificabili né
+      // eliminabili da /admin, vedi il commento su DppRecord.isStatic in db.ts.
+      isStatic: true,
     });
     console.log(`- ${entry.gtin} (${entry.name}): bozza creata (${record.id}), registro su mock-eu-registry…`);
     try {

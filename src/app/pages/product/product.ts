@@ -227,7 +227,7 @@ export class ProductComponent implements OnDestroy {
     const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
     // UPI: stesso URI GS1 Digital Link registrato come "upi" presso il DPP Registry UE (vedi
     // mockRegistryClient.ts#buildUpi) — al livello di granularità più fine dichiarato dalla
-    // scheda (FprEN 18219 §4.4.2(1)), quindi con l'AI (10)/(21) in coda quando presente.
+    // scheda, quindi con l'AI (10)/(21) in coda quando presente.
     const upi =
       dpp.granularityLevel === 'MODEL' || !dpp.batchOrSerial
         ? id
@@ -238,21 +238,18 @@ export class ProductComponent implements OnDestroy {
           })();
 
     const doc: Record<string, unknown> = {
+      // gs1/schema come prefissi bastano da soli — vedi il commento nello stesso punto di
+      // registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo di questo oggetto.
       '@context': {
         gs1: 'https://ref.gs1.org/voc/',
         schema: 'http://schema.org/',
-        name: 'schema:name',
-        gtin: 'gs1:gtin',
       },
       '@type': ['schema:Product', 'gs1:Product'],
       '@id': id,
-      // Nomi di campo, formati ed enumerazioni allineati a FprEN 18223:2026 §4.1.2.1 (Table 1) —
-      // vedi il commento in registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo
-      // (incluso il perché "lastUpdate" e non "lastUpdated" più sotto).
       digitalProductPassportId: `urn:uuid:${dpp.id}`,
       uniqueProductIdentifier: upi,
-      name: dpp.name,
-      gtin: dpp.gtin,
+      'schema:name': dpp.name,
+      'gs1:gtin': dpp.gtin,
       granularity: toStandardGranularity(dpp.granularityLevel),
       dppSchemaVersion: DPP_SCHEMA_VERSION,
       dppStatus: toStandardDppStatus(dpp.status),
@@ -278,16 +275,16 @@ export class ProductComponent implements OnDestroy {
       }
     }
 
-    // Ogni attributo come chiave di primo livello (FprEN 18223 §5.2.6 EXAMPLE 1), non più
-    // avvolti in schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa
-    // guardia anti-collisione degli altri due costruttori di questo stesso documento.
+    // Ogni attributo come chiave di primo livello, non più avvolti in
+    // schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa guardia
+    // anti-collisione degli altri due costruttori di questo stesso documento.
     for (const [propName, value] of Object.entries(dpp.attributes)) {
       if (propName in doc) continue;
       doc[propName] = value;
     }
 
-    // Nome allineato all'output di RegisterProductDPP (FprEN 18222 §5.2 Table 8): il DPP
-    // Registry UE restituisce "registrationId", non "registryId" (nome solo nostro, interno).
+    // Il DPP Registry UE restituisce "registrationId", non "registryId" (nome solo nostro,
+    // interno).
     if (dpp.registryId) doc['registrationId'] = dpp.registryId;
 
     return doc;

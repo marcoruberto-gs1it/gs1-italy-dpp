@@ -24,9 +24,9 @@ function validateInput(body: unknown): string | null {
       if (typeof value !== 'string') return 'ogni valore di attributes deve essere una stringa';
     }
   }
-  // economicOperatorId/facilityId (FprEN 18223 §4.1.2.1 Table 1): opzionali qui (db.ts ha un
-  // default demo se omessi, vedi createDpp) — validati solo se presenti, non richiesti, per non
-  // rompere un client che non li manda ancora.
+  // economicOperatorId/facilityId: opzionali qui (db.ts ha un default demo se omessi, vedi
+  // createDpp) — validati solo se presenti, non richiesti, per non rompere un client che non li
+  // manda ancora.
   if (b.economicOperatorId !== undefined && (typeof b.economicOperatorId !== 'string' || !b.economicOperatorId.trim())) {
     return 'economicOperatorId, se presente, deve essere una stringa non vuota';
   }
@@ -65,6 +65,12 @@ dppRouter.put('/:id', async (req, res) => {
     res.status(404).json({ error: 'scheda non trovata' });
     return;
   }
+  // Le 9 schede di esempio del carosello home (seed.ts) sono statiche apposta — vedi il
+  // commento su DppRecord.isStatic in db.ts: modificarle romperebbe quegli esempi.
+  if (existing.isStatic) {
+    res.status(403).json({ error: 'questa scheda è un esempio statico del carosello home e non è modificabile' });
+    return;
+  }
   if (existing.status === 'published') {
     res.status(409).json({ error: 'una scheda già pubblicata non è modificabile in questa demo' });
     return;
@@ -81,6 +87,10 @@ dppRouter.delete('/:id', async (req, res) => {
   const existing = await getDpp(req.params.id);
   if (!existing) {
     res.status(404).json({ error: 'scheda non trovata' });
+    return;
+  }
+  if (existing.isStatic) {
+    res.status(403).json({ error: 'questa scheda è un esempio statico del carosello home e non è eliminabile' });
     return;
   }
   // Stessa regola già in vigore per PUT sopra (una volta registrata su mock-eu-registry, il

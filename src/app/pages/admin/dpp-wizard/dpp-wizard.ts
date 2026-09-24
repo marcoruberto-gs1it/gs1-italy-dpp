@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, Signal, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, Signal, computed, inject, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../../components/icon/icon';
 import { Sector } from '../../../data/sectors';
-import { DppRecord, DppStatus, GranularityLevel } from '../../../services/registry-api.service';
+import { DppRecord, DppStatus, GranularityLevel, PublishTechnicalTrace } from '../../../services/registry-api.service';
 import { DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../../utils/dpp-jsonld';
 import { hasIncompleteAttributeRow, isValidGtin } from '../../../utils/gs1-validators';
+import { highlightJson } from '../../../utils/json-highlight';
+import { JourneyPhase, PublishJourneyComponent } from '../publish-journey/publish-journey';
 
 /** Duplicato apposta di ToastSeverity in admin.ts, non importato — stesso motivo di
  * DppFormGroup qui sotto: admin.ts importa questo componente come valore, quindi il Wizard non
@@ -42,7 +45,8 @@ const STEPS: WizardStep[] = [
   { title: 'Come si identifica il prodotto?', short: 'Identificazione' },
   { title: "Chi è l'operatore economico?", short: 'Operatore' },
   { title: 'Che dati di prodotto vuoi pubblicare?', short: 'Attributi' },
-  { title: 'Riepilogo, salvataggio e registrazione', short: 'Riepilogo' },
+  { title: 'Riepilogo e salvataggio', short: 'Riepilogo' },
+  { title: 'Registrazione sul Registro UE', short: 'Registrazione' },
 ];
 
 /**
@@ -72,23 +76,36 @@ const STEPS: WizardStep[] = [
  */
 @Component({
   selector: 'app-dpp-wizard',
-  imports: [CommonModule, ReactiveFormsModule, IconComponent, QRCodeComponent],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent, QRCodeComponent, PublishJourneyComponent],
   templateUrl: './dpp-wizard.html',
   styleUrl: './dpp-wizard.css',
 })
 export class DppWizardComponent {
+  private sanitizer = inject(DomSanitizer);
+
   @Input({ required: true }) form!: DppFormGroup;
   @Input({ required: true }) sectors!: Sector[];
   @Input({ required: true }) currentSector!: Signal<Sector>;
   @Input({ required: true }) previewGtin!: Signal<string | null>;
   @Input({ required: true }) previewUpi!: Signal<string | null>;
   @Input({ required: true }) previewJsonLd!: Signal<Record<string, unknown> | null>;
+  @Input({ required: true }) economicOperatorValid!: Signal<boolean>;
+  @Input({ required: true }) facilityValid!: Signal<boolean>;
   @Input({ required: true }) attributesArray!: FormArray<FormGroup>;
   @Input({ required: true }) editingId!: Signal<string | null>;
   @Input({ required: true }) publishedRecord!: Signal<DppRecord | null>;
   @Input({ required: true }) formPhase!: Signal<1 | 2 | 3>;
-  @Input({ required: true }) showPublishConfirm!: Signal<boolean>;
   @Input({ required: true }) qrValue!: Signal<string | null>;
+  /** Stato del percorso di registrazione (passo 6) — vedi PublishJourneyComponent, incorporato
+   * qui invece di comparire come blocco separato sotto il wizard (su richiesta esplicita: la
+   * registrazione fa parte dei passi guidati, non un extra in fondo alla pagina). */
+  @Input({ required: true }) journeyStarted!: Signal<boolean>;
+  @Input({ required: true }) journeyPhase!: Signal<JourneyPhase>;
+  @Input({ required: true }) journeyRecord!: Signal<DppRecord | null>;
+  @Input({ required: true }) journeyError!: Signal<string | null>;
+  @Input({ required: true }) journeyRegistryId!: Signal<string | null>;
+  @Input({ required: true }) journeyLongWait!: Signal<boolean>;
+  @Input({ required: true }) journeyTechnical!: Signal<PublishTechnicalTrace | null>;
   @Input() savePending = false;
   @Input() publishPending = false;
   /** angularx-qrcode manipola direttamente il DOM: non compatibile con SSR/prerender — stessa
@@ -101,8 +118,6 @@ export class DppWizardComponent {
   @Output() requestFieldDemo = new EventEmitter<'name' | 'upi' | 'economicOperatorId' | 'facilityId'>();
   @Output() showToast = new EventEmitter<{ message: string; severity: ToastSeverity }>();
   @Output() saveDraft = new EventEmitter<void>();
-  @Output() requestPublish = new EventEmitter<void>();
-  @Output() cancelPublishConfirm = new EventEmitter<void>();
   @Output() confirmPublish = new EventEmitter<void>();
   @Output() viewJsonLd = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
@@ -113,6 +128,15 @@ export class DppWizardComponent {
   protected toStandardGranularity = toStandardGranularity;
   protected toStandardDppStatus = toStandardDppStatus;
   protected dppSchemaVersion = DPP_SCHEMA_VERSION;
+
+  /** JSON-LD colorato per la colonna destra del passo Riepilogo — stessa libreria di
+   * evidenziazione di JsonLdDrawerComponent/PublishJourneyComponent, qui perché quel passo
+   * mostra il JSON dal vivo accanto al form invece che dietro il pulsante "Vedi JSON-LD". */
+  protected previewJsonLdHighlighted = computed<SafeHtml | null>(() => {
+    const doc = this.previewJsonLd();
+    if (!doc) return null;
+    return this.sanitizer.bypassSecurityTrustHtml(highlightJson(JSON.stringify(doc, null, 2)));
+  });
 
   protected steps = STEPS;
   protected currentStep = signal(0);
@@ -159,6 +183,7 @@ export class DppWizardComponent {
     }
     if (index === 2) {
       this.form.controls.economicOperatorId.markAsTouched();
+      this.form.controls.facilityId.markAsTouched();
     }
   }
 
@@ -167,7 +192,9 @@ export class DppWizardComponent {
       case 1:
         return this.fieldError('name') ?? this.fieldError('upi') ?? 'Controlla nome e UPI prima di continuare.';
       case 2:
-        return this.fieldError('economicOperatorId') ?? "L'identificativo dell'operatore economico (EO) è obbligatorio.";
+        return this.fieldError('economicOperatorId') ?? this.fieldError('facilityId') ?? "L'identificativo dell'operatore economico deve essere un GLN GS1 valido.";
+      case 4:
+        return 'Salva la scheda nei sistemi aziendali prima di procedere alla registrazione.';
       default:
         return 'Controlla i campi di questo passo prima di continuare.';
     }
@@ -191,7 +218,11 @@ export class DppWizardComponent {
       case 1:
         return f.name.trim().length >= 2 && isValidGtin(f.gtin.trim());
       case 2:
-        return f.economicOperatorId.trim().length > 0;
+        return this.economicOperatorValid() && this.facilityValid();
+      case 4:
+        // Serve una scheda già salvata prima di poter procedere alla registrazione — non si
+        // registra un DPP che non esiste ancora nei sistemi aziendali.
+        return !!this.editingId();
       default:
         return true;
     }
@@ -219,7 +250,7 @@ export class DppWizardComponent {
 
   /** Messaggio di errore leggibile per un campo — stessa logica di Admin.fieldError(), qui
    * self-contained per non dover passare un'altra funzione dal padre solo per questo. */
-  protected fieldError(name: 'name' | 'upi' | 'economicOperatorId'): string | null {
+  protected fieldError(name: 'name' | 'upi' | 'economicOperatorId' | 'facilityId'): string | null {
     const control = this.form.controls[name];
     if (!control.errors || !(control.dirty || control.touched)) return null;
     const firstError = Object.values(control.errors)[0] as { message?: string } | undefined;

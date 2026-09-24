@@ -117,7 +117,7 @@
           <p class="wizard-field-hint">Incolla l'URI GS1 Digital Link completo del prodotto — GTIN e livello si deducono da soli dalla sua sintassi.</p>
         }
         <p class="wizard-field-hint">
-          Diventa <code>uniqueProductIdentifier</code> (FprEN&nbsp;18219 §3.1.25 · FprEN&nbsp;18223 §4.1.2.1, Table&nbsp;1) — un URI
+          Diventa <code>uniqueProductIdentifier</code> — un URI
           <a class="field-standard-link" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
             GS1 Digital Link <app-icon name="external-link" [size]="11"></app-icon>
           </a>
@@ -142,17 +142,20 @@
           <label for="w-eo">EO — Economic Operator (UOI)</label>
           <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('economicOperatorId')">Usa demo</button>
         </div>
-        <input id="w-eo" type="text" formControlName="economicOperatorId" placeholder="https://id.gs1.org/417/9521234000006" />
+        <input id="w-eo" type="text" inputmode="url" formControlName="economicOperatorId" placeholder="https://id.gs1.org/417/9521234000006" />
         @if (fieldError('economicOperatorId'); as msg) {
           <p class="wizard-field-error">{{ msg }}</p>
         } @else {
           <p class="wizard-field-hint">
-            Campo <code>economicOperatorId</code>, <strong>obbligatorio</strong> (FprEN&nbsp;18223 §4.1.2.1, Table&nbsp;1), conforme a FprEN&nbsp;18219 — nella
-            pratica GS1 un
+            Campo <code>economicOperatorId</code>, <strong>obbligatorio</strong> — un URI
+            <a class="field-standard-link" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
+              GS1 Digital Link <app-icon name="external-link" [size]="11"></app-icon>
+            </a>
+            con il
             <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gln/" target="_blank" rel="noopener noreferrer">
               GLN <app-icon name="external-link" [size]="11"></app-icon>
             </a>
-            come GS1 Digital Link, AI&nbsp;(417). Inviato al DPP Registry UE come <code>reoId</code>.
+            dell'operatore economico, Application Identifier&nbsp;(417). Inviato al DPP Registry UE come <code>reoId</code>.
           </p>
         }
 
@@ -160,14 +163,18 @@
           <label for="w-facility">Facility — Stabilimento (UFI)</label>
           <button type="button" class="wizard-field-demo-link" (click)="requestFieldDemo.emit('facilityId')">Usa demo</button>
         </div>
-        <input id="w-facility" type="text" formControlName="facilityId" placeholder="https://id.gs1.org/414/9521234000112" />
-        <p class="wizard-field-hint">
-          Campo <code>facilityId</code>, facoltativo per lo standard — anche questo tipicamente un
-          <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gln/" target="_blank" rel="noopener noreferrer">
-            GLN <app-icon name="external-link" [size]="11"></app-icon>
-          </a>
-          GS1, AI&nbsp;(414). Inviato al DPP Registry UE come <code>facilitiesId</code>.
-        </p>
+        <input id="w-facility" type="text" inputmode="url" formControlName="facilityId" placeholder="https://id.gs1.org/414/9521234000112" />
+        @if (fieldError('facilityId'); as msg) {
+          <p class="wizard-field-error">{{ msg }}</p>
+        } @else {
+          <p class="wizard-field-hint">
+            Campo <code>facilityId</code>, facoltativo — quando compilato, stesso formato del campo sopra: un URI GS1 Digital Link col
+            <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gln/" target="_blank" rel="noopener noreferrer">
+              GLN <app-icon name="external-link" [size]="11"></app-icon>
+            </a>
+            dello stabilimento, Application Identifier&nbsp;(414). Inviato al DPP Registry UE come <code>facilitiesId</code>.
+          </p>
+        }
       </div>
     }
 
@@ -202,218 +209,214 @@
       </div>
     }
 
-    <!-- Passo 5: Riepilogo, campi automatici, salvataggio e registrazione -->
+    <!-- Passo 5: Riepilogo e salvataggio — sinistra la parte leggibile da un umano, destra il
+         JSON-LD dal vivo, sempre visibile mentre si compila (non più dietro "Vedi JSON-LD"). -->
     @if (currentStep() === 4) {
       <div class="wizard-step" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[4].title }}</h2>
-        <p class="wizard-step-help">Controlla l'anteprima, salva nei sistemi aziendali e — quando sei pronto — invia la registrazione al DPP Registry UE.</p>
+        <p class="wizard-step-help">Controlla l'anteprima e salva nei sistemi aziendali — la registrazione sul Registro UE è il passo successivo.</p>
 
-        <div class="wizard-summary">
-          <div class="wizard-summary-head">
-            <span class="wizard-summary-icon icon-flat" [style.--icon-color]="currentSector().brandColor">
-              <app-icon [name]="currentSector().icon" [size]="24"></app-icon>
-            </span>
-            <div class="wizard-summary-head-body">
-              <span class="wizard-summary-eyebrow" [style.color]="currentSector().brandColor">{{ currentSector().shortName }}</span>
-              <h3>{{ form.controls.name.value || 'Nome prodotto' }}</h3>
-            </div>
-            <div class="wizard-summary-qr">
-              @if (isBrowser && qrValue()) {
-                <qrcode [qrdata]="qrValue()!" [width]="72" [margin]="1" elementType="svg" colorDark="#14101f" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
-              } @else {
-                <div class="wizard-summary-qr-fallback">
-                  <app-icon name="qr-code" [size]="26"></app-icon>
+        <div class="wizard-split">
+          <div class="wizard-split-left">
+            <div class="wizard-summary">
+              <div class="wizard-summary-head">
+                <span class="wizard-summary-icon icon-flat" [style.--icon-color]="currentSector().brandColor">
+                  <app-icon [name]="currentSector().icon" [size]="24"></app-icon>
+                </span>
+                <div class="wizard-summary-head-body">
+                  <span class="wizard-summary-eyebrow" [style.color]="currentSector().brandColor">{{ currentSector().shortName }}</span>
+                  <h3>{{ form.controls.name.value || 'Nome prodotto' }}</h3>
+                </div>
+                <div class="wizard-summary-qr">
+                  @if (isBrowser && qrValue()) {
+                    <qrcode [qrdata]="qrValue()!" [width]="72" [margin]="1" elementType="svg" colorDark="#14101f" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
+                  } @else {
+                    <div class="wizard-summary-qr-fallback">
+                      <app-icon name="qr-code" [size]="26"></app-icon>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="wizard-summary-chips">
+                <span class="wizard-summary-chip">{{ previewGtin() ? 'GTIN (01) ' + previewGtin() : 'GTIN — non valido' }}</span>
+                @if (form.controls.batchOrSerial.value) {
+                  <span class="wizard-summary-chip">{{ form.controls.batchOrSerial.value }}</span>
+                }
+                <span class="gs-badge gs-badge--neutral">{{ form.controls.granularityLevel.value }}</span>
+              </div>
+              @if (attributesArray.controls.length) {
+                <div class="wizard-summary-facts">
+                  @for (row of attributesArray.controls; track $index) {
+                    @if (row.value.key?.trim()) {
+                      <div class="fact-tile">
+                        <span class="fact-label">{{ row.value.key }}</span>
+                        <span class="fact-value">{{ row.value.value || '—' }}</span>
+                      </div>
+                    }
+                  }
                 </div>
               }
             </div>
-          </div>
-          <div class="wizard-summary-chips">
-            <span class="wizard-summary-chip">{{ previewGtin() ? 'GTIN (01) ' + previewGtin() : 'GTIN — non valido' }}</span>
-            @if (form.controls.batchOrSerial.value) {
-              <span class="wizard-summary-chip">{{ form.controls.batchOrSerial.value }}</span>
-            }
-            <span class="gs-badge gs-badge--neutral">{{ form.controls.granularityLevel.value }}</span>
-          </div>
-          @if (attributesArray.controls.length) {
-            <div class="wizard-summary-facts">
-              @for (row of attributesArray.controls; track $index) {
-                @if (row.value.key?.trim()) {
-                  <div class="fact-tile">
-                    <span class="fact-label">{{ row.value.key }}</span>
-                    <span class="fact-value">{{ row.value.value || '—' }}</span>
-                  </div>
-                }
-              }
+
+            <!-- Campi che il sistema assegna da solo (non compilabili: editarli romperebbe un
+                 vincolo di coerenza interno), spiegati qui in modo che questo riepilogo dia
+                 comunque conto di TUTTO il JSON mostrato a destra, non solo dei campi del form. -->
+            <div class="wizard-auto-fields-head">
+              <span class="form-section-eyebrow">Campi assegnati automaticamente</span>
             </div>
-          }
-          <button
-            type="button"
-            class="gs-btn gs-btn--ghost gs-btn--sm wizard-summary-jsonld-btn"
-            [disabled]="!previewJsonLd()"
-            [title]="previewJsonLd() ? '' : 'Serve un UPI (GTIN) valido per generare il JSON-LD'"
-            (click)="viewJsonLd.emit()"
-          >
-            <app-icon name="braces" [size]="15"></app-icon>
-            Vedi JSON-LD
-          </button>
-        </div>
-
-        <!-- Campi dello schema §6.1 che il sistema assegna da solo — non compilabili
-             (editarli romperebbe la dichiarazione di conformità o un vincolo dello standard
-             stesso), mostrati comunque così questo riepilogo fa vedere DAVVERO tutto il JSON. -->
-        <div class="wizard-auto-fields-head">
-          <span class="form-section-eyebrow">Campi assegnati automaticamente (FprEN 18223 §4.1.2.1, Table 1)</span>
-        </div>
-        <dl class="auto-fields">
-          <div>
-            <dt>digitalProductPassportId</dt>
-            <dd>
-              <code>{{ editingId() ? 'urn:uuid:' + editingId() : 'assegnato al primo salvataggio' }}</code>
-              <span class="auto-field-note">Identificativo dell'istanza del passaporto (URN, RFC 4122) — distinto da UPI/GTIN, che identificano il prodotto.</span>
-            </dd>
-          </div>
-          <div>
-            <dt>granularity</dt>
-            <dd>
-              <code>{{ toStandardGranularity(form.controls.granularityLevel.value) }}</code>
-              <span class="auto-field-note">Dedotta dalla sintassi dell'UPI — non un campo separato da compilare.</span>
-            </dd>
-          </div>
-          <div>
-            <dt>dppSchemaVersion</dt>
-            <dd>
-              <code>{{ dppSchemaVersion }}</code>
-              <span class="auto-field-note">Versione dello schema JSON qui implementato — fissa per questo sito.</span>
-            </dd>
-          </div>
-          <div>
-            <dt>dppStatus</dt>
-            <dd>
-              <code>{{ toStandardDppStatus(recordStatus()) }}</code>
-              <span class="auto-field-note">Rispecchia lo stato bozza/registrato qui sotto.</span>
-            </dd>
-          </div>
-          <div>
-            <dt>lastUpdate</dt>
-            <dd>
-              <code>ISO 8601, UTC</code>
-              <span class="auto-field-note">Impostato automaticamente a ogni salvataggio.</span>
-            </dd>
-          </div>
-          <div>
-            <dt>contentSpecificationIds</dt>
-            <dd>
-              <code>{{ currentSector().contentSpecificationId }}</code>
-              <span class="auto-field-note">Dedotto dal Settore scelto al passo 1.</span>
-            </dd>
-          </div>
-        </dl>
-
-        <!-- I tre momenti del percorso: si salva nei propri sistemi, POI (con una conferma
-             esplicita, vedi il pannello più sotto) si invia al Registro UE, infine arriva la
-             conferma di registrazione vera. -->
-        <ol class="phase-stepper" aria-label="Percorso di pubblicazione">
-          <li class="phase-step" [class.is-done]="formPhase() > 1" [class.is-current]="formPhase() === 1">
-            <span class="phase-step-main">
-              <span class="phase-dot">
-                @if (formPhase() > 1) {
-                  <app-icon name="check-circle" [size]="14"></app-icon>
-                } @else {
-                  1
-                }
-              </span>
-              <span class="phase-label">Salva nei sistemi aziendali</span>
-            </span>
-            <span class="phase-connector"><span class="phase-connector-fill"></span></span>
-          </li>
-          <li class="phase-step" [class.is-done]="formPhase() > 2" [class.is-current]="formPhase() === 2">
-            <span class="phase-step-main">
-              <span class="phase-dot">
-                @if (formPhase() > 2) {
-                  <app-icon name="check-circle" [size]="14"></app-icon>
-                } @else {
-                  2
-                }
-              </span>
-              <span class="phase-label">Conferma e invia al Registro UE</span>
-            </span>
-            <span class="phase-connector"><span class="phase-connector-fill"></span></span>
-          </li>
-          <li class="phase-step" [class.is-done]="formPhase() === 3">
-            <span class="phase-step-main">
-              <span class="phase-dot">
-                @if (formPhase() === 3) {
-                  <app-icon name="check-circle" [size]="14"></app-icon>
-                } @else {
-                  3
-                }
-              </span>
-              <span class="phase-label">Conferma di registrazione</span>
-            </span>
-          </li>
-        </ol>
-
-        <div class="wizard-save-row">
-          <button type="button" class="gs-btn gs-btn--ghost wizard-save-btn" [disabled]="savePending || !!publishedRecord()" (click)="saveDraft.emit()">
-            @if (savePending) {
-              <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
-              Salvataggio…
-            } @else {
-              <app-icon name="save" [size]="16"></app-icon>
-              Salva nei sistemi aziendali
-            }
-          </button>
-          @if (editingId() && !showPublishConfirm()) {
-            <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="publishPending || !!publishedRecord()" (click)="requestPublish.emit()">
-              <app-icon name="send" [size]="16"></app-icon>
-              {{ publishPending ? 'Pubblicazione…' : publishedRecord() ? 'Già registrata' : 'Pubblica sul DPP Registry UE' }}
-            </button>
-          }
-        </div>
-
-        @if (showPublishConfirm()) {
-          <div class="publish-confirm">
-            <div class="publish-confirm-head">
-              <app-icon name="send" [size]="18"></app-icon>
+            <dl class="auto-fields">
               <div>
-                <h3>Confermi l'invio al Registro UE?</h3>
-                <p>Solo gli identificativi e l'hash del link lasceranno i sistemi aziendali — i dati di prodotto restano qui (vedi "Cos'è il DPP" in home).</p>
-              </div>
-            </div>
-            <dl class="publish-confirm-facts">
-              <div>
-                <dt>Prodotto</dt>
-                <dd>{{ form.controls.name.value || '—' }}</dd>
+                <dt>digitalProductPassportId</dt>
+                <dd>
+                  <code>{{ editingId() ? 'urn:uuid:' + editingId() : 'assegnato al primo salvataggio' }}</code>
+                  <span class="auto-field-note">Identificativo dell'istanza del passaporto — distinto da UPI/GTIN, che identificano il prodotto.</span>
+                </dd>
               </div>
               <div>
-                <dt>UPI</dt>
-                <dd>{{ previewGtin() ? 'GTIN' : '—' }} @if (previewGtin()) { <code>{{ previewGtin() }}</code> }</dd>
+                <dt>granularity</dt>
+                <dd>
+                  <code>{{ toStandardGranularity(form.controls.granularityLevel.value) }}</code>
+                  <span class="auto-field-note">Dedotta dalla sintassi dell'UPI — non un campo separato da compilare.</span>
+                </dd>
               </div>
               <div>
-                <dt>EO (UOI)</dt>
-                <dd><code>{{ form.controls.economicOperatorId.value || '—' }}</code></dd>
+                <dt>dppSchemaVersion</dt>
+                <dd>
+                  <code>{{ dppSchemaVersion }}</code>
+                  <span class="auto-field-note">Versione dello schema JSON qui implementato — fissa per questo sito.</span>
+                </dd>
               </div>
               <div>
-                <dt>Facility (UFI)</dt>
-                <dd><code>{{ form.controls.facilityId.value || '—' }}</code></dd>
+                <dt>dppStatus</dt>
+                <dd>
+                  <code>{{ toStandardDppStatus(recordStatus()) }}</code>
+                  <span class="auto-field-note">Rispecchia lo stato bozza/registrato di questa scheda.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>lastUpdate</dt>
+                <dd>
+                  <code>ISO 8601, UTC</code>
+                  <span class="auto-field-note">Impostato automaticamente a ogni salvataggio.</span>
+                </dd>
+              </div>
+              <div>
+                <dt>contentSpecificationIds</dt>
+                <dd>
+                  <code>{{ currentSector().contentSpecificationId }}</code>
+                  <span class="auto-field-note">Dedotto dal Settore scelto al passo 1.</span>
+                </dd>
               </div>
             </dl>
-            <div class="publish-confirm-actions">
-              <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelPublishConfirm.emit()">Annulla</button>
-              <button type="button" class="gs-btn gs-btn--primary" (click)="confirmPublish.emit()">
-                <app-icon name="send" [size]="15"></app-icon>
-                Conferma e invia al Registro UE
+
+            <div class="wizard-save-row">
+              <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="savePending || !!publishedRecord()" (click)="saveDraft.emit()">
+                @if (savePending) {
+                  <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
+                  Salvataggio…
+                } @else {
+                  <app-icon name="save" [size]="16"></app-icon>
+                  {{ publishedRecord() ? 'Già salvata' : 'Salva nei sistemi aziendali' }}
+                }
               </button>
             </div>
           </div>
-        }
+
+          <div class="wizard-split-right">
+            <div class="wizard-split-right-head">
+              <span class="wizard-split-right-label">JSON-LD</span>
+              <button type="button" class="wizard-json-expand" [disabled]="!previewJsonLd()" (click)="viewJsonLd.emit()" title="Espandi e copia">
+                <app-icon name="braces" [size]="14"></app-icon>
+              </button>
+            </div>
+            @if (previewJsonLdHighlighted(); as json) {
+              <pre class="wizard-json gs-code-block"><code [innerHTML]="json"></code></pre>
+            } @else {
+              <div class="wizard-json-placeholder">Serve un UPI (GTIN) valido per generare il JSON-LD.</div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Passo 6: Registrazione sul Registro UE — prima della conferma, cosa sta per essere
+         inviato (sinistra) e cosa dice già oggi il JSON-LD pubblico (destra); dopo la conferma,
+         il percorso reale verso mock-eu-registry (vedi PublishJourneyComponent), che porta il suo
+         stesso schema sinistra/destra. -->
+    @if (currentStep() === 5) {
+      <div class="wizard-step" [class]="'slide-' + slideDirection()">
+        <h2>{{ steps[5].title }}</h2>
+        <p class="wizard-step-help">Solo gli identificativi e l'hash del link GS1 Digital Link lasciano i sistemi aziendali — i dati di prodotto restano qui.</p>
 
         @if (publishedRecord(); as published) {
-          <div class="publish-result">
-            <app-icon name="check-circle" [size]="18"></app-icon>
-            <div>
-              <strong>Registrata sul DPP Registry UE.</strong>
-              <span>Identificativo di registrazione (Unique Registration Identifier): <code>{{ published.registryId }}</code></span>
+          <div class="wizard-split">
+            <div class="wizard-split-left">
+              <div class="wizard-publish-done">
+                <app-icon name="check-circle" [size]="20"></app-icon>
+                <div>
+                  <strong>Registrata sul DPP Registry UE.</strong>
+                  <span>Identificativo di registrazione: <code>{{ published.registryId }}</code></span>
+                </div>
+              </div>
+            </div>
+            <div class="wizard-split-right">
+              <div class="wizard-split-right-head">
+                <span class="wizard-split-right-label">JSON-LD pubblico</span>
+                <button type="button" class="wizard-json-expand" (click)="viewJsonLd.emit()" title="Espandi e copia">
+                  <app-icon name="braces" [size]="14"></app-icon>
+                </button>
+              </div>
+              @if (previewJsonLdHighlighted(); as json) {
+                <pre class="wizard-json gs-code-block"><code [innerHTML]="json"></code></pre>
+              }
+            </div>
+          </div>
+        } @else if (journeyStarted()) {
+          <app-publish-journey
+            [phase]="journeyPhase()"
+            [record]="journeyRecord()"
+            [errorMessage]="journeyError()"
+            [registryId]="journeyRegistryId()"
+            [longWait]="journeyLongWait()"
+            [technical]="journeyTechnical()"
+            [liveUrlJsonLd]="previewJsonLd()"
+          ></app-publish-journey>
+        } @else {
+          <div class="wizard-split">
+            <div class="wizard-split-left">
+              <dl class="publish-confirm-facts">
+                <div>
+                  <dt>Prodotto</dt>
+                  <dd>{{ form.controls.name.value || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>UPI</dt>
+                  <dd>{{ previewGtin() ? 'GTIN' : '—' }} @if (previewGtin()) { <code>{{ previewGtin() }}</code> }</dd>
+                </div>
+                <div>
+                  <dt>EO</dt>
+                  <dd><code>{{ form.controls.economicOperatorId.value || '—' }}</code></dd>
+                </div>
+                <div>
+                  <dt>Facility</dt>
+                  <dd><code>{{ form.controls.facilityId.value || '—' }}</code></dd>
+                </div>
+              </dl>
+              <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="publishPending" (click)="confirmPublish.emit()">
+                <app-icon name="send" [size]="16"></app-icon>
+                Conferma e invia al Registro UE
+              </button>
+            </div>
+            <div class="wizard-split-right">
+              <div class="wizard-split-right-head">
+                <span class="wizard-split-right-label">JSON-LD che il registro verificherà</span>
+                <button type="button" class="wizard-json-expand" (click)="viewJsonLd.emit()" title="Espandi e copia">
+                  <app-icon name="braces" [size]="14"></app-icon>
+                </button>
+              </div>
+              @if (previewJsonLdHighlighted(); as json) {
+                <pre class="wizard-json gs-code-block"><code [innerHTML]="json"></code></pre>
+              }
             </div>
           </div>
         }

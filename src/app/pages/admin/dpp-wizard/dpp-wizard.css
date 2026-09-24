@@ -420,10 +420,6 @@
   border-radius: var(--radius-sm);
 }
 
-.wizard-summary-jsonld-btn {
-  margin-top: 14px;
-}
-
 .wizard-summary-icon {
   width: 46px;
   height: 46px;
@@ -520,116 +516,95 @@
   line-height: 1.5;
 }
 
-/* --- Stepper dei tre momenti del percorso (salva → conferma e invia → conferma di
-   registrazione) — vedi PublishJourneyComponent per il dettaglio passo-passo del momento 2.
-   Duplicato di admin.css (stesso motivo dei .gs-btn override in cima al file). */
-.phase-stepper {
-  display: flex;
-  list-style: none;
-  margin: 0 0 24px;
-  padding: 0;
+/* --- Schema a due colonne dei passi 5-6 (Riepilogo/Registrazione): sinistra la parte
+   comprensibile da un umano (form, spiegazioni, azioni), destra il JSON-LD corrispondente dal
+   vivo — su richiesta esplicita, così il JSON non è più un'anteprima dietro un click ma resta
+   visibile mentre si compila/conferma. */
+.wizard-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
 }
 
-.phase-step {
-  flex: 1;
+.wizard-split-left {
+  min-width: 0;
+}
+
+.wizard-split-right {
+  min-width: 0;
+  position: sticky;
+  top: 12px;
+}
+
+.wizard-split-right-head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.phase-step:last-child {
-  flex: 0 0 auto;
+.wizard-split-right-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
-.phase-step-main {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.phase-dot {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  display: flex;
+.wizard-json-expand {
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-surface-sunken);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--border-default);
   color: var(--text-tertiary);
-  border: 2px solid var(--border-subtle);
-  font-size: 0.78rem;
-  font-weight: 700;
-  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 
-.phase-label {
-  font-size: 0.84rem;
-  font-weight: 600;
+.wizard-json-expand:hover:not(:disabled) {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.wizard-json-expand:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wizard-json {
+  margin: 0;
+  max-height: 520px;
+  overflow: auto;
+  font-size: 0.76rem;
+}
+
+.wizard-json-placeholder {
+  display: flex;
+  align-items: center;
+  min-height: 120px;
+  padding: 14px 16px;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
   color: var(--text-tertiary);
-  white-space: nowrap;
-  transition: color var(--dur-base) var(--ease-out);
+  font-size: 0.82rem;
+  font-style: italic;
 }
 
-.phase-connector {
-  flex: 1;
-  height: 2px;
-  margin: 0 14px;
-  min-width: 24px;
-  background: var(--border-subtle);
-  overflow: hidden;
-}
+@media (max-width: 860px) {
+  .wizard-split {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 
-.phase-connector-fill {
-  display: block;
-  height: 100%;
-  width: 0%;
-  background: var(--text-primary);
-  transition: width 0.5s var(--ease-out);
-}
-
-.phase-step.is-done .phase-dot {
-  background: var(--text-primary);
-  border-color: var(--text-primary);
-  color: var(--bg-surface);
-  animation: phase-dot-pop 0.4s var(--ease-spring);
-}
-
-.phase-step.is-done .phase-label {
-  color: var(--text-primary);
-}
-
-.phase-step.is-done .phase-connector-fill {
-  width: 100%;
-}
-
-.phase-step.is-current .phase-dot {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-soft);
-  animation: phase-pulse 1.6s ease-in-out infinite;
-}
-
-.phase-step.is-current .phase-label {
-  color: var(--text-primary);
-}
-
-@keyframes phase-dot-pop {
-  0% { transform: scale(0.7); }
-  60% { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-
-@keyframes phase-pulse {
-  0% { box-shadow: 0 0 0 0 var(--accent-soft); }
-  70% { box-shadow: 0 0 0 8px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .phase-step.is-done .phase-dot,
-  .phase-step.is-current .phase-dot {
-    animation: none;
+  .wizard-split-right {
+    position: static;
   }
 }
 
@@ -637,6 +612,7 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 24px;
 }
 
 .wizard-save-btn {
@@ -644,83 +620,41 @@
   min-width: 220px;
 }
 
-.publish-result {
+/* --- Esito "già registrata" (passo 6, quando publishedRecord() è già valorizzato all'ingresso
+   nel passo — non un nuovo invio, solo la conferma di uno stato già raggiunto). */
+.wizard-publish-done {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 20px;
   padding: 14px 16px;
   border-radius: var(--radius-md);
   background: var(--success-soft);
   color: var(--success);
 }
 
-.publish-result strong {
+.wizard-publish-done strong {
   display: block;
   font-size: 0.9rem;
 }
 
-.publish-result span {
+.wizard-publish-done span {
   display: block;
   font-size: 0.82rem;
   color: var(--text-secondary);
 }
 
-.publish-result code {
+.wizard-publish-done code {
   font-family: var(--font-mono);
 }
 
-/* --- Riepilogo di conferma prima dell'invio al Registro UE: un momento distinto, non
-   automatico, tra "Pubblica" e il vero avvio della richiesta — così il secondo momento del
-   percorso ("conferma e invia") è un'azione deliberata, non solo un'etichetta sullo stepper
-   sopra. Duplicato di admin.css (stesso motivo dei .gs-btn override in cima al file). */
-.publish-confirm {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface-sunken);
-  animation: publish-confirm-in 0.3s var(--ease-out);
-}
-
-@keyframes publish-confirm-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.publish-confirm-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.publish-confirm-head app-icon {
-  flex-shrink: 0;
-  margin-top: 2px;
-  color: var(--accent);
-}
-
-.publish-confirm-head h3 {
-  font-size: 0.98rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 4px;
-}
-
-.publish-confirm-head p {
-  font-size: 0.82rem;
-  color: var(--text-tertiary);
-  line-height: 1.5;
-  margin: 0;
-}
-
+/* --- Riepilogo prima dell'invio al Registro UE (passo 6, prima della conferma): cosa sta per
+   lasciare i sistemi aziendali. */
 .publish-confirm-facts {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px 16px;
-  margin: 16px 0 0;
-  padding: 16px 0 0;
-  border-top: 1px solid var(--border-subtle);
+  gap: 14px 16px;
+  margin: 0;
+  padding: 0 0 20px;
 }
 
 .publish-confirm-facts dt {
@@ -744,12 +678,6 @@
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 0.82rem;
-}
-
-.publish-confirm-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 18px;
 }
 
 @media (max-width: 640px) {

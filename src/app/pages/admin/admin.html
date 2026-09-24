@@ -102,7 +102,12 @@
                 </td>
                 <td data-label="UPI (GTIN)"><code>{{ record.gtin }}</code></td>
                 <td data-label="Stato">
-                  @if (record.status === 'published') {
+                  @if (record.isStatic) {
+                    <span class="gs-badge gs-badge--neutral">
+                      <app-icon name="shield-check" [size]="11"></app-icon>
+                      Esempio home
+                    </span>
+                  } @else if (record.status === 'published') {
                     <span class="gs-badge gs-badge--verified">
                       <span class="status-dot"></span>
                       Registrata
@@ -112,19 +117,25 @@
                   }
                 </td>
                 <td data-label="Azioni" class="record-actions">
-                  <button type="button" class="gs-icon-btn" title="Apri" aria-label="Apri" (click)="startEdit(record)">
-                    <app-icon name="edit" [size]="15"></app-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="gs-icon-btn gs-icon-btn--danger"
-                    [disabled]="record.status === 'published'"
-                    [title]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
-                    [attr.aria-label]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
-                    (click)="deleteRecord(record)"
-                  >
-                    <app-icon name="trash" [size]="15"></app-icon>
-                  </button>
+                  @if (record.isStatic) {
+                    <span class="record-static-note" title="Esempio del carosello home: non modificabile né eliminabile da qui.">
+                      <app-icon name="shield-check" [size]="14"></app-icon>
+                    </span>
+                  } @else {
+                    <button type="button" class="gs-icon-btn" title="Apri" aria-label="Apri" (click)="startEdit(record)">
+                      <app-icon name="edit" [size]="15"></app-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="gs-icon-btn gs-icon-btn--danger"
+                      [disabled]="record.status === 'published'"
+                      [title]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
+                      [attr.aria-label]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
+                      (click)="deleteRecord(record)"
+                    >
+                      <app-icon name="trash" [size]="15"></app-icon>
+                    </button>
+                  }
                 </td>
               </tr>
             } @empty {
@@ -151,42 +162,33 @@
         [previewGtin]="previewGtin"
         [previewUpi]="previewUpi"
         [previewJsonLd]="previewJsonLd"
+        [economicOperatorValid]="economicOperatorValid"
+        [facilityValid]="facilityValid"
         [attributesArray]="attributesArray"
         [editingId]="editingId"
         [publishedRecord]="publishedRecord"
         [formPhase]="formPhase"
-        [showPublishConfirm]="showPublishConfirm"
         [savePending]="savePending()"
         [publishPending]="publishPending()"
         [qrValue]="qrValue"
         [isBrowser]="isBrowser"
+        [journeyStarted]="journeyOpen"
+        [journeyPhase]="journeyPhase"
+        [journeyRecord]="journeyRecord"
+        [journeyError]="journeyError"
+        [journeyRegistryId]="journeyRegistryId"
+        [journeyLongWait]="journeyLongWait"
+        [journeyTechnical]="journeyTechnical"
         (addAttribute)="addAttributeRow()"
         (removeAttribute)="removeAttributeRow($event)"
         (requestDemoFill)="fillDemoAttributes()"
         (requestFieldDemo)="demoFillField($event)"
         (showToast)="showToast($event.message, $event.severity)"
         (saveDraft)="saveDraft()"
-        (requestPublish)="requestPublish()"
-        (cancelPublishConfirm)="cancelPublishConfirm()"
         (confirmPublish)="confirmPublish()"
         (viewJsonLd)="openJsonLdPreview()"
         (cancel)="cancelForm()"
       ></app-dpp-wizard>
-
-      <!-- Percorso di pubblicazione: inline nella pagina (non una modale) così resta
-           consultabile insieme al wizard, con il JSON di ogni passo visibile a lato invece che
-           dietro un click — vedi PublishJourneyComponent. -->
-      <app-publish-journey
-        [open]="journeyOpen()"
-        [phase]="journeyPhase()"
-        [record]="journeyRecord()"
-        [errorMessage]="journeyError()"
-        [registryId]="journeyRegistryId()"
-        [longWait]="journeyLongWait()"
-        [technical]="journeyTechnical()"
-        [liveUrlJsonLd]="previewJsonLd()"
-        (closed)="closeJourney()"
-      ></app-publish-journey>
     }
   }
 </div>

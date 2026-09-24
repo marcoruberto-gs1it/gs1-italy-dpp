@@ -15,30 +15,31 @@
  * pubblicata (immagine Docker :latest, evidentemente non allineata al branch) lo rifiuta come
  * mancante se omesso. Dove i due divergono vince il comportamento verificato dal vivo.
  *
- * ATTENZIONE (importante per chi legge questo file conoscendo lo standard CEN/CENELEC): mockeu-registry è l'implementazione di riferimento CIRPASS-2, con un proprio schema JSON — NON è
- * la stessa cosa del metodo astratto "RegisterProductDPP" descritto in FprEN 18222:2026 §5.2
- * (Tabella 8), che definisce un oggetto "DppRegistryEntry" con nomi di campo diversi (schema
- * completo in dpp-api-specification.md §6.2, la sintesi da cui è stata riverificata questa
- * tabella). I due non sono intercambiabili: lo standard descrive il CONCETTO, mock-eu-registry è
+ * ATTENZIONE (importante per chi legge questo file conoscendo il quadro normativo CEN/CENELEC):
+ * mock-eu-registry è l'implementazione di riferimento CIRPASS-2, con un proprio schema JSON —
+ * NON è la stessa cosa del metodo astratto di registrazione che lo standard descrive a livello
+ * concettuale, con nomi di campo diversi (schema completo in dpp-api-specification.md). I due
+ * non sono intercambiabili: lo standard descrive il CONCETTO, mock-eu-registry è
  * un'implementazione concreta con le sue scelte di naming. NON "correggere" i nomi qui sotto per
  * farli combaciare con lo standard: romperebbe le richieste vere contro il registro live.
  * Corrispondenza concettuale, campo per campo, tra ciò che inviamo davvero (a sinistra) e il
- * nome/formato equivalente nello standard (a destra):
- *   upi              ~ DppRegistryEntry.uniqueProductIdentifier
- *   reoId            ~ DppRegistryEntry.uniqueEconomicOperatorIdentifier
- *   liveURL          ~ DppRegistryEntry.dppApiEndpoint
- *   granularityLevel ~ DppRegistryEntry.granularity — stesso concetto, casing diverso:
- *                      MODEL/BATCH/ITEM qui, "model"/"batch"/"item" nel JSON-LD pubblico (vedi
- *                      toStandardGranularity in jsonld.ts — minuscolo per scelta, allineato a
- *                      openepcis/openepcis-dpp-ready, non un refuso) — questo file invece deve
- *                      restare MAIUSCOLO, il valore verificato dal vivo contro lo schema di
- *                      mock-eu-registry)
- *   (nessun campo)   ~ DppRegistryEntry.digitalProductPassportId (non richiesto da mock-eu-registry;
- *                      esposto comunque nel nostro JSON-LD pubblico, vedi jsonld.ts)
+ * concetto equivalente nello standard (a destra):
+ *   upi              ~ identificativo univoco di prodotto (UPI)
+ *   reoId            ~ identificativo dell'operatore economico
+ *   liveURL          ~ endpoint API del passaporto
+ *   granularityLevel ~ granularità — stesso concetto, casing diverso: MODEL/BATCH/ITEM qui,
+ *                      "model"/"batch"/"item" nel JSON-LD pubblico (vedi toStandardGranularity in
+ *                      jsonld.ts — minuscolo perché richiesto dallo standard, non un refuso) —
+ *                      questo file invece deve restare MAIUSCOLO, il valore verificato dal vivo
+ *                      contro lo schema di mock-eu-registry.
+ *   (nessun campo)   ~ identificativo dell'istanza del passaporto (non richiesto da
+ *                      mock-eu-registry; esposto comunque nel nostro JSON-LD pubblico, vedi
+ *                      jsonld.ts)
  * commodityCode, facilitiesId, modelUpi, batchUpi, deactivated, backupURL sono campi propri
- * dello schema di mock-eu-registry, senza equivalente nella Tabella 8 dello standard (che lascia
- * i dettagli del payload di registrazione all'implementazione del registro) — productGroup di
- * DppRegistryEntry, viceversa, non ha equivalente qui: mock-eu-registry non lo richiede.
+ * dello schema di mock-eu-registry, senza un concetto equivalente nello standard (che lascia i
+ * dettagli del payload di registrazione all'implementazione del registro) — un campo dello
+ * standard equivalente a productGroup, viceversa, non ha equivalente qui: mock-eu-registry non lo
+ * richiede.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import type { SectorId } from './sectors.ts';
