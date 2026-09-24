@@ -1,6 +1,15 @@
 import { GranularityLevel } from '../../services/registry-api.service';
 
-/** Dati fittizi plausibili per popolare rapidamente il form — non prodotti reali. */
+/** Dati fittizi plausibili per popolare rapidamente il form — non prodotti reali.
+ *
+ * Gli attributi contrassegnati "tracepass:" sotto sono stati scelti (nome del concetto, unità
+ * di misura, valore plausibile) confrontando questo file con i template reali di
+ * github.com/malinoto/tracepass-dpp-schemas (Apache-2.0) — 1.005 campi su 13 categorie
+ * prodotto, ciascuno tracciato all'articolo del regolamento UE che lo richiede o lo anticipa.
+ * Non tutti i settori hanno un template corrispondente lì (mancano alluminio e materassi, che
+ * restano quindi solo plausibili come prima) e non tutti i campi lì sono "required" nel senso
+ * legale — dove il commento dice "anticipated" l'atto delegato ESPR che lo imporrà non è ancora
+ * stato adottato, la citazione resta comunque quella reale del template. */
 export interface DemoDataset {
   name: string;
   granularityLevel: GranularityLevel;
@@ -21,6 +30,12 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'cicli di ricarica': '42',
       'impronta di carbonio (kg CO₂e)': '1850',
       'contenuto riciclato cobalto (%)': '16',
+      // tracepass: batteryCategory — Reg. (UE) 2023/1542 Art. 1, Annex VI Part A (required).
+      'categoria batteria': 'EV',
+      // tracepass: nominalVoltage — Art. 77, Annex XIII (required).
+      'tensione nominale (V)': '400',
+      // tracepass: ceMarking — Art. 20 (required).
+      'marcatura CE': 'Sì',
     },
   },
   apparel: {
@@ -32,6 +47,11 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'paese di origine': 'Portogallo',
       certificazione: 'GOTS',
       'istruzioni di cura': 'Lavaggio a 30°C',
+      // tracepass: recycledContentPercentage — ESPR Art. 7(2)(b) (anticipated, nessun atto
+      // delegato tessile ancora adottato — vedi nota in cima al file).
+      'contenuto riciclato (%)': '35',
+      // tracepass: carbonFootprint — ESPR Art. 7(2)(a), metodologia PEF (anticipated).
+      'impronta di carbonio (kg CO₂e)': '4.2',
     },
   },
   steel: {
@@ -43,6 +63,12 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'contenuto riciclato (%)': '32',
       'impronta di carbonio (kg CO₂e/t)': '1420',
       stabilimento: 'Acciaieria di Taranto',
+      // tracepass: yieldStrengthMpa — EN 10025/EN 10204 (required). 355 MPa è per
+      // definizione il carico di snervamento nominale di un acciaio "S355".
+      'carico di snervamento (MPa)': '355',
+      // tracepass: tensileStrengthMpa — EN 10204 (required). Intervallo tipico per S355:
+      // 470-630 MPa.
+      'resistenza alla trazione (MPa)': '510',
     },
   },
   construction: {
@@ -54,6 +80,8 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'classe reazione al fuoco': 'A1',
       'spessore (mm)': '100',
       certificazione: 'CE — EN 13162',
+      // tracepass: recycledContent — CPR (UE) 2024/3110 (anticipated).
+      'contenuto riciclato (%)': '30',
     },
   },
   aluminium: {
@@ -75,6 +103,8 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'classe aderenza bagnato': 'A',
       'rumorosità (dB)': '68',
       'indice carico/velocità': '91V',
+      // tracepass: recycledRubberContentPercentage — ESPR Art. 7(2)(b) (anticipated).
+      'contenuto gomma riciclata (%)': '12',
     },
   },
   furniture: {
@@ -86,6 +116,10 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'garanzia (anni)': '5',
       'disponibilità ricambi (anni)': '10',
       'peso (kg)': '14.2',
+      // tracepass: repairabilityScore — ESPR Art. 7(2)(a) (anticipated).
+      'punteggio di riparabilità': '7.5 / 10',
+      // tracepass: carbonFootprint — ESPR Art. 7(2)(a), metodologia PEF (anticipated).
+      'impronta di carbonio (kg CO₂e)': '18',
     },
   },
   mattresses: {
@@ -110,6 +144,8 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'disponibilità ricambi (anni)': '7',
       'consumo in standby (W)': '1.8',
       'contenuto riciclato plastica (%)': '30',
+      // tracepass: recycledMetalContent — ESPR Art. 7 (anticipated).
+      'contenuto riciclato metallo (%)': '18',
     },
   },
 };
