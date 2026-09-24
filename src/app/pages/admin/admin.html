@@ -39,7 +39,7 @@
       <div class="admin-header">
         <div>
           <h1>I tuoi DPP</h1>
-          <p class="admin-stat"><strong>{{ records().length }}</strong> DPP totali — in bozza o registrati sul DPP Registry UE.</p>
+          <p class="admin-stat"><strong>{{ records().length }}</strong> DPP totali — salvati in azienda o registrati sul DPP Registry UE.</p>
         </div>
         <div class="admin-header-actions">
           <button type="button" class="gs-btn gs-btn--primary" (click)="startCreate()">
@@ -108,7 +108,7 @@
                       Registrata
                     </span>
                   } @else {
-                    <span class="gs-badge gs-badge--neutral">Bozza</span>
+                    <span class="gs-badge gs-badge--neutral">Salvata in azienda</span>
                   }
                 </td>
                 <td data-label="Azioni" class="record-actions">
@@ -286,7 +286,7 @@
                 <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
                 Salvataggio…
               } @else {
-                Salva bozza
+                Salva nei sistemi aziendali
               }
             </button>
             @if (editingId()) {
@@ -372,20 +372,23 @@
           </button>
         </aside>
       </form>
+
+      <!-- Percorso di pubblicazione: inline nella pagina (non una modale) così resta
+           consultabile insieme al form, con il JSON di ogni passo visibile a lato invece che
+           dietro un click — vedi PublishJourneyComponent. -->
+      <app-publish-journey
+        [open]="journeyOpen()"
+        [phase]="journeyPhase()"
+        [record]="journeyRecord()"
+        [errorMessage]="journeyError()"
+        [registryId]="journeyRegistryId()"
+        [longWait]="journeyLongWait()"
+        [technical]="journeyTechnical()"
+        [liveUrlJsonLd]="previewJsonLd()"
+        (closed)="closeJourney()"
+      ></app-publish-journey>
     }
   }
 </div>
-
-<app-publish-journey
-  [open]="journeyOpen()"
-  [phase]="journeyPhase()"
-  [record]="journeyRecord()"
-  [errorMessage]="journeyError()"
-  [registryId]="journeyRegistryId()"
-  [longWait]="journeyLongWait()"
-  [technical]="journeyTechnical()"
-  [liveUrlJsonLd]="previewJsonLd()"
-  (closed)="closeJourney()"
-></app-publish-journey>
 
 <app-json-ld-drawer [open]="jsonLdPreviewOpen()" [jsonLd]="previewJsonLd()" (closed)="closeJsonLdPreview()"></app-json-ld-drawer>

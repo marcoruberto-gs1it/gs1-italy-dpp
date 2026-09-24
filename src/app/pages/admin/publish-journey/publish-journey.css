@@ -1,55 +1,47 @@
-.journey-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1100;
-  background: rgba(15, 15, 20, 0.55);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: journey-fade-in 0.18s ease-out;
-}
-
-.journey-dialog {
+/* --- Percorso di pubblicazione: inline nella pagina, non più una modale — appare sotto il
+   form quando si preme "Pubblica" e resta consultabile insieme al resto della pagina. */
+.pj {
   position: relative;
-  width: 100%;
-  max-width: 560px;
-  max-height: 90vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  margin-top: 28px;
   background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   padding: 28px;
-  animation: journey-pop-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+  animation: pj-enter 0.4s var(--ease-out);
 }
 
-.journey-dialog.is-success {
-  animation: journey-pop-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), journey-success-glow 1s ease-out 0.1s;
+.pj.is-success {
+  animation: pj-enter 0.4s var(--ease-out), pj-success-glow 1s ease-out 0.2s;
 }
 
-/* --- Barra di avanzamento sottile: l'unico elemento puramente decorativo del percorso —
-   non è una fonte di verità in più, ricalcolata da progressPercent() a partire dagli stessi
-   stepStatus() che colorano i nodi sotto, quindi non può mai raccontare una storia diversa. */
-.journey-progress-track {
+@keyframes pj-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Barra di avanzamento sottile: puramente decorativa (l'unica fonte di verità resta
+   stepStatus/phase), ricalcolata da progressPercent() così non può mai raccontare una storia
+   diversa dai nodi sotto. */
+.pj-progress-track {
   margin: -28px -28px 22px;
   height: 3px;
   background: var(--border-subtle);
   overflow: hidden;
 }
 
-.journey-progress-fill {
+.pj-progress-fill {
   height: 100%;
   background: var(--accent);
   transition: width 0.6s var(--ease-out);
 }
 
-.journey-progress-track.is-error .journey-progress-fill {
+.pj-progress-track.is-error .pj-progress-fill {
   background: var(--warning);
 }
 
-.journey-header {
+.pj-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -57,25 +49,25 @@
   margin-bottom: 6px;
 }
 
-.journey-header h2 {
+.pj-header h2 {
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--text-primary);
   margin: 6px 0 4px;
 }
 
-.journey-header p {
+.pj-header p {
   font-size: 0.85rem;
   color: var(--text-tertiary);
   margin: 0;
 }
 
-.journey-header code {
+.pj-header code {
   font-family: var(--font-mono);
   color: var(--text-secondary);
 }
 
-.journey-close {
+.pj-close {
   appearance: none;
   border: none;
   background: none;
@@ -85,18 +77,126 @@
   flex-shrink: 0;
 }
 
-.journey-close:hover {
+.pj-close:hover {
   color: var(--text-primary);
 }
 
-.journey-explainer {
+.pj-explainer {
   font-size: 0.82rem;
   color: var(--text-tertiary);
   line-height: 1.5;
-  margin: 14px 0 24px;
+  margin: 14px 0 26px;
+  max-width: 640px;
 }
 
-.journey-steps {
+/* --- Flusso compatto A → B → C → D: una vista d'insieme di dove si è arrivati, sopra il
+   dettaglio riga per riga. Le etichette si nascondono sotto i 560px (vedi media query in fondo):
+   restano solo i pallini numerati/connessi, il testo completo resta comunque nel dettaglio sotto. */
+.pj-flow {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: 0 0 30px;
+  padding: 0;
+}
+
+.pj-flow-item {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pj-flow-item:last-child {
+  flex: 0 0 auto;
+}
+
+.pj-flow-dot {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface-sunken);
+  color: var(--text-tertiary);
+  border: 2px solid var(--border-subtle);
+  font-size: 0.72rem;
+  font-weight: 700;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.pj-flow-label {
+  margin-left: 8px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.25s ease;
+}
+
+.pj-flow-connector {
+  flex: 1 1 auto;
+  min-width: 16px;
+  height: 2px;
+  margin: 0 10px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.pj-flow-connector-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: var(--success);
+  transition: width 0.5s var(--ease-out);
+}
+
+.pj-flow-item.is-done .pj-flow-dot {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .pj-flow-item.is-done .pj-flow-dot {
+  background: #059669;
+  border-color: #059669;
+}
+
+.pj-flow-item.is-done .pj-flow-label {
+  color: var(--text-primary);
+}
+
+.pj-flow-item.is-done .pj-flow-connector-fill {
+  width: 100%;
+}
+
+.pj-flow-item.is-active .pj-flow-dot {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  animation: pj-pulse 1.4s ease-in-out infinite;
+}
+
+.pj-flow-item.is-active .pj-flow-label {
+  color: var(--text-primary);
+}
+
+.pj-flow-item.is-error .pj-flow-dot {
+  background: var(--warning-soft);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.pj-flow-item.is-error .pj-flow-label {
+  color: var(--warning);
+}
+
+/* --- Dettaglio riga per riga: icona+linea | testo | JSON sempre visibile a lato. */
+.pj-detail {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -104,19 +204,19 @@
   flex-direction: column;
 }
 
-.journey-step {
+.pj-row {
   position: relative;
   display: grid;
-  grid-template-columns: 32px 1fr;
-  column-gap: 14px;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 20px;
   padding-bottom: 26px;
 }
 
-.journey-step:last-child {
+.pj-row:last-child {
   padding-bottom: 0;
 }
 
-.journey-node {
+.pj-node {
   position: relative;
   grid-row: 1;
   grid-column: 1;
@@ -133,7 +233,7 @@
   z-index: 1;
 }
 
-.journey-node::after {
+.pj-node::after {
   content: '';
   position: absolute;
   inset: -2px;
@@ -143,7 +243,7 @@
   pointer-events: none;
 }
 
-.journey-line {
+.pj-line {
   grid-row: 1 / span 2;
   grid-column: 1;
   width: 2px;
@@ -154,7 +254,7 @@
   overflow: hidden;
 }
 
-.journey-line-fill {
+.pj-line-fill {
   display: block;
   width: 100%;
   height: 0%;
@@ -162,7 +262,7 @@
   transition: height 0.5s var(--ease-out);
 }
 
-.journey-copy {
+.pj-row-copy {
   grid-row: 1;
   grid-column: 2;
   display: flex;
@@ -171,210 +271,247 @@
   padding-top: 4px;
 }
 
-.journey-copy strong {
+.pj-row-copy strong {
   font-size: 0.92rem;
   color: var(--text-tertiary);
   transition: color 0.25s ease;
 }
 
-.journey-term {
+.pj-term {
   font-size: 0.74rem;
   color: var(--text-tertiary);
   opacity: 0.7;
   font-family: var(--font-mono);
 }
 
-.journey-term--reassure {
+.pj-term--reassure {
   font-family: inherit;
   font-style: italic;
   opacity: 1;
   color: var(--accent);
 }
 
-.journey-detail {
+.pj-row-detail {
   font-size: 0.78rem;
   color: var(--text-secondary);
   margin-top: 4px;
 }
 
-.journey-tech-toggle {
-  appearance: none;
-  border: none;
-  background: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 6px;
-  padding: 2px 0;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.journey-tech-toggle:hover {
-  text-decoration: underline;
-}
-
-.journey-tech-json {
-  margin: 8px 0 0;
-  max-height: 220px;
-  overflow: auto;
-  font-size: 0.72rem;
-  animation: journey-json-in 0.25s var(--ease-out);
-}
-
-.journey-detail code {
+.pj-row-detail code {
   font-family: var(--font-mono);
   background: var(--bg-surface-sunken);
   padding: 1px 6px;
   border-radius: var(--radius-sm);
 }
 
-.journey-detail--success {
+.pj-row-detail--success {
   color: var(--success);
 }
 
-.journey-detail--error {
+.pj-row-detail--error {
   color: var(--warning);
 }
 
+.pj-row-json {
+  grid-row: 1;
+  grid-column: 3;
+  padding-top: 4px;
+  min-width: 0;
+}
+
+.pj-json {
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+  font-size: 0.72rem;
+  animation: pj-json-in 0.3s var(--ease-out);
+}
+
+.pj-json-placeholder {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-height: 44px;
+  padding: 14px 16px;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
 /* --- Stati --- */
-.journey-step.is-done .journey-node {
+.pj-row.is-done .pj-node {
   background: var(--success);
   border-color: var(--success);
   color: #fff;
-  animation: journey-node-pop 0.4s var(--ease-spring);
+  animation: pj-node-pop 0.4s var(--ease-spring);
 }
 
-.journey-step.is-done .journey-node::after {
-  animation: journey-ring-ping 0.6s ease-out;
+.pj-row.is-done .pj-node::after {
+  animation: pj-ring-ping 0.6s ease-out;
 }
 
-/* Nel tema scuro --success è pensato per leggersi come testo su sfondo scuro (10:1), non come
-   riempimento con icona bianca sopra (1.9:1, sotto anche la soglia 3:1 per elementi grafici
-   non testuali) — qui serve una tinta più scura, verificata solo per questo riempimento. */
-:root[data-theme='dark'] .journey-step.is-done .journey-node {
+:root[data-theme='dark'] .pj-row.is-done .pj-node {
   background: #059669;
   border-color: #059669;
 }
 
-:root[data-theme='dark'] .journey-step.is-done .journey-node::after {
+:root[data-theme='dark'] .pj-row.is-done .pj-node::after {
   border-color: #059669;
 }
 
-.journey-step.is-done .journey-copy strong {
+.pj-row.is-done .pj-row-copy strong {
   color: var(--text-primary);
 }
 
-.journey-step.is-done .journey-line-fill {
+.pj-row.is-done .pj-line-fill {
   height: 100%;
 }
 
-.journey-step.is-active .journey-node {
+.pj-row.is-active .pj-node {
   background: var(--accent-soft);
   border-color: var(--accent);
   color: var(--accent);
-  animation: journey-pulse 1.4s ease-in-out infinite;
+  animation: pj-pulse 1.4s ease-in-out infinite;
 }
 
-.journey-step.is-active .journey-node app-icon {
+.pj-row.is-active .pj-node app-icon {
   display: flex;
-  animation: journey-icon-bob 1.4s ease-in-out infinite;
+  animation: pj-icon-bob 1.4s ease-in-out infinite;
 }
 
-.journey-step.is-active .journey-copy strong {
+.pj-row.is-active .pj-row-copy strong {
   color: var(--text-primary);
 }
 
-.journey-step.is-error .journey-node {
+.pj-row.is-error .pj-node {
   background: var(--warning-soft);
   border-color: var(--warning);
   color: var(--warning);
 }
 
-.journey-step.is-error .journey-copy strong {
+.pj-row.is-error .pj-row-copy strong {
   color: var(--warning);
 }
 
-.journey-dismiss {
+.pj-dismiss {
   width: 100%;
   margin-top: 24px;
 }
 
-.journey-cancel-row {
+.pj-cancel-row {
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.journey-cancel-hint {
+.pj-cancel-hint {
   font-size: 0.8rem;
   color: var(--text-tertiary);
   line-height: 1.5;
   margin: 0 0 10px;
 }
 
-.journey-cancel-row .journey-dismiss {
+.pj-cancel-row .pj-dismiss {
   width: 100%;
   margin-top: 0;
 }
 
-@keyframes journey-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes journey-pop-in {
-  from { opacity: 0; transform: scale(0.96) translateY(6px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-@keyframes journey-pulse {
+@keyframes pj-pulse {
   0% { box-shadow: 0 0 0 0 var(--accent-soft); }
   70% { box-shadow: 0 0 0 10px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-@keyframes journey-icon-bob {
+@keyframes pj-icon-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-1.5px); }
 }
 
-@keyframes journey-node-pop {
+@keyframes pj-node-pop {
   0% { transform: scale(0.6); }
   60% { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
 
-@keyframes journey-ring-ping {
+@keyframes pj-ring-ping {
   0% { transform: scale(0.8); opacity: 0.7; }
   100% { transform: scale(1.7); opacity: 0; }
 }
 
-@keyframes journey-json-in {
+@keyframes pj-json-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes journey-success-glow {
-  0% { box-shadow: var(--shadow-md), 0 0 0 0 var(--success-soft); }
-  50% { box-shadow: var(--shadow-md), 0 0 0 14px transparent; }
-  100% { box-shadow: var(--shadow-md), 0 0 0 0 transparent; }
+@keyframes pj-success-glow {
+  0% { box-shadow: var(--shadow-sm), 0 0 0 0 var(--success-soft); }
+  50% { box-shadow: var(--shadow-sm), 0 0 0 14px transparent; }
+  100% { box-shadow: var(--shadow-sm), 0 0 0 0 transparent; }
+}
+
+@media (max-width: 860px) {
+  /* Sotto gli 860px la linea di collegamento continua non ha più senso una volta che il JSON,
+     a piena larghezza, si inserisce tra una riga e la successiva — righe separate da un
+     divisore invece, il flusso compatto sopra resta comunque a mostrare la progressione. */
+  .pj-row {
+    grid-template-columns: 32px minmax(0, 1fr);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .pj-row:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
+  .pj-line {
+    display: none;
+  }
+
+  .pj-row-json {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    padding-top: 12px;
+    padding-left: 44px;
+  }
+}
+
+@media (max-width: 560px) {
+  .pj-flow-label {
+    display: none;
+  }
+
+  .pj {
+    padding: 20px;
+  }
+
+  .pj-progress-track {
+    margin: -20px -20px 18px;
+  }
+
+  .pj-row-json {
+    padding-left: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .journey-step.is-active .journey-node,
-  .journey-step.is-active .journey-node app-icon,
-  .journey-step.is-done .journey-node,
-  .journey-step.is-done .journey-node::after,
-  .journey-dialog.is-success,
-  .journey-tech-json {
+  .pj,
+  .pj.is-success,
+  .pj-row.is-active .pj-node,
+  .pj-row.is-active .pj-node app-icon,
+  .pj-row.is-done .pj-node,
+  .pj-row.is-done .pj-node::after,
+  .pj-flow-item.is-active .pj-flow-dot,
+  .pj-json {
     animation: none;
   }
 
-  .journey-line-fill,
-  .journey-progress-fill {
+  .pj-line-fill,
+  .pj-progress-fill,
+  .pj-flow-connector-fill {
     transition: none;
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output, computed, effect, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, effect, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IconComponent, IconName } from '../../../components/icon/icon';
 import { DppRecord, PublishTechnicalTrace } from '../../../services/registry-api.service';
@@ -24,17 +24,19 @@ const DEMO_EO_ID = 'gs1-italy-dpp-demo';
 const DEMO_FACILITY_ID = 'gs1-italy-dpp-demo-facility';
 
 const STEPS: JourneyStep[] = [
-  { icon: 'save', title: 'DPP salvato', standardTerm: 'Product data — presso l\'operatore economico' },
+  { icon: 'save', title: 'Salvato nei sistemi aziendali', standardTerm: 'Product data — presso l\'operatore economico' },
   { icon: 'send', title: 'Invio identificativi al Registro UE', standardTerm: 'UPI · EO (UOI) · Facility (UFI) · Granularity level' },
   { icon: 'link', title: 'Verifica del Digital Link', standardTerm: 'Risoluzione liveURL — calcolo hash del contenuto' },
   { icon: 'check-circle', title: 'Registrazione confermata', standardTerm: 'Registry ID assegnato dal DPP Registry' },
 ];
 
 /**
- * Visualizza il percorso reale di una pubblicazione: la scheda resta presso di noi (Product
- * data decentralizzato, vedi la sezione "Cos'è il DPP" in home.ts), solo gli identificativi e
- * l'hash del Digital Link viaggiano verso il Registro UE — è il punto che la home spiega in
- * teoria e questa animazione mostra in pratica, sulla scheda che si sta davvero pubblicando.
+ * Visualizza il percorso reale di una pubblicazione, inline nella pagina (non una modale): il
+ * DPP viene prima salvato nei sistemi aziendali — presso l'operatore economico, dato che resta
+ * decentralizzato (vedi la sezione "Cos'è il DPP" in home.ts) — e solo dopo i suoi identificativi
+ * e l'hash del Digital Link vengono inviati per la registrazione al Registro UE. È il punto che
+ * la home spiega in teoria e questo percorso mostra in pratica, con il JSON reale di ogni passo
+ * visibile accanto ad esso, non dietro un click.
  *
  * I passi 1-2 sono quasi istantanei (costruiamo e inviamo la richiesta), il passo 3 resta in
  * corso finché non arriva davvero la risposta di registry-api — non è coreografia finta:
@@ -96,14 +98,6 @@ export class PublishJourneyComponent {
   activeError = computed(() => this._errorMessage());
   activeRegistryId = computed(() => this._registryId());
 
-  /** true solo quando l'utente ha aperto la vista tecnica per questo passaggio — richiusa da
-   * sola quando la pubblicazione riparte (constructor). */
-  protected technicalOpen = signal<Record<number, boolean>>({});
-
-  protected toggleTechnical(stepIndex: number): void {
-    this.technicalOpen.update((state) => ({ ...state, [stepIndex]: !state[stepIndex] }));
-  }
-
   private highlight(data: unknown): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(highlightJson(JSON.stringify(data, null, 2)));
   }
@@ -164,7 +158,6 @@ export class PublishJourneyComponent {
       }
       this.staged.set(0);
       this._canCancel.set(false);
-      this.technicalOpen.set({});
       this.timers.push(setTimeout(() => this.staged.set(1), 350));
       this.timers.push(setTimeout(() => this.staged.set(2), 1100));
       // Il passo 3 (registrazione confermata) lo sblocca solo l'arrivo vero della risposta
@@ -180,7 +173,15 @@ export class PublishJourneyComponent {
 
   stepStatus(index: number): StepStatus {
     const phase = this._phase();
-    if (phase === 'error' && index === 2) return 'error';
+    if (phase === 'error') {
+      // Il passo 2 (verifica) è quello che fallisce sempre — 0-1 erano già completati prima
+      // dell'errore, il passo 3 (registrazione) non è mai stato raggiunto: prima restava
+      // segnato "in corso" (animazione attiva a tempo indeterminato) anche a errore ormai
+      // mostrato, un residuo dello stato 'running' che qui non si applica più.
+      if (index < 2) return 'done';
+      if (index === 2) return 'error';
+      return 'pending';
+    }
     if (phase === 'success') return index <= 3 ? 'done' : 'pending';
     // running
     const staged = this.staged();
@@ -189,9 +190,9 @@ export class PublishJourneyComponent {
     return 'pending';
   }
 
-  /** Percentuale di avanzamento per la barra sottile in cima al dialogo — puramente
-   * decorativa (l'unica fonte di verità resta stepStatus/phase), ricalcolata dagli stessi
-   * segnali così resta sempre coerente con i nodi sotto. */
+  /** Percentuale di avanzamento per la barra sottile in cima al percorso e per il flusso
+   * compatto A→B→C→D — puramente decorativa (l'unica fonte di verità resta stepStatus/phase),
+   * ricalcolata dagli stessi segnali così resta sempre coerente con i nodi sotto. */
   protected progressPercent = computed(() => {
     let done = 0;
     for (let i = 0; i < STEPS.length; i++) {
@@ -213,14 +214,5 @@ export class PublishJourneyComponent {
 
   close(): void {
     if (this.canClose()) this.closed.emit();
-  }
-
-  onBackdropClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) this.close();
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.isOpen()) this.close();
   }
 }

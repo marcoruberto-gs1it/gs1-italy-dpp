@@ -67,7 +67,7 @@ export class Admin {
   protected statusFilter = signal<'all' | 'draft' | 'published'>('all');
   protected statusFilters: { id: 'all' | 'draft' | 'published'; label: string }[] = [
     { id: 'all', label: 'Tutte' },
-    { id: 'draft', label: 'Bozze' },
+    { id: 'draft', label: 'In azienda' },
     { id: 'published', label: 'Registrate' },
   ];
 
