@@ -198,6 +198,50 @@
         <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelForm()">← Torna all'elenco</button>
       </div>
 
+      <!-- I tre momenti del percorso, sempre visibili: si salva nei propri sistemi, POI (in un
+           momento distinto, con una conferma esplicita — vedi il pannello più sotto) si invia al
+           Registro UE, infine arriva la conferma di registrazione vera. -->
+      <ol class="phase-stepper" aria-label="Percorso di pubblicazione">
+        <li class="phase-step" [class.is-done]="formPhase() > 1" [class.is-current]="formPhase() === 1">
+          <span class="phase-step-main">
+            <span class="phase-dot">
+              @if (formPhase() > 1) {
+                <app-icon name="check-circle" [size]="14"></app-icon>
+              } @else {
+                1
+              }
+            </span>
+            <span class="phase-label">Salva nei sistemi aziendali</span>
+          </span>
+          <span class="phase-connector"><span class="phase-connector-fill"></span></span>
+        </li>
+        <li class="phase-step" [class.is-done]="formPhase() > 2" [class.is-current]="formPhase() === 2">
+          <span class="phase-step-main">
+            <span class="phase-dot">
+              @if (formPhase() > 2) {
+                <app-icon name="check-circle" [size]="14"></app-icon>
+              } @else {
+                2
+              }
+            </span>
+            <span class="phase-label">Conferma e invia al Registro UE</span>
+          </span>
+          <span class="phase-connector"><span class="phase-connector-fill"></span></span>
+        </li>
+        <li class="phase-step" [class.is-done]="formPhase() === 3">
+          <span class="phase-step-main">
+            <span class="phase-dot">
+              @if (formPhase() === 3) {
+                <app-icon name="check-circle" [size]="14"></app-icon>
+              } @else {
+                3
+              }
+            </span>
+            <span class="phase-label">Conferma di registrazione</span>
+          </span>
+        </li>
+      </ol>
+
       <form class="form-layout" [formGroup]="dppForm" (ngSubmit)="saveDraft()" appScrollReveal="stagger" [revealStagger]="0.1" [revealDuration]="0.35" [revealDistance]="14">
         <div class="gs-card form-card">
           <div class="form-section">
@@ -289,12 +333,49 @@
                 Salva nei sistemi aziendali
               }
             </button>
-            @if (editingId()) {
-              <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending() || !!publishedRecord()" (click)="publish()">
+            @if (editingId() && !showPublishConfirm()) {
+              <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending() || !!publishedRecord()" (click)="requestPublish()">
                 {{ publishPending() ? 'Pubblicazione…' : publishedRecord() ? 'Già registrata' : 'Pubblica sul DPP Registry UE' }}
               </button>
             }
           </div>
+
+          @if (showPublishConfirm()) {
+            <div class="publish-confirm">
+              <div class="publish-confirm-head">
+                <app-icon name="send" [size]="18"></app-icon>
+                <div>
+                  <h3>Confermi l'invio al Registro UE?</h3>
+                  <p>Solo gli identificativi e l'hash del link lasceranno i sistemi aziendali — i dati di prodotto restano qui (vedi "Cos'è il DPP" in home).</p>
+                </div>
+              </div>
+              <dl class="publish-confirm-facts">
+                <div>
+                  <dt>Prodotto</dt>
+                  <dd>{{ dppForm.controls.name.value || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>UPI</dt>
+                  <dd>{{ previewGtin() ? 'GTIN' : '—' }} @if (previewGtin()) { <code>{{ previewGtin() }}</code> }</dd>
+                </div>
+                <div>
+                  <dt>EO (UOI)</dt>
+                  <dd><code>{{ demoEoId }}</code></dd>
+                </div>
+                <div>
+                  <dt>Facility (UFI)</dt>
+                  <dd><code>{{ demoFacilityId }}</code></dd>
+                </div>
+              </dl>
+              <div class="publish-confirm-actions">
+                <button type="button" class="gs-btn gs-btn--ghost" (click)="cancelPublishConfirm()">Annulla</button>
+                <button type="button" class="gs-btn gs-btn--primary" (click)="confirmPublish()">
+                  <app-icon name="send" [size]="15"></app-icon>
+                  Conferma e invia al Registro UE
+                </button>
+              </div>
+            </div>
+          }
 
           @if (publishedRecord(); as published) {
             <div class="publish-result">

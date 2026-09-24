@@ -206,6 +206,237 @@
   gap: 10px;
 }
 
+/* --- Stepper dei tre momenti del percorso (salva → conferma e invia → conferma di
+   registrazione) — sempre visibile sopra il form, indipendente dal dettaglio passo-passo del
+   percorso di pubblicazione più sotto (PublishJourneyComponent), che copre solo il momento 2. */
+.phase-stepper {
+  display: flex;
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+}
+
+.phase-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.phase-step:last-child {
+  flex: 0 0 auto;
+}
+
+.phase-step-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.phase-dot {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface-sunken);
+  color: var(--text-tertiary);
+  border: 2px solid var(--border-subtle);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.phase-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.phase-connector {
+  flex: 1;
+  height: 2px;
+  margin: 0 14px;
+  min-width: 24px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.phase-connector-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--text-primary);
+  transition: width 0.5s var(--ease-out);
+}
+
+.phase-step.is-done .phase-dot {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--bg-surface);
+  animation: phase-dot-pop 0.4s var(--ease-spring);
+}
+
+.phase-step.is-done .phase-label {
+  color: var(--text-primary);
+}
+
+.phase-step.is-done .phase-connector-fill {
+  width: 100%;
+}
+
+.phase-step.is-current .phase-dot {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  animation: phase-pulse 1.6s ease-in-out infinite;
+}
+
+.phase-step.is-current .phase-label {
+  color: var(--text-primary);
+}
+
+@keyframes phase-dot-pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes phase-pulse {
+  0% { box-shadow: 0 0 0 0 var(--accent-soft); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+@media (max-width: 640px) {
+  .phase-stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .phase-step {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .phase-connector {
+    width: 2px;
+    height: 18px;
+    margin: 2px 0 2px 13px;
+  }
+
+  .phase-connector-fill {
+    width: 100%;
+    height: 0%;
+    transition: height 0.5s var(--ease-out);
+  }
+
+  .phase-step.is-done .phase-connector-fill {
+    height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phase-step.is-done .phase-dot,
+  .phase-step.is-current .phase-dot {
+    animation: none;
+  }
+}
+
+/* --- Riepilogo di conferma prima dell'invio al Registro UE: un momento distinto, non
+   automatico, tra "Pubblica" e il vero avvio della richiesta (vedi requestPublish/confirmPublish
+   in admin.ts) — così il secondo momento del percorso ("conferma e invia") è un'azione
+   deliberata dell'utente, non solo un'etichetta sullo stepper qui sopra. */
+.publish-confirm {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+  animation: publish-confirm-in 0.3s var(--ease-out);
+}
+
+@keyframes publish-confirm-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.publish-confirm-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.publish-confirm-head app-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.publish-confirm-head h3 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.publish-confirm-head p {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.publish-confirm-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 16px;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.publish-confirm-facts dt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 2px;
+}
+
+.publish-confirm-facts dd {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  word-break: break-word;
+}
+
+.publish-confirm-facts code {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.publish-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+@media (max-width: 480px) {
+  .publish-confirm-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- Schermata di scelta "Nuova scheda": Wizard guidato vs form a pagina singola --- */
 .create-choice-grid {
   display: grid;

@@ -135,6 +135,26 @@ export class Admin {
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
 
+  /** I tre momenti del percorso, nell'ordine in cui accadono davvero — non tre passi di un
+   * unico wizard "crea DPP", ma tre azioni distinte e separate nel tempo: si salva il DPP nei
+   * propri sistemi (può restare così indefinitamente), solo in un secondo momento si conferma
+   * l'invio al Registro UE (vedi showPublishConfirm sotto), e solo dopo arriva la conferma di
+   * registrazione vera. L'indicatore in admin.html mostra sempre a che punto siamo, anche
+   * prima di aver toccato "Pubblica". */
+  protected formPhase = computed<1 | 2 | 3>(() => {
+    if (this.publishedRecord()) return 3;
+    if (this.editingId()) return 2;
+    return 1;
+  });
+
+  /** true tra il click su "Pubblica" e la conferma esplicita dell'utente — l'invio al Registro
+   * UE non parte al primo click: prima si vede un riepilogo di cosa sta per lasciare i sistemi
+   * aziendali (solo identificativi e hash, mai i dati di prodotto) e si deve confermare davvero.
+   * Vedi requestPublish/cancelPublishConfirm/confirmPublish più sotto. */
+  protected showPublishConfirm = signal(false);
+  protected readonly demoEoId = DEMO_ECONOMIC_OPERATOR_ID;
+  protected readonly demoFacilityId = DEMO_FACILITY_ID;
+
   /** Il percorso animato verso il DPP Registry UE (vedi PublishJourneyComponent) — apparso al
    * click su "Pubblica", chiuso solo dall'utente una volta arrivato l'esito vero. */
   protected journeyOpen = signal(false);
@@ -427,6 +447,7 @@ export class Admin {
    * reset il percorso della registrazione PRECEDENTE riappariva — con il suo JSON e il suo
    * registryId — non appena si tornava sulla vista 'form' per crearne una nuova. */
   private resetJourney(): void {
+    this.showPublishConfirm.set(false);
     this.journeyOpen.set(false);
     this.journeyPhase.set('running');
     this.journeyRecord.set(null);
@@ -595,9 +616,22 @@ export class Admin {
     });
   }
 
-  protected publish(): void {
+  /** Click su "Pubblica": apre il riepilogo di conferma (admin.html), non invia ancora nulla —
+   * vedi il commento su showPublishConfirm più sopra. */
+  protected requestPublish(): void {
+    if (!this.editingId()) return;
+    this.showPublishConfirm.set(true);
+  }
+
+  protected cancelPublishConfirm(): void {
+    this.showPublishConfirm.set(false);
+  }
+
+  /** Click su "Conferma e invia" nel riepilogo: da qui in poi è la stessa richiesta di sempre. */
+  protected confirmPublish(): void {
     const id = this.editingId();
     if (!id) return;
+    this.showPublishConfirm.set(false);
     this.toast.set(null);
     this.publishPending.set(true);
 
