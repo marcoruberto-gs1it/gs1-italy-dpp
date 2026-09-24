@@ -41,11 +41,14 @@
   --font-sans: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
 
-  /* --- Radii --- */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* --- Radii ---
+     Scala allargata (era 8/14/20/28) per il linguaggio "bento" più morbido e arrotondato
+     adottato in questo rebrand — vedi il riferimento visivo discusso con l'utente (dashboard
+     chiara, card bianche molto arrotondate su sfondo caldo, pillole ovunque). */
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 34px;
   --radius-full: 999px;
 
   /* --- Motion --- */
@@ -55,30 +58,40 @@
   --dur-base: 0.3s;
   --dur-slow: 0.5s;
 
-  /* --- Elevation (light) --- */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
-  --shadow-lg: 0 16px 40px -12px rgba(15, 23, 42, 0.18);
-  --shadow-xl: 0 24px 64px -16px rgba(15, 23, 42, 0.28);
+  /* --- Elevation (light) ---
+     Ombre più morbide e diffuse (blur maggiore, meno opacità, tinta calda invece che
+     blu-grigia) per lo stesso motivo della scala radii sopra — carte che "galleggiano"
+     leggere, non un'ombra dura che le stacca dallo sfondo. */
+  --shadow-xs: 0 2px 4px rgba(28, 20, 8, 0.03);
+  --shadow-sm: 0 4px 16px -4px rgba(28, 20, 8, 0.06);
+  --shadow-md: 0 14px 36px -10px rgba(28, 20, 8, 0.10);
+  --shadow-lg: 0 24px 56px -16px rgba(28, 20, 8, 0.14);
+  --shadow-xl: 0 32px 76px -20px rgba(28, 20, 8, 0.20);
   --shadow-glow-blue: 0 8px 32px -8px rgba(0, 44, 108, 0.35);
   --shadow-glow-orange: 0 8px 32px -8px rgba(242, 99, 52, 0.35);
 
   /* --- Semantic surface tokens (LIGHT) ---
-     Base grigio-blu istituzionale GS1 (--gs1-color-ui-1/2), non più viola. */
-  --bg-canvas: #f0f5fa;
-  --bg-canvas-alt: #e5f0fc;
+     Crema caldo invece del grigio-blu istituzionale precedente (--gs1-color-ui-1/2) — stessa
+     luminosità (L 95%+, il testo scuro esistente ci passa sopra senza bisogno di riverificare
+     i contrasti), solo la tinta cambia da fredda a calda per lo stesso motivo di radii/shadow
+     sopra. Il brand blu/arancione GS1 resta invariato: cambia la "tela" su cui poggia, non
+     l'identità del marchio. */
+  --bg-canvas: #f5f2ea;
+  --bg-canvas-alt: #ede7d8;
   --bg-surface: #ffffff;
   --bg-surface-raised: #ffffff;
-  --bg-surface-sunken: #e5f0fc;
+  --bg-surface-sunken: #f5f2ea;
   --bg-glass: rgba(255, 255, 255, 0.7);
   --bg-glass-strong: rgba(255, 255, 255, 0.88);
-  --bg-overlay: rgba(0, 12, 30, 0.5);
+  --bg-overlay: rgba(20, 16, 8, 0.5);
   --bg-inverse: #001335;
 
-  --border-subtle: rgba(0, 19, 53, 0.08);
-  --border-default: rgba(0, 19, 53, 0.14);
-  --border-strong: rgba(0, 19, 53, 0.22);
+  /* Stessa tinta calda di --bg-canvas invece del navy precedente (0,19,53) — stessi valori
+     alpha, quindi lo stesso contrasto relativo contro le superfici chiare, solo intonati alla
+     nuova tela invece di stonare col blu freddo. */
+  --border-subtle: rgba(28, 20, 8, 0.08);
+  --border-default: rgba(28, 20, 8, 0.14);
+  --border-strong: rgba(28, 20, 8, 0.22);
   --border-glass: rgba(255, 255, 255, 0.5);
 
   --text-primary: #001335;
@@ -107,7 +120,7 @@
   --mesh-1: rgba(0, 44, 108, 0.4);
   --mesh-2: rgba(242, 99, 52, 0.3);
   --mesh-3: rgba(0, 182, 222, 0.22);
-  --scrollbar-thumb: rgba(0, 19, 53, 0.18);
+  --scrollbar-thumb: rgba(28, 20, 8, 0.18);
 
   /* Superficie "terminale" sempre scura, indipendente dal tema (blocchi codice, URL bar) */
   --surface-code: #001335;
