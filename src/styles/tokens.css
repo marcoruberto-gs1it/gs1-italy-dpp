@@ -32,12 +32,25 @@
      su tela usa sopra la variante "accessibile" più scura, non questo valore). */
   --brand-accent-vivid: #f26334;
   --brand-ink: #001335;
+  /* Oro GS1 — prima solo il secondo stop del gradiente CTA, ora anche un token a sé: una terza
+     nota di colore (non un nuovo brand color, la stessa tinta già in uso) per badge/eyebrow/
+     dettagli decorativi, così la palette non resta un semplice bicromatismo blu/arancione su
+     ogni pagina. Stessa verifica di contrasto di --brand-accent-vivid: 5.7:1+ con --brand-ink
+     sopra, mai testo bianco. */
+  --brand-gold: #fbb034;
+  --brand-gold-soft: rgba(251, 176, 52, 0.16);
   /* Gradiente per CTA principali (hero, Wizard) — arancione → oro GS1, entrambi gli stop
      verificati 5.7:1+ con --brand-ink sopra, stessa regola di --brand-accent-vivid qui
      accanto: mai testo bianco. */
-  --gradient-cta: linear-gradient(120deg, var(--brand-accent-vivid), #fbb034);
+  --gradient-cta: linear-gradient(120deg, var(--brand-accent-vivid), var(--brand-gold));
 
-  /* --- Typography --- */
+  /* --- Typography ---
+     --font-display (Fraunces, variabile con asse opsz) è nuovo: solo per h1/h2/h3 (regola
+     globale in fondo a questo file) — un carattere con più carattere del solito "grottesco
+     ovunque" da SaaS generico, coerente con l'anima istituzionale-ma-non-anonima di GS1 Italy.
+     Il corpo del testo resta su --font-sans, leggibilità già verificata, mai messa in
+     discussione da questo redesign. */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
 
@@ -218,6 +231,17 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+
+/* Titoli su --font-display (Fraunces) ovunque nel sito, una sola regola invece di ripeterla in
+   ogni foglio di stile per pagina/componente — il peso e la dimensione restano quelli già
+   dichiarati localmente, qui cambia solo il carattere. "font-variation-settings" attiva l'asse
+   opzionale "opsz" (optical size) del font variabile, che Fraunces usa per affinare la forma
+   delle lettere alle dimensioni grandi dei titoli invece di scalare la stessa forma "da testo". */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 40;
+  letter-spacing: -0.01em;
 }
 
 ::selection {

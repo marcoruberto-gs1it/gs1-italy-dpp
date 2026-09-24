@@ -3,6 +3,7 @@ import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } f
 import { Meta, Title } from '@angular/platform-browser';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../components/icon/icon';
+import { LottiePlayerComponent } from '../../components/lottie-player/lottie-player';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { Sector, SECTORS, localizeSector } from '../../data/sectors';
 import { I18nService } from '../../services/i18n.service';
@@ -92,7 +93,7 @@ function buildSpine<T>(items: T[], valueOf: (item: T) => number, todayYear: numb
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, IconComponent, QRCodeComponent, ScrollRevealDirective],
+  imports: [CommonModule, IconComponent, QRCodeComponent, ScrollRevealDirective, LottiePlayerComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

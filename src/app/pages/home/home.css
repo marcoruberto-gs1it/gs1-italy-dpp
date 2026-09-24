@@ -194,6 +194,10 @@
   flex-shrink: 0;
 }
 
+.preview-chrome-url app-lottie-player {
+  flex-shrink: 0;
+}
+
 .preview-card {
   position: relative;
   background: var(--bg-surface);

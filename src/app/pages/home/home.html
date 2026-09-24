@@ -23,7 +23,11 @@
           <span class="preview-chrome-dot"></span>
           <span class="preview-chrome-dot"></span>
           <span class="preview-chrome-url">
-            <app-icon name="shield-check" [size]="11"></app-icon>
+            @if (isBrowser) {
+              <app-lottie-player path="/animations/shield-check-verified.json" [size]="16"></app-lottie-player>
+            } @else {
+              <app-icon name="shield-check" [size]="11"></app-icon>
+            }
             {{ previewUrlDisplay() }}
           </span>
         </div>
