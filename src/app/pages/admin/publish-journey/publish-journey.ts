@@ -189,6 +189,17 @@ export class PublishJourneyComponent {
     return 'pending';
   }
 
+  /** Percentuale di avanzamento per la barra sottile in cima al dialogo — puramente
+   * decorativa (l'unica fonte di verità resta stepStatus/phase), ricalcolata dagli stessi
+   * segnali così resta sempre coerente con i nodi sotto. */
+  protected progressPercent = computed(() => {
+    let done = 0;
+    for (let i = 0; i < STEPS.length; i++) {
+      if (this.stepStatus(i) === 'done') done++;
+    }
+    return Math.round((done / STEPS.length) * 100);
+  });
+
   /** Chiudibile sempre, tranne nei primi 20s di un tentativo genuinamente "in corso" — lì la
    * chiusura è bloccata apposta per non far pensare a un annullamento che questa UI non fa
    * davvero (la richiesta prosegue comunque in background). Oltre i 20s (vedi `canCancel` sopra)

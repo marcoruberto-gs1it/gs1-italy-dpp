@@ -31,6 +31,7 @@
   height: 2px;
   background: var(--border-default);
   z-index: 0;
+  transition: background-color 0.4s var(--ease-out);
 }
 
 .wizard-progress-item:first-child::before {
@@ -73,6 +74,19 @@
   border-color: var(--brand);
   background: var(--brand);
   color: #fff;
+  animation: wizard-dot-pop 0.4s var(--ease-spring);
+}
+
+@keyframes wizard-dot-pop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-progress-item.is-done .wizard-progress-dot {
+    animation: none;
+  }
 }
 
 .wizard-progress-label {
@@ -213,12 +227,22 @@
   font-weight: 600;
   color: var(--text-primary);
   text-align: left;
-  transition: border-color var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
+}
+
+.wizard-sector-card:hover {
+  transform: translateY(-2px);
 }
 
 .wizard-sector-card.is-selected {
   border-color: var(--brand);
   background: var(--brand-soft);
+  animation: wizard-sector-select 0.3s var(--ease-spring);
+}
+
+@keyframes wizard-sector-select {
+  0% { transform: scale(0.97); }
+  100% { transform: scale(1); }
 }
 
 .wizard-sector-icon {

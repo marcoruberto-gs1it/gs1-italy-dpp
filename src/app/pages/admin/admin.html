@@ -39,7 +39,7 @@
       <div class="admin-header">
         <div>
           <h1>I tuoi DPP</h1>
-          <p>{{ records().length }} DPP — in bozza o registrati sul DPP Registry UE.</p>
+          <p class="admin-stat"><strong>{{ records().length }}</strong> DPP totali — in bozza o registrati sul DPP Registry UE.</p>
         </div>
         <div class="admin-header-actions">
           <button type="button" class="gs-btn gs-btn--primary" (click)="startCreate()">
@@ -104,7 +104,7 @@
                 <td data-label="Stato">
                   @if (record.status === 'published') {
                     <span class="gs-badge gs-badge--verified">
-                      <app-icon name="check-circle" [size]="12"></app-icon>
+                      <span class="status-dot"></span>
                       Registrata
                     </span>
                   } @else {

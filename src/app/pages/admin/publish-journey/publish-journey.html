@@ -1,6 +1,10 @@
 @if (isOpen()) {
   <div class="journey-backdrop" (click)="onBackdropClick($event)">
-    <div class="journey-dialog" role="dialog" aria-modal="true" aria-label="Percorso di pubblicazione del DPP">
+    <div class="journey-dialog" [class.is-success]="activeRegistryId() !== null && activeError() === null" role="dialog" aria-modal="true" aria-label="Percorso di pubblicazione del DPP">
+      <div class="journey-progress-track" [class.is-error]="activeError() !== null">
+        <div class="journey-progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+
       <header class="journey-header">
         <div>
           <span class="gs-badge gs-badge--vocab">DPP Registry UE</span>
@@ -34,7 +38,7 @@
               }
             </span>
             @if (i < steps.length - 1) {
-              <span class="journey-line"></span>
+              <span class="journey-line"><span class="journey-line-fill"></span></span>
             }
             <div class="journey-copy">
               <strong>{{ step.title }}</strong>
