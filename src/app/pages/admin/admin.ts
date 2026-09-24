@@ -227,17 +227,18 @@ export class Admin {
     const existing = this.records().find((r) => r.id === this.editingId());
 
     const doc: Record<string, unknown> = {
-      // gs1/schema come prefissi bastano da soli — vedi il commento nello stesso punto di
-      // registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo di questo oggetto.
+      // "@vocab" copre le chiavi senza prefisso (name, i campi del nucleo) — vedi il commento
+      // nello stesso punto di registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio.
       '@context': {
         gs1: 'https://ref.gs1.org/voc/',
-        schema: 'http://schema.org/',
+        schema: 'https://schema.org/',
+        '@vocab': 'https://schema.org/',
       },
-      '@type': ['schema:Product', 'gs1:Product'],
+      '@type': ['Product', 'gs1:Product'],
       '@id': `${this.siteOrigin.value}/01/${gtin}`,
       digitalProductPassportId: existing ? `urn:uuid:${existing.id}` : 'urn:uuid:(assegnato al salvataggio)',
       uniqueProductIdentifier: this.previewUpi(),
-      'schema:name': f.name || null,
+      name: f.name || null,
       'gs1:gtin': gtin,
       granularity: toStandardGranularity(identity.granularityLevel),
       dppSchemaVersion: DPP_SCHEMA_VERSION,

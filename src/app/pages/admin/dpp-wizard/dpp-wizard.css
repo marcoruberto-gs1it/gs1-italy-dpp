@@ -608,18 +608,6 @@
   }
 }
 
-.wizard-save-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 24px;
-}
-
-.wizard-save-btn {
-  flex: 1;
-  min-width: 220px;
-}
-
 /* --- Esito "già registrata" (passo 6, quando publishedRecord() è già valorizzato all'ingresso
    nel passo — non un nuovo invio, solo la conferma di uno stato già raggiunto). */
 .wizard-publish-done {
@@ -696,42 +684,10 @@
   .wizard-actions--top {
     flex-wrap: wrap;
   }
-
-  .phase-stepper {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
-
-  .phase-step {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .phase-connector {
-    width: 2px;
-    height: 18px;
-    margin: 2px 0 2px 13px;
-  }
-
-  .phase-connector-fill {
-    width: 100%;
-    height: 0%;
-    transition: height 0.5s var(--ease-out);
-  }
-
-  .phase-step.is-done .phase-connector-fill {
-    height: 100%;
-  }
 }
 
 @media (max-width: 480px) {
   .publish-confirm-facts {
     grid-template-columns: 1fr;
-  }
-
-  .wizard-save-btn {
-    min-width: 0;
   }
 }

@@ -68,10 +68,13 @@ const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
  *
  * 2) Contenuto aggiuntivo, appoggiato a quel meccanismo di estensione — non fa parte del nucleo,
  *    ma non lo contraddice nemmeno:
- *      a) schema:name/gs1:gtin/gs1:hasBatchLotNumber/gs1:hasSerialNumber, dentro un involucro
- *         JSON-LD GS1 Web Vocabulary (@context/@type/@id) — nostra estensione deliberata per
+ *      a) name/gs1:gtin/gs1:hasBatchLotNumber/gs1:hasSerialNumber, dentro un involucro JSON-LD
+ *         GS1 Web Vocabulary (@context/@type/@id) — nostra estensione deliberata per
  *         l'interoperabilità con schema.org/motori di ricerca, non richiesta dallo standard, non
- *         in contraddizione con esso.
+ *         in contraddizione con esso. Stesso pattern di riferimento usato da altre pagine
+ *         prodotto GS1 in JSON-LD viste online: "@vocab" punta a schema.org, così i termini senza
+ *         prefisso (name, description…) si risolvono lì da soli, e solo i concetti specifici GS1
+ *         (gtin, hasBatchLotNumber…) restano prefissati "gs1:".
  *      b) gli Attributi liberi di settore (chimica, capacità…): ogni attributo diventa una
  *         chiave di primo livello, valore diretto — non avvolti in un array
  *         schema:additionalProperty/PropertyValue come in una versione precedente di questo
@@ -82,14 +85,15 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
   const id = digitalLinkUrl(siteUrl, record.gtin);
 
   const doc: Record<string, unknown> = {
-    // gs1/schema come prefissi bastano da soli: usare direttamente "schema:name"/"gs1:gtin" come
-    // chiavi (sotto) evita di dover rimappare anche "name"/"gtin" come termini a parte nel
-    // contesto, una ridondanza dato che i due prefissi già li rendono raggiungibili.
+    // "@vocab" copre già ogni chiave senza prefisso (qui sotto: name, e i 9 campi del nucleo
+    // DigitalProductPassport) — "schema:" resta comunque dichiarato per chi preferisse usarlo
+    // esplicitamente altrove, "gs1:" per i soli concetti specifici GS1 (gtin, hasBatchLotNumber…).
     '@context': {
       gs1: 'https://ref.gs1.org/voc/',
-      schema: 'http://schema.org/',
+      schema: 'https://schema.org/',
+      '@vocab': 'https://schema.org/',
     },
-    '@type': ['schema:Product', 'gs1:Product'],
+    '@type': ['Product', 'gs1:Product'],
     '@id': id,
     // Identificativo dell'istanza di passaporto — distinto dal GTIN e dall'UPI: quelli
     // identificano il PRODOTTO, questo identifica IL PASSAPORTO STESSO. Formato URN (RFC 4122),
@@ -100,7 +104,7 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     // mockRegistryClient.ts#buildUpi) — stesso valore, nome di campo allineato allo standard
     // invece che allo schema specifico del registro.
     uniqueProductIdentifier: buildUpi(siteUrl, record),
-    'schema:name': record.name,
+    name: record.name,
     'gs1:gtin': record.gtin,
     granularity: toStandardGranularity(record.granularityLevel),
     dppSchemaVersion: 'EN18223:v1.0',

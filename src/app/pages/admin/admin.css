@@ -121,22 +121,25 @@
   max-width: min(480px, calc(100vw - 32px));
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  font-size: 0.86rem;
+  /* Sfondo pieno, non il solo --shadow-md: un pannello fisso sopra il resto della pagina deve
+     restare leggibile qualunque cosa gli scorra sotto (tabella, form, icone colorate) — una
+     tinta trasparente (com'era prima, background: var(--warning-soft) al 12-14% di opacità)
+     lasciava trasparire il contenuto sottostante, rendendo il testo illeggibile in alcuni punti. */
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
   font-weight: 600;
   animation: toast-in 0.2s ease-out;
 }
 
 .toast--error {
-  background: var(--warning-soft);
   color: var(--warning);
-  border: 1px solid currentColor;
+  border: 1.5px solid var(--warning);
 }
 
 /* Avviso non bloccante (es. attributo con solo chiave o solo valore) — stesso contenitore del
    toast d'errore ma un tono neutro, per non sembrare un problema che impedisce di procedere. */
 .toast--warning {
-  background: var(--bg-surface);
   color: var(--text-secondary);
   border: 1px solid var(--border-default);
 }

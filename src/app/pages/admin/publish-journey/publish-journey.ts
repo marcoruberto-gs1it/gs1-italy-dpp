@@ -34,9 +34,11 @@ const STEPS: JourneyStep[] = [
  * del passo attivo visibile a lato (colonna destra del passo, vedi dpp-wizard.html), non dietro
  * un click.
  *
- * I passi 1-2 sono quasi istantanei (costruiamo e inviamo la richiesta), il passo 3 resta in
- * corso finché non arriva davvero la risposta di registry-api — non è coreografia finta:
- * l'attesa qui è l'attesa di rete reale.
+ * I dati (JSON di ogni passo, esito, registryId) sono sempre reali, mai inventati — ma la loro
+ * COMPARSA è volutamente ritardata rispetto al momento in cui arrivano davvero (vedi
+ * MIN_REVEAL_MS sotto): in sviluppo/demo la chiamata reale può concludersi in pochi millisecondi,
+ * il che farebbe "sparire" l'intera animazione prima che l'utente riesca a leggere anche solo il
+ * primo passo. displayPhase, non `phase`, è quello che il template legge davvero.
  */
 @Component({
   selector: 'app-publish-journey',
@@ -119,9 +121,27 @@ export class PublishJourneyComponent {
 
   /** Passo fino a cui l'animazione "in corsa" è arrivata da sola (indipendente dalla vera
    * risposta di rete) — avanza da solo mentre `phase` resta 'running', poi si ferma al passo 2
-   * (verifica) ad aspettare la risposta reale. */
+   * (verifica) ad aspettare la rivelazione dell'esito vero (vedi displayPhase sotto). */
   private staged = signal(0);
   private timers: ReturnType<typeof setTimeout>[] = [];
+  private revealTimer: ReturnType<typeof setTimeout> | null = null;
+  private startedAt = 0;
+
+  /** Quanto restano visibili i passi 1 e 2 prima di passare al successivo — tempo di lettura
+   * minimo, non la durata reale della chiamata (quella può finire molto prima). */
+  private readonly STAGE_1_MS = 900;
+  private readonly STAGE_2_MS = 2200;
+  /** Tempo minimo dall'inizio del percorso prima di rivelare l'esito vero (successo o errore) —
+   * garantisce che l'utente faccia in tempo a leggere ogni passo anche quando l'API risponde in
+   * una frazione di secondo (frequente in sviluppo/demo): senza questo minimo, un servizio
+   * veloce faceva "saltare" l'intera animazione da "in corso" a "fatto" in pochi millisecondi,
+   * mai realmente visibile. */
+  private readonly MIN_REVEAL_MS = 4200;
+
+  /** L'esito che l'interfaccia MOSTRA — distinto da `_phase()` (l'esito VERO, che arriva da
+   * admin.ts non appena registry-api risponde): i due possono divergere per qualche secondo di
+   * proposito, vedi MIN_REVEAL_MS sopra. */
+  protected displayPhase = signal<JourneyPhase>('running');
 
   constructor() {
     // Nessun bisogno di un modo per "uscire" da qui: la barra di navigazione del Wizard
@@ -130,26 +150,41 @@ export class PublishJourneyComponent {
     // nulla da nascondere esplicitamente.
     effect(() => {
       const phase = this._phase();
-      this.clearTimers();
-      if (phase !== 'running') {
-        this.staged.set(STEPS.length - 1);
+      if (phase === 'running') {
+        // Nuovo tentativo (o primo): riparte tutto da zero, timer di lettura inclusi.
+        this.clearTimers();
+        this.startedAt = Date.now();
+        this.displayPhase.set('running');
+        this.staged.set(0);
+        this.timers.push(setTimeout(() => this.staged.set(1), this.STAGE_1_MS));
+        this.timers.push(setTimeout(() => this.staged.set(2), this.STAGE_2_MS));
         return;
       }
-      this.staged.set(0);
-      this.timers.push(setTimeout(() => this.staged.set(1), 350));
-      this.timers.push(setTimeout(() => this.staged.set(2), 1100));
-      // Il passo 3 (registrazione confermata) lo sblocca solo l'arrivo vero della risposta
-      // (vedi stepStatus): qui l'animazione coreografata si ferma di proposito.
+      // Esito vero arrivato: NON tocca i timer già pianificati sopra, che proseguono la propria
+      // animazione di lettura indipendentemente — si limita a pianificare la rivelazione
+      // dell'esito non prima del tempo minimo dall'inizio.
+      if (this.revealTimer) return;
+      const elapsed = Date.now() - this.startedAt;
+      const delay = Math.max(0, this.MIN_REVEAL_MS - elapsed);
+      this.revealTimer = setTimeout(() => {
+        this.staged.set(STEPS.length - 1);
+        this.displayPhase.set(phase);
+        this.revealTimer = null;
+      }, delay);
     });
   }
 
   private clearTimers(): void {
     for (const t of this.timers) clearTimeout(t);
     this.timers = [];
+    if (this.revealTimer) {
+      clearTimeout(this.revealTimer);
+      this.revealTimer = null;
+    }
   }
 
   stepStatus(index: number): StepStatus {
-    const phase = this._phase();
+    const phase = this.displayPhase();
     if (phase === 'error') {
       // Il passo 2 (verifica) è quello che fallisce sempre — 0-1 erano già completati prima
       // dell'errore, il passo 3 (registrazione) non è mai stato raggiunto: prima restava
@@ -182,7 +217,7 @@ export class PublishJourneyComponent {
    * a destra nel layout del Wizard, non più quattro blocchi impilati uno per riga: cambia da solo
    * mentre l'animazione avanza. */
   protected activeStepJson = computed<SafeHtml | null>(() => {
-    const phase = this._phase();
+    const phase = this.displayPhase();
     const index = phase === 'running' ? this.staged() : phase === 'error' ? 2 : 3;
     switch (index) {
       case 0:

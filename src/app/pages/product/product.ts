@@ -238,17 +238,18 @@ export class ProductComponent implements OnDestroy {
           })();
 
     const doc: Record<string, unknown> = {
-      // gs1/schema come prefissi bastano da soli — vedi il commento nello stesso punto di
-      // registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio di ogni campo di questo oggetto.
+      // "@vocab" copre le chiavi senza prefisso (name, i campi del nucleo) — vedi il commento
+      // nello stesso punto di registry-api/src/jsonld.ts#dppToJsonLd per il dettaglio.
       '@context': {
         gs1: 'https://ref.gs1.org/voc/',
-        schema: 'http://schema.org/',
+        schema: 'https://schema.org/',
+        '@vocab': 'https://schema.org/',
       },
-      '@type': ['schema:Product', 'gs1:Product'],
+      '@type': ['Product', 'gs1:Product'],
       '@id': id,
       digitalProductPassportId: `urn:uuid:${dpp.id}`,
       uniqueProductIdentifier: upi,
-      'schema:name': dpp.name,
+      name: dpp.name,
       'gs1:gtin': dpp.gtin,
       granularity: toStandardGranularity(dpp.granularityLevel),
       dppSchemaVersion: DPP_SCHEMA_VERSION,

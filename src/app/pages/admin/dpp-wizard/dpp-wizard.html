@@ -33,6 +33,27 @@
           Indietro
         </button>
       }
+      <!-- Passo 5: l'azione "Salva" vive qui, non in fondo al contenuto — su richiesta esplicita,
+           resta raggiungibile senza scorrere qualunque sia l'altezza del riepilogo. -->
+      @if (currentStep() === 4) {
+        <button type="button" class="gs-btn gs-btn--primary" [disabled]="savePending || !!publishedRecord()" (click)="saveDraft.emit()">
+          @if (savePending) {
+            <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
+            Salvataggio…
+          } @else {
+            <app-icon name="save" [size]="16"></app-icon>
+            {{ publishedRecord() ? 'Già salvata' : 'Salva nei sistemi aziendali' }}
+          }
+        </button>
+      }
+      <!-- Passo 6, prima della conferma: stessa idea, "Conferma e invia" qui invece che sotto il
+           riepilogo di cosa sta per essere inviato. -->
+      @if (currentStep() === 5 && !publishedRecord() && !journeyStarted()) {
+        <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending" (click)="confirmPublish.emit()">
+          <app-icon name="send" [size]="16"></app-icon>
+          Conferma e invia al Registro UE
+        </button>
+      }
       @if (currentStep() < steps.length - 1) {
         <button type="button" class="gs-btn gs-btn--primary" (click)="next()">
           Avanti
@@ -308,18 +329,6 @@
                 </dd>
               </div>
             </dl>
-
-            <div class="wizard-save-row">
-              <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="savePending || !!publishedRecord()" (click)="saveDraft.emit()">
-                @if (savePending) {
-                  <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
-                  Salvataggio…
-                } @else {
-                  <app-icon name="save" [size]="16"></app-icon>
-                  {{ publishedRecord() ? 'Già salvata' : 'Salva nei sistemi aziendali' }}
-                }
-              </button>
-            </div>
           </div>
 
           <div class="wizard-split-right">
@@ -402,10 +411,6 @@
                   <dd><code>{{ form.controls.facilityId.value || '—' }}</code></dd>
                 </div>
               </dl>
-              <button type="button" class="gs-btn gs-btn--primary wizard-save-btn" [disabled]="publishPending" (click)="confirmPublish.emit()">
-                <app-icon name="send" [size]="16"></app-icon>
-                Conferma e invia al Registro UE
-              </button>
             </div>
             <div class="wizard-split-right">
               <div class="wizard-split-right-head">
