@@ -89,6 +89,19 @@ function isAbortOrTimeout(err: unknown): boolean {
   return err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError');
 }
 
+/** 429 (rate limit, sia da Auth0 sia da mock-eu-registry) è transitorio per definizione — "hai
+ * fatto troppe richieste, riprova" non è mai un rifiuto definitivo come lo sarebbe un payload
+ * malformato. Prima non era distinto dagli altri errori non-2xx: un 429 diventava un fallimento
+ * definitivo mostrato subito all'utente, invece di rientrare nello stesso retry automatico già
+ * previsto per un container che si sta risvegliando (vedi TransientRegistryError più sotto e
+ * PUBLISH_RETRY_DELAYS_MS in admin.ts). Se il servizio manda "Retry-After" lo riportiamo nel
+ * messaggio — solo per visibilità nel dettaglio tecnico dell'errore, il retry automatico lato
+ * client segue comunque i propri tempi fissi, non (ancora) quel valore. */
+function retryAfterSuffix(response: Response): string {
+  const retryAfter = response.headers.get('retry-after');
+  return retryAfter ? ` (Retry-After: ${retryAfter}s)` : '';
+}
+
 /** Codice merceologico (HS/TARIC, 4-10 cifre — obbligatorio nello schema di mock-eu-registry,
  * che rifiuta stringhe libere) plausibile per settore. Solo per la demo: non è una
  * classificazione doganale verificata prodotto per prodotto. */
@@ -139,6 +152,9 @@ async function fetchAccessToken(config: ReturnType<typeof requiredConfig>): Prom
     throw err;
   }
   if (!response.ok) {
+    if (response.status === 429) {
+      throw new TransientRegistryError(`Auth0 ha risposto 429 (troppe richieste)${retryAfterSuffix(response)}: ${await response.text()}`);
+    }
     throw new Error(`Auth0 non ha rilasciato un token (${response.status}): ${await response.text()}`);
   }
   const body = (await response.json()) as { access_token: string };
@@ -259,8 +275,9 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     throw err;
   }
   if (!registerResponse.ok) {
-    if ([502, 503, 504].includes(registerResponse.status)) {
-      throw new TransientRegistryError(await registerResponse.text());
+    if ([429, 502, 503, 504].includes(registerResponse.status)) {
+      const suffix = registerResponse.status === 429 ? retryAfterSuffix(registerResponse) : '';
+      throw new TransientRegistryError(`${await registerResponse.text()}${suffix}`);
     }
     throw new Error(`Registrazione rifiutata da mock-eu-registry (${registerResponse.status}): ${await registerResponse.text()}`);
   }

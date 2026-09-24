@@ -415,9 +415,27 @@ DPP — vedi `registry-api/src/jsonld.ts#dppToJsonLd` (fonte), duplicato per la 
 documentata altrove in `src/app/utils/dpp-jsonld.ts` (Admin.previewJsonLd e Product.dppJsonLdJson,
 stesso contratto tenuto a mano tra i tre). Tutti i 7 campi obbligatori sono presenti, più
 `facilityId` e `contentSpecificationIds` tra gli opzionali (`documentation` è omesso: la demo non
-ha documenti reali da collegare, e il campo è facoltativo). Non implementati: le rotte REST del
-§3 sotto il prefisso `/v1/dpps` (il servizio usa le proprie, vedi `registry-api/src/routes/`) e
-le Fine Granular API del §5.
+ha documenti reali da collegare, e il campo è facoltativo).
+
+Le rotte REST del §3 sono implementate in `registry-api/src/routes/v1.ts`, sotto
+`/registry-api/v1/dpps*` — path, verbi (inclusa la PATCH con semantica JSON Merge Patch, RFC 7396,
+per UpdateDPPById) e forma del payload in ingresso/uscita, verificati uno per uno dal vivo contro
+questo documento. Affiancano, senza sostituirle, le rotte interne già esistenti sotto
+`/registry-api/dpp` (il contratto con cui l'admin di *questo* sito crea/modifica un DPP — un solo
+campo UPI, pensato per la UX del form, non per l'interoperabilità con terzi): questa qui è invece
+la superficie che un sistema esterno troverebbe seguendo lo standard alla lettera. Scostamenti
+dichiarati, non nascosti:
+- **Autenticazione**: la spec usa `Authorization: Bearer <token>` (OAuth2/OIDC); qui il cookie di
+  sessione già in uso per l'admin (nessun modello multi-tenant "service provider" con credenziali
+  proprie — esplicitamente fuori scope).
+- **`sectorId`**: non è un campo dello schema (8 dei 9 settori demo condividono lo stesso
+  `contentSpecificationId` ESPR, non abbastanza per risalire al settore) — passato come query
+  param su Create/Update invece che nel corpo, così il body resta esattamente lo schema §6.1.
+- **`dppsByIdAndDate`**: nessuno storico versioni reale (EN 18221 mai implementato) — restituisce
+  la versione corrente se la data richiesta cade dopo la creazione, 404 altrimenti; dichiarato nel
+  commento della rotta, non finto.
+- **§5 (Fine Granular API, JSONPath)**: non implementata — nessun campo abbastanza grande da
+  giustificarla in una demo con poche decine di schede.
 
 Il §4/§6.2 (payload verso il Registro UE) descrive il metodo astratto "RegisterProductDPP" — **non**
 implementato letteralmente: `registry-api/src/mockRegistryClient.ts` parla con l'istanza reale di

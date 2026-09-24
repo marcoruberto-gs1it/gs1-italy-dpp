@@ -118,6 +118,22 @@ export async function getAnyByGtin(gtin: string): Promise<DppRecord | undefined>
   return rows[0] ? fromRow(rows[0]) : undefined;
 }
 
+/** Stesso identificativo di prodotto esatto (GTIN + eventuale AI (10)/(21)), non solo lo stesso
+ * GTIN — usata da routes/v1.ts#POST /dpps (EN 18222 §3.5, CreateDPP) per il 409 Conflict su una
+ * ricreazione, verificato contro il comportamento reale di un'implementazione di riferimento
+ * (eclipse-basyx/basyx-go-components, esempio BaSyxDPPAPIExample): creare due volte lo stesso
+ * passaporto deve fallire, non produrre un duplicato silenzioso. Un MODEL e un BATCH/ITEM con lo
+ * stesso GTIN restano identità di prodotto distinte (granularità diversa) e non collidono qui —
+ * a differenza di getAnyByGtin()/getPublishedByGtin(), pensate apposta per "una riga qualunque
+ * con questo GTIN", non per un confronto di identità esatta. */
+export async function findByIdentity(gtin: string, granularityLevel: GranularityLevel, batchOrSerial: string | null): Promise<DppRecord | undefined> {
+  const { rows } = await pool.query<DppRow>(
+    'SELECT * FROM gs1_dpp_records WHERE gtin = $1 AND granularity_level = $2 AND batch_or_serial IS NOT DISTINCT FROM $3 ORDER BY updated_at DESC LIMIT 1',
+    [gtin, granularityLevel, batchOrSerial]
+  );
+  return rows[0] ? fromRow(rows[0]) : undefined;
+}
+
 export interface CreateDppInput {
   sectorId: SectorId;
   gtin: string;

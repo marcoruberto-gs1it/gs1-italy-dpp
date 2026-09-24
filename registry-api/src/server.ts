@@ -5,9 +5,17 @@ import { loginHandler, logoutHandler, requireAuth } from './auth.ts';
 import { pingMockRegistry } from './mockRegistryClient.ts';
 import { dppRouter } from './routes/dpp.ts';
 import { publicRouter } from './routes/public.ts';
+import { v1Router } from './routes/v1.ts';
 
 const app = express();
-app.use(express.json());
+// Di default express.json() analizza solo "application/json" — scarterebbe silenziosamente
+// (req.body resta vuoto, 500 a valle) una PATCH inviata con "application/merge-patch+json", il
+// media type RFC 7396 registrato apposta per il JSON Merge Patch che routes/v1.ts usa per
+// UpdateDPPById (§3.6). "application/ld+json" per lo stesso motivo su richieste che inviano
+// direttamente un documento JSON-LD. Verificato dal vivo: senza questa lista, una richiesta
+// identica a quella dell'esempio ufficiale BaSyx (Content-Type: application/merge-patch+json)
+// falliva con 500, non con l'errore di validazione atteso.
+app.use(express.json({ type: ['application/json', 'application/merge-patch+json', 'application/ld+json'] }));
 
 // Nessun CORS da configurare: in sviluppo Angular vi arriva tramite proxy.conf.json (stessa
 // origine agli occhi del browser), in produzione tramite lo stesso Traefik del resto del sito
@@ -31,6 +39,10 @@ base.post('/login', loginHandler);
 base.post('/logout', logoutHandler);
 base.use('/public', publicRouter);
 base.use('/dpp', requireAuth, dppRouter);
+// Autenticazione mista al suo interno (letture pubbliche, scritture protette con requireAuth
+// applicato per singola rotta) — vedi il commento in cima a routes/v1.ts per il perché non può
+// stare tutto dietro un requireAuth unico a livello di mount, come /dpp qui sopra.
+base.use('/v1', v1Router);
 
 app.use('/registry-api', base);
 
