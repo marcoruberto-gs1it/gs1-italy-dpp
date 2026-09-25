@@ -161,7 +161,10 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
  * disponibili per lo stesso identificativo — utile a un client che non vuole indovinare cosa
  * c'è dietro un URL prima di seguirlo. Tre relazioni, tutte già risolvibili su questo sito:
  *   gs1:defaultLink  — dove porta una richiesta senza content negotiation (la pagina HTML)
- *   gs1:pip          — Product Information Page, la stessa pagina HTML, nominata esplicitamente
+ *   gs1:dpp          — Digital Product Passport (https://ref.gs1.org/voc/dpp), non il più
+ *                       generico gs1:pip: questa pagina è specificamente il DPP, GS1 distingue
+ *                       esplicitamente i due link type — stesso linktype usato dal vero
+ *                       resolver CE, vedi resolverClient.ts#buildLinksetDocument
  *   gs1:masterData   — il JSON-LD di dppToJsonLd(), raggiungibile anche con ?linkType=masterData
  *                       (vedi webshop/nginx.conf) invece di dover rimandare Accept: application/ld+json
  */
@@ -172,7 +175,7 @@ export function dppToLinkset(record: DppRecord, siteUrl: string): Record<string,
       {
         anchor: id,
         'https://ref.gs1.org/voc/defaultLink': [{ href: id, title: record.name }],
-        'https://ref.gs1.org/voc/pip': [{ href: id, title: record.name, type: 'text/html' }],
+        'https://ref.gs1.org/voc/dpp': [{ href: id, title: record.name, type: 'text/html' }],
         'https://ref.gs1.org/voc/masterData': [
           { href: `${id}?linkType=masterData`, title: `${record.name} — JSON-LD`, type: 'application/ld+json' },
         ],

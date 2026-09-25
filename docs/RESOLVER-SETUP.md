@@ -31,8 +31,8 @@ curl -X POST http://id.localhost/api/new \
   -d '{
     "anchor": "/01/09521234000006",
     "itemDescription": "Prova",
-    "defaultLinktype": "gs1:pip",
-    "links": [{"linktype": "gs1:pip", "href": "http://localhost/01/09521234000006", "title": "Prova", "type": "text/html", "hreflang": ["it"]}]
+    "defaultLinktype": "gs1:dpp",
+    "links": [{"linktype": "gs1:dpp", "href": "http://localhost/01/09521234000006", "title": "Prova", "type": "text/html", "hreflang": ["it"]}]
   }'
 
 # Redirect 307 verso la pagina prodotto reale del sito
@@ -157,7 +157,7 @@ Sostituisci con gli URL veri delle tue dashboard Render:
 curl -X POST https://<resolver-data-entry>.onrender.com/api/new \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <SESSION_TOKEN scelto al passo 2>" \
-  -d '{"anchor":"/01/09521234000006","itemDescription":"Prova","defaultLinktype":"gs1:pip","links":[{"linktype":"gs1:pip","href":"https://<tuo-sito>/01/09521234000006","title":"Prova","type":"text/html","hreflang":["it"]}]}'
+  -d '{"anchor":"/01/09521234000006","itemDescription":"Prova","defaultLinktype":"gs1:dpp","links":[{"linktype":"gs1:dpp","href":"https://<tuo-sito>/01/09521234000006","title":"Prova","type":"text/html","hreflang":["it"]}]}'
 
 curl -i https://<resolver-frontend-proxy>.onrender.com/01/09521234000006
 # atteso: 307, Location verso la tua pagina prodotto reale

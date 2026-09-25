@@ -55,9 +55,12 @@ function requiredConfig(): { apiUrl: string; token: string } | null {
 }
 
 /** Il documento che il resolver si aspetta (vedi tests/test_01_09506000134352.json nel progetto
- * upstream per la forma esatta) — un solo link "gs1:pip" verso la pagina prodotto reale: quella
- * pagina fa già da sola la content negotiation HTML/JSON-LD sullo stesso URL (vedi
- * webshop/nginx.conf), quindi è una sola risorsa, non due. Due voci "gs1:pip" con lo stesso
+ * upstream per la forma esatta) — un solo link "gs1:dpp" (Digital Product Passport, vedi
+ * https://ref.gs1.org/voc/dpp) verso la pagina prodotto reale: quella pagina fa già da sola la
+ * content negotiation HTML/JSON-LD sullo stesso URL (vedi webshop/nginx.conf), quindi è una sola
+ * risorsa, non due. "gs1:dpp" invece del più generico "gs1:pip" perché questa pagina è
+ * specificamente il Digital Product Passport, non una Product Information Page qualunque — GS1
+ * distingue esplicitamente i due link type nel proprio vocabolario. Due voci con lo stesso
  * anchor (una per type) sembrava la scelta più esplicita, ma il resolver la tratta davvero come
  * un'ambiguità: senza un Accept che sceglie tra le due, un browser normale riceve "300 Multiple
  * Choices" invece del redirect atteso — verificato dal vivo, non solo dedotto dalla
@@ -73,8 +76,8 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
   return {
     anchor,
     itemDescription: record.name,
-    defaultLinktype: 'gs1:pip',
-    links: [{ linktype: 'gs1:pip', href, title: record.name, type: 'text/html', hreflang: ['it'] }],
+    defaultLinktype: 'gs1:dpp',
+    links: [{ linktype: 'gs1:dpp', href, title: record.name, type: 'text/html', hreflang: ['it'] }],
   };
 }
 

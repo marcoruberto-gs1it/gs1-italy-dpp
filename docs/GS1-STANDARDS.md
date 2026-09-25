@@ -25,7 +25,7 @@ interroga — vedi `webshop/nginx.conf` e `registry-api/src/jsonld.ts#dppToLinks
 |---|---|
 | Un browser (nessuna richiesta esplicita) | La pagina HTML prerenderizzata |
 | `Accept: application/ld+json`, o `?linkType=masterData` | Il JSON-LD puro (GS1 Web Vocabulary) |
-| `Accept: application/linkset+json`, o `?linkType=linkset` | Il **linkset** (RFC 9264): l'elenco esplicito delle rappresentazioni disponibili per questo identificativo (`gs1:defaultLink`, `gs1:pip`, `gs1:masterData`), invece di un solo redirect — è la terza rappresentazione che uno [standard resolver GS1 conforme](https://ref.gs1.org/standards/resolver/) deve offrire |
+| `Accept: application/linkset+json`, o `?linkType=linkset` | Il **linkset** (RFC 9264): l'elenco esplicito delle rappresentazioni disponibili per questo identificativo (`gs1:defaultLink`, `gs1:dpp`, `gs1:masterData`), invece di un solo redirect — è la terza rappresentazione che uno [standard resolver GS1 conforme](https://ref.gs1.org/standards/resolver/) deve offrire |
 
 È lo stesso principio per cui GS1 Digital Link esiste: un solo identificativo, più
 rappresentazioni a seconda di chi lo interroga.
