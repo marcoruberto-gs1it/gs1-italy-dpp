@@ -1,10 +1,18 @@
 # GS1 Digital Link Resolver CE (vendorizzato)
 
 Codice preso da [gs1/GS1_DigitalLink_Resolver_CE](https://github.com/gs1/GS1_DigitalLink_Resolver_CE)
-(Apache-2.0, vedi `LICENSE` in questa cartella), versione 3.0.0 — non un fork: nessuna modifica
-al codice sorgente di `data_entry_server`/`web_server`/`database_server`, solo la configurazione
-di orchestrazione (`docker-compose.yml` alla radice del repo, con Traefik al posto della loro
-`frontend_proxy_server`, che qui non serve — vedi sotto).
+(Apache-2.0, vedi `LICENSE` in questa cartella), versione 3.0.0.
+
+- `data_entry_server/`, `web_server/`, `database_server/`: **vendorizzati pari pari, non un
+  fork** — nessuna modifica al codice sorgente, solo la configurazione di orchestrazione
+  attorno (vedi `docker-compose.yml` alla radice del repo).
+- `frontend_proxy_server/`: **adattato**, non vendorizzato tale e quale — stessa identica logica
+  di instradamento dell'originale (root → resolving web server con prefisso `/api` aggiunto,
+  `/api`+`/swaggerui` → data entry server), ma con gli host a monte parametrizzati via variabili
+  d'ambiente invece che scritti fissi (`web-service:4000`, `data-entry-service:3000`), perché su
+  Render — a differenza della rete Docker locale — questo servizio non ha "vicini" con un nome
+  DNS interno fisso: serve per il deploy in produzione (vedi `docs/RESOLVER-SETUP.md`), non per
+  `docker-compose.yml` locale, dove Traefik già ricopre lo stesso ruolo (vedi sotto).
 
 ## Perché questo servizio esiste
 
@@ -24,19 +32,21 @@ la sua Data Entry API, `POST/PUT/DELETE /api{anchor}`) a ogni pubblicazione di u
 bozza — stessa regola già in vigore per JSON-LD/pagina pubblica, che il pubblico non deve vedere
 mai una scheda ancora in bozza.
 
-## Perché non la loro `frontend_proxy_server`
+## Perché in locale non si usa `frontend_proxy_server`
 
-La loro immagine `frontend_proxy_server` è un nginx che instrada `/` verso `web-service:4000` e
-`/api`+`/swaggerui` verso `data-entry-service:3000` — esattamente il ruolo che Traefik già
-ricopre nel resto di questo progetto (vedi `docker-compose.yml` alla radice). Usarla in più
-avrebbe significato un doppio livello di proxy per lo stesso lavoro: qui `database-service`,
-`resolver-data-entry` e `resolver-web` sono raggiunti direttamente da Traefik con le proprie
-label, sotto l'host locale `id.localhost` (in produzione: un vero sottodominio `id.<dominio>`,
-vedi `docs/RESOLVER-SETUP.md`).
+In `docker-compose.yml` (locale) `resolver-database`, `resolver-data-entry` e `resolver-web`
+sono raggiunti direttamente da Traefik con le proprie label, sotto l'host locale `id.localhost`
+— Traefik ricopre già lo stesso ruolo di instradamento che altrimenti spetterebbe a
+`frontend_proxy_server`, usarla in più sarebbe un doppio livello di proxy per lo stesso lavoro.
+Su Render invece non c'è un Traefik condiviso davanti ai servizi: lì `frontend_proxy_server` (la
+versione adattata in questa cartella) diventa l'unico punto d'ingresso pubblico del resolver —
+vedi `docs/RESOLVER-SETUP.md`.
 
 ## Aggiornare questo vendoring
 
-Per allineare a una versione più recente del progetto upstream: ripetere lo stesso
-`git clone --depth 1` di `data_entry_server/`, `web_server/`, `database_server/` (non
-`frontend_proxy_server/`, non usata qui) e ricopiare sopra queste cartelle — senza portare
-modifiche locali al loro codice, che non ce ne sono.
+Per allineare `data_entry_server/`, `web_server/`, `database_server/` a una versione più recente
+del progetto upstream: ripetere lo stesso `git clone --depth 1` e ricopiare sopra queste tre
+cartelle — senza portare modifiche locali al loro codice, che non ce ne sono. `frontend_proxy_server/`
+va invece confrontata a mano con l'originale (`nginx.conf` upstream), visto che qui è stata
+adattata: solo gli host a monte sono cambiati (da valori fissi a `${VAR}`), la logica di
+instradamento resta identica.
