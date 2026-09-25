@@ -9,6 +9,10 @@ Supabase (Postgres) + Auth0 + `mock-eu-registry` già pubblicato su Render. I va
 (stringa di connessione Supabase, credenziali Auth0, URL di `mock-eu-registry`) servono anche
 qui.
 
+**Opzionale ma consigliato**: **[docs/RESOLVER-SETUP.md](RESOLVER-SETUP.md)** — il GS1 Digital
+Link Resolver CE, per la piena conformità allo standard di risoluzione (non necessario perché il
+resto del sito funzioni: senza, salta solo la sincronizzazione col resolver, vedi quella guida).
+
 GitHub Pages non basta: il sito ha bisogno di un server vero per `registry-api` (crea/pubblica
 le schede DPP) e di regole di instradamento che un hosting statico non supporta (vedi
 `webshop/nginx.conf` — content negotiation JSON-LD, fallback client-side per `/01/` e `/admin`).

@@ -7,10 +7,18 @@
 #
 #   docker compose up -d --build
 #
-# Due servizi dietro un unico Traefik, tutti sullo stesso dominio (niente CORS):
+# Quattro servizi dietro un unico Traefik:
 #
-#   /             → webshop         nginx con l'Angular prerenderizzato
-#   /registry-api → registry-api    CRUD schede DPP + pubblicazione su mock-eu-registry
+#   localhost/             → webshop              nginx con l'Angular prerenderizzato
+#   localhost/registry-api → registry-api          CRUD schede DPP + pubblicazione su mock-eu-registry
+#   id.localhost/          → resolver-web           GS1 Digital Link Resolver CE — risoluzione conforme allo standard
+#   id.localhost/api,/swaggerui → resolver-data-entry  Data Entry API del resolver (vedi resolver/README.md)
+#
+# id.localhost è un dominio locale distinto (non solo un path) apposta: in produzione un vero
+# GS1-Conformant Resolver vive su un sottodominio dedicato (es. id.<dominio>, vedi
+# docs/RESOLVER-SETUP.md), non su un path del sito principale — .localhost risolve da solo su
+# 127.0.0.1 senza toccare /etc/hosts (RFC 6761), quindi anche in locale si riproduce la stessa
+# separazione di dominio vera, non un'approssimazione.
 #
 # mock-eu-registry (il registro UE, https://github.com/CIRPASS-2/mock-eu-registry) NON è in
 # questo file: gira su Render (Postgres su Supabase, OIDC su Auth0) — vedi
@@ -83,6 +91,12 @@ services:
       # In produzione il router `smart-webshop-tls` con regola Host ha priorità più alta.
       traefik.http.routers.smart-webshop.entrypoints: "web"
       traefik.http.routers.smart-webshop.rule: "PathPrefix(`/`)"
+      # Priorità esplicita e bassa (era implicita, calcolata da Traefik dalla lunghezza della
+      # regola): senza, mischiare router con priorità esplicita (resolver-*, sotto) e router
+      # senza è un comportamento non garantito da Traefik — verificato dal vivo, senza questa
+      # riga "PathPrefix(`/`)" a volte intercetta anche le richieste per id.localhost prima che
+      # arrivino al resolver.
+      traefik.http.routers.smart-webshop.priority: "1"
 
   # Sezione admin DPP: CRUD delle schede (Postgres Supabase, tabella separata da mock-eu-registry)
   # + pubblicazione su mock-eu-registry (chiamata in uscita, non sulla rete Docker — vedi
@@ -110,6 +124,16 @@ services:
       AUTH0_M2M_CLIENT_ID: "${AUTH0_M2M_CLIENT_ID:-}"
       AUTH0_M2M_CLIENT_SECRET: "${AUTH0_M2M_CLIENT_SECRET:-}"
       AUTH0_M2M_AUDIENCE: "${AUTH0_M2M_AUDIENCE:-}"
+      # GS1 Digital Link Resolver CE (vedi resolver/README.md) — indirizzo interno alla rete
+      # Docker, niente bisogno di passare da Traefik/id.localhost per una chiamata
+      # servizio-a-servizio. Finché RESOLVER_SESSION_TOKEN è vuota, la sincronizzazione è
+      # disattivata (stessa filosofia di MOCK_EU_REGISTRY_URL sopra): il resto dell'admin
+      # continua a funzionare, vedi registry-api/src/resolverClient.ts.
+      # /api: le rotte Flask di data_entry_server vivono native sotto quel prefisso (Blueprint
+      # con url_prefix='/api', verificato in resolver/data_entry_server/src/__init__.py) — a
+      # differenza di resolver-web, qui non serve nessun middleware Traefik che lo aggiunga.
+      RESOLVER_API_URL: "${RESOLVER_API_URL:-http://resolver-data-entry:3000/api}"
+      RESOLVER_SESSION_TOKEN: "${RESOLVER_SESSION_TOKEN:-}"
     labels:
       traefik.enable: "true"
       traefik.docker.network: "catalogosmart-web"
@@ -117,6 +141,79 @@ services:
       traefik.http.services.smart-registry-api.loadbalancer.server.port: "4310"
       traefik.http.routers.smart-registry-api.entrypoints: "web"
       traefik.http.routers.smart-registry-api.rule: "PathPrefix(`/registry-api`)"
+      # Priorità esplicita: vedi il commento su smart-webshop.priority più sopra.
+      traefik.http.routers.smart-registry-api.priority: "5"
+
+  # --- GS1 Digital Link Resolver CE (vedi resolver/README.md) ---------------------------------
+  # Vendorizzato da gs1/GS1_DigitalLink_Resolver_CE, non un fork: nessuna modifica al codice
+  # sorgente Python, solo questa orchestrazione (la loro frontend_proxy_server/nginx non serve,
+  # Traefik già ricopre lo stesso ruolo nel resto di questo file).
+  resolver-database:
+    build: ./resolver/database_server
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${RESOLVER_MONGO_USER:-gs1resolver}"
+      MONGO_INITDB_ROOT_PASSWORD: "${RESOLVER_MONGO_PASSWORD:-gs1resolver}"
+    volumes:
+      - resolver-database-volume:/data/db
+
+  resolver-data-entry:
+    build: ./resolver/data_entry_server
+    restart: unless-stopped
+    networks:
+      - web
+    depends_on:
+      - resolver-database
+    environment:
+      MONGO_URI: "${RESOLVER_MONGO_URI:-mongodb://gs1resolver:gs1resolver@resolver-database:27017}"
+      SESSION_TOKEN: "${RESOLVER_SESSION_TOKEN:-devtoken}"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "catalogosmart-web"
+      traefik.http.services.smart-resolver-data-entry.loadbalancer.server.port: "3000"
+      traefik.http.routers.smart-resolver-data-entry.entrypoints: "web"
+      # Sotto id.localhost (non un path del sito principale, vedi il commento in cima al file) —
+      # priorità esplicita più alta di resolver-web sotto, che sullo stesso Host risponde a
+      # tutto il resto: senza, Traefik potrebbe scegliere la regola più corta a parità di altri
+      # criteri invece di quella più specifica.
+      traefik.http.routers.smart-resolver-data-entry.rule: "Host(`id.localhost`) && (PathPrefix(`/api`) || PathPrefix(`/swaggerui`))"
+      traefik.http.routers.smart-resolver-data-entry.priority: "20"
+
+  resolver-web:
+    build: ./resolver/web_server
+    restart: unless-stopped
+    networks:
+      - web
+    depends_on:
+      - resolver-database
+    environment:
+      MONGO_URI: "${RESOLVER_MONGO_URI:-mongodb://gs1resolver:gs1resolver@resolver-database:27017}"
+      # Sovrascrive il default nel loro Dockerfile (vedi resolver/web_server/Dockerfile) — il
+      # dominio che questo servizio dichiara di sé nei linkset che genera (usato nudo, SENZA
+      # schema: il loro codice antepone da solo "https://" — verificato dal vivo, con lo schema
+      # incluso qui si ottiene un doppio prefisso "https://http://..." nel campo "anchor").
+      FQDN: "${RESOLVER_FQDN:-id.localhost}"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "catalogosmart-web"
+      traefik.http.services.smart-resolver-web.loadbalancer.server.port: "4000"
+      traefik.http.routers.smart-resolver-web.entrypoints: "web"
+      traefik.http.routers.smart-resolver-web.rule: "Host(`id.localhost`)"
+      # Le rotte Flask di questo servizio vivono sotto /api al proprio interno (stessa scelta
+      # della loro frontend_proxy_server/nginx.conf originale, verificato leggendone la
+      # location "/": "proxy_pass http://web-service:4000/api/"): senza aggiungere lo stesso
+      # prefisso qui, un GET id.localhost/01/{gtin} arriverebbe come /01/{gtin} nudo e
+      # risponderebbe 404, mai raggiungendo web_namespace.py.
+      traefik.http.middlewares.smart-resolver-web-api-prefix.addprefix.prefix: "/api"
+      traefik.http.routers.smart-resolver-web.middlewares: "smart-resolver-web-api-prefix"
+      traefik.http.routers.smart-resolver-web.priority: "10"
+
+volumes:
+  # Dati del resolver (Mongo) — persistono tra un `docker compose up` e l'altro, come il resto
+  # dei volumi Docker di questo progetto.
+  resolver-database-volume: {}
 
 networks:
   web:

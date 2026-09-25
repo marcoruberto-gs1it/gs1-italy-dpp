@@ -1,9 +1,17 @@
 import { Router } from 'express';
 import { createDpp, deleteDpp, getDpp, listDpp, markPublished, updateDpp } from '../db.ts';
 import { registerDpp, TransientRegistryError } from '../mockRegistryClient.ts';
+import { syncResolverEntry } from '../resolverClient.ts';
 import { isValidSectorId } from '../sectors.ts';
 
 export const dppRouter = Router();
+
+// Stesso fallback di routes/v1.ts#siteUrl() e mockRegistryClient.ts#registerDpp — un solo posto
+// in cui SITE_URL viene letta non basterebbe (moduli diversi, nessuna dipendenza incrociata tra
+// loro, stesso motivo già documentato altrove in questo servizio).
+function siteUrl(): string {
+  return process.env.SITE_URL || 'http://localhost:4200';
+}
 
 const GRANULARITY_LEVELS = ['MODEL', 'BATCH', 'ITEM'];
 
@@ -120,6 +128,19 @@ dppRouter.post('/:id/publish', async (req, res) => {
   try {
     const { registryId, proofJwt, request, response } = await registerDpp(record);
     const published = await markPublished(record.id, registryId, proofJwt);
+    if (!published) {
+      // markPublished non trova più la riga (cancellata nel frattempo?) — non dovrebbe
+      // succedere in pratica (nessuna DELETE concorrente possibile sulla stessa riga in questa
+      // demo), ma se capitasse rispondere 404 è più onesto di un 200 con un body vuoto.
+      res.status(404).json({ error: 'scheda non trovata' });
+      return;
+    }
+    // Sincronizza il GS1 Digital Link Resolver CE (vedi resolver/README.md) — non bloccante e
+    // mai un motivo di fallimento per questa richiesta: la pubblicazione vera è già avvenuta
+    // (registerDpp/markPublished sopra), il resolver è un livello di conformità aggiuntivo, non
+    // la fonte di verità. Solo ORA, non a ogni salvataggio di bozza: stessa regola già in vigore
+    // per JSON-LD/pagina pubblica.
+    void syncResolverEntry(published, siteUrl());
     // `technical`: il payload/risposta reali scambiati con mock-eu-registry, solo per la
     // visibilità tecnica nell'interfaccia (vedi PublishJourneyComponent) — non persistiti,
     // rilevanti solo per l'istante della pubblicazione appena avvenuta.
