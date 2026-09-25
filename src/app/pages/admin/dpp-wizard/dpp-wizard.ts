@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, Signal, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, Signal, computed, effect, inject, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QRCodeComponent } from 'angularx-qrcode';
@@ -96,6 +96,11 @@ export class DppWizardComponent {
   @Input({ required: true }) publishedRecord!: Signal<DppRecord | null>;
   @Input({ required: true }) formPhase!: Signal<1 | 2 | 3>;
   @Input({ required: true }) qrValue!: Signal<string | null>;
+  /** Incrementato da Admin a ogni salvataggio riuscito (mai a un fallimento) — un solo pulsante
+   * "Avanti" al passo Riepilogo lo emette e aspetta di vederlo cambiare per avanzare davvero
+   * (vedi l'effect nel costruttore), invece di due pulsanti separati "Salva"/"Avanti": salvare
+   * QUI *è* procedere, non un'azione a parte da capire. */
+  @Input({ required: true }) saveVersion!: Signal<number>;
   /** Stato del percorso di registrazione (passo 6) — vedi PublishJourneyComponent, incorporato
    * qui invece di comparire come blocco separato sotto il wizard (su richiesta esplicita: la
    * registrazione fa parte dei passi guidati, non un extra in fondo alla pagina). */
@@ -145,12 +150,35 @@ export class DppWizardComponent {
    * orizzontale in dpp-wizard.css (sinistra↔destra, mai verticale, su richiesta esplicita). */
   protected slideDirection = signal<'forward' | 'back'>('forward');
 
+  /** true tra il click su "Avanti" al passo Riepilogo e l'avanzamento vero, che aspetta la
+   * conferma di salvataggio riuscito (vedi saveVersion sopra) invece di scattare subito. */
+  private awaitingAdvanceAfterSave = signal(false);
+
+  constructor() {
+    effect(() => {
+      this.saveVersion();
+      if (!this.awaitingAdvanceAfterSave()) return;
+      this.awaitingAdvanceAfterSave.set(false);
+      // Se nel frattempo l'utente ha già lasciato il passo Riepilogo (Indietro, un altro
+      // salvataggio da un passo diverso...) l'avanzamento automatico non ha più senso.
+      if (this.currentStep() !== 4) return;
+      this.advanceTo(5);
+    });
+  }
+
   protected goTo(index: number): void {
     // Si può tornare indietro liberamente, ma si può saltare avanti solo fino al passo più
     // lontano già raggiunto validamente (niente scorciatoie verso passi mai sbloccati).
     if (index > this.lastReachedStep()) return;
+    this.awaitingAdvanceAfterSave.set(false);
     this.slideDirection.set(index < this.currentStep() ? 'back' : 'forward');
     this.currentStep.set(index);
+  }
+
+  private advanceTo(step: number): void {
+    this.slideDirection.set('forward');
+    this.currentStep.set(step);
+    this.lastReachedStep.set(Math.max(this.lastReachedStep(), step));
   }
 
   /** A differenza di una volta, il pulsante "Avanti" resta sempre cliccabile (vedi
@@ -170,10 +198,15 @@ export class DppWizardComponent {
       // ignorata al salvataggio (vedi Admin.buildInput()) — un avviso, non un errore.
       this.showToast.emit({ message: 'Un attributo ha solo il nome o solo il valore compilato: verrà ignorato al salvataggio.', severity: 'warning' });
     }
-    const nextStep = Math.min(step + 1, this.steps.length - 1);
-    this.slideDirection.set('forward');
-    this.currentStep.set(nextStep);
-    this.lastReachedStep.set(Math.max(this.lastReachedStep(), nextStep));
+    if (step === 4) {
+      // Un solo pulsante: "Avanti" qui salva PRIMA, poi avanza — solo a salvataggio riuscito
+      // (vedi l'effect nel costruttore, che osserva saveVersion). Se il salvataggio fallisce,
+      // Admin mostra il proprio errore e non tocca saveVersion: si resta su questo passo.
+      this.awaitingAdvanceAfterSave.set(true);
+      this.saveDraft.emit();
+      return;
+    }
+    this.advanceTo(Math.min(step + 1, this.steps.length - 1));
   }
 
   private markStepTouched(index: number): void {
@@ -194,13 +227,14 @@ export class DppWizardComponent {
       case 2:
         return this.fieldError('economicOperatorId') ?? this.fieldError('facilityId') ?? "L'identificativo dell'operatore economico deve essere un GLN GS1 valido.";
       case 4:
-        return 'Salva la scheda nei sistemi aziendali prima di procedere alla registrazione.';
+        return 'Controlla i campi dei passi precedenti prima di continuare.';
       default:
         return 'Controlla i campi di questo passo prima di continuare.';
     }
   }
 
   protected back(): void {
+    this.awaitingAdvanceAfterSave.set(false);
     this.slideDirection.set('back');
     this.currentStep.set(Math.max(this.currentStep() - 1, 0));
   }
@@ -220,9 +254,10 @@ export class DppWizardComponent {
       case 2:
         return this.economicOperatorValid() && this.facilityValid();
       case 4:
-        // Serve una scheda già salvata prima di poter procedere alla registrazione — non si
-        // registra un DPP che non esiste ancora nei sistemi aziendali.
-        return !!this.editingId();
+        // Il salvataggio avviene dentro next() stesso ora (un solo pulsante "Avanti") — qui
+        // basta che il form sia ancora valido nel suo complesso: i singoli requisiti sono già
+        // stati garantiti uno per uno dai passi precedenti.
+        return this.form.valid;
       default:
         return true;
     }

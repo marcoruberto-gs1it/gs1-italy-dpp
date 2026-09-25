@@ -129,6 +129,10 @@ export class Admin {
     this.toast.set({ message, severity });
   }
   protected savePending = signal(false);
+  /** Incrementato a ogni salvataggio riuscito, mai a un fallimento — il Wizard lo osserva per
+   * sapere quando avanzare davvero dal passo Riepilogo dopo aver premuto il suo unico pulsante
+   * "Avanti" (che lì emette saveDraft e aspetta), vedi dpp-wizard.ts. */
+  protected saveVersion = signal(0);
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
 
@@ -500,11 +504,14 @@ export class Admin {
   }
 
   protected startEdit(record: DppRecord): void {
-    // Rete di sicurezza oltre a quella già in admin.html (che nasconde il pulsante "Apri" per
-    // queste righe): niente dipende SOLO dal template per una regola che conta anche lato server
+    // Rete di sicurezza oltre a quella già in admin.html (che mostra "Apri" solo per le righe
+    // ancora bozza): niente dipende SOLO dal template per una regola che conta anche lato server
     // (routes/dpp.ts/routes/v1.ts rifiutano comunque la scrittura, ma qui evitiamo anche di aprire
-    // un wizard che finirebbe per fallire al salvataggio).
-    if (record.isStatic) return;
+    // un wizard che finirebbe per fallire al salvataggio). Una scheda già registrata non è più
+    // modificabile da nessuna parte, statica o no: admin.html apre invece publicUrlFor() in una
+    // nuova scheda, la stessa pagina che risolve il GS1 Digital Link, in sola lettura per
+    // costruzione (ProductComponent non ha alcuna funzione di modifica).
+    if (record.isStatic || record.status === 'published') return;
     this.editingId.set(record.id);
     this.dppForm.reset({
       sectorId: record.sectorId,
@@ -640,6 +647,7 @@ export class Admin {
         this.savePending.set(false);
         this.editingId.set(record.id);
         this.view.set('wizard');
+        this.saveVersion.update((v) => v + 1);
         this.loadRecords().subscribe();
       },
       error: (err: HttpErrorResponse) => {
@@ -697,7 +705,7 @@ export class Admin {
   }
 
   protected deleteRecord(record: DppRecord): void {
-    if (record.isStatic) return;
+    if (record.isStatic || record.status === 'published') return;
     if (!confirm(`Eliminare il DPP "${record.name}"?`)) return;
     this.api.delete(record.id).subscribe({
       next: () => this.loadRecords().subscribe(),
@@ -717,5 +725,13 @@ export class Admin {
 
   protected sectorBrandColor(sectorId: string): string {
     return this.sectors.find((s) => s.id === sectorId)?.brandColor ?? 'var(--brand)';
+  }
+
+  /** URI GS1 Digital Link pubblico di una scheda già registrata — la pagina che l'admin apre per
+   * "vederla" (sola lettura, stessa istanza di ProductComponent che risolve /01/:gtin per
+   * chiunque) invece di riaprire il Wizard. Stessa funzione già usata da startEdit() per
+   * ricostruire il campo upi. */
+  protected publicUrlFor(record: DppRecord): string {
+    return buildDigitalLinkUpi(this.siteOrigin.value, record.gtin, record.granularityLevel, record.batchOrSerial ?? '');
   }
 }

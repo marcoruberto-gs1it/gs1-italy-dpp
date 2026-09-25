@@ -1,5 +1,9 @@
 .admin-container {
-  max-width: 1080px;
+  /* Largo abbastanza da far vedere per intero, senza scorrimento orizzontale, il JSON-LD nella
+     colonna destra dei passi Riepilogo/Registrazione del Wizard (vedi .wizard in
+     dpp-wizard.css) — l'elenco e il login restano centrati alla stessa larghezza, non ne
+     risentono negativamente su schermi larghi. */
+  max-width: 1360px;
   margin: 0 auto;
   padding: 48px 24px 80px;
 }

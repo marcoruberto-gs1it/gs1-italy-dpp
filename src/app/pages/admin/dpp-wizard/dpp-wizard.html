@@ -33,31 +33,24 @@
           Indietro
         </button>
       }
-      <!-- Passo 5: l'azione "Salva" vive qui, non in fondo al contenuto — su richiesta esplicita,
-           resta raggiungibile senza scorrere qualunque sia l'altezza del riepilogo. -->
-      @if (currentStep() === 4) {
-        <button type="button" class="gs-btn gs-btn--primary" [disabled]="savePending || !!publishedRecord()" (click)="saveDraft.emit()">
-          @if (savePending) {
-            <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
-            Salvataggio…
-          } @else {
-            <app-icon name="save" [size]="16"></app-icon>
-            {{ publishedRecord() ? 'Già salvata' : 'Salva nei sistemi aziendali' }}
-          }
-        </button>
-      }
-      <!-- Passo 6, prima della conferma: stessa idea, "Conferma e invia" qui invece che sotto il
-           riepilogo di cosa sta per essere inviato. -->
+      <!-- Un solo pulsante per andare avanti in ogni passo, mai due azioni distinte da capire:
+           al passo Riepilogo "Avanti" salva prima e poi avanza (vedi next() in dpp-wizard.ts),
+           al passo Registrazione diventa l'azione di invio vera e propria — sempre un solo
+           pulsante primario, mai "Salva" + "Avanti" affiancati. -->
       @if (currentStep() === 5 && !publishedRecord() && !journeyStarted()) {
         <button type="button" class="gs-btn gs-btn--primary" [disabled]="publishPending" (click)="confirmPublish.emit()">
           <app-icon name="send" [size]="16"></app-icon>
           Conferma e invia al Registro UE
         </button>
-      }
-      @if (currentStep() < steps.length - 1) {
-        <button type="button" class="gs-btn gs-btn--primary" (click)="next()">
-          Avanti
-          <app-icon name="chevron-right" [size]="16"></app-icon>
+      } @else if (currentStep() < steps.length - 1) {
+        <button type="button" class="gs-btn gs-btn--primary" [disabled]="currentStep() === 4 && savePending" (click)="next()">
+          @if (currentStep() === 4 && savePending) {
+            <app-icon name="loader" [size]="16" [spin]="true"></app-icon>
+            Salvataggio…
+          } @else {
+            Avanti
+            <app-icon name="chevron-right" [size]="16"></app-icon>
+          }
         </button>
       }
     </div>
@@ -69,7 +62,7 @@
          scorrimento orizzontale (vedi .wizard-step in dpp-wizard.css, guidata da
          slideDirection()). -->
     @if (currentStep() === 0) {
-      <div class="wizard-step" [class]="'slide-' + slideDirection()">
+      <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[0].title }}</h2>
         <p class="wizard-step-help">
           Il settore determina quali requisiti del regolamento ESPR si applicano a questo prodotto e da quando —
@@ -96,7 +89,7 @@
 
     <!-- Passo 2: Identificazione prodotto -->
     @if (currentStep() === 1) {
-      <div class="wizard-step" [class]="'slide-' + slideDirection()">
+      <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[1].title }}</h2>
         <p class="wizard-step-help">
           L'<strong>UPI</strong> (Unique Product Identifier) è l'URI GS1 Digital Link che identifica il prodotto —
@@ -152,7 +145,7 @@
 
     <!-- Passo 3: Operatore economico -->
     @if (currentStep() === 2) {
-      <div class="wizard-step" [class]="'slide-' + slideDirection()">
+      <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[2].title }}</h2>
         <p class="wizard-step-help">
           Chi mette il prodotto sul mercato (EO) e, se vuoi, lo stabilimento che lo produce — nella pratica GS1
@@ -201,7 +194,7 @@
 
     <!-- Passo 4: Attributi -->
     @if (currentStep() === 3) {
-      <div class="wizard-step" [class]="'slide-' + slideDirection()">
+      <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[3].title }}</h2>
         <p class="wizard-step-help">
           Dati liberi specifici del prodotto — impronta di carbonio, contenuto riciclato, composizione, garanzia:

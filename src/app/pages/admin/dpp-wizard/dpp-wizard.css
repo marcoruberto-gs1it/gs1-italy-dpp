@@ -1,5 +1,13 @@
 .wizard {
-  max-width: 760px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* I passi a colonna singola (Settore…Attributi) restano leggibili su una riga di testo
+   normale anche se .wizard ora è molto più largo (serve al JSON del Riepilogo/Registrazione,
+   vedi .wizard-split sotto) — solo i passi con .wizard-split usano davvero tutta la larghezza. */
+.wizard-step--narrow {
+  max-width: 680px;
   margin: 0 auto;
 }
 
@@ -581,8 +589,19 @@
 .wizard-json {
   margin: 0;
   max-height: 520px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   font-size: 0.76rem;
+}
+
+/* .gs-code-block code (tokens.css) usa "white-space: pre" — corretto per un JSON compatto
+   copia-incolla come nel drawer, ma qui il pannello vive dentro metà pagina e valori lunghi
+   (URI GS1 Digital Link, UUID) andrebbero a scorrimento orizzontale — su richiesta esplicita,
+   qui vanno invece a capo. */
+.wizard-json code {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .wizard-json-placeholder {

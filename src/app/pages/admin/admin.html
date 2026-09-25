@@ -121,18 +121,35 @@
                     <span class="record-static-note" title="Esempio del carosello home: non modificabile né eliminabile da qui.">
                       <app-icon name="shield-check" [size]="14"></app-icon>
                     </span>
+                  } @else if (record.status === 'published') {
+                    <!-- Registrata sul Registro UE: non più modificabile da qui (vedi il commento
+                         su startEdit() in admin.ts) — la stessa pagina pubblica che risolve il
+                         GS1 Digital Link è anche la "vista" di sola lettura per l'admin, non una
+                         vista admin separata da mantenere in parallelo. -->
+                    <a
+                      [href]="publicUrlFor(record)"
+                      target="_blank"
+                      rel="noopener"
+                      class="gs-icon-btn"
+                      title="Vedi la scheda pubblica (sola lettura)"
+                      aria-label="Vedi la scheda pubblica (sola lettura)"
+                    >
+                      <app-icon name="external-link" [size]="15"></app-icon>
+                    </a>
+                    <button
+                      type="button"
+                      class="gs-icon-btn gs-icon-btn--danger"
+                      disabled
+                      title="Già registrato sul DPP Registry UE: non eliminabile in questa demo."
+                      aria-label="Già registrato sul DPP Registry UE: non eliminabile in questa demo."
+                    >
+                      <app-icon name="trash" [size]="15"></app-icon>
+                    </button>
                   } @else {
                     <button type="button" class="gs-icon-btn" title="Apri" aria-label="Apri" (click)="startEdit(record)">
                       <app-icon name="edit" [size]="15"></app-icon>
                     </button>
-                    <button
-                      type="button"
-                      class="gs-icon-btn gs-icon-btn--danger"
-                      [disabled]="record.status === 'published'"
-                      [title]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
-                      [attr.aria-label]="record.status === 'published' ? 'Già registrato sul DPP Registry UE: non eliminabile in questa demo.' : 'Elimina'"
-                      (click)="deleteRecord(record)"
-                    >
+                    <button type="button" class="gs-icon-btn gs-icon-btn--danger" title="Elimina" aria-label="Elimina" (click)="deleteRecord(record)">
                       <app-icon name="trash" [size]="15"></app-icon>
                     </button>
                   }
@@ -169,6 +186,7 @@
         [publishedRecord]="publishedRecord"
         [formPhase]="formPhase"
         [savePending]="savePending()"
+        [saveVersion]="saveVersion"
         [publishPending]="publishPending()"
         [qrValue]="qrValue"
         [isBrowser]="isBrowser"
