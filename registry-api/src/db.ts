@@ -30,7 +30,7 @@ export interface DppRecord {
    * mock-eu-registry (vedi mockRegistryClient.ts) richiede sempre facilitiesId nel payload di
    * registrazione: lasciarlo vuoto romperebbe una pubblicazione vera. */
   facilityId: string;
-  /** true solo per i 9 DPP di esempio del carosello della home (creati da seed.ts, stessi GTIN
+  /** true solo per i 10 DPP di esempio del carosello della home (creati da seed.ts, stessi GTIN
    * di src/app/data/sectors.ts): non modificabili né eliminabili da /admin, perché la home li
    * linka come "scansionabili" — cancellarli o alterarli romperebbe quegli esempi per chiunque li
    * apra. Ogni altro DPP creato da un utente vero resta libero. Applicato dalle rotte
@@ -178,7 +178,7 @@ export interface CreateDppInput {
    * chiamanti esistenti (routes/v1.ts) scritti prima di questa colonna. */
   economicOperatorId?: string;
   facilityId?: string;
-  /** Solo seed.ts la passa true, per i 9 esempi del carosello home — vedi il commento su
+  /** Solo seed.ts la passa true, per i 10 esempi del carosello home — vedi il commento su
    * DppRecord.isStatic sopra. Ogni altro chiamante (routes/dpp.ts, routes/v1.ts) la lascia
    * implicita (false): un DPP creato da un utente vero non è mai statico. */
   isStatic?: boolean;

@@ -16,7 +16,7 @@ export interface Sector {
   dateLabel: string;
   /** Solo il frammento data di dateLabel (es. "18 feb 2027", "Q4 2026"), senza il prefisso
    * "Obbligo dal"/"Atto delegato atteso" — quel prefisso è già leggibile una volta sola
-   * nell'intro della roadmap compatta in home.html; ripeterlo per ciascuno dei 9 nodi, in una
+   * nell'intro della roadmap compatta in home.html; ripeterlo per ciascuno dei 10 nodi, in una
    * colonna larga quanto 1/9 di 620px, è quello che li faceva andare a capo su 2-3 righe. */
   dateShort: string;
   /** Stessa data di dateLabel, come numero (anno + frazione per il trimestre) — usato solo per
@@ -224,6 +224,25 @@ export const SECTORS: Sector[] = [
     exampleJourneyStep1: 'Assemblaggio schede · Taiwan',
     exampleJourneyStep2: 'Collaudo finale · Paesi Bassi',
   },
+  {
+    id: 'detergents',
+    name: 'Detergenti',
+    shortName: 'Detergenti',
+    icon: 'droplet',
+    description:
+      'Dosaggio corretto, biodegradabilità dei tensioattivi e riciclabilità del packaging per i detersivi e detergenti immessi sul mercato europeo, accessibili da un QR code sulla confezione.',
+    brandColor: '#30D158',
+    dateLabel: 'Atto delegato atteso 2028',
+    dateShort: '2028',
+    roadmapYear: 2028.8,
+    regulationRef: 'ESPR — Regolamento (UE) 2024/1781',
+    contentSpecificationId: 'EU_ESPR_REGULATION_2024_1781',
+    status: 'coming-soon',
+    exampleName: 'Detersivo liquido bucato — esempio',
+    exampleGtin: '08000000000101',
+    exampleJourneyStep1: 'Formulazione tensioattivi · Paesi Bassi',
+    exampleJourneyStep2: 'Imbottigliamento e confezione · Italia',
+  },
 ];
 
 interface SectorTranslationEn {
@@ -341,6 +360,18 @@ const SECTOR_TRANSLATIONS_EN: Record<string, SectorTranslationEn> = {
     exampleName: 'Home router — example',
     exampleJourneyStep1: 'Boards assembled · Taiwan',
     exampleJourneyStep2: 'Final testing · Netherlands',
+  },
+  detergents: {
+    name: 'Detergents',
+    shortName: 'Detergents',
+    description:
+      'Correct dosage, surfactant biodegradability and packaging recyclability for detergents and cleaning products placed on the European market.',
+    dateLabel: 'Delegated act expected 2028',
+    dateShort: '2028',
+    regulationRef: 'ESPR — Regulation (EU) 2024/1781',
+    exampleName: 'Liquid laundry detergent — example',
+    exampleJourneyStep1: 'Surfactant formulation · Netherlands',
+    exampleJourneyStep2: 'Bottling and packing · Italy',
   },
 };
 

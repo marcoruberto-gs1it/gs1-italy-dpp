@@ -1,0 +1,110 @@
+.product-info-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+
+.breadcrumbs {
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+.breadcrumbs ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.breadcrumbs a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-weight: 500;
+}
+.breadcrumbs a:hover {
+  color: var(--brand);
+}
+.separator {
+  margin: 0 8px;
+  color: var(--text-muted);
+}
+.current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.not-found {
+  text-align: center;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-tertiary);
+}
+
+/* --- Scheda PIP (gs1:pip) --- */
+.pip-view {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pip-view-badge {
+  align-self: flex-start;
+}
+
+.pip-view-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pip-view-icon {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pip-view-eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.pip-view-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.pip-view-description {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.pip-view-dpp-link {
+  align-self: flex-start;
+}
+
+@media (max-width: 600px) {
+  .pip-view {
+    padding: 24px;
+  }
+}

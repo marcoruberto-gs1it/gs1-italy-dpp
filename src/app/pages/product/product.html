@@ -431,10 +431,16 @@
         </div>
       }
 
-      <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm dpp-view-jsonld-btn" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
-        <app-icon name="braces" [size]="15"></app-icon>
-        {{ t('product.viewJsonLd') }}
-      </button>
+      <div class="dpp-view-actions">
+        <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm dpp-view-jsonld-btn" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
+          <app-icon name="braces" [size]="15"></app-icon>
+          {{ t('product.viewJsonLd') }}
+        </button>
+        <a [routerLink]="['/product-info', dpp.gtin]" class="gs-btn gs-btn--ghost gs-btn--sm" [attr.aria-label]="t('product.viewProductInfoAria')">
+          <app-icon name="external-link" [size]="15"></app-icon>
+          {{ t('product.viewProductInfo') }}
+        </a>
+      </div>
     </article>
   } @else if (dppLoading()) {
     <div class="not-found">

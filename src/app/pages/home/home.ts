@@ -33,7 +33,7 @@ type MilestoneStatus = 'done' | 'soon' | 'later';
 
 /** Stato "urgenza" di un nodo timeline dalla distanza in mesi da oggi (entrambi in anni
  * decimali, vedi toDecimalYear) — condiviso tra la timeline normativa (4 nodi) e quella dei
- * settori (9 nodi, vedi sectorsSpine): stessa soglia dei 12 mesi per entrambe. */
+ * settori (10 nodi, vedi sectorsSpine): stessa soglia dei 12 mesi per entrambe. */
 function statusFromMonthsAway(monthsAway: number): MilestoneStatus {
   if (monthsAway <= 0) return 'done';
   return monthsAway <= 12 ? 'soon' : 'later';
@@ -140,7 +140,7 @@ export class Home implements OnDestroy {
     };
   });
 
-  /** Stessa timeline "a spina", questa volta per i 9 settori (sezione #settori) — sostituisce
+  /** Stessa timeline "a spina", questa volta per i 10 settori (sezione #settori) — sostituisce
    * il precedente grafico SVG con lo stesso componente HTML/CSS già usato per la normativa,
    * solo con nodi più compatti (vedi .spine-timeline--compact in home.css). Posizionata su
    * `roadmapYear` (anno decimale, stesso significato di toDecimalYear ma già pronto in

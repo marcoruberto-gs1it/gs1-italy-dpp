@@ -55,30 +55,46 @@ function requiredConfig(): { apiUrl: string; token: string } | null {
 }
 
 /** Il documento che il resolver si aspetta (vedi tests/test_01_09506000134352.json nel progetto
- * upstream per la forma esatta) — un solo link "gs1:dpp" (Digital Product Passport, vedi
- * https://ref.gs1.org/voc/dpp) verso la pagina prodotto reale: quella pagina fa già da sola la
- * content negotiation HTML/JSON-LD sullo stesso URL (vedi webshop/nginx.conf), quindi è una sola
- * risorsa, non due. "gs1:dpp" invece del più generico "gs1:pip" perché questa pagina è
- * specificamente il Digital Product Passport, non una Product Information Page qualunque — GS1
- * distingue esplicitamente i due link type nel proprio vocabolario. Due voci con lo stesso
- * anchor (una per type) sembrava la scelta più esplicita, ma il resolver la tratta davvero come
- * un'ambiguità: senza un Accept che sceglie tra le due, un browser normale riceve "300 Multiple
- * Choices" invece del redirect atteso — verificato dal vivo, non solo dedotto dalla
- * documentazione. */
+ * upstream per la forma esatta).
+ *
+ * Un solo link "gs1:dpp" (Digital Product Passport, https://ref.gs1.org/voc/dpp) per i DPP
+ * creati da un utente vero: quella pagina fa già da sola la content negotiation HTML/JSON-LD
+ * sullo stesso URL (vedi webshop/nginx.conf), quindi è una sola risorsa, non due. "gs1:dpp"
+ * invece del più generico "gs1:pip" perché questa pagina è specificamente il Digital Product
+ * Passport, non una Product Information Page qualunque — GS1 distingue esplicitamente i due
+ * link type nel proprio vocabolario.
+ *
+ * Due link, "gs1:pip" + "gs1:dpp", per i 10 DPP statici del carosello home (record.isStatic,
+ * vedi seed.ts): a differenza dei DPP utente, questi hanno anche una vera pagina "informazioni
+ * prodotto" distinta (src/app/pages/product-info/), consumer-facing, senza dati di compliance —
+ * vedi il componente Angular per il contenuto esatto. Linktype DIVERSI fra loro (non due voci
+ * "gs1:pip" con URL diverso): il resolver tratta due link con lo STESSO linktype sullo stesso
+ * anchor come un'ambiguità reale — senza un Accept che sceglie fra le due, un browser normale
+ * riceve "300 Multiple Choices" invece del redirect atteso (verificato dal vivo). Linktype
+ * diversi invece si risolvono ciascuno per conto proprio (?linkType=gs1:pip esplicito, o
+ * defaultLinktype quando la richiesta non specifica nulla), nessuna ambiguità. defaultLinktype
+ * resta "gs1:dpp" in entrambi i casi: è la pagina che mostra i dati del passaporto, il cuore di
+ * questa demo — "gs1:pip" resta comunque raggiungibile esplicitamente. */
 function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string, unknown> {
   const anchor = buildAnchor(record);
-  const href = digitalLinkUrl(
+  const dppHref = digitalLinkUrl(
     siteUrl,
     record.gtin,
     record.batchOrSerial ? parseBatchOrSerial(record.batchOrSerial, record.granularityLevel).ai : undefined,
     record.batchOrSerial ? parseBatchOrSerial(record.batchOrSerial, record.granularityLevel).value : undefined
   );
-  return {
-    anchor,
-    itemDescription: record.name,
-    defaultLinktype: 'gs1:dpp',
-    links: [{ linktype: 'gs1:dpp', href, title: record.name, type: 'text/html', hreflang: ['it'] }],
-  };
+  const dppLink = { linktype: 'gs1:dpp', href: dppHref, title: record.name, type: 'text/html', hreflang: ['it'] };
+
+  if (!record.isStatic) {
+    return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:dpp', links: [dppLink] };
+  }
+
+  // Stesso dominio/GTIN della pagina DPP, rotta diversa — vedi src/app/app.routes.ts
+  // ('product-info/:gtin') e webshop/nginx.conf (location /product-info, stesso trattamento
+  // client-side di /admin).
+  const pipHref = `${siteUrl.replace(/\/$/, '')}/product-info/${record.gtin}`;
+  const pipLink = { linktype: 'gs1:pip', href: pipHref, title: record.name, type: 'text/html', hreflang: ['it'] };
+  return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:dpp', links: [pipLink, dppLink] };
 }
 
 /** Crea o aggiorna l'entry — PUT prima (idempotente se esiste già), POST /new come fallback se

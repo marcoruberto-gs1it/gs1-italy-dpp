@@ -95,7 +95,7 @@
   border-color: rgba(255, 255, 255, 0.55);
 }
 
-/* Riga di anteprima dei 9 settori sotto le CTA dell'hero — anticipa la griglia più sotto,
+/* Riga di anteprima dei 10 settori sotto le CTA dell'hero — anticipa la griglia più sotto,
    puramente informativa (non link: i settori non hanno un'ancora individuale in pagina). */
 .hero-sector-strip {
   display: flex;
@@ -677,7 +677,7 @@
 /* --- Timeline "a spina" (ispirata a origovero.com): una linea orizzontale, un pallino per
    nodo, un marcatore "oggi" tratteggiato posizionato per interpolazione tra i due nodi reali
    più vicini (vedi buildSpine in home.ts) — usata sia per i 4 momenti normativi (nodi ricchi,
-   con testo) sia, in versione compatta, per i 9 settori (sostituisce il precedente grafico
+   con testo) sia, in versione compatta, per i 10 settori (sostituisce il precedente grafico
    SVG). Nodi distribuiti con flexbox space-between: a larghezza naturale, non forzati alla
    stessa larghezza — le card normative hanno testi di lunghezza diversa. */
 .spine-timeline-wrap {
@@ -809,7 +809,7 @@
   white-space: nowrap;
 }
 
-/* --- Variante compatta (roadmap dei 9 settori): niente icona né descrizione, solo data e
+/* --- Variante compatta (roadmap dei 10 settori): niente icona né descrizione, solo data e
    nome — la scheda per-settore sopra ha già il resto. Colore del pallino per settore invece
    che per stato (qui non è "urgenza", è "quale settore"). */
 .spine-timeline--compact {
@@ -839,7 +839,7 @@
 }
 
 /* flex-shrink:0 — con l'etichetta ora ridotta al solo frammento data (vedi Sector.dateShort in
-   sectors.ts) il nodo può mantenere la sua larghezza naturale senza comprimersi: se i 9 nodi
+   sectors.ts) il nodo può mantenere la sua larghezza naturale senza comprimersi: se i 10 nodi
    insieme superano i 620px di .spine-timeline--compact, il wrapper scorre in orizzontale
    invece di far andare a capo il testo. */
 .spine-node--compact {

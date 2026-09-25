@@ -16,7 +16,7 @@ export interface DemoDataset {
   attributes: Record<string, string>;
 }
 
-/** Una scheda demo per ciascuno dei 9 settori (vedi src/app/data/sectors.ts, stessi id). */
+/** Una scheda demo per ciascuno dei 10 settori (vedi src/app/data/sectors.ts, stessi id). */
 export const DEMO_DATA: Record<string, DemoDataset> = {
   battery: {
     name: 'Modulo batteria EV 75 kWh — demo',
@@ -132,7 +132,7 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
   },
   ict: {
     name: 'Router Wi-Fi 6 domestico — demo',
-    // Unico settore demo a livello MODEL (gli altri 8 sono ITEM/BATCH): un router non
+    // Unico settore demo a livello MODEL (gli altri 9 sono ITEM/BATCH): un router non
     // serializzato individualmente — passaporto valido per l'intera linea di prodotto, non
     // per il singolo esemplare o lotto. Nessun batchOrSerial: non si applica a MODEL.
     granularityLevel: 'MODEL',
@@ -144,6 +144,18 @@ export const DEMO_DATA: Record<string, DemoDataset> = {
       'contenuto riciclato plastica (%)': '30',
       // tracepass: recycledMetalContent (anticipated dall'ESPR).
       'contenuto riciclato metallo (%)': '18',
+    },
+  },
+  detergents: {
+    name: 'Detersivo liquido bucato concentrato — demo',
+    granularityLevel: 'BATCH',
+    batchOrSerial: '(10) LOTTO2027DET04',
+    attributes: {
+      'biodegradabilità tensioattivi (%)': '92',
+      'dosaggio raccomandato (ml/lavaggio)': '35',
+      'packaging riciclabile (%)': '100',
+      certificazione: 'Ecolabel UE',
+      'ingredienti pubblicati': 'Sì — scheda ingredienti online',
     },
   },
 };

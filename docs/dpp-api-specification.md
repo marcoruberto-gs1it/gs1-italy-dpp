@@ -477,7 +477,7 @@ dichiarati, non nascosti:
 - **Autenticazione**: la spec usa `Authorization: Bearer <token>` (OAuth2/OIDC); qui il cookie di
   sessione già in uso per l'admin (nessun modello multi-tenant "service provider" con credenziali
   proprie — esplicitamente fuori scope).
-- **`sectorId`**: non è un campo dello schema (8 dei 9 settori demo condividono lo stesso
+- **`sectorId`**: non è un campo dello schema (9 dei 10 settori demo condividono lo stesso
   `contentSpecificationId` ESPR, non abbastanza per risalire al settore) — passato come query
   param su Create/Update invece che nel corpo, così il body resta esattamente lo schema §6.1.
 - **`dppsByIdAndDate`**: nessuno storico versioni reale (EN 18221 mai implementato) — restituisce

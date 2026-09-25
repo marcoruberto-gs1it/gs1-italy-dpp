@@ -14,6 +14,7 @@ export const SECTOR_IDS = [
   'furniture',
   'mattresses',
   'ict',
+  'detergents',
 ] as const;
 
 export type SectorId = (typeof SECTOR_IDS)[number];

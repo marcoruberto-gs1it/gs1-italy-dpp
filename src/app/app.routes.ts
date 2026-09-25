@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
 import { ProductComponent } from './pages/product/product';
+import { ProductInfoComponent } from './pages/product-info/product-info';
 import { BrandComponent } from './pages/brand/brand';
 import { Admin } from './pages/admin/admin';
 
@@ -14,6 +15,10 @@ export const routes: Routes = [
   // lotto/seriale in più non cambia quale scheda mostra (la nostra tabella è chiave sul GTIN).
   { path: '01/:gtin/10/:batch', component: ProductComponent },
   { path: '01/:gtin/21/:serial', component: ProductComponent },
+  // Pagina "informazioni prodotto" (gs1:pip) — distinta da /01/:gtin (gs1:dpp), non è un URL
+  // GS1 Digital Link: nessun AI, quindi nessun vincolo di sintassi qui. Vedi il commento in cima
+  // a product-info.ts e resolverClient.ts#buildLinksetDocument per il perché delle due pagine.
+  { path: 'product-info/:gtin', component: ProductInfoComponent },
   // GS1 Digital Link, Application Identifier 414 (Global Location Number): pagina del brand
   // owner del prodotto, vedi BrandOwner in product.service.ts.
   { path: '414/:gln', component: BrandComponent },

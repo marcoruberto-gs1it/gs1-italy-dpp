@@ -23,6 +23,13 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client
   },
   {
+    // Pagina "informazioni prodotto" (gs1:pip) — dati sempre da registry-api a runtime, come
+    // /01/:gtin/10|21/... qui sopra: nessun prodotto di products.json ha una scheda DPP, quindi
+    // niente da prerenderizzare.
+    path: 'product-info/:gtin',
+    renderMode: RenderMode.Client
+  },
+  {
     path: '414/:gln',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {

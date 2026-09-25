@@ -1,23 +1,30 @@
 import './env.ts';
 import { createDpp, getAnyByGtin, markPublished, type GranularityLevel } from './db.ts';
 import { registerDpp } from './mockRegistryClient.ts';
+import { syncResolverEntry } from './resolverClient.ts';
 import type { SectorId } from './sectors.ts';
 
 /**
- * Registra sul DPP Registry UE (vero, tramite mockRegistryClient.ts — non finto) i 9 prodotti
+ * Registra sul DPP Registry UE (vero, tramite mockRegistryClient.ts — non finto) i 10 prodotti
  * di esempio del carosello della home (vedi src/app/data/sectors.ts, stessi GTIN/nomi/AI
  * qualificatori: coerenza intenzionale, chi apre l'esempio dalla home trova esattamente questo
- * DPP). Serve perché altrimenti quegli esempi — mostrati come "scansionabili" nella hero — non
- * risolverebbero mai davvero: nessuno li ha ancora creati né pubblicati tramite /admin.
+ * DPP) e li sincronizza sul GS1 Digital Link Resolver CE (resolverClient.ts) — a differenza della
+ * rotta /admin di pubblicazione (routes/dpp.ts), che lo fa da sola a ogni pubblicazione, questo
+ * script scrive direttamente nel database (createDpp/markPublished), quindi deve richiamare
+ * syncResolverEntry esplicitamente. Serve perché altrimenti quegli esempi — mostrati come
+ * "scansionabili" nella hero — non risolverebbero mai davvero: nessuno li ha ancora creati né
+ * pubblicati tramite /admin.
  *
  * Idempotente: salta ogni GTIN già presente (bozza o pubblicato) invece di duplicarlo — si può
- * rilanciare in sicurezza, es. dopo aver aggiunto un decimo settore in futuro.
+ * rilanciare in sicurezza, es. dopo aver aggiunto un altro settore in futuro.
  *
  * Esecuzione: `SITE_URL=<dominio pubblico reale> npm run seed` — SITE_URL qui sovrascrive il
  * fallback a localhost di registerDpp() (vedi il commento su digitalLinkUrl() in
  * mockRegistryClient.ts): mock-eu-registry scarica davvero questo URL per calcolare l'hash della
  * scheda, e non può raggiungere una macchina locale. Va lanciato con il dominio pubblico vero
- * del webshop (quello che risolve /01/:gtin), non con quello di registry-api.
+ * del webshop (quello che risolve /01/:gtin), non con quello di registry-api. Stesso SITE_URL
+ * passato a syncResolverEntry, per lo stesso motivo (gli href del linkset devono puntare al sito
+ * pubblico vero, non a localhost).
  */
 
 interface SeedEntry {
@@ -145,9 +152,23 @@ const SEED_DATA: SeedEntry[] = [
       'contenuto riciclato plastica (%)': '30',
     },
   },
+  {
+    sectorId: 'detergents',
+    gtin: '08000000000101',
+    name: 'Detersivo liquido bucato — esempio',
+    granularityLevel: 'MODEL',
+    batchOrSerial: null,
+    attributes: {
+      'biodegradabilità tensioattivi (%)': '92',
+      'dosaggio raccomandato (ml/lavaggio)': '35',
+      'packaging riciclabile (%)': '100',
+      certificazione: 'Ecolabel UE',
+    },
+  },
 ];
 
 async function main(): Promise<void> {
+  const site = process.env.SITE_URL || 'http://localhost:4200';
   if (!process.env.SITE_URL) {
     console.warn('ATTENZIONE: SITE_URL non impostata — mock-eu-registry non potrà raggiungere le pagine /01/:gtin (vedi il commento in cima a questo file). La registrazione fallirà quasi certamente.');
   }
@@ -164,15 +185,19 @@ async function main(): Promise<void> {
       granularityLevel: entry.granularityLevel,
       batchOrSerial: entry.batchOrSerial,
       attributes: entry.attributes,
-      // Questi 9 DPP sono gli esempi "scansionabili" della home: non modificabili né
+      // Questi 10 DPP sono gli esempi "scansionabili" della home: non modificabili né
       // eliminabili da /admin, vedi il commento su DppRecord.isStatic in db.ts.
       isStatic: true,
     });
     console.log(`- ${entry.gtin} (${entry.name}): bozza creata (${record.id}), registro su mock-eu-registry…`);
     try {
       const { registryId, proofJwt } = await registerDpp(record);
-      await markPublished(record.id, registryId, proofJwt);
+      const published = await markPublished(record.id, registryId, proofJwt);
       console.log(`  ✓ registrato, registryId=${registryId}`);
+      if (published) {
+        await syncResolverEntry(published, site);
+        console.log(`  ✓ sincronizzato sul resolver (${published.isStatic ? 'gs1:pip + gs1:dpp' : 'gs1:dpp'})`);
+      }
     } catch (err) {
       console.error(`  ✗ registrazione fallita: ${err instanceof Error ? err.message : String(err)}`);
     }

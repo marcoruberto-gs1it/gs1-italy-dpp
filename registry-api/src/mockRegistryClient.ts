@@ -117,6 +117,8 @@ const COMMODITY_CODES: Record<SectorId, string> = {
   furniture: '94013000',
   mattresses: '94042100',
   ict: '85176200',
+  // Capitolo 34 (saponi, agenti organici tensioattivi, preparati per il bucato) — voce 3402.
+  detergents: '34022090',
 };
 
 function requiredConfig() {

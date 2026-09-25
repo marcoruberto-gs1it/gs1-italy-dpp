@@ -56,6 +56,7 @@ const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
   furniture: 'EU_ESPR_REGULATION_2024_1781',
   mattresses: 'EU_ESPR_REGULATION_2024_1781',
   ict: 'EU_ESPR_REGULATION_2024_1781',
+  detergents: 'EU_ESPR_REGULATION_2024_1781',
 };
 
 /**

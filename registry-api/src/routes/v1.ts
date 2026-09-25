@@ -202,7 +202,7 @@ v1Router.post('/dpps', requireAuth, async (req, res) => {
     return;
   }
   // sectorId: non è un campo dello schema dello standard (contentSpecificationIds non basta a
-  // distinguerlo — 8 dei 9 settori demo condividono lo stesso atto delegato ESPR, vedi
+  // distinguerlo — 9 dei 10 settori demo condividono lo stesso atto delegato ESPR, vedi
   // src/app/data/sectors.ts#contentSpecificationId) — query param invece di un'estensione nel
   // body, così il corpo della richiesta resta ESATTAMENTE lo schema dello standard, senza campi
   // nostri mescolati dentro.

@@ -1,0 +1,45 @@
+<div class="product-info-page">
+  @if (record(); as record) {
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+      <ol>
+        <li><a routerLink="/">{{ t('nav.home') }}</a></li>
+        <li class="separator">/</li>
+        <li class="current" aria-current="page">{{ record.name }}</li>
+      </ol>
+    </nav>
+
+    <article class="pip-view gs-card" appScrollReveal [revealDuration]="0.4">
+      <span class="gs-badge gs-badge--neutral pip-view-badge">{{ t('productInfo.badge') }}</span>
+
+      <div class="pip-view-head">
+        <span class="pip-view-icon icon-flat" [style.--icon-color]="sector()?.brandColor">
+          <app-icon [name]="sector()?.icon ?? 'box'" [size]="30"></app-icon>
+        </span>
+        <div>
+          @if (sector(); as s) {
+            <span class="pip-view-eyebrow" [style.color]="s.brandColor">{{ s.shortName }}</span>
+          }
+          <h1 class="pip-view-name">{{ record.name }}</h1>
+        </div>
+      </div>
+
+      @if (sector(); as s) {
+        <p class="pip-view-description">{{ s.description }}</p>
+      }
+
+      <a [routerLink]="['/01', record.gtin]" class="gs-btn gs-btn--primary pip-view-dpp-link" [attr.aria-label]="t('productInfo.viewFullDppAria')">
+        <app-icon name="external-link" [size]="15"></app-icon>
+        {{ t('productInfo.viewFullDpp') }}
+      </a>
+    </article>
+  } @else if (loading()) {
+    <div class="not-found">
+      <p>{{ t('productInfo.loading') }}</p>
+    </div>
+  } @else {
+    <div class="not-found">
+      <p>{{ t('productInfo.notFound') }}</p>
+      <a routerLink="/" class="gs-btn gs-btn--ghost">{{ t('nav.home') }}</a>
+    </div>
+  }
+</div>
