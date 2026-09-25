@@ -32,15 +32,26 @@ function parseBatchOrSerial(batchOrSerial: string, granularityLevel: Granularity
   return { ai, value };
 }
 
-/** L'anchor del resolver è solo il PATH del GS1 Digital Link (es. "/01/{gtin}/21/{seriale}"),
- * mai il dominio: il resolver ci mette il proprio (FQDN, vedi docker-compose.yml) davanti da
- * solo. Stessa deduzione AI di buildUpi() in jsonld.ts/mockRegistryClient.ts. */
+/** L'anchor del resolver è SEMPRE solo "/01/{gtin}", mai con un qualificatore AI (lotto/
+ * seriale) in coda, anche per un DPP a livello BATCH/ITEM — a differenza di quel che ci si
+ * aspetterebbe dalla sintassi GS1 Digital Link in generale. Non è una semplificazione nostra:
+ * è come il resolver CE stesso risolve davvero una richiesta qualificata — web_namespace.py
+ * costruisce SEMPRE `doc_id` dai soli due segmenti base (AI+valore identificativo, "01_{gtin}"),
+ * anche quando l'URL richiesto ha segmenti extra in coda (DocOperationsResource, la rotta con
+ * <path:extra_segments>): il qualificatore viene cercato DENTRO quel documento base (un campo
+ * "qualifiers" per link, vedi web_logic.py#_do_qualifiers_match), mai come parte dell'id del
+ * documento. Un anchor creato con il qualificatore in coda (es. "/01/{gtin}/10/{lotto}", quello
+ * che questa funzione produceva prima) finisce quindi in un documento MongoDB separato che
+ * nessuna richiesta di risoluzione troverà mai — verificato dal vivo in produzione (404
+ * "No document found" sulla risoluzione, nonostante GET diretta sulla Data Entry API lo trovi
+ * per quell'anchor esatto). Innocuo per questo progetto: un GTIN identifica sempre un solo DPP
+ * pubblicato qui (vedi getPublishedByGtin in db.ts), mai più identità sotto lo stesso GTIN, quindi
+ * non serve differenziare i link per qualificatore all'interno del documento — un solo anchor di
+ * base per GTIN è già corretto. L'URL nel campo "href" (digitalLinkUrl più sotto) resta invece
+ * qualificato per intero quando serve: lì è solo un link opaco verso questo sito, non un id per
+ * il resolver. */
 function buildAnchor(record: DppRecord): string {
-  if (record.granularityLevel === 'MODEL' || !record.batchOrSerial) {
-    return `/01/${record.gtin}`;
-  }
-  const { ai, value } = parseBatchOrSerial(record.batchOrSerial, record.granularityLevel);
-  return `/01/${record.gtin}/${ai}/${encodeURIComponent(value)}`;
+  return `/01/${record.gtin}`;
 }
 
 function requiredConfig(): { apiUrl: string; token: string } | null {
@@ -98,9 +109,16 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
 }
 
 /** Crea o aggiorna l'entry — PUT prima (idempotente se esiste già), POST /new come fallback se
- * il PUT risponde 404 (prima registrazione di questo anchor). Non lancia mai: una pubblicazione
- * riuscita verso mock-eu-registry non deve fallire per un resolver non raggiungibile o non
- * configurato — solo un avviso in log, verificabile a parte. */
+ * il PUT risponde 404 (prima registrazione di questo anchor) O 405 (Method Not Allowed: il
+ * resolver CE espone PUT/DELETE solo sulla rotta a DUE segmenti "/<ai_code>/<ai>", non su quella
+ * con un qualificatore AI extra in coda per lotto/seriale, "/<ai_code>/<ai>/<extra>" — vedi
+ * DocOperationsQualified in data_entry_namespace.py, che implementa solo GET. Un DPP con
+ * batchOrSerial (anchor tipo "/01/{gtin}/10/{lotto}") finirebbe quindi sempre in 405 al primo
+ * PUT, mai in 404 — verificato dal vivo in produzione, non dedotto dalla documentazione. POST
+ * /new fa comunque upsert su qualunque forma di anchor (vedi NewDocOperations nello stesso
+ * file), quindi resta il fallback corretto anche qui. Non lancia mai: una pubblicazione riuscita
+ * verso mock-eu-registry non deve fallire per un resolver non raggiungibile o non configurato —
+ * solo un avviso in log, verificabile a parte. */
 export async function syncResolverEntry(record: DppRecord, siteUrl: string): Promise<void> {
   const config = requiredConfig();
   if (!config) return;
@@ -120,11 +138,12 @@ export async function syncResolverEntry(record: DppRecord, siteUrl: string): Pro
       signal: AbortSignal.timeout(10_000),
     });
     if (putResponse.ok) return;
-    if (putResponse.status !== 404) {
+    if (putResponse.status !== 404 && putResponse.status !== 405) {
       console.warn(`resolverClient: PUT ${anchor} → ${putResponse.status}: ${await putResponse.text()}`);
       return;
     }
-    // 404: l'anchor non esisteva ancora, prima registrazione — crealo.
+    // 404 (anchor non esistente) o 405 (anchor con qualificatore AI, PUT non supportato lì) —
+    // in entrambi i casi POST /new fa comunque l'upsert corretto.
     const postResponse = await fetch(`${config.apiUrl}/new`, {
       method: 'POST',
       headers,
