@@ -237,7 +237,7 @@ export class ProductComponent implements OnDestroy {
   protected dppUpi = computed(() => {
     const dpp = this.dppRecord();
     if (!dpp) return '';
-    const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
+    const id = this.resolverOrigin.digitalLink(dpp.gtin);
     if (dpp.granularityLevel === 'MODEL' || !dpp.batchOrSerial) return id;
     const value = dpp.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
     const ai = /^\(21\)/.test(dpp.batchOrSerial) || dpp.granularityLevel === 'ITEM' ? '21' : '10';
@@ -403,7 +403,8 @@ export class ProductComponent implements OnDestroy {
     const dpp = this.dppRecord();
     if (!dpp) return null;
 
-    const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
+    // @id/UPI = URI GS1 Digital Link canonico sul RESOLVER, come nel JSON-LD di registry-api.
+    const id = this.resolverOrigin.digitalLink(dpp.gtin);
     const upi = this.dppUpi();
 
     const doc: Record<string, unknown> = {

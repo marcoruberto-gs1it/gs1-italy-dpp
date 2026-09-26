@@ -127,3 +127,16 @@ scheda sorgente (es. paese di origine non dichiarato, traduzione inglese non dis
 proprietà corrispondente è semplicemente omessa, mai indovinata. L'unica eccezione dichiarata è
 il riferimento di sede del GLN (vedi sopra), per la quale non esiste una fonte pubblica
 verificabile: è segnalata come dimostrativa ovunque compare.
+
+## Origini negli URL: resolver per l'identificatore, sito per le pagine
+
+- L'URI GS1 Digital Link **canonico** di un prodotto è `{resolver}/01/{gtin}` (mai con `linkType` o
+  `context`: sono parametri del resolver, non parte del Digital Link canonico — GS1 Digital Link
+  URI Syntax §4.12). Con questo URI si costruiscono `@id` e `uniqueProductIdentifier` del JSON-LD,
+  l'`upi` registrato presso il DPP Registry UE, l'`anchor` del linkset e il QR code.
+- Le **pagine** (`/01/{gtin}`, `/product-info/{gtin}`) vivono sul webshop: sono le destinazioni
+  (`href`) dei link registrati sul resolver e il `liveURL` che mock-eu-registry scarica.
+- `linkType` nelle richieste al resolver è un CURIE con prefisso `gs1:` (`?linkType=gs1:pip`,
+  `?linkType=gs1:sustainabilityInfo`) oppure `linkType=linkset`.
+- Nessun valore di riserva su `localhost`: senza `RESOLVER_PUBLIC_URL` / `SITE_URL` si usano i
+  domini di produzione (vedi `registry-api/src/publicUrls.ts`).

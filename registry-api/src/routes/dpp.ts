@@ -2,16 +2,11 @@ import { Router } from 'express';
 import { createDpp, deleteDpp, getDpp, listDpp, markPublished, updateDpp } from '../db.ts';
 import { registerDpp, TransientRegistryError } from '../mockRegistryClient.ts';
 import { syncResolverEntry } from '../resolverClient.ts';
+import { siteUrl } from '../publicUrls.ts';
 import { isValidSectorId } from '../sectors.ts';
 
 export const dppRouter = Router();
 
-// Stesso fallback di routes/v1.ts#siteUrl() e mockRegistryClient.ts#registerDpp — un solo posto
-// in cui SITE_URL viene letta non basterebbe (moduli diversi, nessuna dipendenza incrociata tra
-// loro, stesso motivo già documentato altrove in questo servizio).
-function siteUrl(): string {
-  return process.env.SITE_URL || 'http://localhost:4200';
-}
 
 const GRANULARITY_LEVELS = ['MODEL', 'BATCH', 'ITEM'];
 

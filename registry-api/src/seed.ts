@@ -2,6 +2,7 @@ import './env.ts';
 import { createDpp, getAnyByGtin, markPublished, type GranularityLevel } from './db.ts';
 import { registerDpp } from './mockRegistryClient.ts';
 import { syncResolverEntry } from './resolverClient.ts';
+import { siteUrl } from './publicUrls.ts';
 import type { SectorId } from './sectors.ts';
 
 /**
@@ -168,9 +169,9 @@ const SEED_DATA: SeedEntry[] = [
 ];
 
 async function main(): Promise<void> {
-  const site = process.env.SITE_URL || 'http://localhost:4200';
+  const site = siteUrl();
   if (!process.env.SITE_URL) {
-    console.warn('ATTENZIONE: SITE_URL non impostata — mock-eu-registry non potrà raggiungere le pagine /01/:gtin (vedi il commento in cima a questo file). La registrazione fallirà quasi certamente.');
+    console.warn(`SITE_URL non impostata — uso il webshop di produzione (${site}). Per un altro dominio impostala esplicitamente: mock-eu-registry deve poter raggiungere le pagine /01/:gtin.`);
   }
   for (const entry of SEED_DATA) {
     const existing = await getAnyByGtin(entry.gtin);

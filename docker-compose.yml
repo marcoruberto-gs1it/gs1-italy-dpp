@@ -110,6 +110,9 @@ services:
       - web
     environment:
       SITE_URL: "${SITE_URL:-http://localhost}"
+      # Origine del resolver pubblico: è l'IDENTIFICATORE Digital Link (@id, UPI, anchor del
+      # linkset), mentre SITE_URL sopra è dove vivono le pagine — vedi registry-api/src/publicUrls.ts.
+      RESOLVER_PUBLIC_URL: "${RESOLVER_PUBLIC_URL:-http://id.localhost}"
       # Dati delle schede DPP — vedi docs/REGISTRY-SETUP.md.
       REGISTRY_DATABASE_URL: "${REGISTRY_DATABASE_URL:?REGISTRY_DATABASE_URL non impostata}"
       # Sbarramento a password davanti a /registry-api (vedi registry-api/src/auth.ts).

@@ -1,6 +1,7 @@
 import './env.ts';
 import { listDpp } from './db.ts';
 import { syncResolverEntry } from './resolverClient.ts';
+import { siteUrl } from './publicUrls.ts';
 
 /**
  * Ri-sincronizza sul GS1 Digital Link Resolver TUTTE le schede DPP già pubblicate, con il
@@ -34,12 +35,7 @@ export async function resyncAllToResolver(site: string): Promise<number> {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const site = process.env.SITE_URL;
-  if (!site) {
-    console.error('SITE_URL mancante: gli href del linkset devono puntare al sito pubblico vero.');
-    process.exit(1);
-  }
-  resyncAllToResolver(site).then(
+  resyncAllToResolver(siteUrl()).then(
     () => process.exit(0),
     (err) => {
       console.error(err);

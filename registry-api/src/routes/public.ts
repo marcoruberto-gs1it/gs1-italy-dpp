@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getAnyByGtin, getPublishedByGtin } from '../db.ts';
 import { dppToJsonLd, dppToLinkset } from '../jsonld.ts';
+import { resolverPublicUrl, siteUrl } from '../publicUrls.ts';
 
 /** Rotte pubbliche, senza requireAuth (vedi server.ts) — usate dalle pagine prodotto
  * `/01/:gtin` del sito per mostrare una scheda DPP pubblicata quando esiste, invece del
@@ -28,8 +29,7 @@ publicRouter.get('/dpp/:gtin/jsonld', async (req, res) => {
     res.status(404).json({ error: 'nessuna scheda con questo GTIN' });
     return;
   }
-  const siteUrl = process.env.SITE_URL || 'http://localhost:4200';
-  res.type('application/ld+json').json(dppToJsonLd(record, siteUrl));
+  res.type('application/ld+json').json(dppToJsonLd(record, resolverPublicUrl()));
 });
 
 /** Stessa content negotiation GS1 Digital Link di /jsonld qui sopra, per la rappresentazione
@@ -41,6 +41,5 @@ publicRouter.get('/dpp/:gtin/linkset', async (req, res) => {
     res.status(404).json({ error: 'nessuna scheda con questo GTIN' });
     return;
   }
-  const siteUrl = process.env.SITE_URL || 'http://localhost:4200';
-  res.type('application/linkset+json').json(dppToLinkset(record, siteUrl));
+  res.type('application/linkset+json').json(dppToLinkset(record, resolverPublicUrl(), siteUrl()));
 });

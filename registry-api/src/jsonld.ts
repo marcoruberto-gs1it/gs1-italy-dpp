@@ -82,8 +82,10 @@ const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
  *         progetto (nostra invenzione, non richiesta dallo standard e non coerente col suo
  *         esempio di serializzazione).
  */
-export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, unknown> {
-  const id = digitalLinkUrl(siteUrl, record.gtin);
+export function dppToJsonLd(record: DppRecord, identifierBase: string): Record<string, unknown> {
+  // identifierBase = origine del RESOLVER (vedi publicUrls.ts): @id e UPI sono l'URI GS1 Digital
+  // Link canonico del prodotto, non l'indirizzo della pagina.
+  const id = digitalLinkUrl(identifierBase, record.gtin);
 
   const doc: Record<string, unknown> = {
     // "@vocab" copre già ogni chiave senza prefisso (qui sotto: name, e i 9 campi del nucleo
@@ -104,7 +106,7 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
     // URI GS1 Digital Link registrato presso il DPP Registry UE come "upi" (vedi
     // mockRegistryClient.ts#buildUpi) — stesso valore, nome di campo allineato allo standard
     // invece che allo schema specifico del registro.
-    uniqueProductIdentifier: buildUpi(siteUrl, record),
+    uniqueProductIdentifier: buildUpi(identifierBase, record),
     name: record.name,
     'gs1:gtin': record.gtin,
     granularity: toStandardGranularity(record.granularityLevel),
@@ -169,12 +171,14 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
  *   gs1:masterData   — il JSON-LD di dppToJsonLd(), raggiungibile anche con ?linkType=gs1:masterData
  *                       (vedi webshop/nginx.conf) invece di dover rimandare Accept: application/ld+json
  */
-export function dppToLinkset(record: DppRecord, siteUrl: string): Record<string, unknown> {
+export function dppToLinkset(record: DppRecord, resolverUrl: string, siteUrl: string): Record<string, unknown> {
+  // anchor = identificatore (resolver); href = pagine (sito) — vedi publicUrls.ts.
+  const anchor = digitalLinkUrl(resolverUrl, record.gtin);
   const id = digitalLinkUrl(siteUrl, record.gtin);
   return {
     linkset: [
       {
-        anchor: id,
+        anchor,
         'https://ref.gs1.org/voc/defaultLink': [{ href: id, title: record.name }],
         'https://ref.gs1.org/voc/dpp': [{ href: id, title: record.name, type: 'text/html' }],
         'https://ref.gs1.org/voc/masterData': [

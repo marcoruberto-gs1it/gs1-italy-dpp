@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { createDpp, deleteDpp, findByIdentity, getDpp, getPublishedByGtin, updateDpp, type DppRecord, type GranularityLevel } from '../db.ts';
 import { dppToJsonLd } from '../jsonld.ts';
 import { requireAuth } from '../auth.ts';
+import { resolverPublicUrl } from '../publicUrls.ts';
 import { isValidSectorId, type SectorId } from '../sectors.ts';
 
 /**
@@ -49,10 +50,6 @@ function parseProductIdentifier(value: string): { gtin: string; granularityLevel
   return { gtin, granularityLevel: ai === '21' ? 'ITEM' : 'BATCH', batchOrSerial: `(${ai}) ${value_}` };
 }
 
-function siteUrl(): string {
-  return process.env.SITE_URL || 'http://localhost:4200';
-}
-
 /** dppId in ingresso può arrivare come UUID nudo o come l'intero digitalProductPassportId
  * ("urn:uuid:<uuid>", il valore esatto che questo stesso servizio assegna — vedi jsonld.ts):
  * accettiamo entrambi invece di imporre all'esterno di conoscere la nostra convenzione interna. */
@@ -75,7 +72,7 @@ v1Router.get('/dpps/:dppId', async (req, res) => {
   // "representation=compressed|full": questa demo produce un solo formato — lo stesso per
   // entrambi i valori, invece di implementare la rappresentazione estesa che lo standard lascia
   // comunque facoltativa per un service provider.
-  res.type('application/ld+json').json(dppToJsonLd(record, siteUrl()));
+  res.type('application/ld+json').json(dppToJsonLd(record, resolverPublicUrl()));
 });
 
 // ---------------------------------------------------------------------------
@@ -92,7 +89,7 @@ v1Router.get('/dppsByProductId/:productId', async (req, res) => {
     res.status(404).json({ error: 'nessun DPP attivo per questo identificativo di prodotto' });
     return;
   }
-  res.type('application/ld+json').json(dppToJsonLd(record, siteUrl()));
+  res.type('application/ld+json').json(dppToJsonLd(record, resolverPublicUrl()));
 });
 
 // ---------------------------------------------------------------------------
@@ -118,7 +115,7 @@ v1Router.get('/dppsByIdAndDate/:dppId', async (req, res) => {
     res.status(404).json({ error: 'nessuna versione esisteva a questa data — questo servizio non conserva uno storico, solo la versione corrente' });
     return;
   }
-  res.type('application/ld+json').json(dppToJsonLd(record, siteUrl()));
+  res.type('application/ld+json').json(dppToJsonLd(record, resolverPublicUrl()));
 });
 
 // ---------------------------------------------------------------------------
@@ -309,7 +306,7 @@ v1Router.patch('/dpps/:dppId', requireAuth, async (req, res) => {
   }
 
   const updated = (await updateDpp(id, patch)) as DppRecord;
-  res.type('application/ld+json').json(dppToJsonLd(updated, siteUrl()));
+  res.type('application/ld+json').json(dppToJsonLd(updated, resolverPublicUrl()));
 });
 
 // ---------------------------------------------------------------------------

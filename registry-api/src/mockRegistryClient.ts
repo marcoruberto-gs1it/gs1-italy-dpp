@@ -42,6 +42,7 @@
  * richiede.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
+import { resolverPublicUrl, siteUrl } from './publicUrls.ts';
 import type { SectorId } from './sectors.ts';
 
 export interface RegistrationResult {
@@ -280,13 +281,17 @@ export function pingMockRegistry(): void {
 
 export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
   const config = requiredConfig();
-  const siteUrl = process.env.SITE_URL || 'http://localhost:4200';
-  assertSiteUrlReachableFromRegistry(siteUrl);
+  const site = siteUrl();
+  // UPI e identificativi di granularità: URI GS1 Digital Link canonici sul RESOLVER (vedi
+  // publicUrls.ts). liveURL/backupURL invece restano la PAGINA sul sito: è quella che
+  // mock-eu-registry scarica per calcolare l'hash, e deve essere raggiungibile dal cloud.
+  const identifierBase = resolverPublicUrl();
+  assertSiteUrlReachableFromRegistry(site);
   const token = await fetchAccessToken(config);
-  const liveUrl = digitalLinkUrl(siteUrl, record.gtin);
+  const liveUrl = digitalLinkUrl(site, record.gtin);
 
   const requestBody = {
-    upi: buildUpi(siteUrl, record),
+    upi: buildUpi(identifierBase, record),
     // Compilato dall'utente nel form admin (colonna economic_operator_id, vedi db.ts) — non più
     // una costante fissa: non abbiamo comunque un modello multi-tenant reale (un solo cancello
     // password per tutto l'admin, vedi auth.ts), ma almeno il valore inviato è quello che
@@ -297,7 +302,7 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     commodityCode: COMMODITY_CODES[record.sectorId],
     facilitiesId: [record.facilityId],
     granularityLevel: record.granularityLevel,
-    ...granularityFields(siteUrl, record),
+    ...granularityFields(identifierBase, record),
   };
 
   let registerResponse: Response;
