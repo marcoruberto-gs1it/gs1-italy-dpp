@@ -6,6 +6,7 @@ import { pingMockRegistry } from './mockRegistryClient.ts';
 import { dppRouter } from './routes/dpp.ts';
 import { publicRouter } from './routes/public.ts';
 import { v1Router } from './routes/v1.ts';
+import { resyncAllToResolver } from './resyncResolver.ts';
 
 const app = express();
 // Di default express.json() analizza solo "application/json" — scarterebbe silenziosamente
@@ -49,4 +50,9 @@ app.use('/registry-api', base);
 const port = Number(process.env.PORT) || 4310;
 app.listen(port, () => {
   console.log(`registry-api in ascolto su http://localhost:${port}`);
+  // Opt-in: ri-sincronizza sul resolver tutte le schede già pubblicate (vedi resyncResolver.ts).
+  // In background, mai bloccante per l'avvio; da togliere dalle env di Render dopo il primo giro.
+  if (process.env.RESYNC_RESOLVER_ON_BOOT === 'true' && process.env.SITE_URL) {
+    resyncAllToResolver(process.env.SITE_URL).catch((err) => console.warn('resync resolver fallito:', err));
+  }
 });

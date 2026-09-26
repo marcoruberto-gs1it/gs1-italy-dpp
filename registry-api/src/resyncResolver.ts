@@ -11,26 +11,39 @@ import { syncResolverEntry } from './resolverClient.ts';
  * fallback): si può rilanciare in sicurezza. Nota: aggiunge/aggiorna link, non rimuove quelli
  * di sezioni che nel frattempo non ci sono più.
  *
- * Esecuzione: `SITE_URL=<dominio pubblico del webshop> RESOLVER_API_URL=… RESOLVER_SESSION_TOKEN=…
- * DATABASE_URL=… npm run resolver:sync` — SITE_URL è l'origine degli href dei link (deve essere
- * il sito pubblico vero, mai localhost), come per `npm run seed`.
+ * Due modi d'uso: da riga di comando (`SITE_URL=<dominio pubblico del webshop> RESOLVER_API_URL=…
+ * RESOLVER_SESSION_TOKEN=… DATABASE_URL=… npm run resolver:sync`) oppure all'avvio di
+ * registry-api con RESYNC_RESOLVER_ON_BOOT=true (server.ts) — comodo su Render free, dove non c'è
+ * una shell e le credenziali esistono solo lì. SITE_URL è l'origine degli href dei link (deve
+ * essere il sito pubblico vero, mai localhost), come per `npm run seed`.
  */
-async function main(): Promise<void> {
+export async function resyncAllToResolver(site: string): Promise<number> {
+  const apiUrl = process.env.RESOLVER_API_URL;
+  if (apiUrl) {
+    // Sveglia il resolver (Render free: 30-60s a freddo) prima di scrivere, altrimenti i primi
+    // PUT scadono a 10s e il link resta non sincronizzato. L'esito non conta.
+    await fetch(apiUrl.replace(/\/api\/?$/, '/'), { signal: AbortSignal.timeout(75_000) }).catch(() => undefined);
+  }
+  const records = (await listDpp()).filter((r) => r.status === 'published');
+  console.log(`resync resolver: ${records.length} schede pubblicate da sincronizzare`);
+  for (const record of records) {
+    await syncResolverEntry(record, site);
+    console.log(`resync resolver: ✓ ${record.gtin} (${record.name}) — ${record.isStatic ? 'statica' : 'utente'}`);
+  }
+  return records.length;
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
   const site = process.env.SITE_URL;
   if (!site) {
     console.error('SITE_URL mancante: gli href del linkset devono puntare al sito pubblico vero.');
     process.exit(1);
   }
-  const records = (await listDpp()).filter((r) => r.status === 'published');
-  console.log(`${records.length} schede pubblicate da sincronizzare su ${process.env.RESOLVER_API_URL ?? '(RESOLVER_API_URL non impostata)'}`);
-  for (const record of records) {
-    await syncResolverEntry(record, site);
-    console.log(`✓ ${record.gtin} (${record.name}) — ${record.isStatic ? 'statica' : 'utente'}`);
-  }
-  process.exit(0);
+  resyncAllToResolver(site).then(
+    () => process.exit(0),
+    (err) => {
+      console.error(err);
+      process.exit(1);
+    }
+  );
 }
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
