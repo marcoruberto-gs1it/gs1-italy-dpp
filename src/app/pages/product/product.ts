@@ -715,7 +715,9 @@ export class ProductComponent implements OnDestroy {
    * della scheda siano caricati: l'anchorScrolling del router scatta a pagina ancora vuota, quindi
    * si riprova qui, a sezioni renderizzate. */
   private scrollToFragment(): void {
-    const id = this.document.location.hash.replace(/^#/, '');
+    // Il resolver accoda `?linkType=…` a qualunque destinazione, anche dopo il frammento
+    // ("#section-x?linkType=gs1%3Ax"): l'id della sezione è la parte prima del "?".
+    const id = this.document.location.hash.replace(/^#/, '').split('?')[0];
     if (!id) return;
     setTimeout(() => this.document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
   }

@@ -110,12 +110,19 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
   // gs1:recyclingInfo/repairInfo: imballaggio e riciclo stanno in gs1:sustainabilityInfo, uso e
   // riparazione in gs1:instructions). Stesso URL della pagina DPP + frammento: è una sola risorsa
   // HTML, il resolver dice al client QUALE parte aprire. gs1:masterData è l'eccezione: punta alla
-  // rappresentazione JSON-LD (?linkType=gs1:masterData, vedi $wants_jsonld_qs in webshop/nginx.conf).
+  // rappresentazione JSON-LD, ma con l'URL PULITO della pagina, senza query: il resolver CE
+  // accoda da solo `?linkType=<curie>` (percent-encoded) a QUALUNQUE destinazione, anche dopo un
+  // `#frammento` o un `?` già presente (verificato in produzione) — un href con
+  // `?linkType=gs1:masterData` diventava `…?linkType=gs1:masterData?linkType=gs1%3AmasterData`,
+  // valore che $wants_jsonld_qs (webshop/nginx.conf) non riconosce, e rispondeva HTML. Con l'URL
+  // pulito arriva esattamente `?linkType=gs1%3AmasterData`, che nginx serve come JSON-LD.
+  // Per lo stesso motivo i frammenti `#section-…` arrivano come `#section-x?linkType=…`: la
+  // pagina passaporto li normalizza (product.ts#scrollToFragment).
   // Un link per link type, mai due con lo stesso sullo stesso anchor: due link uguali producono
   // un 300 Multiple Choices (vedi il commento più sotto).
   const withFragment = (linkType: string) => `${dppHref}#section-${linkType}`;
   const sectionLinks = [
-    link('gs1:masterData', `${dppHref}?linkType=gs1:masterData`, `${record.name} — dati tecnici (JSON-LD)`, 'application/ld+json'),
+    link('gs1:masterData', dppHref, `${record.name} — dati tecnici (JSON-LD)`, 'application/ld+json'),
     link('gs1:traceability', withFragment('traceability'), `${record.name} — tracciabilità e ciclo di vita`),
   ];
   if (record.registryId) {
