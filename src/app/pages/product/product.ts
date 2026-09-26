@@ -20,7 +20,7 @@ import { StructuredDataService } from '../../services/structured-data.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
-import { AttributeLinkTypeId, DPP_LINK_TYPES, DppLinkTypeId, classifyAttribute, linkTypeBySlug, linkTypePath } from '../../data/dpp-link-types';
+import { AttributeLinkTypeId, DPP_LINK_TYPES, DppLinkTypeId, classifyAttribute, linkTypeFromParam, linkTypeRoute } from '../../data/dpp-link-types';
 import { LinkTypeHeadComponent } from '../../components/link-type-head/link-type-head';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 
@@ -138,13 +138,13 @@ export class ProductComponent implements OnDestroy {
   private routeParams = toSignal(this.route.paramMap);
   gtin = computed(() => this.routeParams()?.get('gtin') ?? null);
 
-  /** Pagina dedicata di un link type (`/passport/:gtin/:section`), o null sul passaporto vero e
-   * proprio (`/01/:gtin`): un solo componente per entrambe, stessi dati e stesso JSON-LD. */
-  protected sectionSlug = computed(() => this.routeParams()?.get('section') ?? null);
-  protected section = computed(() => linkTypeBySlug(this.sectionSlug()));
-  /** `/passport/:gtin/<slug>` con uno slug che non corrisponde a nessun link type. */
-  protected unknownSection = computed(() => this.sectionSlug() !== null && this.section() === null);
-  protected pathOf = linkTypePath;
+  private queryParams = toSignal(this.route.queryParamMap);
+
+  /** Pagina dedicata di un link type: `/01/:gtin?linkType=gs1:xxx`, la stessa sintassi del
+   * resolver GS1 (vedi linkTypeRoute). Null sul passaporto (`/01/:gtin` nudo, `gs1:dpp`, `all`):
+   * un solo componente per entrambe, stessi dati e stesso JSON-LD. */
+  protected section = computed(() => linkTypeFromParam(this.queryParams()?.get('linkType')));
+  protected routeOf = linkTypeRoute;
 
   activeImageIndex = signal(0);
 

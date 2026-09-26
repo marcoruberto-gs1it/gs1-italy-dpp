@@ -576,7 +576,7 @@
           @for (item of sectionNav(); track item.lt.id) {
             @if (item.lt.id !== sec.id) {
               <li>
-                <a class="lt-nav-item" [routerLink]="pathOf(item.lt.id, dpp.gtin)">
+                <a class="lt-nav-item" [routerLink]="routeOf(item.lt.id, dpp.gtin).commands" [queryParams]="routeOf(item.lt.id, dpp.gtin).queryParams">
                   <span class="lt-nav-icon"><app-icon [name]="item.lt.icon" [size]="16"></app-icon></span>
                   <span class="lt-nav-body">
                     <strong>{{ t('linkType.' + item.lt.id + '.title') }}</strong>
@@ -588,11 +588,6 @@
           }
         </ul>
       </nav>
-    } @else if (unknownSection()) {
-      <div class="not-found">
-        <p>{{ t('product.notFound') }}</p>
-        <a [routerLink]="['/01', dpp.gtin]" class="gs-btn gs-btn--ghost">{{ t('linkType.backToPassport') }}</a>
-      </div>
     } @else {
       <article class="passport-grid" appScrollReveal [revealDuration]="0.4">
         <aside class="passport-visual gs-card">
@@ -692,7 +687,7 @@
         <ul class="lt-nav-grid">
           @for (item of sectionNav(); track item.lt.id) {
             <li>
-              <a class="lt-nav-item" [routerLink]="pathOf(item.lt.id, dpp.gtin)">
+              <a class="lt-nav-item" [routerLink]="routeOf(item.lt.id, dpp.gtin).commands" [queryParams]="routeOf(item.lt.id, dpp.gtin).queryParams">
                 <span class="lt-nav-icon"><app-icon [name]="item.lt.icon" [size]="16"></app-icon></span>
                 <span class="lt-nav-body">
                   <strong>{{ t('linkType.' + item.lt.id + '.title') }}</strong>

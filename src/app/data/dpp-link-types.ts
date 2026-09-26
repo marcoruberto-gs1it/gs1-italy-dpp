@@ -26,35 +26,38 @@ export interface DppLinkType {
   /** CURIE usato nel resolver: `?linkType=gs1:xxx`. */
   curie: string;
   icon: IconName;
-  /** Slug della pagina dedicata: `/passport/:gtin/<slug>` (vedi linkTypePath). `null` per
-   * dpp (`/01/:gtin`) e pip (`/product-info/:gtin`), che hanno già la loro pagina. */
-  slug: string | null;
 }
 
 export const DPP_LINK_TYPES: readonly DppLinkType[] = [
-  { id: 'dpp', curie: 'gs1:dpp', icon: 'shield-check', slug: null },
-  { id: 'pip', curie: 'gs1:pip', icon: 'tag', slug: null },
-  { id: 'sustainabilityInfo', curie: 'gs1:sustainabilityInfo', icon: 'leaf', slug: 'sustainability' },
-  { id: 'certificationInfo', curie: 'gs1:certificationInfo', icon: 'award', slug: 'certifications' },
-  { id: 'safetyInfo', curie: 'gs1:safetyInfo', icon: 'alert-triangle', slug: 'safety' },
-  { id: 'instructions', curie: 'gs1:instructions', icon: 'wrench', slug: 'instructions' },
-  { id: 'masterData', curie: 'gs1:masterData', icon: 'braces', slug: 'technical-data' },
-  { id: 'traceability', curie: 'gs1:traceability', icon: 'truck', slug: 'traceability' },
-  { id: 'registryEntry', curie: 'gs1:registryEntry', icon: 'hash', slug: 'registry' },
+  { id: 'dpp', curie: 'gs1:dpp', icon: 'shield-check' },
+  { id: 'pip', curie: 'gs1:pip', icon: 'tag' },
+  { id: 'sustainabilityInfo', curie: 'gs1:sustainabilityInfo', icon: 'leaf' },
+  { id: 'certificationInfo', curie: 'gs1:certificationInfo', icon: 'award' },
+  { id: 'safetyInfo', curie: 'gs1:safetyInfo', icon: 'alert-triangle' },
+  { id: 'instructions', curie: 'gs1:instructions', icon: 'wrench' },
+  { id: 'masterData', curie: 'gs1:masterData', icon: 'braces' },
+  { id: 'traceability', curie: 'gs1:traceability', icon: 'truck' },
+  { id: 'registryEntry', curie: 'gs1:registryEntry', icon: 'hash' },
 ];
 
-/** Pagina dedicata di un link type — una pagina per link type, mai ancore dentro un'altra pagina:
- * gs1:dpp → /01/:gtin, gs1:pip → /product-info/:gtin, gli altri → /passport/:gtin/<slug>. Stesso
- * schema usato dal resolver (registry-api/src/linkTypes.ts#linkTypePath). */
-export function linkTypePath(id: DppLinkTypeId, gtin: string): string[] {
-  if (id === 'dpp') return ['/01', gtin];
-  if (id === 'pip') return ['/product-info', gtin];
-  return ['/passport', gtin, linkTypeById(id).slug!];
+/** Destinazione (routerLink + queryParams) della pagina di un link type. Stessa sintassi del
+ * resolver GS1: l'URL base del prodotto più `?linkType=gs1:xxx` — `/01/{gtin}?linkType=gs1:
+ * sustainabilityInfo` — invece di percorsi inventati. Il resolver CE accoda già da solo
+ * `?linkType=<curie>` a ogni destinazione registrata, quindi la stessa URL base va bene per tutti
+ * (vedi registry-api/src/resolverClient.ts). Fa eccezione gs1:pip, la scheda informazioni
+ * consumer-facing, che ha la sua pagina `/product-info/{gtin}`. */
+export function linkTypeRoute(id: DppLinkTypeId, gtin: string): { commands: string[]; queryParams: Record<string, string> | null } {
+  if (id === 'pip') return { commands: ['/product-info', gtin], queryParams: null };
+  if (id === 'dpp') return { commands: ['/01', gtin], queryParams: null };
+  return { commands: ['/01', gtin], queryParams: { linkType: linkTypeById(id).curie } };
 }
 
-/** Il link type di una pagina `/passport/:gtin/:slug`, o null se lo slug non esiste. */
-export function linkTypeBySlug(slug: string | null | undefined): DppLinkType | null {
-  return DPP_LINK_TYPES.find((lt) => lt.slug !== null && lt.slug === slug) ?? null;
+/** Il link type di sezione richiesto dal parametro `linkType` (`gs1:sustainabilityInfo`), o null
+ * per `gs1:dpp`, `all`, valori sconosciuti e assenza del parametro: in tutti quei casi si mostra il
+ * passaporto. */
+export function linkTypeFromParam(value: string | null | undefined): DppLinkType | null {
+  const lt = DPP_LINK_TYPES.find((t) => t.curie === value);
+  return lt && lt.id !== 'dpp' && lt.id !== 'pip' ? lt : null;
 }
 
 export function linkTypeById(id: DppLinkTypeId): DppLinkType {

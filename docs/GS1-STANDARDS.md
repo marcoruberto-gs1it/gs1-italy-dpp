@@ -24,7 +24,7 @@ interroga — vedi `webshop/nginx.conf` e `registry-api/src/jsonld.ts#dppToLinks
 | Chi chiede | Cosa riceve |
 |---|---|
 | Un browser (nessuna richiesta esplicita) | La pagina HTML prerenderizzata |
-| `Accept: application/ld+json`, o `?linkType=gs1:masterData` | Il JSON-LD puro (GS1 Web Vocabulary) |
+| `Accept: application/ld+json` | Il JSON-LD puro (GS1 Web Vocabulary) |
 | `Accept: application/linkset+json`, o `?linkType=linkset` | Il **linkset** (RFC 9264): l'elenco esplicito delle rappresentazioni disponibili per questo identificativo (`gs1:defaultLink`, `gs1:dpp`, `gs1:masterData`), invece di un solo redirect — è la terza rappresentazione che uno [standard resolver GS1 conforme](https://ref.gs1.org/standards/resolver/) deve offrire |
 
 È lo stesso principio per cui GS1 Digital Link esiste: un solo identificativo, più
@@ -141,23 +141,22 @@ verificabile: è segnalata come dimostrativa ovunque compare.
 - Nessun valore di riserva su `localhost`: senza `RESOLVER_PUBLIC_URL` / `SITE_URL` si usano i
   domini di produzione (vedi `registry-api/src/publicUrls.ts`).
 
-## Una pagina per link type
+## Una pagina per link type, con la sintassi del resolver
 
-Ogni link type registrato sul resolver ha una **pagina dedicata**, mai un'ancora (`#…`) dentro
-un'altra pagina — il resolver CE accoda `?linkType=…` a qualunque destinazione, anche dopo un
-frammento, quindi un frammento non è un indirizzo affidabile:
+Ogni link type registrato sul resolver ha una **pagina dedicata**, raggiunta con la stessa sintassi
+del resolver GS1 — l'URL base del prodotto più `?linkType=gs1:xxx` (vedi ad esempio
+`https://id.gs1.org/01/09506000134369?linkType=all`) — senza percorsi inventati né ancore `#…`:
 
-| Link type | Pagina |
+| Link type | URL |
 |---|---|
 | `gs1:pip` (default) | `/product-info/{gtin}` |
 | `gs1:dpp` | `/01/{gtin}` |
-| `gs1:sustainabilityInfo` | `/passport/{gtin}/sustainability` |
-| `gs1:certificationInfo` | `/passport/{gtin}/certifications` |
-| `gs1:safetyInfo` | `/passport/{gtin}/safety` |
-| `gs1:instructions` | `/passport/{gtin}/instructions` |
-| `gs1:masterData` | `/passport/{gtin}/technical-data` (il JSON-LD resta su `/01/{gtin}` con `Accept: application/ld+json`) |
-| `gs1:traceability` | `/passport/{gtin}/traceability` |
-| `gs1:registryEntry` | `/passport/{gtin}/registry` |
+| `gs1:sustainabilityInfo`, `gs1:certificationInfo`, `gs1:safetyInfo`, `gs1:instructions`, `gs1:masterData`, `gs1:traceability`, `gs1:registryEntry` | `/01/{gtin}?linkType=gs1:<nome>` |
 
-Uno slug non valido dà «non trovato»; una pagina senza dati per quel prodotto non è registrata sul
-resolver (risposta 404 alla richiesta `?linkType=…`).
+Sul resolver tutti questi link hanno la **stessa destinazione pulita** (`…/01/{gtin}`): è il resolver
+CE ad accodarle `?linkType=<curie>` a ogni redirect, e il sito mostra la pagina di quel link type.
+Un frammento `#…` non va bene (il resolver ci accoda la query dopo) e nemmeno un `?linkType=` scritto
+nell'href (diventerebbe una doppia query). `?linkType=all` sul resolver elenca tutti i link.
+
+Il JSON-LD non ha un link type proprio sul sito: si ottiene con `Accept: application/ld+json` sullo
+stesso URL. Se un link type non ha dati per quel prodotto non è registrato sul resolver (404).

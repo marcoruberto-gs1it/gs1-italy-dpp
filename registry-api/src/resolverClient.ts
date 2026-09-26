@@ -17,7 +17,7 @@
  * Autenticazione: header `Authorization: Bearer <RESOLVER_SESSION_TOKEN>` su tutte e tre.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
-import { SECTION_SLUGS, attributeLinkTypes, type SectionLinkTypeId } from './linkTypes.ts';
+import { attributeLinkTypes, type SectionLinkTypeId } from './linkTypes.ts';
 
 /** Stessa funzione di jsonld.ts/mockRegistryClient.ts, duplicata qui per lo stesso motivo già
  * documentato in quei due file: nessuna dipendenza incrociata tra moduli che parlano con
@@ -105,16 +105,17 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
   const dppLink = link('gs1:dpp', dppHref, record.name);
 
   // Un link per OGNI sezione del passaporto, ciascuno con il proprio link type del GS1 Web
-  // Vocabulary e la propria PAGINA DEDICATA (`/passport/{gtin}/{slug}`, vedi SECTION_SLUGS e
-  // src/app/app.routes.ts): mai ancore/frammenti dentro un'unica pagina — il resolver CE accoda
-  // `?linkType=<curie>` a qualunque destinazione, anche dopo un `#frammento` (verificato in
-  // produzione: `#section-x?linkType=…`), quindi un frammento non è un indirizzo affidabile.
-  // Solo termini che esistono davvero in gs1/WebVoc v1.16 (NON gs1:packagingInfo né
-  // gs1:recyclingInfo/repairInfo: imballaggio e riciclo stanno in gs1:sustainabilityInfo, uso e
-  // riparazione in gs1:instructions). Un link per link type, mai due con lo stesso sullo stesso
-  // anchor: due link uguali producono un 300 Multiple Choices (vedi il commento più sotto).
-  const sectionHref = (id: SectionLinkTypeId) => `${siteUrl.replace(/\/$/, '')}/passport/${record.gtin}/${SECTION_SLUGS[id]}`;
-  const sectionLink = (id: SectionLinkTypeId, title: string) => link(`gs1:${id}`, sectionHref(id), `${record.name} — ${title}`);
+  // Vocabulary. Tutti con la STESSA destinazione pulita, l'URL base della pagina (`/01/{gtin}`):
+  // il resolver CE accoda da solo `?linkType=<curie>` a qualunque destinazione (verificato in
+  // produzione, come fa anche id.gs1.org), quindi il sito riceve `/01/{gtin}?linkType=gs1:xxx` e
+  // mostra la pagina dedicata di quel link type (src/app/data/dpp-link-types.ts#linkTypeRoute).
+  // Niente `?linkType=` scritto a mano nell'href — diventerebbe una doppia query —, niente
+  // frammenti `#…` — il resolver ci accoda la query DOPO il frammento, rompendolo — e niente
+  // percorsi inventati. Solo termini che esistono davvero in gs1/WebVoc v1.16 (NON
+  // gs1:packagingInfo né gs1:recyclingInfo/repairInfo: imballaggio e riciclo stanno in
+  // gs1:sustainabilityInfo, uso e riparazione in gs1:instructions). Un link per link type, mai
+  // due con lo stesso sullo stesso anchor: due link uguali producono un 300 Multiple Choices.
+  const sectionLink = (id: SectionLinkTypeId, title: string) => link(`gs1:${id}`, dppHref, `${record.name} — ${title}`);
   const sectionLinks = [
     sectionLink('masterData', 'dati tecnici'),
     sectionLink('traceability', 'tracciabilità e ciclo di vita'),
