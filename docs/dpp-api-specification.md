@@ -10,17 +10,21 @@ La presente guida definisce le specifiche tecniche, gli endpoint API, i formati 
 ### 1.1 Standard Tecnici di Riferimento
 L'architettura software deve implementare in modo stringente le seguenti 8 norme europee armonizzate:
 1. **FprEN 18219:2026** – *Unique Identifiers*: Gestione di identificativi univoci di prodotto (UPI: GS1 Digital Link, SGTIN), operatore (UOI: GLN, EORI) e stabilimento (UFI: GLN).
-2. **EN 18220:2026** – *Data Carriers*: Codifica vettori fisici AIDC (QR code con GS1 Digital Link, RFID/NFC con EPC TDS 2.3).
-3. **EN 18216:2026** – *Data Exchange Protocols*: Protocolli di rete sicuri (HTTPS / TLS 1.2+ / HTTP/2+) e Content Negotiation (JSON, JSON-LD, HTML).
+2. **FprEN 18220:2026** – *Data Carriers*: Codifica vettori fisici AIDC (QR code con GS1 Digital Link, RFID/NFC con EPC TDS 2.3).
+3. **FprEN 18216:2026** – *Data Exchange Protocols*: Protocolli di rete sicuri (HTTPS / TLS 1.2+ / HTTP/2+) e Content Negotiation (JSON, JSON-LD, HTML).
 4. **FprEN 18222:2026** – *APIs for Lifecycle Management*: Interfacce RESTful per lettura, creazione, aggiornamento, cancellazione e notifica dei passaporti.
 5. **FprEN 18223:2026** – *System Interoperability*: Modello dati concettuale UML, classi `DigitalProductPassport` e `DataElement`, e dizionari esterni (`dictionaryReference` / GS1 Web Vocabulary).
-6. **EN 18221:2026** – *Data Storage, Archiving and Persistence*: Archiviazione storica OAIS (ISO 14721), registro modifiche inalterabile e replica verso il *Back-up Service Provider*.
-7. **EN 18239:2026** – *Access Rights Management and Security*: Profilazione RBAC dei diritti d'accesso sui dati controllati e riservatezza commerciale.
-8. **EN 18246:2026** – *Data Authentication and Integrity*: Firme digitali al livello del dato (ESDC, W3C Verifiable Credentials, QSeal eIDAS).
+6. **FprEN 18221:2026** – *Data Storage, Archiving and Persistence*: Archiviazione storica OAIS (ISO 14721), registro modifiche inalterabile e replica verso il *Back-up Service Provider*.
+7. **prEN 18239:2025** – *Access Rights Management and Security*: Profilazione RBAC dei diritti d'accesso sui dati controllati e riservatezza commerciale.
+8. **prEN 18246:2025** – *Data Authentication and Integrity*: Firme digitali al livello del dato (ESDC, W3C Verifiable Credentials, QSeal eIDAS).
+
+Nota sui prefissi: **FprEN** ("Final Draft") per le prime 6, ancora in **prEN** (draft precedente) per le
+ultime 2 — non un refuso, è lo stato di avanzamento reale di ciascuna dichiarato nell'introduzione di
+entrambi i Final Draft FprEN 18222/18223 (texts di riferimento di questa sezione).
 
 ---
 
-## 2. Requisiti di Protocollo e Comunicazione Sicura (EN 18216)
+## 2. Requisiti di Protocollo e Comunicazione Sicura (FprEN 18216)
 
 ### 2.1 Requisiti di Rete
 * **Protocollo:** HTTP over TLS (HTTPS).
@@ -198,11 +202,14 @@ Endpoint esposto dal server del Registro Centrale della Commissione Europea (`ht
   "digitalProductPassportId": "https://dpp.company.com/dpp/EV-BATT-2026-987654",
   "uniqueEconomicOperatorIdentifier": "urn:gs1:gln:8012345000008",
   "uniqueEconomicOperatorIdentifierBackup": "urn:gs1:gln:8099999000001",
-  "dppApiEndpoint": "https://dpp.company.com/v1/dpps/EV-BATT-2026-987654",
-  "granularity": "item",
-  "productGroup": "Batteries"
+  "dppApiEndpoint": "https://dpp.company.com/v1/dpps/EV-BATT-2026-987654"
 }
 ```
+Solo questi 5 campi: `DppRegistryEntry` (Table 11, FprEN 18222 §7.1) non include `granularity` né
+`productGroup` — nessuno dei due compare nella definizione ufficiale, a differenza di quanto
+riportava una versione precedente di questa guida (vedi nota di correzione in fondo al documento).
+Il registro riceve solo identificativi + l'indirizzo (`dppApiEndpoint`) dove va cercato il DPP
+vero: nessun dato di prodotto/semantico transita da questo endpoint.
 * **Payload Risposta (200 OK):**
 ```json
 {
@@ -345,19 +352,24 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
 
 ### 6.2 Schema Validazione del Registro UE (`dpp-registry-entry.schema.json`)
 
+Campi esattamente come elencati in Table 11 (FprEN 18222, tipo `DppRegistryEntry`) — nessun campo
+aggiuntivo: il registro è solo un indice di puntatori (chi è il prodotto, chi è l'operatore
+economico, dove si trova il DPP vero), non un secondo posto dove finiscono i dati di prodotto.
+`granularity`/`dppStatus`/`contentSpecificationIds`/ecc. appartengono al DPP stesso (schema §6.1),
+mai al registro.
+
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://registry.product-passport.ec.europa.eu/schemas/v1.0/dpp-registry-entry.schema.json",
   "title": "DppRegistryEntry",
-  "description": "Schema per la validazione della notifica al Registro Centrale Europeo (Regolamento UE 2026/1778).",
+  "description": "Schema per la notifica al Registro Centrale Europeo (FprEN 18222 §5.2 Method RegisterProductDPP, Table 11).",
   "type": "object",
   "required": [
     "uniqueProductIdentifier",
     "digitalProductPassportId",
     "uniqueEconomicOperatorIdentifier",
-    "dppApiEndpoint",
-    "granularity"
+    "dppApiEndpoint"
   ],
   "properties": {
     "uniqueProductIdentifier": {
@@ -373,18 +385,12 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
       "type": "string"
     },
     "uniqueEconomicOperatorIdentifierBackup": {
-      "type": "string"
+      "type": "string",
+      "description": "\"uniqueEconomicOperatorIdentifier of the Back-up operator\" in Table 11 — facoltativo, non ogni registrazione ha un secondo operatore/service provider di backup."
     },
     "dppApiEndpoint": {
       "type": "string",
       "format": "uri"
-    },
-    "granularity": {
-      "type": "string",
-      "enum": ["model", "batch", "item"]
-    },
-    "productGroup": {
-      "type": "string"
     }
   },
   "additionalProperties": false
@@ -393,14 +399,14 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
 
 ---
 
-## 7. Sicurezza, Autenticazione e Tracciabilità (EN 18239 & EN 18246)
+## 7. Sicurezza, Autenticazione e Tracciabilità (prEN 18239 & prEN 18246)
 
 ### 7.1 Architettura della Sicurezza
 1. **Dati Pubblici (Unauthenticated):** Accesso `GET` in lettura per consumatori e cittadini generici. **Nessun login, nessuna registrazione, nessun tracciamento di dati personali**.
 2. **Dati Controllati (Authenticated & Authorized):** Accesso profilato basato sul principio del *Need-to-Know* (RBAC).
 3. **Autenticazione Attori:** Basata su credenziali digitali fiduciarie (OAuth2 / OIDC con certificati **eIDAS QSeal** o **W3C Verifiable Credentials**).
-4. **Firma del Dato (ESDC - EN 18246):** Il payload inviato alle autorità o memorizzato nell'archivio storico include un blocco di firma crittografica `ESDC` (Electronically Signed Data Construct) per garantire l'impossibilità di manomissioni retroattive.
-5. **Log di Audit Inalterabile (EN 18221):** Ogni operazione di modifica (`PATCH`, `POST`, `DELETE`) registra in modo immutabile l'ID dell'attore, il timestamp UTC, i campi modificati e la firma digitale del richiedente.
+4. **Firma del Dato (ESDC - prEN 18246):** Il payload inviato alle autorità o memorizzato nell'archivio storico include un blocco di firma crittografica `ESDC` (Electronically Signed Data Construct) per garantire l'impossibilità di manomissioni retroattive.
+5. **Log di Audit Inalterabile (FprEN 18221):** Ogni operazione di modifica (`PATCH`, `POST`, `DELETE`) registra in modo immutabile l'ID dell'attore, il timestamp UTC, i campi modificati e la firma digitale del richiedente.
 
 ---
 
@@ -453,6 +459,17 @@ verificati e corretti direttamente contro le Tabelle normative:
   Digital Link con AI 417/414): il testo ufficiale non impone un formato URI specifico per questi
   due campi oltre "identificativo conforme a FprEN 18219" — l'URN resta una scelta valida, non
   corretta né invalidata da questa revisione.
+- **`DppRegistryEntry` (§6.2) senza `granularity` né `productGroup`**: una versione precedente di
+  questa guida (basata su OpenEPCIS) elencava questi due campi come parte del payload di
+  registrazione al Registro UE. **Table 11 di FprEN 18222** (il tipo `DppRegistryEntry`, referenziato
+  da §5.2 Method RegisterProductDPP / Table 17 REST-Path `v1/registerDPP`) elenca invece
+  esplicitamente solo cinque campi: `uniqueProductIdentifier`, `digitalProductPassportId`,
+  `uniqueEconomicOperatorIdentifier`, l'identificativo dell'operatore di backup, e
+  `dppApiEndpoint`. Nessun dato di prodotto/settore, nessuna granularità: il registro è solo un
+  indice di puntatori verso il DPP vero (servito altrove, dal "creator of the digital product
+  passport or their main digital product passport service provider", FprEN 18222 §4.1) — non un
+  secondo posto dove finiscono i dati semantici. Corretto sia nell'esempio §4.1 sia nello schema
+  §6.2 qui sopra.
 
 Vedi `toStandardGranularity()`/`toStandardDppStatus()` in `registry-api/src/jsonld.ts` e
 `src/app/utils/dpp-jsonld.ts` per il dettaglio, con citazione di clausola/tabella esatta in
@@ -480,7 +497,7 @@ dichiarati, non nascosti:
 - **`sectorId`**: non è un campo dello schema (9 dei 10 settori demo condividono lo stesso
   `contentSpecificationId` ESPR, non abbastanza per risalire al settore) — passato come query
   param su Create/Update invece che nel corpo, così il body resta esattamente lo schema §6.1.
-- **`dppsByIdAndDate`**: nessuno storico versioni reale (EN 18221 mai implementato) — restituisce
+- **`dppsByIdAndDate`**: nessuno storico versioni reale (FprEN 18221 mai implementato) — restituisce
   la versione corrente se la data richiesta cade dopo la creazione, 404 altrimenti; dichiarato nel
   commento della rotta, non finto.
 - **§5 (Fine Granular API, JSONPath)**: non implementata — nessun campo abbastanza grande da
