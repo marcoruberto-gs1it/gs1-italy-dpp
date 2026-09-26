@@ -1,4 +1,4 @@
-import { Component, HostListener, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, HostListener, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -37,6 +37,16 @@ export class App {
     this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)),
     { initialValue: null },
   );
+
+  /** /admin ha una console propria (sidebar + topbar, vedi admin.html): header e footer del sito
+   * vetrina si nascondono lì, come nel design Figma dove la console è a schermo intero. Stessa
+   * logica di risoluzione dell'URL del canonical più sotto (NavigationEnd, con ripiego su
+   * location al primissimo paint quando il Router non ha ancora emesso). */
+  protected consoleMode = computed(() => {
+    const nav = this.navigationEnd();
+    const url = nav?.urlAfterRedirects ?? (isPlatformBrowser(this.platformId) ? this.relativePathFromLocation() : this.router.url);
+    return url.split('?')[0].split('#')[0].startsWith('/admin');
+  });
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {

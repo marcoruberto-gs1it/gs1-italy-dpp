@@ -613,3 +613,418 @@
     padding: 24px;
   }
 }
+
+
+/* ==========================================================================
+   Console (design Figma "GS1 DPP Console"): sidebar + topbar a schermo intero. Header/footer del
+   sito si nascondono su /admin (vedi consoleMode in app.ts); login e verifica accesso restano
+   centrati senza sidebar (.console--bare).
+   ========================================================================== */
+.console {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.console--bare {
+  display: block;
+}
+
+.console-side {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 16px;
+  background: var(--bg-canvas-alt);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
+}
+
+.console-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px 6px;
+  text-decoration: none;
+}
+
+.console-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 3px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 24, 67, 0.18);
+  flex-shrink: 0;
+}
+
+.console-brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.console-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.console-brand-text strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.console-brand-text span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.console-registry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.console-registry-pill {
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: var(--green-tint);
+  color: var(--green-ink);
+  font-size: 0.66rem;
+}
+
+.console-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.console-nav-label {
+  padding: 0 12px 6px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.console-nav-item {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.console-nav-item app-icon:last-child:not(:first-child) {
+  margin-left: auto;
+  opacity: 0.55;
+}
+
+.console-nav-item:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.console-nav-item.is-active {
+  background: var(--brand-ink);
+  color: #fff;
+  cursor: default;
+}
+
+.console-side-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.console-note {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.console-note app-icon {
+  color: var(--brand-accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.console-note strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+}
+
+.console-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.console-user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--brand-ink);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.console-user-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.console-user-text strong {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.console-user-text span {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.console-user-logout {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+}
+
+.console-user-logout:hover {
+  background: var(--bg-surface-sunken);
+  color: var(--text-primary);
+}
+
+.console-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.console-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 28px;
+  background: var(--bg-glass-strong);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.console-search {
+  flex: 1;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+}
+
+.console-search:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.console-search--error {
+  border-color: var(--brand-accent);
+}
+
+.console-search input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+.console-search-error {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--brand-accent);
+}
+
+.console-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.console-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--success);
+}
+
+.console-top-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.console-lang {
+  display: flex;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-sunken);
+}
+
+.console-lang button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+}
+
+.console-lang button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.console-icon-btn {
+  appearance: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+}
+
+.console-cta {
+  padding: 9px 14px;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+}
+
+.console .admin-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0;
+  padding: 28px 28px 64px;
+}
+
+.console--bare .admin-container {
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+@media (max-width: 1100px) {
+  .console-status {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .console {
+    grid-template-columns: 1fr;
+  }
+
+  .console-side {
+    position: static;
+    height: auto;
+    gap: 12px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .console-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .console-nav-label,
+  .console-side-foot,
+  .console-registry {
+    display: none;
+  }
+
+  .console-top {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+  }
+
+  .console .admin-container {
+    padding: 20px 16px 56px;
+  }
+}

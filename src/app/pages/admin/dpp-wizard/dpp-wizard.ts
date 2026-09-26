@@ -120,6 +120,8 @@ export class DppWizardComponent {
   @Output() addAttribute = new EventEmitter<void>();
   @Output() removeAttribute = new EventEmitter<number>();
   @Output() requestDemoFill = new EventEmitter<void>();
+  @Output() requestFullDemo = new EventEmitter<void>();
+  @Output() resetForm = new EventEmitter<void>();
   @Output() requestFieldDemo = new EventEmitter<'name' | 'upi' | 'economicOperatorId' | 'facilityId'>();
   @Output() showToast = new EventEmitter<{ message: string; severity: ToastSeverity }>();
   @Output() saveDraft = new EventEmitter<void>();
@@ -142,6 +144,38 @@ export class DppWizardComponent {
     if (!doc) return null;
     return this.sanitizer.bypassSecurityTrustHtml(highlightJson(JSON.stringify(doc, null, 2)));
   });
+
+  /** Dimensione in byte del JSON-LD mostrato — dato reale, ricalcolato a ogni modifica del form. */
+  protected previewBytes = computed(() => {
+    const doc = this.previewJsonLd();
+    return doc ? new TextEncoder().encode(JSON.stringify(doc, null, 2)).length : 0;
+  });
+
+  protected payloadCopied = signal(false);
+
+  protected async copyPayload(): Promise<void> {
+    const doc = this.previewJsonLd();
+    if (!doc) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(doc, null, 2));
+      this.payloadCopied.set(true);
+      setTimeout(() => this.payloadCopied.set(false), 1800);
+    } catch {
+      /* clipboard non disponibile — ignora */
+    }
+  }
+
+  protected fullDemo(): void {
+    this.requestFullDemo.emit();
+  }
+
+  /** Azzera il form (lo fa Admin) e riporta il wizard al primo passo, come un nuovo DPP. */
+  protected resetAll(): void {
+    this.resetForm.emit();
+    this.lastReachedStep.set(0);
+    this.slideDirection.set('back');
+    this.currentStep.set(0);
+  }
 
   protected steps = STEPS;
   protected currentStep = signal(0);

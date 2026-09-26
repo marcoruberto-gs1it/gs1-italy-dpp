@@ -441,38 +441,144 @@
           <p class="passport-description">{{ sector.description }}</p>
         }
 
-        <dl class="passport-tiles">
-          <div class="passport-tile">
-            <dt>{{ t('product.dppGtinLabel') }}</dt>
-            <dd>{{ dpp.gtin }}</dd>
+        <div class="passport-granularity">
+          <span class="passport-block-label">{{ t('product.dppGranularityLevel') }}</span>
+          <div class="passport-seg" role="group" [attr.aria-label]="t('product.dppGranularityLevel')">
+            @for (level of granularityLevels; track level) {
+              <span class="passport-seg-item" [class.is-active]="dpp.granularityLevel === level" [attr.aria-current]="dpp.granularityLevel === level ? 'true' : null">{{ t('product.granularity' + level) }}</span>
+            }
           </div>
-          <div class="passport-tile">
-            <dt>{{ t('product.dppGranularity') }}</dt>
-            <dd>{{ dpp.granularityLevel }}</dd>
-          </div>
-          @if (dpp.batchOrSerial) {
-            <div class="passport-tile">
-              <dt>{{ t('product.dppBatchOrSerial') }}</dt>
-              <dd>{{ dpp.batchOrSerial }}</dd>
+          <p class="passport-granularity-text">{{ t('product.granularity' + dpp.granularityLevel + 'Text') }}</p>
+        </div>
+
+        <div class="passport-idbox">
+          <div class="passport-idbox-top">
+            <div>
+              <span class="passport-block-label">{{ t('product.dppGtinLabel') }}</span>
+              <span class="passport-idbox-value">{{ dpp.gtin }}</span>
             </div>
-          }
-          <div class="passport-tile">
-            <dt>{{ t('product.dppEconomicOperator') }}</dt>
-            <dd>{{ economicOperatorId() }}</dd>
+            @if (dppBatchOrSerial(); as bs) {
+              <div class="passport-idbox-side">
+                <span class="passport-block-label">{{ t(bs.isSerial ? 'product.dppSerialLabel' : 'product.dppBatchLabel') }}</span>
+                <span class="passport-idbox-accent">{{ bs.value }}</span>
+              </div>
+            }
           </div>
-          <div class="passport-tile">
-            <dt>{{ t('product.dppFacility') }}</dt>
-            <dd>{{ facilityId() }}</dd>
+          <div class="passport-idbox-row">
+            <span class="passport-idbox-urn"><strong>{{ t('product.dppUrnLabel') }}:</strong> {{ dppUrn() }}</span>
+            <button type="button" class="passport-copy-btn" (click)="copy('urn', dppUrn())">
+              <app-icon name="link" [size]="13"></app-icon>
+              {{ copiedKey() === 'urn' ? t('product.copiedLabel') : t('product.copyUrn') }}
+            </button>
+          </div>
+        </div>
+
+        <h2 class="passport-subtitle">{{ t('product.dppEntities') }}</h2>
+        <div class="passport-entities">
+          <div class="passport-entity">
+            <span class="passport-block-label">{{ t('product.dppEconomicOperator') }}</span>
+            <strong>{{ economicOperatorId() }}</strong>
+            @if (glnOf(economicOperatorId()); as gln) { <span class="passport-entity-gln">{{ t('product.dppEntityGln') }} {{ gln }}</span> }
+          </div>
+          <div class="passport-entity">
+            <span class="passport-block-label">{{ t('product.dppFacility') }}</span>
+            <strong>{{ facilityId() }}</strong>
+            @if (glnOf(facilityId()); as gln) { <span class="passport-entity-gln">{{ t('product.dppEntityGln') }} {{ gln }}</span> }
           </div>
           @if (dpp.registryId) {
-            <div class="passport-tile passport-tile--wide">
-              <dt>{{ t('product.dppRegistryId') }}</dt>
-              <dd>{{ dpp.registryId }}</dd>
+            <div class="passport-entity">
+              <span class="passport-block-label">{{ t('product.dppRegistryId') }}</span>
+              <strong>{{ dpp.registryId }}</strong>
             </div>
           }
-        </dl>
+        </div>
       </section>
     </article>
+
+    <section class="passport-section gs-card" appScrollReveal [revealDuration]="0.4">
+      <div class="passport-section-head">
+        <div>
+          <span class="passport-eyebrow-accent">{{ t('product.carriersEyebrow') }}</span>
+          <h2>{{ t('product.carriersTitle') }}</h2>
+        </div>
+        <div class="passport-section-pills">
+          <span class="gs-badge gs-badge--green passport-pill">{{ t('product.carriersPublic') }}</span>
+          <span class="gs-badge gs-badge--blue passport-pill">{{ t('product.carriersNoApp') }}</span>
+        </div>
+      </div>
+      <div class="passport-carriers">
+        <div class="passport-carrier passport-carrier--qr">
+          <div class="passport-carrier-qr">
+            @if (isBrowser) {
+              <qrcode [qrdata]="dppUpi()" [width]="150" [margin]="1" elementType="svg" colorDark="#001843" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
+            } @else {
+              <app-icon name="qr-code" [size]="56"></app-icon>
+            }
+            <span>{{ t('product.carriersQrCaption') }}</span>
+          </div>
+          <div class="passport-carrier-uri">
+            <span class="passport-block-label">{{ t('product.carriersUriLabel') }}</span>
+            <code>{{ dppUpi() }}</code>
+            <button type="button" class="passport-copy-btn" (click)="copy('uri', dppUpi())">
+              <app-icon name="link" [size]="13"></app-icon>
+              {{ copiedKey() === 'uri' ? t('product.copiedLabel') : t('product.copyUri') }}
+            </button>
+          </div>
+        </div>
+        <div class="passport-carrier">
+          <span class="passport-carrier-icon"><app-icon name="zap" [size]="18"></app-icon></span>
+          <div>
+            <strong>{{ t('regulation.capture2Title') }}</strong>
+            <span class="passport-carrier-standard">{{ t('regulation.capture2Standard') }}</span>
+            <p>{{ t('regulation.capture2Text') }}</p>
+            <span class="gs-badge gs-badge--neutral">{{ t('product.carriersPlanned') }}</span>
+          </div>
+        </div>
+        <div class="passport-carrier">
+          <span class="passport-carrier-icon passport-carrier-icon--orange"><app-icon name="cpu" [size]="18"></app-icon></span>
+          <div>
+            <strong>{{ t('regulation.capture3Title') }}</strong>
+            <span class="passport-carrier-standard">{{ t('regulation.capture3Standard') }}</span>
+            <p>{{ t('regulation.capture3Text') }}</p>
+            <span class="gs-badge gs-badge--neutral">{{ t('product.carriersPlanned') }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="passport-banner gs-navy-panel" appScrollReveal [revealDuration]="0.4">
+      <div class="passport-banner-text">
+        <span class="passport-banner-eyebrow">{{ t('product.structuredEyebrow') }}</span>
+        <h2>{{ t('product.structuredTitle') }}</h2>
+        <p>{{ t('product.structuredText') }}</p>
+      </div>
+      <button type="button" class="gs-btn gs-btn--accent" (click)="openJsonLd()">
+        <app-icon name="braces" [size]="16"></app-icon>
+        {{ t('product.structuredCta') }}
+      </button>
+    </section>
+
+    @if (dppCarbon() || dppPercents().length) {
+      <section class="passport-indicators" appScrollReveal="stagger" [revealStagger]="0.08" [revealDuration]="0.35">
+        @if (dppCarbon(); as carbon) {
+          <div class="passport-indicator gs-card">
+            <span class="passport-block-label">{{ carbon.label }}</span>
+            <div class="passport-indicator-value">{{ carbon.value }} <small>{{ carbon.unit }}</small></div>
+          </div>
+        }
+        @if (dppPercents().length) {
+          <div class="passport-indicator passport-indicator--bars gs-card">
+            <span class="passport-block-label">{{ t('product.indicatorsPercent') }}</span>
+            @for (row of dppPercents(); track row.label) {
+              <div class="passport-bar-row">
+                <div class="passport-bar-row-head"><span>{{ row.label }}</span><strong>{{ row.value }}%</strong></div>
+                <div class="passport-bar-track"><div class="passport-bar-fill" [style.width.%]="row.value"></div></div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
 
     @if (dppAttributeEntries().length) {
       <section class="passport-attrs gs-card" appScrollReveal [revealDuration]="0.4">
@@ -490,6 +596,63 @@
         </div>
       </section>
     }
+
+    <section class="passport-section gs-card" appScrollReveal [revealDuration]="0.4">
+      <div class="passport-section-head">
+        <div>
+          <span class="passport-eyebrow-accent">{{ t('product.lifecycleEyebrow') }}</span>
+          <h2>{{ t('product.lifecycleTitle') }}</h2>
+        </div>
+        <span class="gs-badge gs-badge--neutral passport-pill">{{ t('product.lifecycleNote') }}</span>
+      </div>
+      <ol class="passport-timeline">
+        @for (event of dppEvents(); track event.key) {
+          <li class="passport-event" [class.is-future]="event.future">
+            <span class="passport-event-dot"></span>
+            <div class="passport-event-card">
+              <div class="passport-event-head">
+                <strong>{{ event.title }}</strong>
+                <time>{{ event.future ? t('product.eventFuture') : event.when }}</time>
+              </div>
+              <p>{{ event.text }}</p>
+              @if (event.meta) { <span class="passport-event-meta">{{ event.meta }}</span> }
+            </div>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <section class="passport-inspector" appScrollReveal [revealDuration]="0.4">
+      <div class="passport-inspector-head">
+        <div>
+          <span class="passport-inspector-eyebrow"><span class="passport-inspector-live"></span>{{ t('product.inspectorEyebrow') }}</span>
+          <h2>{{ t('product.inspectorTitle') }}</h2>
+          <p>{{ t('product.inspectorText') }}</p>
+        </div>
+        <div class="passport-inspector-actions">
+          <button type="button" class="passport-inspector-btn" (click)="copy('json', jsonLdText())">
+            <app-icon name="braces" [size]="14"></app-icon>
+            {{ copiedKey() === 'json' ? t('product.copiedLabel') : t('product.copyJson') }}
+          </button>
+          <button type="button" class="passport-inspector-btn passport-inspector-btn--accent" (click)="downloadJsonLd()">
+            <app-icon name="file-text" [size]="14"></app-icon>
+            {{ t('product.downloadJsonLd') }}
+          </button>
+        </div>
+      </div>
+      <div class="passport-terminal">
+        <div class="passport-terminal-bar">
+          <span class="passport-terminal-dots"></span>
+          <span class="passport-terminal-file">dpp-passport-payload.jsonld</span>
+          <span class="passport-terminal-size">{{ jsonLdBytes() }} {{ t('product.inspectorBytes') }}</span>
+        </div>
+        <pre class="passport-terminal-body"><code [innerHTML]="jsonLdHtml()"></code></pre>
+      </div>
+      <div class="passport-inspector-foot">
+        <span><strong>{{ t('product.inspectorHashLabel') }}:</strong> <code>{{ jsonLdHash() || '…' }}</code></span>
+        <span>{{ t('product.inspectorRef') }}</span>
+      </div>
+    </section>
   } @else if (dppLoading()) {
     <div class="not-found">
       <p>{{ t('product.dppLoading') }}</p>

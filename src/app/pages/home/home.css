@@ -757,6 +757,18 @@
   margin: 0 0 6px;
 }
 
+.dpp-flow-code {
+  display: block;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-sunken);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
 .dpp-flow-body p {
   font-size: 0.86rem;
   color: var(--text-secondary);
@@ -767,7 +779,7 @@
 /* --- Perché adottarlo: 4 card di beneficio, stesso linguaggio visivo delle card settore --- */
 .benefit-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   list-style: none;
   margin: 0;
@@ -802,6 +814,54 @@
 .benefit-card:nth-child(2) .benefit-icon { background: var(--blue-tint); color: var(--blue-ink); }
 .benefit-card:nth-child(3) .benefit-icon { background: var(--orange-tint); color: var(--orange-ink); }
 .benefit-card:nth-child(4) .benefit-icon { background: var(--blue-tint); color: var(--blue-ink); }
+
+.benefit-tag {
+  font-size: 0.68rem;
+  padding: 4px 10px;
+}
+
+.benefit-points {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 14px 16px;
+  align-self: stretch;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-sunken);
+}
+
+.benefit-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.benefit-points app-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--green-ink);
+}
+
+.benefit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--brand-accent);
+  text-decoration: none;
+}
+
+.benefit-link:hover {
+  text-decoration: underline;
+}
 
 .benefit-card h3 {
   font-size: 1rem;

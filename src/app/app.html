@@ -1,5 +1,6 @@
 <a class="skip-link" href="#main-content">{{ t('nav.skipToContent') }}</a>
 
+@if (!consoleMode()) {
 <header class="site-header">
   <div class="header-container">
     <div class="header-left">
@@ -20,6 +21,9 @@
 
       <nav class="header-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
+        <a routerLink="/" fragment="dpp">{{ t('nav.howItWorks') }}</a>
+        <a routerLink="/" fragment="normativa">{{ t('nav.regulation') }}</a>
+        <a routerLink="/" fragment="settori">{{ t('nav.sectors') }}</a>
         <a routerLink="/admin" routerLinkActive="active">{{ t('nav.demo') }}</a>
       </nav>
     </div>
@@ -80,6 +84,9 @@
         </button>
       </div>
       <a routerLink="/" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.home') }}</a>
+      <a routerLink="/" fragment="dpp" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.howItWorks') }}</a>
+      <a routerLink="/" fragment="normativa" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.regulation') }}</a>
+      <a routerLink="/" fragment="settori" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.sectors') }}</a>
       <a routerLink="/admin" class="mobile-nav-link" (click)="closeMobileNav()">{{ t('nav.demo') }}</a>
       <div class="lang-switch mobile-lang-switch" role="group" [attr.aria-label]="t('nav.languageLabel')">
         <button type="button" [class.active]="languageService.lang() === 'it'" (click)="languageService.setLang('it')" [attr.aria-label]="t('nav.switchToItalian')">IT</button>
@@ -88,11 +95,13 @@
     </aside>
   </div>
 }
+}
 
 <main class="main-content" id="main-content" tabindex="-1">
   <router-outlet></router-outlet>
 </main>
 
+@if (!consoleMode()) {
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-grid">
@@ -138,3 +147,4 @@
     </div>
   </div>
 </footer>
+}

@@ -1,3 +1,106 @@
+<div class="console" [class.console--bare]="view() === 'checking' || view() === 'login'">
+  @if (view() === 'list' || view() === 'wizard') {
+    <aside class="console-side">
+      <a routerLink="/" class="console-brand" title="Torna al sito">
+        <span class="console-brand-mark"><img src="/images/gs1-italy-logo.png" alt="" width="180" height="180" /></span>
+        <span class="console-brand-text">
+          <strong>GS1 DPP Console</strong>
+          <span>Gestione passaporti</span>
+        </span>
+      </a>
+
+      <div class="console-registry">
+        <span>Registro UE</span>
+        <span class="console-registry-pill">DEMO</span>
+      </div>
+
+      <nav class="console-nav" aria-label="Console">
+        <span class="console-nav-label">Navigazione</span>
+        <button type="button" class="console-nav-item" [class.is-active]="view() === 'list'" (click)="view() === 'wizard' ? cancelForm() : null">
+          <app-icon name="layers" [size]="17"></app-icon>
+          I miei DPP
+        </button>
+        <button type="button" class="console-nav-item" [class.is-active]="view() === 'wizard'" (click)="view() === 'list' ? startCreate() : null">
+          <app-icon name="box" [size]="17"></app-icon>
+          Crea DPP
+        </button>
+        <a routerLink="/" class="console-nav-item">
+          <app-icon name="globe" [size]="17"></app-icon>
+          Sito pubblico
+        </a>
+        <a class="console-nav-item" href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport/dpp-registry_en" target="_blank" rel="noopener noreferrer">
+          <app-icon name="shield-check" [size]="17"></app-icon>
+          Registro DPP UE
+          <app-icon name="external-link" [size]="12"></app-icon>
+        </a>
+        <a class="console-nav-item" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
+          <app-icon name="qr-code" [size]="17"></app-icon>
+          GS1 Digital Link
+          <app-icon name="external-link" [size]="12"></app-icon>
+        </a>
+      </nav>
+
+      <div class="console-side-foot">
+        <div class="console-note">
+          <app-icon name="shield-check" [size]="15"></app-icon>
+          <div>
+            <strong>Ambiente dimostrativo</strong>
+            <span>Le schede pubblicate vengono registrate su mock-eu-registry (CIRPASS-2), non sul registro UE di produzione.</span>
+          </div>
+        </div>
+        <div class="console-user">
+          <span class="console-user-avatar"><app-icon name="check-circle" [size]="16"></app-icon></span>
+          <div class="console-user-text">
+            <strong>Amministratore demo</strong>
+            <span>Sessione con password</span>
+          </div>
+          <button type="button" class="console-user-logout" (click)="logout()" title="Esci" aria-label="Esci">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+  }
+
+  <div class="console-main">
+    @if (view() === 'list' || view() === 'wizard') {
+      <header class="console-top">
+        <form class="console-search" [class.console-search--error]="topSearchError()" (submit)="submitTopSearch($event)" role="search">
+          <app-icon name="hash" [size]="15"></app-icon>
+          <input
+            type="search"
+            placeholder="Apri un passaporto per GTIN…"
+            [value]="topSearch()"
+            (input)="onTopSearchInput($event)"
+            aria-label="Apri un passaporto per GTIN"
+          />
+        </form>
+        @if (topSearchError()) {
+          <span class="console-search-error" role="alert">GTIN non valido</span>
+        }
+        <span class="console-status"><span class="console-status-dot"></span>mock-eu-registry · CIRPASS-2</span>
+
+        <div class="console-top-actions">
+          <div class="console-lang" role="group" aria-label="Lingua">
+            <button type="button" [class.active]="languageService.lang() === 'it'" (click)="languageService.setLang('it')">IT</button>
+            <button type="button" [class.active]="languageService.lang() === 'en'" (click)="languageService.setLang('en')">EN</button>
+          </div>
+          <button type="button" class="console-icon-btn theme-toggle--to-light" (click)="themeService.setTheme('light')" aria-label="Tema chiaro" title="Tema chiaro">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </button>
+          <button type="button" class="console-icon-btn theme-toggle--to-dark" (click)="themeService.setTheme('dark')" aria-label="Tema scuro" title="Tema scuro">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+          </button>
+          @if (view() === 'list') {
+            <button type="button" class="gs-btn gs-btn--accent console-cta" (click)="startCreate()">
+              <app-icon name="qr-code" [size]="15"></app-icon>
+              Crea DPP
+            </button>
+          }
+        </div>
+      </header>
+    }
+
 <div class="admin-container">
   @if (toast(); as t) {
     <div class="toast" [class.toast--error]="t.severity === 'error'" [class.toast--warning]="t.severity === 'warning'" role="alert">
@@ -219,6 +322,8 @@
         (addAttribute)="addAttributeRow()"
         (removeAttribute)="removeAttributeRow($event)"
         (requestDemoFill)="fillDemoAttributes()"
+        (requestFullDemo)="fillDemoData()"
+        (resetForm)="startCreate()"
         (requestFieldDemo)="demoFillField($event)"
         (showToast)="showToast($event.message, $event.severity)"
         (saveDraft)="saveDraft()"
@@ -228,6 +333,8 @@
       ></app-dpp-wizard>
     }
   }
+</div>
+  </div>
 </div>
 
 <app-json-ld-drawer [open]="jsonLdPreviewOpen()" [jsonLd]="previewJsonLd()" (closed)="closeJsonLdPreview()"></app-json-ld-drawer>

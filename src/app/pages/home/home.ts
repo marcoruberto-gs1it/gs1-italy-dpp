@@ -120,6 +120,12 @@ export class Home implements OnDestroy {
    * di controllo GS1 verificata con lo stesso isValidGtin() del form admin) e porta alla pagina
    * pubblica /01/:gtin, la stessa che il resolver GS1 risolve. Nessuna chiamata di rete qui:
    * se il GTIN non ha una scheda pubblicata lo dice la pagina di destinazione. */
+  /** Esempio reale di GS1 Digital Link mostrato nella card "risoluzione" di Come funziona: lo
+   * stesso URL del primo esempio del carosello, senza protocollo (come lo mostra un browser). */
+  protected exampleDigitalLink = computed(() =>
+    `${this.siteOrigin.value}/01/${SECTORS[0].exampleGtin}`.replace(/^https?:\/\//, '')
+  );
+
   protected gtinQuery = signal('');
   protected gtinError = signal(false);
 

@@ -212,6 +212,7 @@
           <span class="dpp-flow-index">01</span>
           <h3>{{ t('dpp.step1Title') }}</h3>
           <p>{{ t('dpp.step1Text') }}</p>
+          <code class="dpp-flow-code">(01) {{ sectors()[0].exampleGtin }}</code>
         </div>
       </li>
       <li class="dpp-flow-step">
@@ -228,6 +229,7 @@
           <span class="dpp-flow-index">03</span>
           <h3>{{ t('dpp.step3Title') }}</h3>
           <p>{{ t('dpp.step3Text') }}</p>
+          <code class="dpp-flow-code">{{ exampleDigitalLink() }}</code>
         </div>
       </li>
       <li class="dpp-flow-step dpp-flow-step--highlight">
@@ -250,24 +252,52 @@
 
     <ul class="benefit-grid" appScrollReveal="stagger" [revealGrid]="true" [revealStagger]="0.08">
       <li class="benefit-card gs-card">
-        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand)"><app-icon name="leaf" [size]="20"></app-icon></span>
+        <span class="benefit-icon icon-flat"><app-icon name="leaf" [size]="20"></app-icon></span>
+        <span class="gs-badge gs-badge--green benefit-tag">{{ t('benefits.item1Tag') }}</span>
         <h3>{{ t('benefits.item1Title') }}</h3>
         <p>{{ t('benefits.item1Text') }}</p>
+        <ul class="benefit-points">
+          @for (point of t('benefits.item1Points').split('|'); track point) {
+            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
+          }
+        </ul>
+        <a class="benefit-link" href="#settori">{{ t('benefits.item1Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
       <li class="benefit-card gs-card">
-        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand-accent-strong)"><app-icon name="globe" [size]="20"></app-icon></span>
+        <span class="benefit-icon icon-flat"><app-icon name="globe" [size]="20"></app-icon></span>
+        <span class="gs-badge gs-badge--blue benefit-tag">{{ t('benefits.item2Tag') }}</span>
         <h3>{{ t('benefits.item2Title') }}</h3>
         <p>{{ t('benefits.item2Text') }}</p>
+        <ul class="benefit-points">
+          @for (point of t('benefits.item2Points').split('|'); track point) {
+            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
+          }
+        </ul>
+        <a class="benefit-link" href="#dpp">{{ t('benefits.item2Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
       <li class="benefit-card gs-card">
-        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand)"><app-icon name="shield-check" [size]="20"></app-icon></span>
+        <span class="benefit-icon icon-flat"><app-icon name="shield-check" [size]="20"></app-icon></span>
+        <span class="gs-badge gs-badge--orange benefit-tag">{{ t('benefits.item3Tag') }}</span>
         <h3>{{ t('benefits.item3Title') }}</h3>
         <p>{{ t('benefits.item3Text') }}</p>
+        <ul class="benefit-points">
+          @for (point of t('benefits.item3Points').split('|'); track point) {
+            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
+          }
+        </ul>
+        <a class="benefit-link" href="#normativa">{{ t('benefits.item3Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
       <li class="benefit-card gs-card">
-        <span class="benefit-icon icon-flat" style="--icon-color: var(--brand-accent-strong)"><app-icon name="check-circle" [size]="20"></app-icon></span>
+        <span class="benefit-icon icon-flat"><app-icon name="check-circle" [size]="20"></app-icon></span>
+        <span class="gs-badge gs-badge--blue benefit-tag">{{ t('benefits.item4Tag') }}</span>
         <h3>{{ t('benefits.item4Title') }}</h3>
         <p>{{ t('benefits.item4Text') }}</p>
+        <ul class="benefit-points">
+          @for (point of t('benefits.item4Points').split('|'); track point) {
+            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
+          }
+        </ul>
+        <a class="benefit-link" href="#normativa">{{ t('benefits.item4Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
     </ul>
   </section>

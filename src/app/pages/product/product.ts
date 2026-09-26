@@ -3,11 +3,12 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Meta, Title } from '@angular/platform-browser';
+import { DomSanitizer, Meta, SafeHtml, Title } from '@angular/platform-browser';
 import { ProductService, productImages, discountPercent, formatEuro, pricePerKg, formatNetContent, formatDimensions, nutritionBasisLabel } from '../../services/product.service';
 import { StarRatingComponent } from '../../components/star-rating/star-rating';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { IconComponent, IconName } from '../../components/icon/icon';
+import { highlightJson } from '../../utils/json-highlight';
 import { setSocialMeta } from '../../utils/social-meta';
 import { normalizeUrl } from '../../utils/url';
 import { onImageError } from '../../utils/image-fallback';
@@ -113,6 +114,7 @@ export class ProductComponent implements OnDestroy {
   private registryApi = inject(RegistryApiService);
   private languageService = inject(LanguageService);
   private platformId = inject(PLATFORM_ID);
+  private sanitizer = inject(DomSanitizer);
   /** angularx-qrcode manipola il DOM: niente rendering lato server (stesso motivo della home). */
   protected isBrowser = isPlatformBrowser(this.platformId);
   protected t = inject(I18nService).t;
@@ -236,6 +238,110 @@ export class ProductComponent implements OnDestroy {
     const ai = /^\(21\)/.test(dpp.batchOrSerial) || dpp.granularityLevel === 'ITEM' ? '21' : '10';
     return `${id}/${ai}/${encodeURIComponent(value)}`;
   });
+
+  protected granularityLevels = ['MODEL', 'BATCH', 'ITEM'] as const;
+
+  /** Lotto o seriale già "ripulito" dal prefisso AI, con il tipo dedotto (stessa regola di
+   * dppUpi): serve alla casella identificativi della pagina passaporto. */
+  protected dppBatchOrSerial = computed(() => {
+    const dpp = this.dppRecord();
+    if (!dpp?.batchOrSerial) return null;
+    const value = dpp.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+    const isSerial = /^\(21\)/.test(dpp.batchOrSerial) || dpp.granularityLevel === 'ITEM';
+    return { value, isSerial };
+  });
+
+  /** DPP-ID come URN UUID — lo stesso valore di digitalProductPassportId nel JSON-LD. */
+  protected dppUrn = computed(() => {
+    const dpp = this.dppRecord();
+    return dpp ? `urn:uuid:${dpp.id}` : '';
+  });
+
+  /** Estrae un GLN (13 cifre) in coda a un identificativo GS1 (URI Digital Link, URN…), se c'è. */
+  protected glnOf(id: string): string | null {
+    const match = /(\d{13})\/?$/.exec(id ?? '');
+    return match ? match[1] : null;
+  }
+
+  protected copiedKey = signal<string | null>(null);
+
+  protected async copy(key: string, text: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(text);
+      this.copiedKey.set(key);
+      setTimeout(() => this.copiedKey.set(null), 1800);
+    } catch {
+      /* clipboard non disponibile — ignora */
+    }
+  }
+
+  /** Attributo di impronta di carbonio, se la scheda ne ha uno (chiave che contiene "carbonio"
+   * o "CO₂"): valore in evidenza e unità dalla parentesi della chiave. Nessun valore inventato —
+   * solo ciò che l'operatore ha dichiarato. */
+  protected dppCarbon = computed(() => {
+    const entry = this.dppAttributeEntries().find(([key]) => /carbon|co₂|co2/i.test(key));
+    if (!entry) return null;
+    const unit = /\(([^)]+)\)/.exec(entry[0])?.[1] ?? '';
+    return { label: entry[0].replace(/\s*\([^)]*\)\s*$/, ''), value: entry[1], unit };
+  });
+
+  /** Attributi espressi in percentuale ("… (%)") come barre — solo valori numerici veri. */
+  protected dppPercents = computed(() =>
+    this.dppAttributeEntries()
+      .filter(([key]) => /\(%\)/.test(key))
+      .map(([key, value]) => ({ label: key.replace(/\s*\(%\)\s*$/, ''), value: Number.parseFloat(String(value).replace(',', '.')) }))
+      .filter((row) => Number.isFinite(row.value))
+      .map((row) => ({ ...row, value: Math.max(0, Math.min(100, row.value)) }))
+  );
+
+  /** Eventi mostrati nella cronologia: solo quelli davvero registrati (creazione, registrazione
+   * sul registro, eventuale modifica successiva) più un segnaposto esplicito per il fine vita. */
+  protected dppEvents = computed(() => {
+    const dpp = this.dppRecord();
+    if (!dpp) return [];
+    const locale = this.languageService.lang() === 'it' ? 'it-IT' : 'en-GB';
+    const fmt = (iso: string) => new Date(iso).toLocaleString(locale, { dateStyle: 'long', timeStyle: 'short' });
+    const events: { key: string; title: string; text: string; when: string; meta?: string; future?: boolean }[] = [
+      { key: 'created', title: this.t('product.eventCreated'), text: this.t('product.eventCreatedText'), when: fmt(dpp.createdAt), meta: this.dppUrn() },
+    ];
+    if (dpp.registeredAt) {
+      events.push({
+        key: 'registered',
+        title: this.t('product.eventRegistered'),
+        text: this.t('product.eventRegisteredText'),
+        when: fmt(dpp.registeredAt),
+        meta: dpp.registryId ? `${this.t('product.eventRegistryId')}: ${dpp.registryId}` : undefined,
+      });
+    }
+    const baseline = new Date(dpp.registeredAt ?? dpp.createdAt).getTime();
+    if (new Date(dpp.updatedAt).getTime() - baseline > 60_000) {
+      events.push({ key: 'updated', title: this.t('product.eventUpdated'), text: this.t('product.eventUpdatedText'), when: fmt(dpp.updatedAt) });
+    }
+    events.push({ key: 'eol', title: this.t('product.eventEndOfLife'), text: this.t('product.eventEndOfLifeText'), when: '', future: true });
+    return events;
+  });
+
+  protected jsonLdText = computed(() => {
+    const doc = this.activeJsonLd();
+    return doc ? JSON.stringify(doc, null, 2) : '';
+  });
+  protected jsonLdBytes = computed(() => new TextEncoder().encode(this.jsonLdText()).length);
+  protected jsonLdHtml = computed<SafeHtml>(() => this.sanitizer.bypassSecurityTrustHtml(highlightJson(this.jsonLdText())));
+
+  /** SHA-256 calcolato davvero (Web Crypto) sul testo del JSON-LD mostrato qui sopra — non il
+   * hash che mock-eu-registry calcola sulla pagina HTML (vedi mockRegistryClient.ts): etichettato
+   * di conseguenza nel template. Solo lato browser. */
+  protected jsonLdHash = signal('');
+
+  protected downloadJsonLd(): void {
+    const blob = new Blob([this.jsonLdText()], { type: 'application/ld+json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dpp-${this.dppRecord()?.gtin ?? 'passport'}.jsonld`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   dppJsonLdJson = computed(() => {
     const dpp = this.dppRecord();
@@ -517,6 +623,19 @@ export class ProductComponent implements OnDestroy {
           error: () => {
             this.dppLoading.set(false);
           },
+        });
+      });
+    }
+
+    if (isPlatformBrowser(this.platformId)) {
+      effect(() => {
+        const text = this.jsonLdText();
+        if (!text) {
+          this.jsonLdHash.set('');
+          return;
+        }
+        void crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then((buf) => {
+          this.jsonLdHash.set([...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join(''));
         });
       });
     }
