@@ -82,10 +82,16 @@ function requiredConfig(): { apiUrl: string; token: string } | null {
  * "gs1:pip" con URL diverso): il resolver tratta due link con lo STESSO linktype sullo stesso
  * anchor come un'ambiguità reale — senza un Accept che sceglie fra le due, un browser normale
  * riceve "300 Multiple Choices" invece del redirect atteso (verificato dal vivo). Linktype
- * diversi invece si risolvono ciascuno per conto proprio (?linkType=gs1:pip esplicito, o
- * defaultLinktype quando la richiesta non specifica nulla), nessuna ambiguità. defaultLinktype
- * resta "gs1:dpp" in entrambi i casi: è la pagina che mostra i dati del passaporto, il cuore di
- * questa demo — "gs1:pip" resta comunque raggiungibile esplicitamente. */
+ * diversi invece si risolvono ciascuno per conto proprio (?linkType=gs1:dpp esplicito, o
+ * defaultLinktype quando la richiesta non specifica nulla), nessuna ambiguità.
+ *
+ * defaultLinktype è "gs1:pip" quando esiste (record statico): è il comportamento standard di
+ * un resolver GS1 generico — una scansione "nuda" (senza Accept/linkType espliciti, es. da un
+ * QR reader qualunque) atterra sulla pagina informazioni prodotto, non direttamente sui dati di
+ * compliance del passaporto. "gs1:dpp" resta una risorsa specifica, raggiungibile solo con
+ * ?linkType=gs1:dpp esplicito o dal link "Vedi il Passaporto Digitale di Prodotto completo"
+ * nella pagina PIP stessa. Per i DPP utente (un solo link, "gs1:dpp") defaultLinktype resta
+ * "gs1:dpp": è l'unico link che esiste, non c'è una pagina PIP fra cui scegliere. */
 function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string, unknown> {
   const anchor = buildAnchor(record);
   const dppHref = digitalLinkUrl(
@@ -105,7 +111,7 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
   // client-side di /admin).
   const pipHref = `${siteUrl.replace(/\/$/, '')}/product-info/${record.gtin}`;
   const pipLink = { linktype: 'gs1:pip', href: pipHref, title: record.name, type: 'text/html', hreflang: ['it'] };
-  return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:dpp', links: [pipLink, dppLink] };
+  return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:pip', links: [pipLink, dppLink] };
 }
 
 /** Crea o aggiorna l'entry — PUT prima (idempotente se esiste già), POST /new come fallback se
