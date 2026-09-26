@@ -166,7 +166,7 @@ export function dppToJsonLd(record: DppRecord, siteUrl: string): Record<string, 
  *                       generico gs1:pip: questa pagina è specificamente il DPP, GS1 distingue
  *                       esplicitamente i due link type — stesso linktype usato dal vero
  *                       resolver CE, vedi resolverClient.ts#buildLinksetDocument
- *   gs1:masterData   — il JSON-LD di dppToJsonLd(), raggiungibile anche con ?linkType=masterData
+ *   gs1:masterData   — il JSON-LD di dppToJsonLd(), raggiungibile anche con ?linkType=gs1:masterData
  *                       (vedi webshop/nginx.conf) invece di dover rimandare Accept: application/ld+json
  */
 export function dppToLinkset(record: DppRecord, siteUrl: string): Record<string, unknown> {
@@ -178,7 +178,7 @@ export function dppToLinkset(record: DppRecord, siteUrl: string): Record<string,
         'https://ref.gs1.org/voc/defaultLink': [{ href: id, title: record.name }],
         'https://ref.gs1.org/voc/dpp': [{ href: id, title: record.name, type: 'text/html' }],
         'https://ref.gs1.org/voc/masterData': [
-          { href: `${id}?linkType=masterData`, title: `${record.name} — JSON-LD`, type: 'application/ld+json' },
+          { href: `${id}?linkType=gs1:masterData`, title: `${record.name} — JSON-LD`, type: 'application/ld+json' },
         ],
       },
     ],

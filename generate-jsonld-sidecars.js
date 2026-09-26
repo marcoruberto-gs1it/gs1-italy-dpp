@@ -36,7 +36,7 @@ function writeLinkset(dir, id, name) {
         'https://ref.gs1.org/voc/defaultLink': [{ href: id, title: name }],
         'https://ref.gs1.org/voc/pip': [{ href: id, title: name, type: 'text/html' }],
         'https://ref.gs1.org/voc/masterData': [
-          { href: `${id}?linkType=masterData`, title: `${name} — JSON-LD`, type: 'application/ld+json' },
+          { href: `${id}?linkType=gs1:masterData`, title: `${name} — JSON-LD`, type: 'application/ld+json' },
         ],
       },
     ],

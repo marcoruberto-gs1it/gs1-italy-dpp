@@ -110,12 +110,12 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
   // gs1:recyclingInfo/repairInfo: imballaggio e riciclo stanno in gs1:sustainabilityInfo, uso e
   // riparazione in gs1:instructions). Stesso URL della pagina DPP + frammento: è una sola risorsa
   // HTML, il resolver dice al client QUALE parte aprire. gs1:masterData è l'eccezione: punta alla
-  // rappresentazione JSON-LD (?linkType=masterData, vedi $wants_jsonld_qs in webshop/nginx.conf).
+  // rappresentazione JSON-LD (?linkType=gs1:masterData, vedi $wants_jsonld_qs in webshop/nginx.conf).
   // Un link per link type, mai due con lo stesso sullo stesso anchor: due link uguali producono
   // un 300 Multiple Choices (vedi il commento più sotto).
   const withFragment = (linkType: string) => `${dppHref}#section-${linkType}`;
   const sectionLinks = [
-    link('gs1:masterData', `${dppHref}?linkType=masterData`, `${record.name} — dati tecnici (JSON-LD)`, 'application/ld+json'),
+    link('gs1:masterData', `${dppHref}?linkType=gs1:masterData`, `${record.name} — dati tecnici (JSON-LD)`, 'application/ld+json'),
     link('gs1:traceability', withFragment('traceability'), `${record.name} — tracciabilità e ciclo di vita`),
   ];
   if (record.registryId) {
