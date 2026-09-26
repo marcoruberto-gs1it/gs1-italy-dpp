@@ -1,15 +1,23 @@
 .modern-container {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px 80px;
+  padding: 0 24px;
 }
 
-/* --- Hero: piena larghezza, sempre scura (non segue il tema) --- */
+/* --- Hero: chiaro, come nel design Figma di riferimento — copia + campo "Verifica GTIN" a
+   sinistra, carosello di anteprima a destra, KPI e banner "scadenzario" sotto. --- */
 .modern-hero {
   position: relative;
   width: 100%;
-  background: var(--brand-ink);
-  padding: 96px 24px 88px;
+  background:
+    radial-gradient(ellipse 50% 60% at 85% 0%, rgba(0, 44, 108, 0.06), transparent 70%),
+    var(--bg-canvas);
+  padding: 56px 24px 40px;
+  /* Il bagliore sfocato dietro la card (.hero-preview::before, inset:-10%) sporge oltre il
+     bordo della pagina e creava uno scroll orizzontale dell'intero documento (già presente prima
+     di questo redesign, ~30px a ogni larghezza) — clip, non hidden, così l'hero non diventa un
+     contenitore di scroll. */
+  overflow-x: clip;
 }
 
 .hero-inner {
@@ -19,117 +27,328 @@
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 56px;
-  align-items: center;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  align-items: start;
 }
 
-.hero-copy h1 {
-  font-size: clamp(2.6rem, 5.2vw, 4.35rem);
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.96);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
-  margin: 0 0 22px;
-}
-
-/* --brand-accent-vivid, non --brand-accent: qui sotto c'è sempre --brand-ink (fisso,
-   indipendente dal tema), ma --brand-accent CAMBIA con il tema — in chiaro risolve in un
-   verde scuro (2.9:1 sull'ink, sotto anche la soglia 3:1 per testo grande) pensato per stare
-   su UNO sfondo chiaro, non su questo hero sempre scuro. Stesso bug, stessa causa, stessa
-   correzione già applicata a .hero-pill--primary qui sotto. */
-.hero-highlight {
-  color: var(--brand-accent-vivid);
-}
-
-.hero-copy p {
-  font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.6);
-  max-width: 480px;
-  line-height: 1.6;
-  margin: 0 0 32px;
-}
-
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 26px;
-  border-radius: var(--radius-full);
-  font-weight: 600;
-  font-size: 0.95rem;
-  text-decoration: none;
-  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
-}
-
-.hero-pill:active {
-  transform: scale(0.97);
-}
-
-/* Smeraldo chiaro + testo scuro (non bianco): è l'unica combinazione che regge il contrasto
-   sia sull'hero sempre scuro sia, volendo, su sfondo chiaro — il turchese precedente con testo
-   bianco non aveva mai superato 3:1, verificato solo ora in fase di redesign. */
-.hero-pill--primary {
-  background: var(--gradient-cta);
-  color: var(--brand-ink);
-}
-
-.hero-pill--primary:hover {
-  filter: brightness(0.94);
-}
-
-.hero-pill--ghost {
-  background: transparent;
-  color: #ffffff;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-}
-
-.hero-pill--ghost:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-}
-
-/* Riga di anteprima dei 10 settori sotto le CTA dell'hero — anticipa la griglia più sotto,
-   puramente informativa (non link: i settori non hanno un'ancora individuale in pagina). */
-.hero-sector-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  list-style: none;
-  margin: 48px 0 0;
-  padding: 24px 0 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.hero-sector-chip {
+.hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 14px 7px 8px;
+  padding: 6px 12px;
+  margin-bottom: 20px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.82rem;
-  font-weight: 600;
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.hero-sector-chip-icon {
+.hero-badge app-icon {
+  color: var(--green-ink);
+}
+
+.hero-copy h1 {
+  font-size: clamp(2.3rem, 4.4vw, 3.6rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin: 0 0 20px;
+}
+
+.hero-highlight {
+  color: var(--brand-accent);
+}
+
+.hero-copy > p {
+  font-size: 1.08rem;
+  color: var(--text-secondary);
+  max-width: 540px;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+/* --- Card "Verifica un passaporto digitale" --- */
+.verify-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 560px;
+}
+
+.verify-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.verify-row {
+  display: flex;
+  gap: 10px;
+}
+
+.verify-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.verify-field:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.verify-field--error {
+  border-color: var(--brand-accent);
+}
+
+.verify-field input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+
+.verify-field input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.verify-btn {
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  padding: 0 18px;
+  height: 46px;
+}
+
+.verify-error {
+  margin: -4px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand-accent);
+}
+
+.verify-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.verify-demo-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.verify-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.verify-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+
+.verify-chip:hover {
+  background: var(--border-default);
+  transform: translateY(-1px);
+}
+
+.verify-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.hero-links {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--brand-accent);
+  text-decoration: none;
+}
+
+.hero-link:hover {
+  text-decoration: underline;
+}
+
+/* --- KPI: 4 tessere con icona, numero grande e didascalia (design Figma) --- */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.kpi-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: var(--radius-full);
-  background: rgba(242, 99, 52, 0.16);
-  color: var(--brand-accent-vivid);
+  margin-bottom: 8px;
+}
+
+.kpi-icon--blue { background: var(--blue-tint); color: var(--blue-ink); }
+.kpi-icon--green { background: var(--green-tint); color: var(--green-ink); }
+.kpi-icon--orange { background: var(--orange-tint); color: var(--orange-ink); }
+
+.kpi-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-value--green { color: var(--green-ink); }
+.kpi-value--orange { color: var(--brand-accent); }
+
+.kpi-label {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* --- Banner navy "scadenzario normativo" --- */
+.deadline-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+  color: #fff;
+}
+
+.deadline-icon {
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-accent);
+  color: #fff;
+}
+
+.deadline-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.deadline-text strong {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.deadline-text span {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.deadline-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.deadline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.deadline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.deadline-link {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
 }
 
 /* --- Carosello di anteprima --- */
@@ -145,7 +364,7 @@
   position: absolute;
   inset: -10%;
   z-index: -1;
-  background: radial-gradient(ellipse 60% 55% at 60% 35%, rgba(242, 99, 52, 0.28), transparent 70%);
+  background: radial-gradient(ellipse 60% 55% at 60% 35%, rgba(0, 44, 108, 0.14), transparent 70%);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -158,8 +377,8 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-canvas-alt);
+  border: 1px solid var(--border-subtle);
   border-bottom: none;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding: 12px 16px;
@@ -169,7 +388,7 @@
   width: 9px;
   height: 9px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--border-strong);
   flex-shrink: 0;
 }
 
@@ -180,8 +399,8 @@
   margin-left: 10px;
   padding: 5px 12px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.55);
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
   font-family: var(--font-mono);
   font-size: 0.74rem;
   overflow: hidden;
@@ -190,7 +409,7 @@
 }
 
 .preview-chrome-url app-icon {
-  color: var(--brand-accent-vivid);
+  color: var(--brand-accent);
   flex-shrink: 0;
 }
 
@@ -446,18 +665,13 @@
 /* Pillola contornata invece di semplice testo maiuscolo: stesso ruolo (eyebrow di sezione),
    più peso visivo — coerente con .gs-badge/.gs-chip già usati altrove nel design system. */
 .section-eyebrow {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
   font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--brand);
-  background: var(--accent-soft, rgba(0, 44, 108, 0.08));
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-full);
-  padding: 6px 14px;
-  margin-bottom: 16px;
+  color: var(--brand-accent);
+  margin-bottom: 12px;
 }
 
 .section-head h2 {
@@ -483,73 +697,58 @@
   margin: 0;
 }
 
-/* --- Cos'è il DPP: 4 tappe in sequenza, collegate da un binario orizzontale ---
-   Sostituisce il precedente diagramma a chevron incastrati (clip-path): il contrasto fra i
-   pannelli e lo sfondo pagina era troppo basso perché le tacche si leggessero come una vera
-   pipeline (bg-surface-sunken e bg-canvas, entrambi un azzurro chiarissimo, quasi si
-   confondevano). Qui la sequenza è comunicata da un elemento inequivocabile — una linea
-   continua dietro alle icone circolari — indipendente dal contrasto cromatico dei pannelli,
-   stesso linguaggio visivo dello .spine-timeline già usato più sotto in questa pagina. */
+/* --- Come funziona: 4 card numerate (design Figma "Architettura tecnica") — numero grande a
+   sinistra, tessera-icona tinta a destra, titolo e testo sotto. */
 .dpp-flow {
-  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 28px;
+  gap: 16px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Il binario si ferma al centro della prima/ultima icona (metà colonna, quindi 12.5% su 4
-   colonne), non ai bordi della griglia — altrimenti sporgerebbe oltre le icone estreme. */
-.dpp-flow::before {
-  content: '';
-  position: absolute;
-  top: 27px;
-  left: 12.5%;
-  right: 12.5%;
-  height: 2px;
-  background: var(--border-strong);
-  z-index: 0;
-}
-
 .dpp-flow-step {
   position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  padding: 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .dpp-flow-icon {
-  width: 54px;
-  height: 54px;
-  flex-shrink: 0;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px -6px rgba(0, 44, 108, 0.4);
+  background: var(--blue-tint);
+  color: var(--blue-ink);
 }
 
-/* L'ultima tappa (i livelli di accesso ai dati) è la "destinazione" del racconto — si
-   distingue con l'arancione GS1 invece del blu di riempimento delle altre tre, stesso ruolo
-   narrativo che aveva il bordo smeraldo nella versione precedente. */
-.dpp-flow-step--highlight .dpp-flow-icon {
-  background: var(--brand-accent-vivid);
-  color: var(--brand-ink);
-  box-shadow: 0 6px 16px -6px rgba(242, 99, 52, 0.5);
-}
+.dpp-flow-step:nth-child(2) .dpp-flow-icon { background: var(--orange-tint); color: var(--orange-ink); }
+.dpp-flow-step:nth-child(3) .dpp-flow-icon { background: var(--green-tint); color: var(--green-ink); }
+.dpp-flow-step--highlight .dpp-flow-icon { background: var(--brand-accent); color: #fff; }
 
 .dpp-flow-index {
   display: block;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin-bottom: 10px;
 }
+
+.dpp-flow-step:nth-child(2) .dpp-flow-index { color: var(--brand-accent); }
+.dpp-flow-step:nth-child(3) .dpp-flow-index { color: var(--green-ink); }
 
 .dpp-flow-body h3 {
   font-size: 1rem;
@@ -596,7 +795,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--green-tint);
+  color: var(--green-ink);
 }
+
+.benefit-card:nth-child(2) .benefit-icon { background: var(--blue-tint); color: var(--blue-ink); }
+.benefit-card:nth-child(3) .benefit-icon { background: var(--orange-tint); color: var(--orange-ink); }
+.benefit-card:nth-child(4) .benefit-icon { background: var(--blue-tint); color: var(--blue-ink); }
 
 .benefit-card h3 {
   font-size: 1rem;
@@ -862,9 +1067,9 @@
   height: 41px;
 }
 
-/* --- Pannello "risposta GS1": stesso trattamento scuro a griglia+glow dell'hero (vedi
-   .gs-grid-glow in tokens.css) — fa da bookend visivo con l'apertura della pagina, e distingue
-   nettamente "cosa richiede la norma" (le card chiare sopra) da "come risponde GS1" (qui). */
+/* --- Pannello "risposta GS1": navy pieno (vedi .gs-navy-panel in tokens.css), lo stesso
+   trattamento del banner scadenzario e della fascia CTA finale — distingue nettamente "cosa
+   richiede la norma" (le card chiare sopra) da "come risponde GS1" (qui). */
 .standards-panel {
   border-radius: var(--radius-xl);
   padding: 44px 40px;
@@ -1118,25 +1323,67 @@
   flex-shrink: 0;
 }
 
-.key-stats {
-  grid-template-columns: repeat(4, 1fr);
-  margin: 40px 0 0;
+/* --- Fascia CTA finale navy (design Figma) --- */
+.cta-band {
+  padding: 72px 24px;
+  text-align: center;
+  color: #fff;
 }
 
-.key-stats .gs-stat-value {
-  font-size: 1.35rem;
+.cta-band-inner {
+  max-width: 720px;
+  margin: 0 auto;
 }
 
-@media (max-width: 640px) {
-  .key-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.cta-band-eyebrow {
+  display: inline-block;
+  padding: 5px 12px;
+  margin-bottom: 18px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cta-band h2 {
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0 0 14px;
+}
+
+.cta-band p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.65;
+  margin: 0 auto 28px;
+}
+
+.cta-band-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cta-band-btn--ghost {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.cta-band-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 /* --- Settori: griglia compatta di card piatte con bordo sottile, niente ombra --- */
 .sector-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* 5 colonne: i 10 settori riempiono esattamente due righe, senza una card sola in coda. */
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   list-style: none;
   margin: 0;
@@ -1238,37 +1485,28 @@
    Responsive — tablet (≤900px) poi telefono (≤640px / ≤420px), progressivo.
    --------------------------------------------------------------------------- */
 
+@media (max-width: 1180px) {
+  .sector-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .hero-grid {
     grid-template-columns: 1fr;
   }
 
-  .hero-copy p {
+  .hero-copy > p,
+  .verify-card {
     max-width: none;
   }
 
-  /* Sotto i 900px 4 colonne affiancate stringerebbero troppo le didascalie: la sequenza torna
-     verticale e il binario ruota con lei, ora allineato al centro delle icone (metà di 54px). */
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .dpp-flow {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    padding-left: 27px;
-  }
-
-  .dpp-flow::before {
-    top: 0;
-    bottom: 0;
-    left: 27px;
-    right: auto;
-    width: 2px;
-    height: auto;
-  }
-
-  .dpp-flow-step {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 18px;
-    margin-left: -27px;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .sector-grid {
@@ -1306,16 +1544,27 @@
 
 @media (max-width: 600px) {
   .modern-container {
-    padding: 0 16px 56px;
+    padding: 0 16px;
   }
 
   .modern-hero {
     padding: 56px 16px;
   }
 
-  .hero-pill {
-    padding: 12px 20px;
-    font-size: 0.88rem;
+  .verify-row {
+    flex-direction: column;
+  }
+
+  .verify-btn {
+    justify-content: center;
+  }
+
+  .dpp-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band {
+    padding: 56px 16px;
   }
 
   .preview-card {
@@ -1353,6 +1602,14 @@
     padding: 48px 16px;
   }
 
+  /* Il wrapper della timeline compensa il padding del contenitore con un margine negativo: a 16px
+     (non più 24) qui sotto, altrimenti sporge di 8px oltre il viewport e crea scroll orizzontale
+     dell'intera pagina. */
+  .spine-timeline-wrap {
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+  }
+
   .section-head {
     margin-bottom: 32px;
   }
@@ -1371,13 +1628,8 @@
 }
 
 @media (max-width: 420px) {
-  .hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .hero-pill {
-    justify-content: center;
+  .kpi-row {
+    grid-template-columns: 1fr;
   }
 
   .preview-top {

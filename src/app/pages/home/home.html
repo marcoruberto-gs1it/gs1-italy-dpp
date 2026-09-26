@@ -1,18 +1,63 @@
-<section class="modern-hero gs-grid-glow">
+<section class="modern-hero">
   <div class="hero-inner">
     <div class="hero-grid">
       <div class="hero-copy" appScrollReveal="stagger" [revealStagger]="0.12">
+        <span class="hero-badge">
+          <app-icon name="shield-check" [size]="14"></app-icon>
+          {{ t('hero.badge') }}
+        </span>
         <h1>{{ t('hero.titleLine1') }}<br><span class="hero-highlight">{{ t('hero.titleHighlight') }}</span></h1>
         <p>{{ t('hero.subtitle') }}</p>
 
-        <div class="hero-actions">
-          <a href="#dpp" class="hero-pill hero-pill--primary">
-            <app-icon name="shield-check" [size]="18"></app-icon>
+        <form class="verify-card" (submit)="submitGtin($event)" novalidate>
+          <label class="verify-label" for="gtin-input">{{ t('hero.verifyLabel') }}</label>
+          <div class="verify-row">
+            <div class="verify-field" [class.verify-field--error]="gtinError()">
+              <app-icon name="hash" [size]="16"></app-icon>
+              <input
+                id="gtin-input"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                [placeholder]="t('hero.verifyPlaceholder')"
+                [value]="gtinQuery()"
+                (input)="onGtinInput($event)"
+                [attr.aria-invalid]="gtinError()"
+                [attr.aria-describedby]="gtinError() ? 'gtin-error' : null"
+              />
+            </div>
+            <button type="submit" class="gs-btn gs-btn--primary verify-btn">
+              {{ t('hero.verifyButton') }}
+              <app-icon name="chevron-right" [size]="15"></app-icon>
+            </button>
+          </div>
+          @if (gtinError()) {
+            <p id="gtin-error" class="verify-error" role="alert">{{ t('hero.verifyError') }}</p>
+          }
+
+          <div class="verify-demo">
+            <span class="verify-demo-label">{{ t('hero.demoLabel') }}</span>
+            <ul class="verify-chips">
+              @for (sector of sectors(); track sector.id) {
+                <li>
+                  <a class="verify-chip" [routerLink]="['/01', sector.exampleGtin]">
+                    <span class="verify-chip-dot" [style.background]="sector.brandColor"></span>
+                    {{ sector.shortName }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        </form>
+
+        <div class="hero-links">
+          <a href="#dpp" class="hero-link">
             {{ t('hero.primaryCta') }}
+            <app-icon name="chevron-right" [size]="14"></app-icon>
           </a>
-          <a href="#settori" class="hero-pill hero-pill--ghost">
-            <app-icon name="layers" [size]="18"></app-icon>
+          <a href="#settori" class="hero-link">
             {{ t('hero.secondaryCta') }}
+            <app-icon name="chevron-right" [size]="14"></app-icon>
           </a>
         </div>
       </div>
@@ -110,14 +155,45 @@
       </div>
     </div>
 
-    <ul class="hero-sector-strip" appScrollReveal="stagger" [revealStagger]="0.04" [revealDelay]="0.3" aria-label="{{ t('sectorsSection.title') }}">
-      @for (sector of sectors(); track sector.id) {
-        <li class="hero-sector-chip">
-          <span class="hero-sector-chip-icon"><app-icon [name]="sector.icon" [size]="16"></app-icon></span>
-          {{ sector.shortName }}
-        </li>
-      }
-    </ul>
+    <div class="kpi-row" appScrollReveal="stagger" [revealStagger]="0.08" [revealDelay]="0.2">
+      <div class="kpi-tile">
+        <span class="kpi-icon kpi-icon--blue"><app-icon name="layers" [size]="18"></app-icon></span>
+        <span class="kpi-value">{{ t('keyStats.stat1Value') }}</span>
+        <span class="kpi-label">{{ t('keyStats.stat1Label') }}</span>
+      </div>
+      <div class="kpi-tile">
+        <span class="kpi-icon kpi-icon--green"><app-icon name="battery" [size]="18"></app-icon></span>
+        <span class="kpi-value kpi-value--green">{{ t('keyStats.stat2Value') }}</span>
+        <span class="kpi-label">{{ t('keyStats.stat2Label') }}</span>
+      </div>
+      <div class="kpi-tile">
+        <span class="kpi-icon kpi-icon--orange"><app-icon name="shield-check" [size]="18"></app-icon></span>
+        <span class="kpi-value kpi-value--orange">{{ t('keyStats.stat3Value') }}</span>
+        <span class="kpi-label">{{ t('keyStats.stat3Label') }}</span>
+      </div>
+      <div class="kpi-tile">
+        <span class="kpi-icon kpi-icon--blue"><app-icon name="hash" [size]="18"></app-icon></span>
+        <span class="kpi-value">{{ t('keyStats.stat4Value') }}</span>
+        <span class="kpi-label">{{ t('keyStats.stat4Label') }}</span>
+      </div>
+    </div>
+
+    <div class="deadline-banner gs-navy-panel" appScrollReveal>
+      <span class="deadline-icon"><app-icon name="calendar" [size]="20"></app-icon></span>
+      <div class="deadline-text">
+        <strong>{{ t('deadlines.title') }}</strong>
+        <span>{{ t('deadlines.subtitle') }}</span>
+      </div>
+      <ul class="deadline-chips">
+        @for (sector of nextDeadlines(); track sector.id) {
+          <li class="deadline-chip">
+            <span class="deadline-dot" [style.background]="sector.brandColor"></span>
+            {{ sector.shortName }}: {{ sector.dateShort }}
+          </li>
+        }
+      </ul>
+      <a href="#normativa" class="deadline-link">{{ t('deadlines.cta') }}</a>
+    </div>
   </div>
 </section>
 
@@ -244,7 +320,7 @@
       </ol>
     </div>
 
-    <div class="standards-panel gs-grid-glow" appScrollReveal>
+    <div class="standards-panel gs-navy-panel" appScrollReveal>
       <div class="standards-panel-head">
         <span class="standards-eyebrow">{{ t('regulation.standardsEyebrow') }}</span>
         <h3>{{ t('regulation.standardsTitle') }}</h3>
@@ -357,25 +433,6 @@
         </a>
       </div>
     </div>
-
-    <div class="gs-stat-grid key-stats" appScrollReveal>
-      <div class="gs-stat-cell">
-        <span class="gs-stat-value">{{ t('keyStats.stat1Value') }}</span>
-        <span class="gs-stat-label">{{ t('keyStats.stat1Label') }}</span>
-      </div>
-      <div class="gs-stat-cell">
-        <span class="gs-stat-value">{{ t('keyStats.stat2Value') }}</span>
-        <span class="gs-stat-label">{{ t('keyStats.stat2Label') }}</span>
-      </div>
-      <div class="gs-stat-cell">
-        <span class="gs-stat-value">{{ t('keyStats.stat3Value') }}</span>
-        <span class="gs-stat-label">{{ t('keyStats.stat3Label') }}</span>
-      </div>
-      <div class="gs-stat-cell">
-        <span class="gs-stat-value">{{ t('keyStats.stat4Value') }}</span>
-        <span class="gs-stat-label">{{ t('keyStats.stat4Label') }}</span>
-      </div>
-    </div>
   </section>
 
   <section class="info-section" id="settori">
@@ -427,3 +484,26 @@
     </div>
   </section>
 </div>
+
+<section class="cta-band gs-navy-panel">
+  <div class="cta-band-inner" appScrollReveal>
+    <span class="cta-band-eyebrow">{{ t('ctaBand.eyebrow') }}</span>
+    <h2>{{ t('ctaBand.title') }}</h2>
+    <p>{{ t('ctaBand.text') }}</p>
+    <div class="cta-band-actions">
+      <a routerLink="/admin" class="gs-btn gs-btn--accent cta-band-btn">
+        <app-icon name="qr-code" [size]="16"></app-icon>
+        {{ t('ctaBand.primary') }}
+      </a>
+      <a
+        class="gs-btn cta-band-btn cta-band-btn--ghost"
+        href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {{ t('ctaBand.secondary') }}
+        <app-icon name="external-link" [size]="14"></app-icon>
+      </a>
+    </div>
+  </div>
+</section>

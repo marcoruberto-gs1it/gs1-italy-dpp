@@ -24,14 +24,14 @@
   --brand-soft: rgba(0, 44, 108, 0.08);
   /* Arancione "accessibile" GS1 (non il #f26334 pieno, che regge solo 3.18:1
      con il bianco): 4.94:1 su bianco, 4.51:1 sul nuovo --bg-canvas. */
-  --brand-accent: #cd3c0d;
-  --brand-accent-strong: #a82c05;
-  --brand-accent-soft: rgba(242, 99, 52, 0.12);
+  --brand-accent: #ad3302;
+  --brand-accent-strong: #8f2900;
+  --brand-accent-soft: rgba(173, 51, 2, 0.1);
   /* Arancione GS1 pieno: 5.77:1 con testo --brand-ink sopra, MAI con testo bianco
      (il #f26334 ufficiale non regge il bianco — per questo il riempimento/testo
      su tela usa sopra la variante "accessibile" più scura, non questo valore). */
   --brand-accent-vivid: #f26334;
-  --brand-ink: #001335;
+  --brand-ink: #001843;
   /* Oro GS1 — prima solo il secondo stop del gradiente CTA, ora anche un token a sé: una terza
      nota di colore (non un nuovo brand color, la stessa tinta già in uso) per badge/eyebrow/
      dettagli decorativi, così la palette non resta un semplice bicromatismo blu/arancione su
@@ -44,24 +44,33 @@
      accanto: mai testo bianco. */
   --gradient-cta: linear-gradient(120deg, var(--brand-accent-vivid), var(--brand-gold));
 
+  /* --- Verde e tinte pastello del design Figma ---
+     Verde: solo per gli accenti "positivi/circolari" (parola evidenziata del titolo, badge
+     "attivo"). Le tinte sono i fondi delle tessere-icona e delle pillole tematiche; su ognuna il
+     testo/icona usa il proprio inchiostro scuro (verificato ≥ 4.5:1: #003811 su #9ef7a4 11:1,
+     #001843 su #d9e2ff 13:1, #8f2900 su #ffdbd0 6.7:1). */
+  --green-ink: #003811;
+  --green-tint: #9ef7a4;
+  --blue-tint: #d9e2ff;
+  --blue-ink: #001843;
+  --orange-tint: #ffdbd0;
+  --orange-ink: #8f2900;
+
   /* --- Typography ---
-     --font-display (Fraunces, variabile con asse opsz) è nuovo: solo per h1/h2/h3 (regola
-     globale in fondo a questo file) — un carattere con più carattere del solito "grottesco
-     ovunque" da SaaS generico, coerente con l'anima istituzionale-ma-non-anonima di GS1 Italy.
-     Il corpo del testo resta su --font-sans, leggibilità già verificata, mai messa in
-     discussione da questo redesign. */
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Plus Jakarta Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+     Inter ovunque, titoli compresi (peso 700-800, tracking stretto): è il carattere del design
+     Figma di riferimento (file "DPP PIM & EPCIS 2.0 Traceability Engine"). --font-display resta
+     un token separato per poter distinguere titoli e corpo senza toccare i fogli di stile. */
+  --font-display: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
 
   /* --- Radii ---
-     Scala allargata (era 8/14/20/28) per il linguaggio "bento" più morbido e arrotondato
-     adottato in questo rebrand — vedi il riferimento visivo discusso con l'utente (dashboard
-     chiara, card bianche molto arrotondate su sfondo caldo, pillole ovunque). */
-  --radius-sm: 10px;
-  --radius-md: 18px;
-  --radius-lg: 26px;
-  --radius-xl: 34px;
+     Scala del design Figma di riferimento: 8px (campi, chip quadrati), 12px (card), 16-20px
+     (pannelli grandi), pillola piena per badge e bottoni secondari. */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
   --radius-full: 999px;
 
   /* --- Motion --- */
@@ -75,42 +84,41 @@
      Ombre più morbide e diffuse (blur maggiore, meno opacità, tinta calda invece che
      blu-grigia) per lo stesso motivo della scala radii sopra — carte che "galleggiano"
      leggere, non un'ombra dura che le stacca dallo sfondo. */
-  --shadow-xs: 0 2px 4px rgba(28, 20, 8, 0.03);
-  --shadow-sm: 0 4px 16px -4px rgba(28, 20, 8, 0.06);
-  --shadow-md: 0 14px 36px -10px rgba(28, 20, 8, 0.10);
-  --shadow-lg: 0 24px 56px -16px rgba(28, 20, 8, 0.14);
-  --shadow-xl: 0 32px 76px -20px rgba(28, 20, 8, 0.20);
-  --shadow-glow-blue: 0 8px 32px -8px rgba(0, 44, 108, 0.35);
-  --shadow-glow-orange: 0 8px 32px -8px rgba(242, 99, 52, 0.35);
+  --shadow-xs: 0 1px 1px rgba(0, 24, 67, 0.05);
+  --shadow-sm: 0 1px 8px rgba(0, 44, 108, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 24, 67, 0.08), 0 2px 4px -2px rgba(0, 24, 67, 0.06);
+  --shadow-lg: 0 12px 20px -6px rgba(0, 24, 67, 0.1), 0 4px 8px -4px rgba(0, 24, 67, 0.06);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 24, 67, 0.12), 0 8px 10px -6px rgba(0, 24, 67, 0.08);
+  --shadow-glow-blue: 0 4px 12px -4px rgba(0, 44, 108, 0.4);
+  --shadow-glow-orange: 0 4px 12px -4px rgba(173, 51, 2, 0.4);
 
   /* --- Semantic surface tokens (LIGHT) ---
-     Crema caldo invece del grigio-blu istituzionale precedente (--gs1-color-ui-1/2) — stessa
-     luminosità (L 95%+, il testo scuro esistente ci passa sopra senza bisogno di riverificare
-     i contrasti), solo la tinta cambia da fredda a calda per lo stesso motivo di radii/shadow
-     sopra. Il brand blu/arancione GS1 resta invariato: cambia la "tela" su cui poggia, non
-     l'identità del marchio. */
-  --bg-canvas: #f5f2ea;
-  --bg-canvas-alt: #ede7d8;
+     Tela azzurrina fredda (#f9f9ff) con fondi alternati #f0f3ff, come nel design Figma di
+     riferimento: le card bianche si staccano dalla tela con un'ombra sottile invece che con un
+     bordo marcato. Più chiara della crema precedente, quindi ogni testo già verificato sopra la
+     vecchia tela regge a maggior ragione. */
+  --bg-canvas: #f9f9ff;
+  --bg-canvas-alt: #f0f3ff;
   --bg-surface: #ffffff;
   --bg-surface-raised: #ffffff;
-  --bg-surface-sunken: #f5f2ea;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --bg-glass-strong: rgba(255, 255, 255, 0.88);
+  --bg-surface-sunken: #f0f3ff;
+  --bg-glass: rgba(249, 249, 255, 0.82);
+  --bg-glass-strong: rgba(249, 249, 255, 0.94);
   --bg-overlay: rgba(20, 16, 8, 0.5);
-  --bg-inverse: #001335;
+  --bg-inverse: #001843;
 
   /* Stessa tinta calda di --bg-canvas invece del navy precedente (0,19,53) — stessi valori
      alpha, quindi lo stesso contrasto relativo contro le superfici chiare, solo intonati alla
      nuova tela invece di stonare col blu freddo. */
-  --border-subtle: rgba(28, 20, 8, 0.08);
-  --border-default: rgba(28, 20, 8, 0.14);
-  --border-strong: rgba(28, 20, 8, 0.22);
+  --border-subtle: rgba(0, 24, 67, 0.08);
+  --border-default: rgba(0, 24, 67, 0.14);
+  --border-strong: rgba(0, 24, 67, 0.24);
   --border-glass: rgba(255, 255, 255, 0.5);
 
-  --text-primary: #001335;
-  --text-secondary: #35425c;
-  --text-tertiary: #5c6478;
-  --text-muted: #5c6478;
+  --text-primary: #001843;
+  --text-secondary: #444650;
+  --text-tertiary: #5b5f6e;
+  --text-muted: #5b5f6e;
   --text-on-accent: #ffffff;
   /* --brand (12.14:1 sul canvas, 13.32:1 su superficie bianca) regge sia da
      link-su-tela sia da riempimento — solo il tema scuro ha bisogno di un
@@ -133,10 +141,10 @@
   --mesh-1: rgba(0, 44, 108, 0.4);
   --mesh-2: rgba(242, 99, 52, 0.3);
   --mesh-3: rgba(0, 182, 222, 0.22);
-  --scrollbar-thumb: rgba(28, 20, 8, 0.18);
+  --scrollbar-thumb: rgba(0, 24, 67, 0.2);
 
   /* Superficie "terminale" sempre scura, indipendente dal tema (blocchi codice, URL bar) */
-  --surface-code: #001335;
+  --surface-code: #001843;
 
   color-scheme: light;
 }
@@ -184,6 +192,13 @@
   --brand-accent-soft: rgba(242, 99, 52, 0.18);
   --accent-2: var(--brand-accent);
   --accent-2-soft: rgba(242, 99, 52, 0.16);
+
+  --green-ink: #9ef7a4;
+  --green-tint: rgba(158, 247, 164, 0.16);
+  --blue-tint: rgba(137, 170, 219, 0.2);
+  --blue-ink: #d9e2ff;
+  --orange-tint: rgba(255, 158, 122, 0.18);
+  --orange-ink: #ffb59c;
 
   --success: #34d399;
   --success-soft: rgba(52, 211, 153, 0.14);
@@ -233,15 +248,12 @@ body {
   transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
 }
 
-/* Titoli su --font-display (Fraunces) ovunque nel sito, una sola regola invece di ripeterla in
-   ogni foglio di stile per pagina/componente — il peso e la dimensione restano quelli già
-   dichiarati localmente, qui cambia solo il carattere. "font-variation-settings" attiva l'asse
-   opzionale "opsz" (optical size) del font variabile, che Fraunces usa per affinare la forma
-   delle lettere alle dimensioni grandi dei titoli invece di scalare la stessa forma "da testo". */
+/* Titoli su --font-display ovunque nel sito, una sola regola invece di ripeterla in ogni foglio
+   di stile per pagina/componente — il peso e la dimensione restano quelli già dichiarati
+   localmente, qui cambia solo il carattere e il tracking. */
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-variation-settings: 'opsz' 40;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 ::selection {
@@ -353,6 +365,21 @@ img.img-fallback {
   color: #ff8f8f;
 }
 
+.gs-badge--green {
+  background: var(--green-tint);
+  color: var(--green-ink);
+}
+
+.gs-badge--blue {
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+}
+
+.gs-badge--orange {
+  background: var(--orange-tint);
+  color: var(--orange-ink);
+}
+
 .gs-badge--neutral {
   background: var(--bg-surface-sunken);
   color: var(--text-secondary);
@@ -381,18 +408,14 @@ img.img-fallback {
   border-color: var(--brand);
 }
 
-/* Sfondo scuro a griglia sottile + glow radiale smeraldo — per blocchi sempre scuri e fissi
-   indipendenti dal tema (come l'hero, che usa già --brand-ink fisso). Il pattern a griglia è
-   puramente decorativo (repeating-linear-gradient, non un'immagine) e il glow è un
-   radial-gradient centrato in alto: entrambi a bassissima opacità, non competono mai con il
-   testo sopra (che resta bianco/rgba(255,255,255,*), invariato). */
-.gs-grid-glow {
+/* Pannello navy pieno, sempre scuro e indipendente dal tema (come nel design Figma: banner
+   "scadenzario", pannello standard, fascia CTA). Un gradiente diagonale appena percettibile
+   evita il blocco piatto senza introdurre pattern decorativi; il testo sopra resta
+   bianco/rgba(255,255,255,*), invariato. */
+.gs-navy-panel {
   position: relative;
   background-color: var(--brand-ink);
-  background-image:
-    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(242, 99, 52, 0.22), transparent 70%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 96px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 96px);
+  background-image: linear-gradient(135deg, #001843 0%, #002c6c 100%);
 }
 
 /* Griglia con divisori sottili INTERNI (stile "tabella statistiche") invece di card separate —
@@ -542,6 +565,15 @@ img.img-fallback {
 }
 .gs-btn--primary:hover {
   background: var(--accent-strong);
+}
+
+.gs-btn--accent {
+  background: var(--brand-accent);
+  color: #fff;
+  box-shadow: var(--shadow-glow-orange);
+}
+.gs-btn--accent:hover {
+  background: var(--brand-accent-strong);
 }
 
 .gs-btn--ghost {

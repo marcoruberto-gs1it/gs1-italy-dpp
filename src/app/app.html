@@ -7,8 +7,16 @@
         <span class="logo-mark" aria-hidden="true">
           <img src="/images/gs1-italy-logo.png" alt="" width="180" height="180" />
         </span>
-        <span class="logo-text">{{ t('hero.pageTitle') }}</span>
+        <span class="logo-text-wrap">
+          <span class="logo-text">{{ t('hero.pageTitle') }}</span>
+          <span class="logo-sub">{{ t('nav.subtitle') }}</span>
+        </span>
       </a>
+
+      <span class="espr-badge desktop-only">
+        <app-icon name="check-circle" [size]="13"></app-icon>
+        ESPR 2024/1781
+      </span>
 
       <nav class="header-nav">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ t('nav.home') }}</a>
@@ -50,6 +58,11 @@
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
       </button>
 
+      <a routerLink="/admin" class="gs-btn gs-btn--accent header-cta">
+        <app-icon name="qr-code" [size]="16"></app-icon>
+        <span>{{ t('nav.cta') }}</span>
+      </a>
+
       <button type="button" class="icon-btn mobile-nav-trigger" (click)="toggleMobileNav()" [attr.aria-label]="t('nav.menuAria')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
@@ -82,16 +95,46 @@
 
 <footer class="site-footer">
   <div class="footer-container">
-    <a routerLink="/" class="footer-brand" [title]="t('nav.backToHome')">
-      <span class="logo-mark" aria-hidden="true">
-        <img src="/images/gs1-italy-logo.png" alt="" width="180" height="180" />
-      </span>
-      <span class="footer-brand-text">{{ t('hero.pageTitle') }}</span>
-    </a>
-    <p class="footer-tagline">{{ t('footer.tagline') }}</p>
-    <a class="footer-official-link" href="https://www.gs1it.org" target="_blank" rel="noopener">
-      {{ t('footer.officialSiteLabel') }}
-      <app-icon name="external-link" [size]="13"></app-icon>
-    </a>
+    <div class="footer-grid">
+      <div class="footer-col footer-col--brand">
+        <a routerLink="/" class="footer-brand" [title]="t('nav.backToHome')">
+          <span class="logo-mark" aria-hidden="true">
+            <img src="/images/gs1-italy-logo.png" alt="" width="180" height="180" />
+          </span>
+          <span class="footer-brand-text">{{ t('hero.pageTitle') }}</span>
+        </a>
+        <p class="footer-tagline">{{ t('footer.tagline') }}</p>
+        <a class="footer-official-link" href="https://www.gs1it.org" target="_blank" rel="noopener">
+          {{ t('footer.officialSiteLabel') }}
+          <app-icon name="external-link" [size]="13"></app-icon>
+        </a>
+      </div>
+
+      <nav class="footer-col" [attr.aria-label]="t('footer.colStandards')">
+        <h2 class="footer-col-title">{{ t('footer.colStandards') }}</h2>
+        <a href="https://gs1it.org/assistenza/standard-specifiche/gtin/" target="_blank" rel="noopener noreferrer">{{ t('regulation.gs1Reference1') }}</a>
+        <a href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">{{ t('regulation.gs1Reference2') }}</a>
+        <a href="https://gs1it.org/assistenza/standard-specifiche/qr-code-standard-gs1/" target="_blank" rel="noopener noreferrer">{{ t('regulation.gs1Reference3') }}</a>
+        <a href="https://gs1it.org/assistenza/standard-specifiche/epc-rfid-identificazione-prodotti-radiofrequenza/" target="_blank" rel="noopener noreferrer">{{ t('regulation.gs1Reference4') }}</a>
+        <a href="https://gs1it.org/assistenza/standard-specifiche/gs1-web-vocabulary/" target="_blank" rel="noopener noreferrer">{{ t('regulation.gs1Reference5') }}</a>
+      </nav>
+
+      <nav class="footer-col" [attr.aria-label]="t('footer.colRegulation')">
+        <h2 class="footer-col-title">{{ t('footer.colRegulation') }}</h2>
+        <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02024R1781-20240628" target="_blank" rel="noopener noreferrer">{{ t('regulation.reference1') }}</a>
+        <a href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport_en" target="_blank" rel="noopener noreferrer">{{ t('regulation.reference2') }}</a>
+        <a href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport/dpp-registry_en" target="_blank" rel="noopener noreferrer">{{ t('regulation.reference3') }}</a>
+      </nav>
+
+      <nav class="footer-col" [attr.aria-label]="t('footer.colProject')">
+        <h2 class="footer-col-title">{{ t('footer.colProject') }}</h2>
+        <a routerLink="/">{{ t('nav.home') }}</a>
+        <a routerLink="/admin">{{ t('nav.demo') }}</a>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <span>{{ t('footer.legalLine') }}</span>
+    </div>
   </div>
 </footer>

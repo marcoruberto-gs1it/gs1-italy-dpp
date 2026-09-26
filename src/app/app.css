@@ -71,11 +71,45 @@
   display: block;
 }
 
+.logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
 .logo-text {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--text-primary);
+}
+
+.logo-sub {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.01em;
+}
+
+/* Pillola "ESPR 2024/1781" accanto al logo (design Figma): solo desktop, puramente informativa. */
+.espr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  background: var(--green-tint);
+  color: var(--green-ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.header-cta {
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  border-radius: var(--radius-md);
 }
 
 .header-nav {
@@ -106,6 +140,10 @@
 .header-nav > a:hover,
 .header-nav > a.active {
   color: var(--accent);
+}
+
+.header-nav > a.active {
+  border-bottom-color: var(--brand-accent-vivid);
 }
 
 /* Skip-link per la navigazione da tastiera/screen reader: invisibile finché non riceve il
@@ -210,12 +248,24 @@
   align-self: flex-start;
 }
 
+@media (max-width: 1099px) {
+  .espr-badge.desktop-only {
+    display: none;
+  }
+}
+
 @media (max-width: 879px) {
   .header-nav {
     display: none;
   }
   .lang-switch.desktop-only {
     display: none;
+  }
+  .header-cta span {
+    display: none;
+  }
+  .header-cta {
+    padding: 10px;
   }
   .mobile-nav-trigger {
     display: flex;
@@ -293,21 +343,55 @@
    Link a gs1it.org perché "GS1 Italy" viene nominato: chi legge deve poter arrivare al sito
    ufficiale con un solo clic, invece di doverlo cercare. */
 .site-footer {
-  background: var(--bg-surface);
-  padding: 36px 0;
-  margin-top: 60px;
+  background: var(--bg-canvas-alt);
+  padding: 56px 0 28px;
+  margin-top: 0;
   border-top: 1px solid var(--border-subtle);
 }
 
 .footer-container {
-  max-width: 1400px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 0.8fr;
+  gap: 40px;
+}
+
+.footer-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  text-align: center;
+  min-width: 0;
+}
+
+.footer-col--brand {
+  gap: 12px;
+}
+
+.footer-col-title {
+  margin: 0 0 4px;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.footer-col > a {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.footer-col > a:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .footer-brand {
@@ -318,7 +402,7 @@
 }
 
 .footer-brand-text {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--text-primary);
@@ -326,17 +410,17 @@
 
 .footer-tagline {
   margin: 0;
-  max-width: 480px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+  max-width: 420px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 .footer-official-link {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-link);
   text-decoration: none;
@@ -344,6 +428,32 @@
 
 .footer-official-link:hover {
   text-decoration: underline;
+}
+
+.footer-bottom {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-default);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .footer-col--brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
