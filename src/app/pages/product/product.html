@@ -383,56 +383,22 @@
       </ol>
     </nav>
 
-    <article class="dpp-view gs-card" appScrollReveal [revealDuration]="0.4">
-      <div class="dpp-view-head">
-        <span class="dpp-view-icon icon-flat" [style.--icon-color]="dppSector()?.brandColor">
-          <app-icon [name]="dppSector()?.icon ?? 'box'" [size]="30"></app-icon>
+    <div class="passport-bar">
+      <div class="passport-bar-pills">
+        <span class="gs-badge gs-badge--green passport-pill">
+          <app-icon name="check-circle" [size]="13"></app-icon>
+          {{ t('product.dppVerified') }}
         </span>
-        <div>
-          @if (dppSector(); as sector) {
-            <span class="dpp-view-eyebrow" [style.color]="sector.brandColor">{{ sector.shortName }}</span>
-          }
-          <h1 class="dpp-view-name">{{ dpp.name }}</h1>
-          <span class="gs-badge gs-badge--verified">
-            <app-icon name="check-circle" [size]="12"></app-icon>
-            {{ t('product.dppVerified') }}
+        <span class="passport-gtin"><span class="passport-gtin-label">GTIN</span>{{ dpp.gtin }}</span>
+        @if (dpp.registryId) {
+          <span class="gs-badge gs-badge--blue passport-pill">
+            <app-icon name="shield-check" [size]="13"></app-icon>
+            {{ t('product.dppRegistered') }}
           </span>
-        </div>
-      </div>
-
-      <div class="dpp-view-identity">
-        <span class="meta-chip">UPI (01) {{ dpp.gtin }}</span>
-        @if (dpp.batchOrSerial) {
-          <span class="meta-chip">{{ dpp.batchOrSerial }}</span>
         }
-        <span class="gs-badge gs-badge--neutral">{{ dpp.granularityLevel }}</span>
       </div>
-
-      @if (dppSector(); as sector) {
-        <p class="dpp-view-description">{{ sector.description }}</p>
-      }
-
-      @if (dppAttributeEntries().length) {
-        <div class="dpp-view-facts" appScrollReveal="stagger" [revealStagger]="0.05" [revealDuration]="0.35">
-          @for (entry of dppAttributeEntries(); track entry[0]) {
-            <div class="fact-tile">
-              <span class="fact-label">{{ entry[0] }}</span>
-              <span class="fact-value">{{ entry[1] }}</span>
-            </div>
-          }
-        </div>
-      }
-
-      @if (dpp.registryId) {
-        <div class="dpp-view-registry">
-          <p><span class="dpp-view-registry-label">{{ t('product.dppRegistryId') }}</span> <code>{{ dpp.registryId }}</code></p>
-          <p><span class="dpp-view-registry-label">{{ t('product.dppEconomicOperator') }}</span> <code>{{ economicOperatorId() }}</code></p>
-          <p><span class="dpp-view-registry-label">{{ t('product.dppFacility') }}</span> <code>{{ facilityId() }}</code></p>
-        </div>
-      }
-
-      <div class="dpp-view-actions">
-        <button type="button" class="gs-btn gs-btn--ghost gs-btn--sm dpp-view-jsonld-btn" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
+      <div class="passport-bar-actions">
+        <button type="button" class="gs-btn gs-btn--primary gs-btn--sm" (click)="openJsonLd()" [attr.aria-label]="t('product.viewJsonLdAria')">
           <app-icon name="braces" [size]="15"></app-icon>
           {{ t('product.viewJsonLd') }}
         </button>
@@ -441,7 +407,89 @@
           {{ t('product.viewProductInfo') }}
         </a>
       </div>
+    </div>
+
+    <article class="passport-grid" appScrollReveal [revealDuration]="0.4">
+      <aside class="passport-visual gs-card">
+        <div class="passport-visual-hero" [style.--sector-color]="dppSector()?.brandColor">
+          <span class="passport-visual-icon">
+            <app-icon [name]="dppSector()?.icon ?? 'box'" [size]="64"></app-icon>
+          </span>
+          <span class="passport-visual-chip">{{ dpp.granularityLevel }}</span>
+        </div>
+        <div class="passport-qr">
+          <div class="passport-qr-box">
+            @if (isBrowser) {
+              <qrcode [qrdata]="dppUpi()" [width]="104" [margin]="1" elementType="svg" colorDark="#001843" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
+            } @else {
+              <app-icon name="qr-code" [size]="44"></app-icon>
+            }
+          </div>
+          <div class="passport-qr-text">
+            <strong>{{ t('product.dppDigitalLinkTitle') }}</strong>
+            <span>{{ t('product.dppDigitalLinkText') }}</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="passport-main gs-card">
+        @if (dppSector(); as sector) {
+          <p class="passport-eyebrow"><span class="passport-eyebrow-dot" [style.background]="sector.brandColor"></span>{{ sector.shortName }}</p>
+        }
+        <h1 class="passport-name">{{ dpp.name }}</h1>
+        @if (dppSector(); as sector) {
+          <p class="passport-description">{{ sector.description }}</p>
+        }
+
+        <dl class="passport-tiles">
+          <div class="passport-tile">
+            <dt>{{ t('product.dppGtinLabel') }}</dt>
+            <dd>{{ dpp.gtin }}</dd>
+          </div>
+          <div class="passport-tile">
+            <dt>{{ t('product.dppGranularity') }}</dt>
+            <dd>{{ dpp.granularityLevel }}</dd>
+          </div>
+          @if (dpp.batchOrSerial) {
+            <div class="passport-tile">
+              <dt>{{ t('product.dppBatchOrSerial') }}</dt>
+              <dd>{{ dpp.batchOrSerial }}</dd>
+            </div>
+          }
+          <div class="passport-tile">
+            <dt>{{ t('product.dppEconomicOperator') }}</dt>
+            <dd>{{ economicOperatorId() }}</dd>
+          </div>
+          <div class="passport-tile">
+            <dt>{{ t('product.dppFacility') }}</dt>
+            <dd>{{ facilityId() }}</dd>
+          </div>
+          @if (dpp.registryId) {
+            <div class="passport-tile passport-tile--wide">
+              <dt>{{ t('product.dppRegistryId') }}</dt>
+              <dd>{{ dpp.registryId }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
     </article>
+
+    @if (dppAttributeEntries().length) {
+      <section class="passport-attrs gs-card" appScrollReveal [revealDuration]="0.4">
+        <div class="passport-attrs-head">
+          <h2>{{ t('product.dppData') }}</h2>
+          <span class="gs-badge gs-badge--green">{{ t('product.dppDataBadge') }}</span>
+        </div>
+        <div class="passport-attrs-grid" appScrollReveal="stagger" [revealStagger]="0.05" [revealDuration]="0.35">
+          @for (entry of dppAttributeEntries(); track entry[0]) {
+            <div class="fact-tile">
+              <span class="fact-label">{{ entry[0] }}</span>
+              <span class="fact-value">{{ entry[1] }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
   } @else if (dppLoading()) {
     <div class="not-found">
       <p>{{ t('product.dppLoading') }}</p>

@@ -56,6 +56,14 @@
     </div>
   </div>
 
+  <!-- Intestazione navy del passo corrente (design Figma): il titolo visibile è qui, mentre
+       l'<h2> dentro ogni passo resta nel DOM solo per screen reader e struttura del documento
+       (vedi .wizard-step > h2 in dpp-wizard.css) — per questo il titolo qui è aria-hidden. -->
+  <header class="wizard-hero gs-navy-panel">
+    <span class="wizard-hero-eyebrow">Passo {{ currentStep() + 1 }} di {{ steps.length }}</span>
+    <p class="wizard-hero-title" aria-hidden="true">{{ steps[currentStep()].title }}</p>
+  </header>
+
   <div class="wizard-panel gs-card">
     <!-- @if invece di *ngIf: solo il passo corrente è nel DOM, non semplicemente nascosto —
          niente contenuto extra da scorrere sotto, e ogni comparsa riparte l'animazione di

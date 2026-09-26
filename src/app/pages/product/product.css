@@ -532,130 +532,269 @@
   color: var(--text-tertiary);
 }
 
-/* --- Scheda DPP (creata in /admin, non nel catalogo statico) --- */
-.dpp-view {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.dpp-view-head {
+/* --- Passaporto DPP (creato in /admin) — layout ispirato al "passaporto" del design Figma:
+   barra di stato + azioni, colonna visiva (pannello colore settore + QR), colonna dati con
+   tessere azzurrine, poi gli attributi di settore. Solo dati reali della scheda. --- */
+.passport-bar {
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.dpp-view-icon {
-  width: 60px;
-  height: 60px;
-  flex-shrink: 0;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-shadow: var(--shadow-sm);
 }
 
-.dpp-view-eyebrow {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.dpp-view-name {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 8px;
-  line-height: 1.3;
-}
-
-.dpp-view-identity {
+.passport-bar-pills,
+.passport-bar-actions {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-subtle);
 }
 
-.dpp-view-description {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin: 0;
+.passport-pill {
+  font-size: 0.72rem;
+  padding: 5px 11px;
 }
 
-.dpp-view-facts {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--border-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-/* Dentro questa griglia i fact-tile condivisi perdono l'angolo arrotondato e lo sfondo proprio
-   (il divisore sottile lo dà il gap di 1px sopra, sullo sfondo --border-subtle) — coerente con
-   lo stile "tabella statistiche" introdotto nel resto del sito (.gs-stat-grid in tokens.css),
-   senza toccare .fact-tile di per sé (condiviso anche con l'anteprima passaporto di /admin). */
-.dpp-view-facts .fact-tile {
-  border-radius: 0;
-  background: var(--bg-surface);
-}
-
-.dpp-view-actions {
-  display: flex;
+.passport-gtin {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  margin-top: 4px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-sunken);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.dpp-view-registry {
+.passport-gtin-label {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.passport-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.passport-visual {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.passport-visual-hero {
+  position: relative;
+  aspect-ratio: 1 / 0.86;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background:
+    radial-gradient(ellipse 80% 70% at 30% 20%, rgba(255, 255, 255, 0.28), transparent 60%),
+    var(--sector-color, var(--brand));
+}
+
+.passport-visual-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 116px;
+  height: 116px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(4px);
+}
+
+.passport-visual-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-ink);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.passport-qr {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+}
+
+.passport-qr-box {
+  flex-shrink: 0;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  line-height: 0;
+  color: var(--text-tertiary);
+}
+
+.passport-qr-text {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
 }
 
-.dpp-view-registry p {
-  font-size: 0.82rem;
-  color: var(--text-tertiary);
+.passport-qr-text strong {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+}
+
+.passport-main {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.passport-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
-}
-
-.dpp-view-registry-label {
-  display: inline-block;
-  min-width: 190px;
-}
-
-.dpp-view-registry code {
-  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-secondary);
 }
 
-@media (max-width: 480px) {
-  .dpp-view-registry-label {
-    display: block;
-    min-width: 0;
+.passport-eyebrow-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.passport-name {
+  margin: 0;
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.passport-description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.passport-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 8px 0 0;
+}
+
+.passport-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+}
+
+.passport-tile--wide {
+  grid-column: 1 / -1;
+}
+
+.passport-tile dt {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.passport-tile dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.passport-attrs {
+  margin-top: 20px;
+  padding: 24px 28px;
+}
+
+.passport-attrs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.passport-attrs-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.passport-attrs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .passport-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .passport-visual-hero {
+    aspect-ratio: 16 / 9;
   }
 }
 
 @media (max-width: 600px) {
-  .dpp-view {
-    padding: 24px;
+  .passport-main {
+    padding: 22px 18px;
   }
 
-  .dpp-view-facts {
+  .passport-tiles {
     grid-template-columns: 1fr;
+  }
+
+  .passport-attrs {
+    padding: 20px 18px;
   }
 }

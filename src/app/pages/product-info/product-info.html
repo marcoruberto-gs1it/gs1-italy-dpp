@@ -9,28 +9,27 @@
     </nav>
 
     <article class="pip-view gs-card" appScrollReveal [revealDuration]="0.4">
-      <span class="gs-badge gs-badge--neutral pip-view-badge">{{ t('productInfo.badge') }}</span>
-
-      <div class="pip-view-head">
-        <span class="pip-view-icon icon-flat" [style.--icon-color]="sector()?.brandColor">
-          <app-icon [name]="sector()?.icon ?? 'box'" [size]="30"></app-icon>
+      <div class="pip-view-hero" [style.--sector-color]="sector()?.brandColor">
+        <span class="pip-view-icon">
+          <app-icon [name]="sector()?.icon ?? 'box'" [size]="56"></app-icon>
         </span>
-        <div>
-          @if (sector(); as s) {
-            <span class="pip-view-eyebrow" [style.color]="s.brandColor">{{ s.shortName }}</span>
-          }
-          <h1 class="pip-view-name">{{ record.name }}</h1>
-        </div>
+        <span class="pip-view-chip">{{ t('productInfo.badge') }}</span>
       </div>
 
-      @if (sector(); as s) {
-        <p class="pip-view-description">{{ s.description }}</p>
-      }
+      <div class="pip-view-body">
+        @if (sector(); as s) {
+          <p class="pip-view-eyebrow"><span class="pip-view-eyebrow-dot" [style.background]="s.brandColor"></span>{{ s.shortName }}</p>
+        }
+        <h1 class="pip-view-name">{{ record.name }}</h1>
+        @if (sector(); as s) {
+          <p class="pip-view-description">{{ s.description }}</p>
+        }
 
-      <a [routerLink]="['/01', record.gtin]" class="gs-btn gs-btn--primary pip-view-dpp-link" [attr.aria-label]="t('productInfo.viewFullDppAria')">
-        <app-icon name="external-link" [size]="15"></app-icon>
-        {{ t('productInfo.viewFullDpp') }}
-      </a>
+        <a [routerLink]="['/01', record.gtin]" class="gs-btn gs-btn--primary pip-view-dpp-link" [attr.aria-label]="t('productInfo.viewFullDppAria')">
+          <app-icon name="shield-check" [size]="16"></app-icon>
+          {{ t('productInfo.viewFullDpp') }}
+        </a>
+      </div>
     </article>
   } @else if (loading()) {
     <div class="not-found">

@@ -38,15 +38,34 @@
     @case ('list') {
       <div class="admin-header">
         <div>
+          <span class="admin-eyebrow">Area demo</span>
           <h1>I tuoi DPP</h1>
-          <p class="admin-stat"><strong>{{ records().length }}</strong> DPP totali — salvati in azienda o registrati sul DPP Registry UE.</p>
+          <p class="admin-stat">Salvati in azienda o registrati sul DPP Registry UE.</p>
         </div>
         <div class="admin-header-actions">
-          <button type="button" class="gs-btn gs-btn--primary" (click)="startCreate()">
+          <button type="button" class="gs-btn gs-btn--accent" (click)="startCreate()">
             <app-icon name="box" [size]="16"></app-icon>
             Crea DPP
           </button>
           <button type="button" class="gs-btn gs-btn--ghost" (click)="logout()">Esci</button>
+        </div>
+      </div>
+
+      <div class="admin-kpis">
+        <div class="admin-kpi">
+          <span class="admin-kpi-icon admin-kpi-icon--blue"><app-icon name="layers" [size]="16"></app-icon></span>
+          <span class="admin-kpi-value">{{ records().length }}</span>
+          <span class="admin-kpi-label">DPP totali</span>
+        </div>
+        <div class="admin-kpi">
+          <span class="admin-kpi-icon admin-kpi-icon--green"><app-icon name="shield-check" [size]="16"></app-icon></span>
+          <span class="admin-kpi-value admin-kpi-value--green">{{ filterCount('published') }}</span>
+          <span class="admin-kpi-label">Registrati sul Registro UE</span>
+        </div>
+        <div class="admin-kpi">
+          <span class="admin-kpi-icon admin-kpi-icon--orange"><app-icon name="save" [size]="16"></app-icon></span>
+          <span class="admin-kpi-value admin-kpi-value--orange">{{ filterCount('draft') }}</span>
+          <span class="admin-kpi-label">Salvati in azienda</span>
         </div>
       </div>
 

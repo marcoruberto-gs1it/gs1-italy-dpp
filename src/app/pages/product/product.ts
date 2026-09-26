@@ -1,5 +1,6 @@
 import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { QRCodeComponent } from 'angularx-qrcode';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
@@ -98,7 +99,7 @@ const DIET_ICONS: Record<string, IconName> = {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, RouterLink, StarRatingComponent, JsonLdDrawerComponent, IconComponent, ScrollRevealDirective],
+  imports: [CommonModule, RouterLink, QRCodeComponent, StarRatingComponent, JsonLdDrawerComponent, IconComponent, ScrollRevealDirective],
   templateUrl: './product.html',
   styleUrl: './product.css',
 })
@@ -112,6 +113,8 @@ export class ProductComponent implements OnDestroy {
   private registryApi = inject(RegistryApiService);
   private languageService = inject(LanguageService);
   private platformId = inject(PLATFORM_ID);
+  /** angularx-qrcode manipola il DOM: niente rendering lato server (stesso motivo della home). */
+  protected isBrowser = isPlatformBrowser(this.platformId);
   protected t = inject(I18nService).t;
 
   protected onImageError = onImageError;
@@ -220,22 +223,26 @@ export class ProductComponent implements OnDestroy {
   /** JSON-LD di una scheda DPP pubblicata — stessa logica di registry-api/src/jsonld.ts
    * (due servizi, stesso contratto tenuto a mano, come DppRecord). Ogni termine gs1: è
    * verificato contro il vocabolario ufficiale, vedi il commento lì per il dettaglio. */
+  /** UPI: stesso URI GS1 Digital Link registrato come "upi" presso il DPP Registry UE (vedi
+   * mockRegistryClient.ts#buildUpi) — al livello di granularità più fine dichiarato dalla
+   * scheda, quindi con l'AI (10)/(21) in coda quando presente. Alimenta sia il JSON-LD sia il QR
+   * code mostrato nella pagina del passaporto. */
+  protected dppUpi = computed(() => {
+    const dpp = this.dppRecord();
+    if (!dpp) return '';
+    const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
+    if (dpp.granularityLevel === 'MODEL' || !dpp.batchOrSerial) return id;
+    const value = dpp.batchOrSerial.replace(/^\(\d{2}\)\s*/, '').trim();
+    const ai = /^\(21\)/.test(dpp.batchOrSerial) || dpp.granularityLevel === 'ITEM' ? '21' : '10';
+    return `${id}/${ai}/${encodeURIComponent(value)}`;
+  });
+
   dppJsonLdJson = computed(() => {
     const dpp = this.dppRecord();
     if (!dpp) return null;
 
     const id = `${this.siteOrigin.value}/01/${dpp.gtin}`;
-    // UPI: stesso URI GS1 Digital Link registrato come "upi" presso il DPP Registry UE (vedi
-    // mockRegistryClient.ts#buildUpi) — al livello di granularità più fine dichiarato dalla
-    // scheda, quindi con l'AI (10)/(21) in coda quando presente.
-    const upi =
-      dpp.granularityLevel === 'MODEL' || !dpp.batchOrSerial
-        ? id
-        : (() => {
-            const value = dpp.batchOrSerial!.replace(/^\(\d{2}\)\s*/, '').trim();
-            const ai = /^\(21\)/.test(dpp.batchOrSerial!) || dpp.granularityLevel === 'ITEM' ? '21' : '10';
-            return `${id}/${ai}/${encodeURIComponent(value)}`;
-          })();
+    const upi = this.dppUpi();
 
     const doc: Record<string, unknown> = {
       // "@vocab" copre le chiavi senza prefisso (name, i campi del nucleo) — vedi il commento

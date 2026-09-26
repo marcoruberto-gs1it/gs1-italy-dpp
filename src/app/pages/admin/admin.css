@@ -189,6 +189,71 @@
   margin-bottom: 28px;
 }
 
+.admin-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-accent);
+}
+
+.admin-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-kpi-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-kpi-icon--blue { background: var(--blue-tint); color: var(--blue-ink); }
+.admin-kpi-icon--green { background: var(--green-tint); color: var(--green-ink); }
+.admin-kpi-icon--orange { background: var(--orange-tint); color: var(--orange-ink); }
+
+.admin-kpi-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-kpi-value--green { color: var(--green-ink); }
+.admin-kpi-value--orange { color: var(--brand-accent); }
+
+.admin-kpi-label {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .admin-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
 .admin-header h1 {
   font-size: 1.5rem;
   font-weight: 800;
@@ -421,11 +486,17 @@
   50% { opacity: 0.7; box-shadow: 0 0 0 3px transparent; }
 }
 
+/* Cella di tabella vera (non display:flex): con flex la cella usciva dal layout a tabella e il
+   bordo di riga si interrompeva prima dell'ultima colonna. Sotto i 720px il blocco @media più
+   sotto la trasforma comunque in riga flex per il layout a schede. */
 .record-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
+  text-align: right;
   white-space: nowrap;
+}
+
+.record-actions > * {
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
 /* Bottoni azione compatti, solo icona — sostituiscono i precedenti "Apri"/"Elimina" testuali:
