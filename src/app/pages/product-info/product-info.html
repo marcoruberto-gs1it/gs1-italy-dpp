@@ -25,6 +25,30 @@
           <p class="pip-view-description">{{ s.description }}</p>
         }
 
+        <ul class="pip-view-facts">
+          <li class="fact-tile"><span class="fact-label">GTIN</span><span class="fact-value fact-value--mono">{{ record.gtin }}</span></li>
+          @if (sector(); as s) {
+            <li class="fact-tile"><span class="fact-label">{{ t('productInfo.factSector') }}</span><span class="fact-value">{{ s.shortName }}</span></li>
+            <li class="fact-tile"><span class="fact-label">{{ t('productInfo.factRegulation') }}</span><span class="fact-value">{{ s.regulationRef }}</span></li>
+          }
+        </ul>
+
+        @if (moreSections().length) {
+          <div class="pip-view-more">
+            <span class="pip-view-more-label">{{ t('productInfo.moreTitle') }}</span>
+            <ul class="pip-view-more-list">
+              @for (lt of moreSections(); track lt.id) {
+                <li>
+                  <a [routerLink]="['/01', record.gtin]" [fragment]="lt.anchor" class="pip-view-more-item">
+                    <app-icon [name]="lt.icon" [size]="15"></app-icon>
+                    {{ t('linkType.' + lt.id + '.title') }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
         <a [routerLink]="['/01', record.gtin]" class="gs-btn gs-btn--primary pip-view-dpp-link" [attr.aria-label]="t('productInfo.viewFullDppAria')">
           <app-icon name="shield-check" [size]="16"></app-icon>
           {{ t('productInfo.viewFullDpp') }}

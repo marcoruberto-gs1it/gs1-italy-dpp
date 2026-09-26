@@ -9,6 +9,7 @@ import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { Sector, SECTORS, localizeSector } from '../../data/sectors';
 import { I18nService } from '../../services/i18n.service';
 import { LanguageService } from '../../services/language.service';
+import { ResolverOriginService } from '../../services/resolver-origin.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
 import { isValidGtin } from '../../utils/gs1-validators';
@@ -105,6 +106,7 @@ export class Home implements OnDestroy {
   private titleService = inject(Title);
   private metaService = inject(Meta);
   protected siteOrigin = inject(SiteOriginService);
+  private resolverOrigin = inject(ResolverOriginService);
   private structuredData = inject(StructuredDataService);
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
@@ -123,7 +125,7 @@ export class Home implements OnDestroy {
   /** Esempio reale di GS1 Digital Link mostrato nella card "risoluzione" di Come funziona: lo
    * stesso URL del primo esempio del carosello, senza protocollo (come lo mostra un browser). */
   protected exampleDigitalLink = computed(() =>
-    `${this.siteOrigin.value}/01/${SECTORS[0].exampleGtin}`.replace(/^https?:\/\//, '')
+    this.resolverOrigin.digitalLink(SECTORS[0].exampleGtin).replace(/^https?:\/\//, '')
   );
 
   protected gtinQuery = signal('');
@@ -195,7 +197,10 @@ export class Home implements OnDestroy {
   protected activeIndex = signal(0);
   protected activeCard = computed(() => this.sectors()[this.activeIndex()]);
   protected autoplay = signal(true);
-  protected qrValue = computed(() => `${this.siteOrigin.value}/01/${this.activeCard().exampleGtin}`);
+  /** URL del GS1 Digital Link risolto dal RESOLVER (non la pagina diretta del sito): è quello che
+   * codificano il QR, la barra indirizzi dell'anteprima e il link "Apri" — una scansione vera
+   * passa dal resolver, che sceglie il link type (gs1:pip di default per i 10 esempi statici). */
+  protected qrValue = computed(() => this.resolverOrigin.digitalLink(this.activeCard().exampleGtin));
   /** Stessa URL del QR, senza protocollo — per la barra indirizzi decorativa sopra il
    * carosello di anteprima (vedi .preview-chrome in home.css): i browser reali nascondono
    * "https://" di default, replichiamo la stessa convenzione invece di mostrarlo per intero. */

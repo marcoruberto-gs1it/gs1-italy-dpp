@@ -1,0 +1,14 @@
+<header class="lt-head">
+  <span class="lt-head-icon"><app-icon [name]="def().icon" [size]="20"></app-icon></span>
+  <div class="lt-head-text">
+    <h2>{{ t('linkType.' + type() + '.title') }}</h2>
+    <p>{{ t('linkType.' + type() + '.text') }}</p>
+  </div>
+  <div class="lt-head-meta">
+    <code class="lt-head-curie" [title]="t('linkType.curieHint')">{{ def().curie }}</code>
+    <a class="lt-head-open" [href]="resolverUrl()" target="_blank" rel="noopener noreferrer" [attr.aria-label]="t('linkType.openViaResolverAria') + ' ' + def().curie">
+      {{ t('linkType.openViaResolver') }}
+      <app-icon name="external-link" [size]="12"></app-icon>
+    </a>
+  </div>
+</header>

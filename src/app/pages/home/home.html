@@ -114,6 +114,10 @@
                 }
               </div>
               <span class="preview-qr-caption">{{ t('heroPreview.caption') }}</span>
+              <a class="preview-open-link" [href]="qrValue()" target="_blank" rel="noopener noreferrer" [attr.aria-label]="t('heroPreview.openLinkAria')">
+                {{ t('heroPreview.openLink') }}
+                <app-icon name="external-link" [size]="13"></app-icon>
+              </a>
             </div>
           </div>
 

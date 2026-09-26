@@ -1,5 +1,5 @@
 import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,11 +14,14 @@ import { normalizeUrl } from '../../utils/url';
 import { onImageError } from '../../utils/image-fallback';
 import { I18nService } from '../../services/i18n.service';
 import { LanguageService } from '../../services/language.service';
+import { ResolverOriginService } from '../../services/resolver-origin.service';
 import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
+import { AttributeLinkTypeId, DPP_LINK_TYPES, classifyAttribute } from '../../data/dpp-link-types';
+import { LinkTypeHeadComponent } from '../../components/link-type-head/link-type-head';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 
 // Stesso placeholder salvato in products.json per gli @id coniati (rawGs1Data.brand['@id']),
@@ -100,7 +103,7 @@ const DIET_ICONS: Record<string, IconName> = {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, RouterLink, QRCodeComponent, StarRatingComponent, JsonLdDrawerComponent, IconComponent, ScrollRevealDirective],
+  imports: [CommonModule, RouterLink, QRCodeComponent, StarRatingComponent, JsonLdDrawerComponent, IconComponent, ScrollRevealDirective, LinkTypeHeadComponent],
   templateUrl: './product.html',
   styleUrl: './product.css',
 })
@@ -110,10 +113,12 @@ export class ProductComponent implements OnDestroy {
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private siteOrigin = inject(SiteOriginService);
+  private resolverOrigin = inject(ResolverOriginService);
   private structuredData = inject(StructuredDataService);
   private registryApi = inject(RegistryApiService);
   private languageService = inject(LanguageService);
   private platformId = inject(PLATFORM_ID);
+  private document = inject(DOCUMENT);
   private sanitizer = inject(DomSanitizer);
   /** angularx-qrcode manipola il DOM: niente rendering lato server (stesso motivo della home). */
   protected isBrowser = isPlatformBrowser(this.platformId);
@@ -275,23 +280,74 @@ export class ProductComponent implements OnDestroy {
     }
   }
 
+  /** Attributi della scheda raggruppati per link type del GS1 Web Vocabulary che li descrive
+   * (vedi classifyAttribute) — ogni gruppo è una sezione della pagina e un link sul resolver. */
+  protected attributeGroups = computed(() => {
+    const groups: Record<AttributeLinkTypeId, [string, string][]> = {
+      sustainabilityInfo: [],
+      certificationInfo: [],
+      safetyInfo: [],
+      instructions: [],
+      masterData: [],
+    };
+    for (const entry of this.dppAttributeEntries()) groups[classifyAttribute(entry[0])].push(entry);
+    return groups;
+  });
+
+  /** Host del resolver mostrato nel navigatore delle sezioni. */
+  protected resolverHost = this.resolverOrigin.value.replace(/^https?:\/\//, '');
+
+  /** Sezioni realmente presenti in questa scheda, nell'ordine della pagina: quelle strutturali
+   * (dpp, pip, masterData, traceability) sempre, le altre solo se c'è almeno un dato. */
+  protected sectionNav = computed(() => {
+    const dpp = this.dppRecord();
+    if (!dpp) return [];
+    const groups = this.attributeGroups();
+    const present = (id: string): boolean => {
+      switch (id) {
+        case 'sustainabilityInfo':
+        case 'certificationInfo':
+        case 'safetyInfo':
+        case 'instructions':
+          return groups[id].length > 0;
+        case 'registryEntry':
+          return !!dpp.registryId;
+        default:
+          return true;
+      }
+    };
+    return DPP_LINK_TYPES.filter((lt) => present(lt.id)).map((lt) => ({ lt }));
+  });
+
+  protected registeredAtLabel = computed(() => {
+    const at = this.dppRecord()?.registeredAt;
+    if (!at) return '';
+    return new Date(at).toLocaleString(this.languageService.lang() === 'it' ? 'it-IT' : 'en-GB', { dateStyle: 'long', timeStyle: 'short' });
+  });
+
   /** Attributo di impronta di carbonio, se la scheda ne ha uno (chiave che contiene "carbonio"
    * o "CO₂"): valore in evidenza e unità dalla parentesi della chiave. Nessun valore inventato —
-   * solo ciò che l'operatore ha dichiarato. */
+   * solo ciò che l'operatore ha dichiarato. Cercato solo fra gli attributi di sostenibilità. */
   protected dppCarbon = computed(() => {
-    const entry = this.dppAttributeEntries().find(([key]) => /carbon|co₂|co2/i.test(key));
+    const entry = this.attributeGroups().sustainabilityInfo.find(([key]) => /carbon|co₂|co2/i.test(key));
     if (!entry) return null;
     const unit = /\(([^)]+)\)/.exec(entry[0])?.[1] ?? '';
     return { label: entry[0].replace(/\s*\([^)]*\)\s*$/, ''), value: entry[1], unit };
   });
 
-  /** Attributi espressi in percentuale ("… (%)") come barre — solo valori numerici veri. */
+  /** Attributi di sostenibilità espressi in percentuale ("… (%)") come barre — solo valori
+   * numerici veri. */
   protected dppPercents = computed(() =>
-    this.dppAttributeEntries()
-      .filter(([key]) => /\(%\)/.test(key))
+    this.attributeGroups()
+      .sustainabilityInfo.filter(([key]) => /\(%\)/.test(key))
       .map(([key, value]) => ({ label: key.replace(/\s*\(%\)\s*$/, ''), value: Number.parseFloat(String(value).replace(',', '.')) }))
       .filter((row) => Number.isFinite(row.value))
       .map((row) => ({ ...row, value: Math.max(0, Math.min(100, row.value)) }))
+  );
+
+  /** Il resto degli attributi di sostenibilità: quelli non già mostrati come indicatore/barra. */
+  protected sustainabilityRest = computed(() =>
+    this.attributeGroups().sustainabilityInfo.filter(([key]) => !/carbon|co₂|co2/i.test(key) && !/\(%\)/.test(key))
   );
 
   /** Eventi mostrati nella cronologia: solo quelli davvero registrati (creazione, registrazione
@@ -619,6 +675,7 @@ export class ProductComponent implements OnDestroy {
           next: (record) => {
             this.dppLoading.set(false);
             this.dppRecord.set(record);
+            this.scrollToFragment();
           },
           error: () => {
             this.dppLoading.set(false);
@@ -652,6 +709,15 @@ export class ProductComponent implements OnDestroy {
         url: `${this.siteOrigin.value}/01/${dpp.gtin}`,
       });
     });
+  }
+
+  /** Un link dal resolver come `/01/{gtin}#section-sustainabilityInfo` arriva prima che i dati
+   * della scheda siano caricati: l'anchorScrolling del router scatta a pagina ancora vuota, quindi
+   * si riprova qui, a sezioni renderizzate. */
+  private scrollToFragment(): void {
+    const id = this.document.location.hash.replace(/^#/, '');
+    if (!id) return;
+    setTimeout(() => this.document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
   }
 
   ngOnDestroy(): void {

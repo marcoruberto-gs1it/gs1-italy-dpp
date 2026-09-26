@@ -17,6 +17,7 @@
  * Autenticazione: header `Authorization: Bearer <RESOLVER_SESSION_TOKEN>` su tutte e tre.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
+import { attributeLinkTypes } from './linkTypes.ts';
 
 /** Stessa funzione di jsonld.ts/mockRegistryClient.ts, duplicata qui per lo stesso motivo già
  * documentato in quei due file: nessuna dipendenza incrociata tra moduli che parlano con
@@ -100,18 +101,50 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
     record.batchOrSerial ? parseBatchOrSerial(record.batchOrSerial, record.granularityLevel).ai : undefined,
     record.batchOrSerial ? parseBatchOrSerial(record.batchOrSerial, record.granularityLevel).value : undefined
   );
-  const dppLink = { linktype: 'gs1:dpp', href: dppHref, title: record.name, type: 'text/html', hreflang: ['it'] };
+  const link = (linktype: string, href: string, title: string, type = 'text/html') => ({ linktype, href, title, type, hreflang: ['it'] });
+  const dppLink = link('gs1:dpp', dppHref, record.name);
+
+  // Un link per OGNI sezione che la pagina passaporto mostra (vedi src/app/pages/product/
+  // product.html, ancore `#section-<linkType>`), ciascuno con il proprio link type del GS1 Web
+  // Vocabulary — solo termini che esistono davvero in gs1/WebVoc v1.16 (NON gs1:packagingInfo né
+  // gs1:recyclingInfo/repairInfo: imballaggio e riciclo stanno in gs1:sustainabilityInfo, uso e
+  // riparazione in gs1:instructions). Stesso URL della pagina DPP + frammento: è una sola risorsa
+  // HTML, il resolver dice al client QUALE parte aprire. gs1:masterData è l'eccezione: punta alla
+  // rappresentazione JSON-LD (?linkType=masterData, vedi $wants_jsonld_qs in webshop/nginx.conf).
+  // Un link per link type, mai due con lo stesso sullo stesso anchor: due link uguali producono
+  // un 300 Multiple Choices (vedi il commento più sotto).
+  const withFragment = (linkType: string) => `${dppHref}#section-${linkType}`;
+  const sectionLinks = [
+    link('gs1:masterData', `${dppHref}?linkType=masterData`, `${record.name} — dati tecnici (JSON-LD)`, 'application/ld+json'),
+    link('gs1:traceability', withFragment('traceability'), `${record.name} — tracciabilità e ciclo di vita`),
+  ];
+  if (record.registryId) {
+    sectionLinks.push(link('gs1:registryEntry', withFragment('registryEntry'), `${record.name} — registrazione sul registro UE`));
+  }
+  const present = attributeLinkTypes(record.attributes);
+  if (present.has('sustainabilityInfo')) {
+    sectionLinks.push(link('gs1:sustainabilityInfo', withFragment('sustainabilityInfo'), `${record.name} — sostenibilità, riciclo e imballaggio`));
+  }
+  if (present.has('certificationInfo')) {
+    sectionLinks.push(link('gs1:certificationInfo', withFragment('certificationInfo'), `${record.name} — certificazioni`));
+  }
+  if (present.has('safetyInfo')) {
+    sectionLinks.push(link('gs1:safetyInfo', withFragment('safetyInfo'), `${record.name} — sicurezza`));
+  }
+  if (present.has('instructions')) {
+    sectionLinks.push(link('gs1:instructions', withFragment('instructions'), `${record.name} — istruzioni, riparazione e ricambi`));
+  }
 
   if (!record.isStatic) {
-    return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:dpp', links: [dppLink] };
+    return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:dpp', links: [dppLink, ...sectionLinks] };
   }
 
   // Stesso dominio/GTIN della pagina DPP, rotta diversa — vedi src/app/app.routes.ts
   // ('product-info/:gtin') e webshop/nginx.conf (location /product-info, stesso trattamento
   // client-side di /admin).
   const pipHref = `${siteUrl.replace(/\/$/, '')}/product-info/${record.gtin}`;
-  const pipLink = { linktype: 'gs1:pip', href: pipHref, title: record.name, type: 'text/html', hreflang: ['it'] };
-  return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:pip', links: [pipLink, dppLink] };
+  const pipLink = link('gs1:pip', pipHref, record.name);
+  return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:pip', links: [pipLink, dppLink, ...sectionLinks] };
 }
 
 /** Crea o aggiorna l'entry — PUT prima (idempotente se esiste già), POST /new come fallback se

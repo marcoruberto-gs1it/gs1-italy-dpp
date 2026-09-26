@@ -536,6 +536,26 @@
   line-height: 1.4;
 }
 
+.preview-open-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.preview-open-link:hover {
+  background: var(--brand-ink);
+  color: #fff;
+}
+
 /* Mini "percorso di filiera" — due tappe verificate (dato dimostrativo, vedi
    Sector.exampleJourneyStep1/2) più la scansione dell'utente stesso come terza tappa "in
    corso": suggerisce cosa un vero DPP mostrerebbe (non solo i dati del prodotto, la sua

@@ -497,7 +497,29 @@ img.img-fallback {
   border-radius: var(--radius-md);
 }
 
+.fact-tile--cert {
+  background: var(--green-tint);
+}
+
+.fact-tile--cert .fact-label,
+.fact-tile--cert .fact-value {
+  color: var(--green-ink);
+}
+
+.fact-tile--wide {
+  grid-column: 1 / -1;
+}
+
+.fact-value--mono {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  word-break: break-all;
+}
+
 .fact-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.02em;

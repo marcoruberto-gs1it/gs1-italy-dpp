@@ -175,6 +175,8 @@ export const TRANSLATIONS = {
     },
     heroPreview: {
       caption: 'Esempio dimostrativo, davvero registrato sul DPP Registry UE',
+      openLink: 'Apri il link',
+      openLinkAria: 'Apri il GS1 Digital Link risolto dal resolver in una nuova scheda',
       digitalLinkChip: 'GS1 Digital Link',
       prev: 'Passaporto precedente',
       next: 'Passaporto successivo',
@@ -319,7 +321,61 @@ export const TRANSLATIONS = {
       format: 'Confezione',
       brandOwnerLink: 'Scheda GS1 del marchio',
     },
+    linkType: {
+      curieHint: 'Link type del GS1 Web Vocabulary (ref.gs1.org/voc)',
+      openViaResolver: 'Apri via resolver',
+      openViaResolverAria: 'Apri questa sezione tramite il resolver GS1, link type',
+      navEyebrow: 'GS1 Web Vocabulary',
+      navTitle: 'Sezioni del passaporto, una per link type',
+      navText: 'Ogni blocco di informazioni qui sotto è registrato sul resolver con il proprio link type: un client GS1 può chiederlo direttamente con ?linkType=gs1:… senza scaricare tutta la pagina.',
+      navResolverLabel: 'Risolto da',
+      dpp: {
+        title: 'Passaporto digitale di prodotto',
+        text: 'Identità del passaporto: identificativi, granularità, operatore economico e stabilimento.',
+      },
+      pip: {
+        title: 'Informazioni di prodotto',
+        text: 'Scheda consumer-facing: cos\'è il prodotto e a cosa serve. È la destinazione predefinita del resolver.',
+        cta: 'Apri la scheda informazioni prodotto',
+      },
+      sustainabilityInfo: {
+        title: 'Sostenibilità, riciclo e imballaggio',
+        text: 'Impronta di carbonio, contenuto riciclato, riciclabilità e imballaggio dichiarati dall\'operatore.',
+      },
+      certificationInfo: {
+        title: 'Certificazioni e conformità',
+        text: 'Marchi, certificazioni e norme di riferimento dichiarati per il prodotto.',
+      },
+      safetyInfo: {
+        title: 'Sicurezza',
+        text: 'Classi e requisiti di sicurezza dichiarati dall\'operatore.',
+      },
+      instructions: {
+        title: 'Istruzioni, riparazione e ricambi',
+        text: 'Uso e dosaggio, garanzia, riparabilità e disponibilità dei ricambi.',
+      },
+      masterData: {
+        title: 'Dati tecnici del prodotto',
+        text: 'Master data strutturati, leggibili anche dalle macchine: la stessa risorsa in JSON-LD.',
+        empty: 'Nessun altro dato tecnico dichiarato: il payload completo è qui sotto.',
+      },
+      traceability: {
+        title: 'Tracciabilità e ciclo di vita',
+        text: 'Eventi registrati per questo passaporto: creazione, registrazione sul registro UE, aggiornamenti, fine vita.',
+      },
+      registryEntry: {
+        title: 'Registrazione sul registro UE',
+        text: 'Il riferimento di questo passaporto nel DPP Registry UE: identificativo, data e prova firmata.',
+        status: 'Stato',
+        statusPublished: 'Pubblicato',
+        registeredAt: 'Registrato il',
+        proof: 'Prova firmata (JWT)',
+      },
+    },
     productInfo: {
+      factSector: 'Settore',
+      factRegulation: 'Normativa',
+      moreTitle: 'Approfondisci nel passaporto',
       badge: 'Scheda informazioni prodotto',
       notFound: 'Prodotto non trovato.',
       loading: 'Caricamento della scheda…',
@@ -521,6 +577,8 @@ export const TRANSLATIONS = {
     },
     heroPreview: {
       caption: 'Demo example, genuinely registered on the EU DPP Registry',
+      openLink: 'Open the link',
+      openLinkAria: 'Open the GS1 Digital Link resolved by the resolver in a new tab',
       digitalLinkChip: 'GS1 Digital Link',
       prev: 'Previous passport',
       next: 'Next passport',
@@ -665,7 +723,61 @@ export const TRANSLATIONS = {
       format: 'Packaging',
       brandOwnerLink: 'GS1 brand record',
     },
+    linkType: {
+      curieHint: 'GS1 Web Vocabulary link type (ref.gs1.org/voc)',
+      openViaResolver: 'Open via resolver',
+      openViaResolverAria: 'Open this section through the GS1 resolver, link type',
+      navEyebrow: 'GS1 Web Vocabulary',
+      navTitle: 'Passport sections, one per link type',
+      navText: 'Each block of information below is registered on the resolver with its own link type: a GS1 client can request it directly with ?linkType=gs1:… without downloading the whole page.',
+      navResolverLabel: 'Resolved by',
+      dpp: {
+        title: 'Digital Product Passport',
+        text: 'Passport identity: identifiers, granularity, economic operator and facility.',
+      },
+      pip: {
+        title: 'Product information',
+        text: 'Consumer-facing page: what the product is and what it is for. It is the resolver\'s default destination.',
+        cta: 'Open the product information page',
+      },
+      sustainabilityInfo: {
+        title: 'Sustainability, recycling and packaging',
+        text: 'Carbon footprint, recycled content, recyclability and packaging declared by the operator.',
+      },
+      certificationInfo: {
+        title: 'Certifications and compliance',
+        text: 'Labels, certifications and reference standards declared for the product.',
+      },
+      safetyInfo: {
+        title: 'Safety',
+        text: 'Safety classes and requirements declared by the operator.',
+      },
+      instructions: {
+        title: 'Instructions, repair and spare parts',
+        text: 'Use and dosage, warranty, repairability and spare-part availability.',
+      },
+      masterData: {
+        title: 'Technical product data',
+        text: 'Structured master data, machine-readable too: the same resource as JSON-LD.',
+        empty: 'No other technical data declared: the full payload is below.',
+      },
+      traceability: {
+        title: 'Traceability and life cycle',
+        text: 'Events recorded for this passport: creation, EU registry registration, updates, end of life.',
+      },
+      registryEntry: {
+        title: 'EU registry entry',
+        text: 'This passport\'s reference in the EU DPP Registry: identifier, date and signed proof.',
+        status: 'Status',
+        statusPublished: 'Published',
+        registeredAt: 'Registered on',
+        proof: 'Signed proof (JWT)',
+      },
+    },
     productInfo: {
+      factSector: 'Sector',
+      factRegulation: 'Regulation',
+      moreTitle: 'Explore in the passport',
       badge: 'Product information page',
       notFound: 'Product not found.',
       loading: 'Loading product sheet…',

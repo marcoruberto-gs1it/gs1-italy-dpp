@@ -11,6 +11,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
+import { DPP_LINK_TYPES, classifyAttribute } from '../../data/dpp-link-types';
 
 /**
  * Pagina "informazioni prodotto" (gs1:pip, https://ref.gs1.org/voc/pip) — distinta dalla pagina
@@ -54,6 +55,17 @@ export class ProductInfoComponent {
     if (!record) return null;
     const base = SECTORS.find((s) => s.id === record.sectorId) ?? SECTORS[0];
     return localizeSector(base, this.languageService.lang());
+  });
+
+  /** Sezioni del passaporto che esistono davvero per questo prodotto, ciascuna con il proprio
+   * link type GS1: la scheda informativa resta semplice e rimanda al dettaglio (solo titoli e
+   * link — nessun valore dichiarato, quelli restano sulla pagina DPP). */
+  moreSections = computed(() => {
+    const record = this.record();
+    if (!record) return [];
+    const present = new Set(Object.keys(record.attributes ?? {}).map(classifyAttribute));
+    const wanted = ['sustainabilityInfo', 'certificationInfo', 'safetyInfo', 'instructions', 'masterData', 'traceability'];
+    return DPP_LINK_TYPES.filter((lt) => wanted.includes(lt.id) && (['masterData', 'traceability'].includes(lt.id) || present.has(lt.id as never)));
   });
 
   constructor() {

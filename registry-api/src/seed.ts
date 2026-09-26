@@ -196,7 +196,7 @@ async function main(): Promise<void> {
       console.log(`  ✓ registrato, registryId=${registryId}`);
       if (published) {
         await syncResolverEntry(published, site);
-        console.log(`  ✓ sincronizzato sul resolver (${published.isStatic ? 'gs1:pip + gs1:dpp' : 'gs1:dpp'})`);
+        console.log(`  ✓ sincronizzato sul resolver (gs1:dpp + link per ogni sezione${published.isStatic ? ', default gs1:pip' : ''})`);
       }
     } catch (err) {
       console.error(`  ✗ registrazione fallita: ${err instanceof Error ? err.message : String(err)}`);
