@@ -8,6 +8,7 @@ import { publicRouter } from './routes/public.ts';
 import { v1Router } from './routes/v1.ts';
 import { resyncAllToResolver } from './resyncResolver.ts';
 import { siteUrl } from './publicUrls.ts';
+import { refreshStaticSeeds } from './refreshSeeds.ts';
 
 const app = express();
 // Di default express.json() analizza solo "application/json" — scarterebbe silenziosamente
@@ -51,9 +52,19 @@ app.use('/registry-api', base);
 const port = Number(process.env.PORT) || 4310;
 app.listen(port, () => {
   console.log(`registry-api in ascolto su http://localhost:${port}`);
-  // Opt-in: ri-sincronizza sul resolver tutte le schede già pubblicate (vedi resyncResolver.ts).
-  // In background, mai bloccante per l'avvio; da togliere dalle env di Render dopo il primo giro.
-  if (process.env.RESYNC_RESOLVER_ON_BOOT === 'true') {
-    resyncAllToResolver(siteUrl()).catch((err) => console.warn('resync resolver fallito:', err));
+  // Opt-in, in background e mai bloccanti per l'avvio (da togliere dalle env di Render dopo il
+  // primo giro): RESEED_STATIC_ON_BOOT riallinea gli attributi dei 10 esempi statici a
+  // seedData.ts (refreshSeeds.ts); RESYNC_RESOLVER_ON_BOOT — o il reseed stesso — ri-sincronizza
+  // poi sul resolver tutte le schede pubblicate (resyncResolver.ts).
+  const reseed = process.env.RESEED_STATIC_ON_BOOT === 'true';
+  if (reseed || process.env.RESYNC_RESOLVER_ON_BOOT === 'true') {
+    void (async () => {
+      try {
+        if (reseed) await refreshStaticSeeds();
+        await resyncAllToResolver(siteUrl());
+      } catch (err) {
+        console.warn('reseed/resync all\'avvio fallito:', err);
+      }
+    })();
   }
 });

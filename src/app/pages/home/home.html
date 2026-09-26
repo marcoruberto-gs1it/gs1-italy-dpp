@@ -9,51 +9,27 @@
         <h1>{{ t('hero.titleLine1') }}<br><span class="hero-highlight">{{ t('hero.titleHighlight') }}</span></h1>
         <p>{{ t('hero.subtitle') }}</p>
 
-        <form class="verify-card" (submit)="submitGtin($event)" novalidate>
-          <label class="verify-label" for="gtin-input">{{ t('hero.verifyLabel') }}</label>
-          <div class="verify-row">
-            <div class="verify-field" [class.verify-field--error]="gtinError()">
-              <app-icon name="hash" [size]="16"></app-icon>
-              <input
-                id="gtin-input"
-                type="text"
-                inputmode="numeric"
-                autocomplete="off"
-                [placeholder]="t('hero.verifyPlaceholder')"
-                [value]="gtinQuery()"
-                (input)="onGtinInput($event)"
-                [attr.aria-invalid]="gtinError()"
-                [attr.aria-describedby]="gtinError() ? 'gtin-error' : null"
-              />
-            </div>
-            <button type="submit" class="gs-btn gs-btn--primary verify-btn">
-              {{ t('hero.verifyButton') }}
-              <app-icon name="chevron-right" [size]="15"></app-icon>
-            </button>
-          </div>
-          @if (gtinError()) {
-            <p id="gtin-error" class="verify-error" role="alert">{{ t('hero.verifyError') }}</p>
-          }
+        <div class="hero-actions">
+          <a routerLink="/admin" class="gs-btn gs-btn--accent hero-cta">
+            <app-icon name="qr-code" [size]="17"></app-icon>
+            {{ t('hero.ctaPrimary') }}
+          </a>
+          <a [routerLink]="['/01', activeCard().exampleGtin]" class="gs-btn hero-cta hero-cta--ghost">
+            {{ t('hero.ctaSecondary') }}
+            <app-icon name="chevron-right" [size]="15"></app-icon>
+          </a>
+        </div>
 
-          <div class="verify-demo">
-            <span class="verify-demo-label">{{ t('hero.demoLabel') }}</span>
-            <ul class="verify-chips">
-              @for (sector of sectors(); track sector.id) {
-                <li>
-                  <a class="verify-chip" [routerLink]="['/01', sector.exampleGtin]">
-                    <span class="verify-chip-dot" [style.background]="sector.brandColor"></span>
-                    {{ sector.shortName }}
-                  </a>
-                </li>
-              }
-            </ul>
-          </div>
-        </form>
+        <ul class="hero-points">
+          <li><app-icon name="check-circle" [size]="16"></app-icon>{{ t('hero.point1') }}</li>
+          <li><app-icon name="check-circle" [size]="16"></app-icon>{{ t('hero.point2') }}</li>
+          <li><app-icon name="check-circle" [size]="16"></app-icon>{{ t('hero.point3') }}</li>
+        </ul>
 
       </div>
 
       <div class="hero-preview">
-        <div class="preview-card">
+        <div class="preview-card" [style.--card-accent]="activeCard().brandColor">
           <div class="preview-top">
             <div class="preview-image icon-flat" [style.--icon-color]="activeCard().brandColor">
               <app-icon [name]="activeCard().icon" [size]="40"></app-icon>

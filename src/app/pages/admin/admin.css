@@ -978,9 +978,11 @@
 }
 
 .console .admin-container {
-  max-width: 1200px;
+  /* Su schermi larghi il contenuto della console riempie l'area accanto alla barra laterale
+     (fino a 1560px, centrato) invece di fermarsi a 1200px a sinistra lasciando il resto vuoto. */
+  max-width: 1560px;
   width: 100%;
-  margin: 0;
+  margin: 0 auto;
   padding: 28px 28px 64px;
 }
 

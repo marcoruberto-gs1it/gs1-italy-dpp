@@ -1,5 +1,5 @@
 .brand-page {
-  max-width: 1180px;
+  max-width: var(--container-max);
   margin: 0 auto;
   padding: 24px 24px 80px;
 }

@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../components/icon/icon';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
@@ -11,7 +11,6 @@ import { LanguageService } from '../../services/language.service';
 import { ResolverOriginService } from '../../services/resolver-origin.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
-import { isValidGtin } from '../../utils/gs1-validators';
 import { setSocialMeta } from '../../utils/social-meta';
 
 const AUTOPLAY_INTERVAL_MS = 5000;
@@ -108,7 +107,6 @@ export class Home implements OnDestroy {
   private resolverOrigin = inject(ResolverOriginService);
   private structuredData = inject(StructuredDataService);
   private platformId = inject(PLATFORM_ID);
-  private router = inject(Router);
   /** angularx-qrcode manipola direttamente il DOM (canvas/SVG): non è compatibile col
    * rendering lato server, quindi il codice QR reale compare solo dopo l'idratazione. */
   protected isBrowser = isPlatformBrowser(this.platformId);
@@ -117,33 +115,11 @@ export class Home implements OnDestroy {
    * carosello di anteprima nella hero (un settore = una card), niente dati duplicati. */
   sectors = computed<Sector[]>(() => SECTORS.map((s) => localizeSector(s, this.languageService.lang())));
 
-  /** Campo "Verifica un passaporto digitale" nell'hero: accetta un GTIN (8/12/13/14 cifre, cifra
-   * di controllo GS1 verificata con lo stesso isValidGtin() del form admin) e porta alla pagina
-   * pubblica /01/:gtin, la stessa che il resolver GS1 risolve. Nessuna chiamata di rete qui:
-   * se il GTIN non ha una scheda pubblicata lo dice la pagina di destinazione. */
   /** Esempio reale di GS1 Digital Link mostrato nella card "risoluzione" di Come funziona: lo
    * stesso URL del primo esempio del carosello, senza protocollo (come lo mostra un browser). */
   protected exampleDigitalLink = computed(() =>
     this.resolverOrigin.digitalLink(SECTORS[0].exampleGtin).replace(/^https?:\/\//, '')
   );
-
-  protected gtinQuery = signal('');
-  protected gtinError = signal(false);
-
-  protected onGtinInput(event: Event): void {
-    this.gtinQuery.set((event.target as HTMLInputElement).value);
-    this.gtinError.set(false);
-  }
-
-  protected submitGtin(event: Event): void {
-    event.preventDefault();
-    const gtin = this.gtinQuery().replace(/\s+/g, '');
-    if (!isValidGtin(gtin)) {
-      this.gtinError.set(true);
-      return;
-    }
-    void this.router.navigate(['/01', gtin]);
-  }
 
   private static readonly STATUS_KEY: Record<MilestoneStatus, string> = { done: 'Done', soon: 'Soon', later: 'Later' };
 

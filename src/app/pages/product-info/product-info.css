@@ -1,5 +1,5 @@
 .product-info-page {
-  max-width: 1180px;
+  max-width: var(--container-max);
   margin: 0 auto;
   padding: 24px 24px 80px;
 }
@@ -189,4 +189,32 @@
 
 .pip-view-more-item:hover {
   transform: translateY(-1px);
+}
+
+/* ----- Desktop: pannello colore a sinistra e contenuto a destra, invece di una colonna stretta
+   centrata in una pagina larga ----- */
+.pip-view-facts {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+}
+
+@media (min-width: 900px) {
+  .pip-view {
+    display: grid;
+    grid-template-columns: minmax(280px, 2fr) 3fr;
+    max-width: 1120px;
+  }
+
+  .pip-view > * {
+    min-width: 0;
+  }
+
+  .pip-view-hero {
+    height: auto;
+    min-height: 100%;
+  }
+
+  .pip-view-body {
+    padding: 40px 44px;
+    justify-content: center;
+  }
 }

@@ -1,5 +1,5 @@
 .wizard {
-  max-width: 1320px;
+  max-width: none;
   margin: 0 auto;
 }
 
@@ -7,7 +7,7 @@
    normale anche se .wizard ora è molto più largo (serve al JSON del Riepilogo/Registrazione,
    vedi .wizard-split sotto) — solo i passi con .wizard-split usano davvero tutta la larghezza. */
 .wizard-step--narrow {
-  max-width: 680px;
+  max-width: 880px;
   margin: 0 auto;
 }
 

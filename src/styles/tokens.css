@@ -8,6 +8,12 @@
    ========================================================================== */
 
 :root {
+  /* --- Layout: UNA larghezza massima per header, contenuti e footer, così i bordi sinistro/destro
+     sono allineati a qualunque larghezza (prima: header 1400, home 1280, passaporto 1180). Sopra
+     i 1400px il contenuto resta centrato; sotto si adatta con il margine laterale. --- */
+  --container-max: 1400px;
+  --gutter: 24px;
+
   /* --- Brand palette ---
      --brand/--brand-strong: ruolo "riempimento" — sfondo di bottoni, badge
      pieni, skip-link, icona di settore di default: qui sopra ci va sempre

@@ -76,7 +76,7 @@ export function classifyAttribute(key: string): AttributeLinkTypeId {
   if (/certific|ecolabel|oeko|gots|\bce\b|\biso\b|marchio|label/.test(k)) return 'certificationInfo';
   if (/fuoco|sicurezz|pericol|tossic|infiamm|aderenza|safety|fire|grip|hazard/.test(k)) return 'safetyInfo';
   if (/dosagg|istruzion|manutenz|ricambi|riparab|garanzia|uso |repair|spare|warranty|instruction|dosage/.test(k)) return 'instructions';
-  if (/carbon|co₂|co2|riciclat|riciclab|biodegrad|imballagg|packag|emission|acqua|water|energia|energy|efficienza|rumor|noise|recycl/.test(k))
+  if (/carbon|co₂|co2|ricicl|fine vita|end of life|biodegrad|imballagg|packag|emission|acqua|water|energia|energy|efficienza|rumor|noise|recycl/.test(k))
     return 'sustainabilityInfo';
   return 'masterData';
 }

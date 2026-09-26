@@ -1,5 +1,5 @@
 .product-page {
-  max-width: 1180px;
+  max-width: var(--container-max);
   margin: 0 auto;
   padding: 24px 24px 80px;
 }
@@ -1578,5 +1578,66 @@
   .lt-nav,
   .lt-section {
     padding: 20px 16px;
+  }
+}
+
+/* ----- Responsive: nessuna colonna deve superare lo spazio disponibile (fino a 280px) ----- */
+.passport-grid > *,
+.lt-section > *,
+.passport-main > * {
+  min-width: 0;
+}
+
+.passport-indicators {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.passport-attrs-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+
+.lt-nav-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+}
+
+/* Schermi larghi: la colonna laterale del passaporto cresce un po', il testo lungo non si stira. */
+@media (min-width: 1200px) {
+  .passport-grid {
+    grid-template-columns: 380px 1fr;
+  }
+}
+
+.passport-carriers > * {
+  min-width: 0;
+}
+
+@media (max-width: 1000px) {
+  .passport-carriers {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  }
+}
+
+.passport-seg {
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.passport-carrier-uri code {
+  overflow-wrap: anywhere;
+}
+
+.passport-carrier > div {
+  min-width: 0;
+}
+
+.passport-carrier strong,
+.passport-carrier p,
+.passport-carrier-standard {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 380px) {
+  .passport-carrier {
+    flex-direction: column;
   }
 }
