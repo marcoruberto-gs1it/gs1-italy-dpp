@@ -50,32 +50,9 @@
           </div>
         </form>
 
-        <div class="hero-links">
-          <a href="#dpp" class="hero-link">
-            {{ t('hero.primaryCta') }}
-            <app-icon name="chevron-right" [size]="14"></app-icon>
-          </a>
-          <a href="#settori" class="hero-link">
-            {{ t('hero.secondaryCta') }}
-            <app-icon name="chevron-right" [size]="14"></app-icon>
-          </a>
-        </div>
       </div>
 
       <div class="hero-preview">
-        <div class="preview-chrome" aria-hidden="true">
-          <span class="preview-chrome-dot"></span>
-          <span class="preview-chrome-dot"></span>
-          <span class="preview-chrome-dot"></span>
-          <span class="preview-chrome-url">
-            @if (isBrowser) {
-              <app-lottie-player path="/animations/shield-check-verified.json" [size]="16"></app-lottie-player>
-            } @else {
-              <app-icon name="shield-check" [size]="11"></app-icon>
-            }
-            {{ previewUrlDisplay() }}
-          </span>
-        </div>
         <div class="preview-card">
           <div class="preview-top">
             <div class="preview-image icon-flat" [style.--icon-color]="activeCard().brandColor">
@@ -90,7 +67,6 @@
               <span class="preview-reg">{{ activeCard().regulationRef }}</span>
               <span class="preview-gs1">{{ elementString() }}</span>
               <div class="preview-chips">
-                <span class="gs-badge gs-badge--neutral">{{ t('heroPreview.digitalLinkChip') }}</span>
                 <span class="gs-badge gs-badge--neutral">{{ activeCard().dateLabel }}</span>
               </div>
             </div>
@@ -120,21 +96,6 @@
               </a>
             </div>
           </div>
-
-          <ul class="preview-journey">
-            <li class="preview-journey-step preview-journey-step--done">
-              <span class="preview-journey-dot"><app-icon name="check-circle" [size]="12"></app-icon></span>
-              {{ activeCard().exampleJourneyStep1 }}
-            </li>
-            <li class="preview-journey-step preview-journey-step--done">
-              <span class="preview-journey-dot"><app-icon name="check-circle" [size]="12"></app-icon></span>
-              {{ activeCard().exampleJourneyStep2 }}
-            </li>
-            <li class="preview-journey-step preview-journey-step--live">
-              <span class="preview-journey-dot preview-journey-dot--live"></span>
-              {{ t('heroPreview.scannedNow') }}
-            </li>
-          </ul>
 
           <div class="preview-footer">
             <span class="preview-counter">{{ activeIndex() + 1 }} / {{ sectors().length }}</span>
@@ -180,23 +141,6 @@
         <span class="kpi-value">{{ t('keyStats.stat4Value') }}</span>
         <span class="kpi-label">{{ t('keyStats.stat4Label') }}</span>
       </div>
-    </div>
-
-    <div class="deadline-banner gs-navy-panel" appScrollReveal>
-      <span class="deadline-icon"><app-icon name="calendar" [size]="20"></app-icon></span>
-      <div class="deadline-text">
-        <strong>{{ t('deadlines.title') }}</strong>
-        <span>{{ t('deadlines.subtitle') }}</span>
-      </div>
-      <ul class="deadline-chips">
-        @for (sector of nextDeadlines(); track sector.id) {
-          <li class="deadline-chip">
-            <span class="deadline-dot" [style.background]="sector.brandColor"></span>
-            {{ sector.shortName }}: {{ sector.dateShort }}
-          </li>
-        }
-      </ul>
-      <a href="#normativa" class="deadline-link">{{ t('deadlines.cta') }}</a>
     </div>
   </div>
 </section>
@@ -257,51 +201,23 @@
     <ul class="benefit-grid" appScrollReveal="stagger" [revealGrid]="true" [revealStagger]="0.08">
       <li class="benefit-card gs-card">
         <span class="benefit-icon icon-flat"><app-icon name="leaf" [size]="20"></app-icon></span>
-        <span class="gs-badge gs-badge--green benefit-tag">{{ t('benefits.item1Tag') }}</span>
         <h3>{{ t('benefits.item1Title') }}</h3>
         <p>{{ t('benefits.item1Text') }}</p>
-        <ul class="benefit-points">
-          @for (point of t('benefits.item1Points').split('|'); track point) {
-            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
-          }
-        </ul>
-        <a class="benefit-link" href="#settori">{{ t('benefits.item1Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
       <li class="benefit-card gs-card">
         <span class="benefit-icon icon-flat"><app-icon name="globe" [size]="20"></app-icon></span>
-        <span class="gs-badge gs-badge--blue benefit-tag">{{ t('benefits.item2Tag') }}</span>
         <h3>{{ t('benefits.item2Title') }}</h3>
         <p>{{ t('benefits.item2Text') }}</p>
-        <ul class="benefit-points">
-          @for (point of t('benefits.item2Points').split('|'); track point) {
-            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
-          }
-        </ul>
-        <a class="benefit-link" href="#dpp">{{ t('benefits.item2Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
       <li class="benefit-card gs-card">
         <span class="benefit-icon icon-flat"><app-icon name="shield-check" [size]="20"></app-icon></span>
-        <span class="gs-badge gs-badge--orange benefit-tag">{{ t('benefits.item3Tag') }}</span>
         <h3>{{ t('benefits.item3Title') }}</h3>
         <p>{{ t('benefits.item3Text') }}</p>
-        <ul class="benefit-points">
-          @for (point of t('benefits.item3Points').split('|'); track point) {
-            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
-          }
-        </ul>
-        <a class="benefit-link" href="#normativa">{{ t('benefits.item3Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
       <li class="benefit-card gs-card">
         <span class="benefit-icon icon-flat"><app-icon name="check-circle" [size]="20"></app-icon></span>
-        <span class="gs-badge gs-badge--blue benefit-tag">{{ t('benefits.item4Tag') }}</span>
         <h3>{{ t('benefits.item4Title') }}</h3>
         <p>{{ t('benefits.item4Text') }}</p>
-        <ul class="benefit-points">
-          @for (point of t('benefits.item4Points').split('|'); track point) {
-            <li><app-icon name="check-circle" [size]="14"></app-icon>{{ point }}</li>
-          }
-        </ul>
-        <a class="benefit-link" href="#normativa">{{ t('benefits.item4Link') }} <app-icon name="chevron-right" [size]="14"></app-icon></a>
       </li>
     </ul>
   </section>
@@ -311,18 +227,6 @@
       <span class="section-eyebrow">{{ t('regulation.eyebrow') }}</span>
       <h2>{{ t('regulation.titlePre') }}<span class="text-highlight">{{ t('regulation.titleHighlight') }}</span></h2>
       <p>{{ t('regulation.intro') }}</p>
-    </div>
-
-    <div class="status-legend">
-      <span class="status-legend-item status-legend-item--done">
-        <span class="status-dot"></span>{{ t('regulation.statusDoneLabel') }} <em>{{ t('regulation.statusDoneHint') }}</em>
-      </span>
-      <span class="status-legend-item status-legend-item--soon">
-        <span class="status-dot"></span>{{ t('regulation.statusSoonLabel') }} <em>{{ t('regulation.statusSoonHint') }}</em>
-      </span>
-      <span class="status-legend-item status-legend-item--later">
-        <span class="status-dot"></span>{{ t('regulation.statusLaterLabel') }} <em>{{ t('regulation.statusLaterHint') }}</em>
-      </span>
     </div>
 
     <div class="spine-timeline-wrap" appScrollReveal>
@@ -367,22 +271,6 @@
           <h4>{{ t('regulation.standardsPillar1Title') }}</h4>
           <span class="standards-pillar-standard">{{ t('regulation.standardsPillar1Standard') }}</span>
           <p>{{ t('regulation.standardsPillar1Text') }}</p>
-          <div class="granularity-row">
-            <span class="granularity-tag">
-              <strong>{{ t('regulation.standardsPillar1Granularity1') }}</strong>
-              <em>{{ t('regulation.standardsPillar1Granularity1Detail') }}</em>
-            </span>
-            <app-icon name="chevron-right" [size]="12"></app-icon>
-            <span class="granularity-tag">
-              <strong>{{ t('regulation.standardsPillar1Granularity2') }}</strong>
-              <em>{{ t('regulation.standardsPillar1Granularity2Detail') }}</em>
-            </span>
-            <app-icon name="chevron-right" [size]="12"></app-icon>
-            <span class="granularity-tag">
-              <strong>{{ t('regulation.standardsPillar1Granularity3') }}</strong>
-              <em>{{ t('regulation.standardsPillar1Granularity3Detail') }}</em>
-            </span>
-          </div>
         </li>
 
         <li class="standards-pillar standards-pillar--capture">
@@ -395,7 +283,6 @@
               <div>
                 <span class="capture-title">{{ t('regulation.capture1Title') }}</span>
                 <span class="capture-standard">{{ t('regulation.capture1Standard') }}</span>
-                <p>{{ t('regulation.capture1Text') }}</p>
               </div>
             </li>
             <li class="capture-item">
@@ -403,7 +290,6 @@
               <div>
                 <span class="capture-title">{{ t('regulation.capture2Title') }}</span>
                 <span class="capture-standard">{{ t('regulation.capture2Standard') }}</span>
-                <p>{{ t('regulation.capture2Text') }}</p>
               </div>
             </li>
             <li class="capture-item">
@@ -411,7 +297,6 @@
               <div>
                 <span class="capture-title">{{ t('regulation.capture3Title') }}</span>
                 <span class="capture-standard">{{ t('regulation.capture3Standard') }}</span>
-                <p>{{ t('regulation.capture3Text') }}</p>
               </div>
             </li>
           </ul>
@@ -424,48 +309,6 @@
           <p>{{ t('regulation.standardsPillar3Text') }}</p>
         </li>
       </ul>
-
-      <p class="standards-footnote">{{ t('regulation.standardsFootnote') }}</p>
-
-      <div class="references-row">
-        <span class="references-label">{{ t('regulation.referencesTitle') }}</span>
-        <a class="reference-chip" href="https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02024R1781-20240628" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.reference1') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-        <a class="reference-chip" href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport_en" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.reference2') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-        <a class="reference-chip" href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport/dpp-registry_en" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.reference3') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-      </div>
-
-      <div class="references-row">
-        <span class="references-label">{{ t('regulation.gs1ReferencesTitle') }}</span>
-        <a class="reference-chip" href="https://gs1it.org/assistenza/standard-specifiche/gtin/" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.gs1Reference1') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-        <a class="reference-chip" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.gs1Reference2') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-        <a class="reference-chip" href="https://gs1it.org/assistenza/standard-specifiche/qr-code-standard-gs1/" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.gs1Reference3') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-        <a class="reference-chip" href="https://gs1it.org/assistenza/standard-specifiche/epc-rfid-identificazione-prodotti-radiofrequenza/" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.gs1Reference4') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-        <a class="reference-chip" href="https://gs1it.org/assistenza/standard-specifiche/gs1-web-vocabulary/" target="_blank" rel="noopener noreferrer">
-          {{ t('regulation.gs1Reference5') }}
-          <app-icon name="external-link" [size]="12"></app-icon>
-        </a>
-      </div>
     </div>
   </section>
 
@@ -490,32 +333,6 @@
         </li>
       }
     </ul>
-
-    <div class="roadmap-chart gs-card" appScrollReveal>
-      <div class="roadmap-chart-head">
-        <h3>{{ t('sectorsSection.roadmapTitle') }}</h3>
-        <p>{{ t('sectorsSection.roadmapIntro') }}</p>
-      </div>
-
-      <div class="spine-timeline-wrap spine-timeline-wrap--compact">
-        <ol class="spine-timeline spine-timeline--compact">
-          @if (sectorsSpine().todayPercent !== null) {
-            <li class="spine-today" [style.left.%]="sectorsSpine().todayPercent">
-              <span class="spine-today-label">{{ t('sectorsSection.today') }}</span>
-            </li>
-          }
-          @for (node of sectorsSpine().nodes; track node.item.id) {
-            <li class="spine-node spine-node--compact" [style.--dot-color]="node.item.brandColor">
-              <span class="spine-dot"></span>
-              <div class="spine-card">
-                <span class="spine-date" [title]="node.item.dateLabel">{{ node.item.dateShort }}</span>
-                <span class="spine-sector-name">{{ node.item.shortName }}</span>
-              </div>
-            </li>
-          }
-        </ol>
-      </div>
-    </div>
   </section>
 </div>
 
