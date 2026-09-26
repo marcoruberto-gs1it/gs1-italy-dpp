@@ -30,6 +30,12 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client
   },
   {
+    // Pagine dedicate per link type (sostenibilità, certificazioni…) — stessi dati runtime di
+    // /product-info/:gtin qui sopra, niente da prerenderizzare.
+    path: 'passport/:gtin/:section',
+    renderMode: RenderMode.Client
+  },
+  {
     path: '414/:gln',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {

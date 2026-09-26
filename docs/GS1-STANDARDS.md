@@ -140,3 +140,24 @@ verificabile: è segnalata come dimostrativa ovunque compare.
   `?linkType=gs1:sustainabilityInfo`) oppure `linkType=linkset`.
 - Nessun valore di riserva su `localhost`: senza `RESOLVER_PUBLIC_URL` / `SITE_URL` si usano i
   domini di produzione (vedi `registry-api/src/publicUrls.ts`).
+
+## Una pagina per link type
+
+Ogni link type registrato sul resolver ha una **pagina dedicata**, mai un'ancora (`#…`) dentro
+un'altra pagina — il resolver CE accoda `?linkType=…` a qualunque destinazione, anche dopo un
+frammento, quindi un frammento non è un indirizzo affidabile:
+
+| Link type | Pagina |
+|---|---|
+| `gs1:pip` (default) | `/product-info/{gtin}` |
+| `gs1:dpp` | `/01/{gtin}` |
+| `gs1:sustainabilityInfo` | `/passport/{gtin}/sustainability` |
+| `gs1:certificationInfo` | `/passport/{gtin}/certifications` |
+| `gs1:safetyInfo` | `/passport/{gtin}/safety` |
+| `gs1:instructions` | `/passport/{gtin}/instructions` |
+| `gs1:masterData` | `/passport/{gtin}/technical-data` (il JSON-LD resta su `/01/{gtin}` con `Accept: application/ld+json`) |
+| `gs1:traceability` | `/passport/{gtin}/traceability` |
+| `gs1:registryEntry` | `/passport/{gtin}/registry` |
+
+Uno slug non valido dà «non trovato»; una pagina senza dati per quel prodotto non è registrata sul
+resolver (risposta 404 alla richiesta `?linkType=…`).

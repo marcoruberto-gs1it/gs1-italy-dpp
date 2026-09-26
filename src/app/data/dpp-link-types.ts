@@ -26,21 +26,36 @@ export interface DppLinkType {
   /** CURIE usato nel resolver: `?linkType=gs1:xxx`. */
   curie: string;
   icon: IconName;
-  /** Ancora della sezione nella pagina passaporto (`/01/:gtin#section-xxx`). */
-  anchor: string;
+  /** Slug della pagina dedicata: `/passport/:gtin/<slug>` (vedi linkTypePath). `null` per
+   * dpp (`/01/:gtin`) e pip (`/product-info/:gtin`), che hanno già la loro pagina. */
+  slug: string | null;
 }
 
 export const DPP_LINK_TYPES: readonly DppLinkType[] = [
-  { id: 'dpp', curie: 'gs1:dpp', icon: 'shield-check', anchor: 'section-dpp' },
-  { id: 'pip', curie: 'gs1:pip', icon: 'tag', anchor: 'section-pip' },
-  { id: 'sustainabilityInfo', curie: 'gs1:sustainabilityInfo', icon: 'leaf', anchor: 'section-sustainabilityInfo' },
-  { id: 'certificationInfo', curie: 'gs1:certificationInfo', icon: 'award', anchor: 'section-certificationInfo' },
-  { id: 'safetyInfo', curie: 'gs1:safetyInfo', icon: 'alert-triangle', anchor: 'section-safetyInfo' },
-  { id: 'instructions', curie: 'gs1:instructions', icon: 'wrench', anchor: 'section-instructions' },
-  { id: 'masterData', curie: 'gs1:masterData', icon: 'braces', anchor: 'section-masterData' },
-  { id: 'traceability', curie: 'gs1:traceability', icon: 'truck', anchor: 'section-traceability' },
-  { id: 'registryEntry', curie: 'gs1:registryEntry', icon: 'hash', anchor: 'section-registryEntry' },
+  { id: 'dpp', curie: 'gs1:dpp', icon: 'shield-check', slug: null },
+  { id: 'pip', curie: 'gs1:pip', icon: 'tag', slug: null },
+  { id: 'sustainabilityInfo', curie: 'gs1:sustainabilityInfo', icon: 'leaf', slug: 'sustainability' },
+  { id: 'certificationInfo', curie: 'gs1:certificationInfo', icon: 'award', slug: 'certifications' },
+  { id: 'safetyInfo', curie: 'gs1:safetyInfo', icon: 'alert-triangle', slug: 'safety' },
+  { id: 'instructions', curie: 'gs1:instructions', icon: 'wrench', slug: 'instructions' },
+  { id: 'masterData', curie: 'gs1:masterData', icon: 'braces', slug: 'technical-data' },
+  { id: 'traceability', curie: 'gs1:traceability', icon: 'truck', slug: 'traceability' },
+  { id: 'registryEntry', curie: 'gs1:registryEntry', icon: 'hash', slug: 'registry' },
 ];
+
+/** Pagina dedicata di un link type — una pagina per link type, mai ancore dentro un'altra pagina:
+ * gs1:dpp → /01/:gtin, gs1:pip → /product-info/:gtin, gli altri → /passport/:gtin/<slug>. Stesso
+ * schema usato dal resolver (registry-api/src/linkTypes.ts#linkTypePath). */
+export function linkTypePath(id: DppLinkTypeId, gtin: string): string[] {
+  if (id === 'dpp') return ['/01', gtin];
+  if (id === 'pip') return ['/product-info', gtin];
+  return ['/passport', gtin, linkTypeById(id).slug!];
+}
+
+/** Il link type di una pagina `/passport/:gtin/:slug`, o null se lo slug non esiste. */
+export function linkTypeBySlug(slug: string | null | undefined): DppLinkType | null {
+  return DPP_LINK_TYPES.find((lt) => lt.slug !== null && lt.slug === slug) ?? null;
+}
 
 export function linkTypeById(id: DppLinkTypeId): DppLinkType {
   return DPP_LINK_TYPES.find((lt) => lt.id === id)!;

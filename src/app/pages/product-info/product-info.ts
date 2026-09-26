@@ -11,7 +11,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
-import { DPP_LINK_TYPES, classifyAttribute } from '../../data/dpp-link-types';
+import { DPP_LINK_TYPES, classifyAttribute, linkTypePath } from '../../data/dpp-link-types';
 
 /**
  * Pagina "informazioni prodotto" (gs1:pip, https://ref.gs1.org/voc/pip) — distinta dalla pagina
@@ -60,6 +60,8 @@ export class ProductInfoComponent {
   /** Sezioni del passaporto che esistono davvero per questo prodotto, ciascuna con il proprio
    * link type GS1: la scheda informativa resta semplice e rimanda al dettaglio (solo titoli e
    * link — nessun valore dichiarato, quelli restano sulla pagina DPP). */
+  protected pathOf = linkTypePath;
+
   moreSections = computed(() => {
     const record = this.record();
     if (!record) return [];

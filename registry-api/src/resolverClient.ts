@@ -17,7 +17,7 @@
  * Autenticazione: header `Authorization: Bearer <RESOLVER_SESSION_TOKEN>` su tutte e tre.
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
-import { attributeLinkTypes } from './linkTypes.ts';
+import { SECTION_SLUGS, attributeLinkTypes, type SectionLinkTypeId } from './linkTypes.ts';
 
 /** Stessa funzione di jsonld.ts/mockRegistryClient.ts, duplicata qui per lo stesso motivo già
  * documentato in quei due file: nessuna dipendenza incrociata tra moduli che parlano con
@@ -104,43 +104,27 @@ function buildLinksetDocument(record: DppRecord, siteUrl: string): Record<string
   const link = (linktype: string, href: string, title: string, type = 'text/html') => ({ linktype, href, title, type, hreflang: ['it'] });
   const dppLink = link('gs1:dpp', dppHref, record.name);
 
-  // Un link per OGNI sezione che la pagina passaporto mostra (vedi src/app/pages/product/
-  // product.html, ancore `#section-<linkType>`), ciascuno con il proprio link type del GS1 Web
-  // Vocabulary — solo termini che esistono davvero in gs1/WebVoc v1.16 (NON gs1:packagingInfo né
+  // Un link per OGNI sezione del passaporto, ciascuno con il proprio link type del GS1 Web
+  // Vocabulary e la propria PAGINA DEDICATA (`/passport/{gtin}/{slug}`, vedi SECTION_SLUGS e
+  // src/app/app.routes.ts): mai ancore/frammenti dentro un'unica pagina — il resolver CE accoda
+  // `?linkType=<curie>` a qualunque destinazione, anche dopo un `#frammento` (verificato in
+  // produzione: `#section-x?linkType=…`), quindi un frammento non è un indirizzo affidabile.
+  // Solo termini che esistono davvero in gs1/WebVoc v1.16 (NON gs1:packagingInfo né
   // gs1:recyclingInfo/repairInfo: imballaggio e riciclo stanno in gs1:sustainabilityInfo, uso e
-  // riparazione in gs1:instructions). Stesso URL della pagina DPP + frammento: è una sola risorsa
-  // HTML, il resolver dice al client QUALE parte aprire. gs1:masterData è l'eccezione: punta alla
-  // rappresentazione JSON-LD, ma con l'URL PULITO della pagina, senza query: il resolver CE
-  // accoda da solo `?linkType=<curie>` (percent-encoded) a QUALUNQUE destinazione, anche dopo un
-  // `#frammento` o un `?` già presente (verificato in produzione) — un href con
-  // `?linkType=gs1:masterData` diventava `…?linkType=gs1:masterData?linkType=gs1%3AmasterData`,
-  // valore che $wants_jsonld_qs (webshop/nginx.conf) non riconosce, e rispondeva HTML. Con l'URL
-  // pulito arriva esattamente `?linkType=gs1%3AmasterData`, che nginx serve come JSON-LD.
-  // Per lo stesso motivo i frammenti `#section-…` arrivano come `#section-x?linkType=…`: la
-  // pagina passaporto li normalizza (product.ts#scrollToFragment).
-  // Un link per link type, mai due con lo stesso sullo stesso anchor: due link uguali producono
-  // un 300 Multiple Choices (vedi il commento più sotto).
-  const withFragment = (linkType: string) => `${dppHref}#section-${linkType}`;
+  // riparazione in gs1:instructions). Un link per link type, mai due con lo stesso sullo stesso
+  // anchor: due link uguali producono un 300 Multiple Choices (vedi il commento più sotto).
+  const sectionHref = (id: SectionLinkTypeId) => `${siteUrl.replace(/\/$/, '')}/passport/${record.gtin}/${SECTION_SLUGS[id]}`;
+  const sectionLink = (id: SectionLinkTypeId, title: string) => link(`gs1:${id}`, sectionHref(id), `${record.name} — ${title}`);
   const sectionLinks = [
-    link('gs1:masterData', dppHref, `${record.name} — dati tecnici (JSON-LD)`, 'application/ld+json'),
-    link('gs1:traceability', withFragment('traceability'), `${record.name} — tracciabilità e ciclo di vita`),
+    sectionLink('masterData', 'dati tecnici'),
+    sectionLink('traceability', 'tracciabilità e ciclo di vita'),
   ];
-  if (record.registryId) {
-    sectionLinks.push(link('gs1:registryEntry', withFragment('registryEntry'), `${record.name} — registrazione sul registro UE`));
-  }
+  if (record.registryId) sectionLinks.push(sectionLink('registryEntry', 'registrazione sul registro UE'));
   const present = attributeLinkTypes(record.attributes);
-  if (present.has('sustainabilityInfo')) {
-    sectionLinks.push(link('gs1:sustainabilityInfo', withFragment('sustainabilityInfo'), `${record.name} — sostenibilità, riciclo e imballaggio`));
-  }
-  if (present.has('certificationInfo')) {
-    sectionLinks.push(link('gs1:certificationInfo', withFragment('certificationInfo'), `${record.name} — certificazioni`));
-  }
-  if (present.has('safetyInfo')) {
-    sectionLinks.push(link('gs1:safetyInfo', withFragment('safetyInfo'), `${record.name} — sicurezza`));
-  }
-  if (present.has('instructions')) {
-    sectionLinks.push(link('gs1:instructions', withFragment('instructions'), `${record.name} — istruzioni, riparazione e ricambi`));
-  }
+  if (present.has('sustainabilityInfo')) sectionLinks.push(sectionLink('sustainabilityInfo', 'sostenibilità, riciclo e imballaggio'));
+  if (present.has('certificationInfo')) sectionLinks.push(sectionLink('certificationInfo', 'certificazioni'));
+  if (present.has('safetyInfo')) sectionLinks.push(sectionLink('safetyInfo', 'sicurezza'));
+  if (present.has('instructions')) sectionLinks.push(sectionLink('instructions', 'istruzioni, riparazione e ricambi'));
 
   if (!record.isStatic) {
     return { anchor, itemDescription: record.name, defaultLinktype: 'gs1:dpp', links: [dppLink, ...sectionLinks] };

@@ -39,7 +39,7 @@
             <ul class="pip-view-more-list">
               @for (lt of moreSections(); track lt.id) {
                 <li>
-                  <a [routerLink]="['/01', record.gtin]" [fragment]="lt.anchor" class="pip-view-more-item">
+                  <a [routerLink]="pathOf(lt.id, record.gtin)" class="pip-view-more-item">
                     <app-icon [name]="lt.icon" [size]="15"></app-icon>
                     {{ t('linkType.' + lt.id + '.title') }}
                   </a>

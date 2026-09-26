@@ -1397,10 +1397,14 @@
   text-transform: none;
 }
 
-#section-dpp,
-.lt-section,
-.lt-group {
-  scroll-margin-top: 96px;
+.lt-nav-text {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.lt-page {
+  margin-top: 0;
 }
 
 .lt-nav {

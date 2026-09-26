@@ -21,3 +21,18 @@ export function classifyAttribute(key: string): AttributeLinkTypeId {
 export function attributeLinkTypes(attributes: Record<string, string>): Set<AttributeLinkTypeId> {
   return new Set(Object.keys(attributes ?? {}).map(classifyAttribute));
 }
+
+/** Slug della pagina dedicata di ogni link type "di sezione" — `/passport/{gtin}/{slug}` sul sito
+ * (stesso schema di src/app/data/dpp-link-types.ts#linkTypePath). Una pagina per link type: niente
+ * ancore/frammenti dentro un'unica pagina. */
+export const SECTION_SLUGS = {
+  sustainabilityInfo: 'sustainability',
+  certificationInfo: 'certifications',
+  safetyInfo: 'safety',
+  instructions: 'instructions',
+  masterData: 'technical-data',
+  traceability: 'traceability',
+  registryEntry: 'registry',
+} as const;
+
+export type SectionLinkTypeId = keyof typeof SECTION_SLUGS;

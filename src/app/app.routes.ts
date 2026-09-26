@@ -19,6 +19,11 @@ export const routes: Routes = [
   // GS1 Digital Link: nessun AI, quindi nessun vincolo di sintassi qui. Vedi il commento in cima
   // a product-info.ts e resolverClient.ts#buildLinksetDocument per il perché delle due pagine.
   { path: 'product-info/:gtin', component: ProductInfoComponent },
+  // Una pagina dedicata per ogni link type del GS1 Web Vocabulary registrato sul resolver
+  // (sostenibilità, certificazioni, sicurezza, istruzioni, dati tecnici, tracciabilità, registro):
+  // /passport/:gtin/<slug>, vedi data/dpp-link-types.ts. Stesso componente del passaporto — i
+  // dati e il JSON-LD sono gli stessi, cambia solo quale sezione mostra.
+  { path: 'passport/:gtin/:section', component: ProductComponent },
   // GS1 Digital Link, Application Identifier 414 (Global Location Number): pagina del brand
   // owner del prodotto, vedi BrandOwner in product.service.ts.
   { path: '414/:gln', component: BrandComponent },

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -20,7 +20,7 @@ import { StructuredDataService } from '../../services/structured-data.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
-import { AttributeLinkTypeId, DPP_LINK_TYPES, classifyAttribute } from '../../data/dpp-link-types';
+import { AttributeLinkTypeId, DPP_LINK_TYPES, DppLinkTypeId, classifyAttribute, linkTypeBySlug, linkTypePath } from '../../data/dpp-link-types';
 import { LinkTypeHeadComponent } from '../../components/link-type-head/link-type-head';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 
@@ -118,7 +118,6 @@ export class ProductComponent implements OnDestroy {
   private registryApi = inject(RegistryApiService);
   private languageService = inject(LanguageService);
   private platformId = inject(PLATFORM_ID);
-  private document = inject(DOCUMENT);
   private sanitizer = inject(DomSanitizer);
   /** angularx-qrcode manipola il DOM: niente rendering lato server (stesso motivo della home). */
   protected isBrowser = isPlatformBrowser(this.platformId);
@@ -138,6 +137,14 @@ export class ProductComponent implements OnDestroy {
   // prodotto precedente.
   private routeParams = toSignal(this.route.paramMap);
   gtin = computed(() => this.routeParams()?.get('gtin') ?? null);
+
+  /** Pagina dedicata di un link type (`/passport/:gtin/:section`), o null sul passaporto vero e
+   * proprio (`/01/:gtin`): un solo componente per entrambe, stessi dati e stesso JSON-LD. */
+  protected sectionSlug = computed(() => this.routeParams()?.get('section') ?? null);
+  protected section = computed(() => linkTypeBySlug(this.sectionSlug()));
+  /** `/passport/:gtin/<slug>` con uno slug che non corrisponde a nessun link type. */
+  protected unknownSection = computed(() => this.sectionSlug() !== null && this.section() === null);
+  protected pathOf = linkTypePath;
 
   activeImageIndex = signal(0);
 
@@ -297,26 +304,29 @@ export class ProductComponent implements OnDestroy {
   /** Host del resolver mostrato nel navigatore delle sezioni. */
   protected resolverHost = this.resolverOrigin.value.replace(/^https?:\/\//, '');
 
-  /** Sezioni realmente presenti in questa scheda, nell'ordine della pagina: quelle strutturali
-   * (dpp, pip, masterData, traceability) sempre, le altre solo se c'è almeno un dato. */
-  protected sectionNav = computed(() => {
+  /** Link type le cui pagine hanno davvero contenuto per questa scheda: quelli strutturali (dpp,
+   * pip, masterData, traceability) sempre, gli altri solo se c'è almeno un dato. */
+  protected presentSections = computed(() => {
     const dpp = this.dppRecord();
-    if (!dpp) return [];
     const groups = this.attributeGroups();
-    const present = (id: string): boolean => {
-      switch (id) {
-        case 'sustainabilityInfo':
-        case 'certificationInfo':
-        case 'safetyInfo':
-        case 'instructions':
-          return groups[id].length > 0;
-        case 'registryEntry':
-          return !!dpp.registryId;
-        default:
-          return true;
-      }
-    };
-    return DPP_LINK_TYPES.filter((lt) => present(lt.id)).map((lt) => ({ lt }));
+    const present = new Set<DppLinkTypeId>(['dpp', 'pip', 'masterData', 'traceability']);
+    if (!dpp) return present;
+    for (const id of ['sustainabilityInfo', 'certificationInfo', 'safetyInfo', 'instructions'] as const) {
+      if (groups[id].length) present.add(id);
+    }
+    if (dpp.registryId) present.add('registryEntry');
+    return present;
+  });
+
+  /** Le pagine (una per link type) elencate nel navigatore, nell'ordine di DPP_LINK_TYPES, con
+   * quanti dati dichiarati contiene ciascuna quando ha senso contarli. */
+  protected sectionNav = computed(() => {
+    const groups = this.attributeGroups();
+    const present = this.presentSections();
+    return DPP_LINK_TYPES.filter((lt) => present.has(lt.id)).map((lt) => ({
+      lt,
+      count: lt.id in groups ? groups[lt.id as AttributeLinkTypeId].length : null,
+    }));
   });
 
   protected registeredAtLabel = computed(() => {
@@ -676,7 +686,6 @@ export class ProductComponent implements OnDestroy {
           next: (record) => {
             this.dppLoading.set(false);
             this.dppRecord.set(record);
-            this.scrollToFragment();
           },
           error: () => {
             this.dppLoading.set(false);
@@ -710,17 +719,6 @@ export class ProductComponent implements OnDestroy {
         url: `${this.siteOrigin.value}/01/${dpp.gtin}`,
       });
     });
-  }
-
-  /** Un link dal resolver come `/01/{gtin}#section-sustainabilityInfo` arriva prima che i dati
-   * della scheda siano caricati: l'anchorScrolling del router scatta a pagina ancora vuota, quindi
-   * si riprova qui, a sezioni renderizzate. */
-  private scrollToFragment(): void {
-    // Il resolver accoda `?linkType=…` a qualunque destinazione, anche dopo il frammento
-    // ("#section-x?linkType=gs1%3Ax"): l'id della sezione è la parte prima del "?".
-    const id = this.document.location.hash.replace(/^#/, '').split('?')[0];
-    if (!id) return;
-    setTimeout(() => this.document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
   }
 
   ngOnDestroy(): void {
