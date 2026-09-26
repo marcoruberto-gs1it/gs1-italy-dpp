@@ -43,6 +43,7 @@
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import { resolverPublicUrl, siteUrl } from './publicUrls.ts';
+import { tracedFetch } from './trace.ts';
 import type { SectorId } from './sectors.ts';
 
 export interface RegistrationResult {
@@ -141,7 +142,7 @@ function requiredConfig() {
 async function fetchAccessToken(config: ReturnType<typeof requiredConfig>): Promise<string> {
   let response: Response;
   try {
-    response = await fetch(`https://${config.auth0Domain}/oauth/token`, {
+    response = await tracedFetch('Auth0 · token M2M', `https://${config.auth0Domain}/oauth/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -279,18 +280,16 @@ export function pingMockRegistry(): void {
   fetch(`${registryUrl.replace(/\/$/, '')}/q/health`).catch(() => {});
 }
 
-export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
-  const config = requiredConfig();
-  const site = siteUrl();
+/** Il payload di registrazione presso il registro UE — SOLO i campi richiesti dallo schema di
+ * mock-eu-registry (puntatori, non contenuto: FprEN 18222). Estratto da registerDpp per poterlo
+ * anche RICOSTRUIRE per le schede registrate prima che la richiesta venisse salvata. */
+export function buildRegistrationRequest(record: DppRecord): Record<string, unknown> {
   // UPI e identificativi di granularità: URI GS1 Digital Link canonici sul RESOLVER (vedi
   // publicUrls.ts). liveURL/backupURL invece restano la PAGINA sul sito: è quella che
   // mock-eu-registry scarica per calcolare l'hash, e deve essere raggiungibile dal cloud.
   const identifierBase = resolverPublicUrl();
-  assertSiteUrlReachableFromRegistry(site);
-  const token = await fetchAccessToken(config);
-  const liveUrl = digitalLinkUrl(site, record.gtin);
-
-  const requestBody = {
+  const liveUrl = digitalLinkUrl(siteUrl(), record.gtin);
+  return {
     upi: buildUpi(identifierBase, record),
     // Compilato dall'utente nel form admin (colonna economic_operator_id, vedi db.ts) — non più
     // una costante fissa: non abbiamo comunque un modello multi-tenant reale (un solo cancello
@@ -304,10 +303,18 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
     granularityLevel: record.granularityLevel,
     ...granularityFields(identifierBase, record),
   };
+}
+
+export async function registerDpp(record: DppRecord): Promise<RegistrationResult> {
+  const config = requiredConfig();
+  assertSiteUrlReachableFromRegistry(siteUrl());
+  const token = await fetchAccessToken(config);
+
+  const requestBody = buildRegistrationRequest(record);
 
   let registerResponse: Response;
   try {
-    registerResponse = await fetch(`${config.registryUrl}/metadata/v1`, {
+    registerResponse = await tracedFetch('DPP Registry UE · registrazione', `${config.registryUrl}/metadata/v1`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -346,7 +353,7 @@ export async function registerDpp(record: DppRecord): Promise<RegistrationResult
  * spiegato nei log disponibili, trattato qui come "proof non disponibile", non come errore. */
 async function tryFetchProof(config: ReturnType<typeof requiredConfig>, token: string, registryId: string): Promise<string | null> {
   try {
-    const proofResponse = await fetch(`${config.registryUrl}/metadata/v1/${registryId}/proof`, {
+    const proofResponse = await tracedFetch('DPP Registry UE · proof of registration', `${config.registryUrl}/metadata/v1/${registryId}/proof`, {
       headers: { Authorization: `Bearer ${token}` },
       signal: AbortSignal.timeout(PROOF_TIMEOUT_MS),
     });
@@ -357,6 +364,28 @@ async function tryFetchProof(config: ReturnType<typeof requiredConfig>, token: s
     return await proofResponse.text();
   } catch (err) {
     console.warn(`mock-eu-registry: richiesta della proof fallita per ${registryId}:`, err);
+    return null;
+  }
+}
+
+/** Rilegge dal registro la voce di una registrazione già fatta (GET /metadata/v1/{registryId}).
+ * Best-effort: solo per le schede registrate PRIMA che la risposta venisse salvata; null se il
+ * registro non è configurato o non risponde. */
+export async function fetchRegistryEntry(registryId: string): Promise<unknown | null> {
+  let config: ReturnType<typeof requiredConfig>;
+  try {
+    config = requiredConfig();
+  } catch {
+    return null;
+  }
+  try {
+    const token = await fetchAccessToken(config);
+    const response = await tracedFetch('DPP Registry UE · lettura voce', `${config.registryUrl}/metadata/v1/${registryId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(PROOF_TIMEOUT_MS),
+    });
+    return response.ok ? await response.json() : null;
+  } catch {
     return null;
   }
 }

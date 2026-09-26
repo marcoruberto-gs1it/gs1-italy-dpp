@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { getAnyByGtin, getPublishedByGtin } from '../db.ts';
+import { getAnyByGtin, getPublishedByGtin, getRegistryTrace, listEvents } from '../db.ts';
+import { buildRegistrationRequest, fetchRegistryEntry } from '../mockRegistryClient.ts';
 import { dppToJsonLd, dppToLinkset } from '../jsonld.ts';
 import { resolverPublicUrl, siteUrl } from '../publicUrls.ts';
 
@@ -42,4 +43,42 @@ publicRouter.get('/dpp/:gtin/linkset', async (req, res) => {
     return;
   }
   res.type('application/linkset+json').json(dppToLinkset(record, resolverPublicUrl(), siteUrl()));
+});
+
+/** Richiesta e risposta REALI del DPP Registry UE alla registrazione (con gli identificativi
+ * assegnati). Per le schede registrate prima che venissero salvate si prova a rileggere la voce dal
+ * registro; se nemmeno quello è possibile, `available: false`. */
+publicRouter.get('/dpp/:gtin/registry-entry', async (req, res) => {
+  const record = await getPublishedByGtin(req.params.gtin);
+  if (!record) {
+    res.status(404).json({ error: 'nessuna scheda pubblicata con questo GTIN' });
+    return;
+  }
+  const stored = await getRegistryTrace(record.id);
+  if (stored) {
+    res.json({ available: true, source: 'registration', registryId: record.registryId, registeredAt: record.registeredAt, request: stored.request, response: stored.response });
+    return;
+  }
+  const live = record.registryId ? await fetchRegistryEntry(record.registryId).catch(() => null) : null;
+  // Registrata prima che si salvassero richiesta e risposta: la richiesta è deterministica (stessi
+  // dati della scheda) e la si ricostruisce dichiarandolo; la risposta originale no.
+  res.json({
+    available: !!live,
+    source: live ? 'registry-lookup' : 'reconstructed',
+    registryId: record.registryId,
+    registeredAt: record.registeredAt,
+    request: buildRegistrationRequest(record),
+    requestReconstructed: true,
+    response: live,
+  });
+});
+
+/** Storico delle modifiche nel tempo (reali o simulate) di una scheda pubblicata. */
+publicRouter.get('/dpp/:gtin/history', async (req, res) => {
+  const record = await getPublishedByGtin(req.params.gtin);
+  if (!record) {
+    res.status(404).json({ error: 'nessuna scheda pubblicata con questo GTIN' });
+    return;
+  }
+  res.json({ dppId: record.id, events: await listEvents(record.id) });
 });

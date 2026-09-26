@@ -1,6 +1,7 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { apiInspectorInterceptor } from './services/api-inspector.service';
 import { provideOptimus } from '@openng/optimus-ui/config';
 
 import { routes } from './app.routes';
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
     // withFetch: usato solo dalla sezione admin (RenderMode.Client, vedi app.routes.server.ts)
     // per parlare con registry-api — nessun'altra pagina del sito fa chiamate HTTP client-side.
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([apiInspectorInterceptor])),
     // darkModeSelector allineato a ThemeService (src/app/services/theme.service.ts), che
     // imposta [data-theme="dark"] su <html> — Optimus UI segue lo stesso attributo, nessuna
     // logica di tema duplicata. Niente `cssLayer`, di proposito: provato con

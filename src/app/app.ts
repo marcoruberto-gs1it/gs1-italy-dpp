@@ -9,10 +9,11 @@ import { I18nService } from './services/i18n.service';
 import { SeoLinkService } from './services/seo-link.service';
 import { SiteOriginService } from './services/site-origin.service';
 import { IconComponent } from './components/icon/icon';
+import { ApiInspectorComponent } from './components/api-inspector/api-inspector';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent, ApiInspectorComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

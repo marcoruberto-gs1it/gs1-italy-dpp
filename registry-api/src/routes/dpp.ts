@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { createDpp, deleteDpp, getDpp, listDpp, markPublished, updateDpp } from '../db.ts';
+import { applyChange, createDpp, deleteDpp, getDpp, listDpp, listEvents, markPublished, saveRegistryTrace, updateDpp } from '../db.ts';
+import { SCENARIOS, addMonths, applyPatch, isScenario, planChange } from '../simulate.ts';
 import { registerDpp, TransientRegistryError } from '../mockRegistryClient.ts';
 import { syncResolverEntry } from '../resolverClient.ts';
 import { siteUrl } from '../publicUrls.ts';
@@ -130,6 +131,9 @@ dppRouter.post('/:id/publish', async (req, res) => {
       res.status(404).json({ error: 'scheda non trovata' });
       return;
     }
+    // Richiesta e risposta reali del registro UE, con gli identificativi assegnati: salvate per
+    // poterle rimostrare in seguito (pagina gs1:registryEntry), non solo ora.
+    await saveRegistryTrace(record.id, request, response);
     // Sincronizza il GS1 Digital Link Resolver CE (vedi resolver/README.md) — non bloccante e
     // mai un motivo di fallimento per questa richiesta: la pubblicazione vera è già avvenuta
     // (registerDpp/markPublished sopra), il resolver è un livello di conformità aggiuntivo, non
@@ -161,4 +165,68 @@ dppRouter.post('/:id/publish', async (req, res) => {
     // registerDpp() (891ms) contro la stessa richiesta che nell'interfaccia sembrava sospesa.
     res.status(422).json({ error: err instanceof Error ? err.message : 'errore sconosciuto durante la pubblicazione' });
   }
+});
+
+/**
+ * Simula UNA modifica nel tempo di un DPP già pubblicato (non statico): applica lo scenario come
+ * patch sugli attributi (JSON Merge Patch, RFC 7396), registra l'evento nello storico, sposta
+ * `lastUpdate` alla data simulata e ri-sincronizza il resolver — una nuova sezione (es. la
+ * certificazione dopo un rinnovo) diventa subito un nuovo link type raggiungibile.
+ *
+ * Body: { scenario, monthsLater?, patch? } — `monthsLater` (1-120, default 12) è quanto tempo dopo
+ * l'ULTIMA modifica nota (o la registrazione) avviene questa; `patch` serve solo a `custom`.
+ * Il registro UE non viene chiamato: conserva solo i puntatori, non il contenuto (FprEN 18222).
+ */
+dppRouter.post('/:id/simulate-change', async (req, res) => {
+  const record = await getDpp(req.params.id);
+  if (!record) {
+    res.status(404).json({ error: 'scheda non trovata' });
+    return;
+  }
+  if (record.status !== 'published') {
+    res.status(409).json({ error: 'si può simulare una modifica solo su una scheda pubblicata' });
+    return;
+  }
+  if (record.isStatic) {
+    res.status(403).json({ error: 'gli esempi della home sono in sola lettura: crea un tuo DPP per simulare una modifica' });
+    return;
+  }
+  const { scenario, monthsLater, patch } = (req.body ?? {}) as { scenario?: unknown; monthsLater?: unknown; patch?: unknown };
+  if (!isScenario(scenario)) {
+    res.status(400).json({ error: `scenario non valido: usa uno tra ${SCENARIOS.join(', ')}` });
+    return;
+  }
+  const months = monthsLater === undefined ? 12 : Number(monthsLater);
+  if (!Number.isInteger(months) || months < 1 || months > 120) {
+    res.status(400).json({ error: 'monthsLater deve essere un intero tra 1 e 120' });
+    return;
+  }
+  let custom: Record<string, string | null> | undefined;
+  if (scenario === 'custom') {
+    const entries = patch && typeof patch === 'object' && !Array.isArray(patch) ? Object.entries(patch as Record<string, unknown>) : [];
+    if (!entries.length || entries.length > 30 || entries.some(([k, v]) => !k || k.length > 120 || !(v === null || (typeof v === 'string' && v.length <= 500)))) {
+      res.status(400).json({ error: 'patch: oggetto con 1-30 chiavi, valori stringa (max 500 caratteri) o null per rimuovere' });
+      return;
+    }
+    custom = Object.fromEntries(entries) as Record<string, string | null>;
+  }
+
+  const events = await listEvents(record.id);
+  const base = new Date(events.length ? events[events.length - 1].at : (record.registeredAt ?? record.createdAt));
+  const at = addMonths(base, months);
+  const planned = planChange(scenario, record, at, custom);
+  const { next, changes } = applyPatch(record.attributes, planned.patch);
+  if (!Object.keys(changes).length) {
+    res.status(409).json({ error: 'la modifica non cambia nessun attributo' });
+    return;
+  }
+  const result = await applyChange(record, next, { at: at.toISOString(), scenario, simulated: true, title: planned.title, summary: planned.summary, changes });
+  void syncResolverEntry(result.record, siteUrl());
+  res.json({
+    record: result.record,
+    event: result.event,
+    // La modifica come richiesta standard equivalente (JSON Merge Patch): stessa operazione che
+    // espone PATCH /registry-api/v1/dpps/{id} (UpdateDPPById).
+    mergePatch: { attributes: planned.patch },
+  });
 });

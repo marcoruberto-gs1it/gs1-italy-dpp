@@ -1641,3 +1641,73 @@
     flex-direction: column;
   }
 }
+
+/* ----- JSON di registrazione presso il registro UE (pagina gs1:registryEntry) ----- */
+.registry-json {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 16px;
+}
+
+.registry-json-block {
+  min-width: 0;
+}
+
+.registry-json-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.registry-json-head code {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-secondary);
+}
+
+.registry-json-body {
+  margin: 0;
+  max-height: 420px;
+  overflow: auto;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: #08142b;
+}
+
+.registry-json-body code {
+  font: 0.78rem/1.6 var(--font-mono);
+  white-space: pre;
+  color: #cbd5e1;
+}
+
+/* ----- Modifiche nel tempo (pagina gs1:traceability) ----- */
+.passport-changes {
+  width: 100%;
+  margin: 10px 0 4px;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.passport-changes th {
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.passport-changes td {
+  padding: 6px 8px;
+  border-top: 1px solid var(--border-subtle);
+  overflow-wrap: anywhere;
+}

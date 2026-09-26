@@ -508,3 +508,18 @@ implementato letteralmente: `registry-api/src/mockRegistryClient.ts` parla con l
 mock-eu-registry (CIRPASS-2), che ha un proprio schema concreto con nomi di campo diversi (`upi`,
 `reoId`, `liveURL`…). I due schemi non sono intercambiabili — vedi il commento in cima a
 `mockRegistryClient.ts` per la corrispondenza campo per campo tra i due.
+
+## Endpoint di dimostrazione: registrazione, storico, simulazione e traccia
+
+Aggiunti a `registry-api` per rendere ispezionabile ogni passaggio. Non fanno parte delle API
+normative FprEN 18222/18223 (le rotte `/registry-api/v1/…`), sono estensioni della demo.
+
+| Metodo e percorso | Auth | Cosa fa |
+|---|---|---|
+| `GET /registry-api/public/dpp/{gtin}/registry-entry` | no | Richiesta (`POST /metadata/v1`) e risposta REALI del DPP Registry UE alla registrazione, con gli identificativi assegnati (`registryId`, …). Per le schede registrate prima che venissero salvate: richiesta ricostruita (`requestReconstructed: true`) e risposta riletta dal registro se possibile. |
+| `GET /registry-api/public/dpp/{gtin}/history` | no | Storico delle modifiche nel tempo (reali o simulate): titolo, riepilogo e cosa è cambiato (prima/dopo). |
+| `POST /registry-api/dpp/{id}/simulate-change` | sì | Simula una modifica nel tempo di un DPP **pubblicato e non statico**. Body: `{ "scenario": "repair" \| "recycled-content" \| "carbon-recalc" \| "certificate-renewal" \| "software-update" \| "end-of-life" \| "custom", "monthsLater": 1-120, "patch": {…} }` (`patch` solo per `custom`, semantica JSON Merge Patch RFC 7396, `null` rimuove una chiave). Aggiorna gli attributi e `lastUpdate`, registra l'evento e ri-sincronizza il resolver. **Non chiama il registro UE**: conserva solo i puntatori, non il contenuto. Risposta: `{ record, event, mergePatch }`. |
+| `GET /registry-api/trace/{id}` | no (id non indovinabile) | Le chiamate che `registry-api` ha fatto verso Auth0, DPP Registry UE e resolver mentre serviva una richiesta. `{id}` è l'header `X-Trace-Id` della risposta. Segreti (`Authorization`, `client_secret`, token) oscurati; tracce solo in memoria (ultime 300). |
+
+Nell'interfaccia il pulsante **API** (in basso a destra) mostra ogni chiamata del browser verso
+`registry-api` con richiesta e risposta JSON e, aprendola, le chiamate del server verso i servizi esterni.

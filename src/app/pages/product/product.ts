@@ -17,7 +17,7 @@ import { LanguageService } from '../../services/language.service';
 import { ResolverOriginService } from '../../services/resolver-origin.service';
 import { SiteOriginService, SSR_FALLBACK_ORIGIN } from '../../services/site-origin.service';
 import { StructuredDataService } from '../../services/structured-data.service';
-import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
+import { DppEvent, DppRecord, RegistryApiService, RegistryEntry } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
 import { AttributeLinkTypeId, DPP_LINK_TYPES, DppLinkTypeId, classifyAttribute, linkTypeFromParam, linkTypeRoute } from '../../data/dpp-link-types';
@@ -367,7 +367,7 @@ export class ProductComponent implements OnDestroy {
     if (!dpp) return [];
     const locale = this.languageService.lang() === 'it' ? 'it-IT' : 'en-GB';
     const fmt = (iso: string) => new Date(iso).toLocaleString(locale, { dateStyle: 'long', timeStyle: 'short' });
-    const events: { key: string; title: string; text: string; when: string; meta?: string; future?: boolean }[] = [
+    const events: { key: string; title: string; text: string; when: string; meta?: string; future?: boolean; simulated?: boolean; changes?: { key: string; before: string | null; after: string | null }[] }[] = [
       { key: 'created', title: this.t('product.eventCreated'), text: this.t('product.eventCreatedText'), when: fmt(dpp.createdAt), meta: this.dppUrn() },
     ];
     if (dpp.registeredAt) {
@@ -379,13 +379,40 @@ export class ProductComponent implements OnDestroy {
         meta: dpp.registryId ? `${this.t('product.eventRegistryId')}: ${dpp.registryId}` : undefined,
       });
     }
+    // Modifiche nel tempo (reali o simulate), dallo storico di registry-api: ciascuna con cosa è
+    // cambiato davvero (prima → dopo).
+    const history = this.history();
+    for (const ev of history) {
+      events.push({
+        key: ev.id,
+        title: ev.title,
+        text: ev.summary,
+        when: fmt(ev.at),
+        simulated: ev.simulated,
+        changes: Object.entries(ev.changes).map(([key, c]) => ({ key, before: c.before, after: c.after })),
+      });
+    }
     const baseline = new Date(dpp.registeredAt ?? dpp.createdAt).getTime();
-    if (new Date(dpp.updatedAt).getTime() - baseline > 60_000) {
+    if (!history.length && new Date(dpp.updatedAt).getTime() - baseline > 60_000) {
       events.push({ key: 'updated', title: this.t('product.eventUpdated'), text: this.t('product.eventUpdatedText'), when: fmt(dpp.updatedAt) });
     }
     events.push({ key: 'eol', title: this.t('product.eventEndOfLife'), text: this.t('product.eventEndOfLifeText'), when: '', future: true });
     return events;
   });
+
+  /** Storico delle modifiche (pagina gs1:traceability) e voce di registrazione presso il registro UE
+   * (pagina gs1:registryEntry): caricati solo quando la pagina corrispondente è aperta. */
+  protected history = signal<DppEvent[]>([]);
+  protected registryEntry = signal<RegistryEntry | null>(null);
+  protected registryEntryLoading = signal(false);
+
+  protected registryJson(value: unknown): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(highlightJson(value ? JSON.stringify(value, null, 2) : ''));
+  }
+
+  protected registryText(value: unknown): string {
+    return value ? JSON.stringify(value, null, 2) : '';
+  }
 
   protected jsonLdText = computed(() => {
     const doc = this.activeJsonLd();
@@ -695,6 +722,25 @@ export class ProductComponent implements OnDestroy {
     }
 
     if (isPlatformBrowser(this.platformId)) {
+      effect(() => {
+        const dpp = this.dppRecord();
+        const id = this.section()?.id;
+        if (!dpp) return;
+        if (id === 'traceability') {
+          this.registryApi.getHistory(dpp.gtin).subscribe({ next: (h) => this.history.set(h.events), error: () => this.history.set([]) });
+        } else if (id === 'registryEntry') {
+          this.registryEntry.set(null);
+          this.registryEntryLoading.set(true);
+          this.registryApi.getRegistryEntry(dpp.gtin).subscribe({
+            next: (entry) => {
+              this.registryEntry.set(entry);
+              this.registryEntryLoading.set(false);
+            },
+            error: () => this.registryEntryLoading.set(false),
+          });
+        }
+      });
+
       effect(() => {
         const text = this.jsonLdText();
         if (!text) {

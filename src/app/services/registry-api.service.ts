@@ -45,6 +45,43 @@ export interface DppInput {
   facilityId?: string;
 }
 
+/** Voce di registrazione presso il DPP Registry UE — richiesta e risposta con gli identificativi
+ * assegnati. `requestReconstructed`: per le schede registrate prima che venissero salvate. */
+export interface RegistryEntry {
+  available: boolean;
+  source: 'registration' | 'registry-lookup' | 'reconstructed' | null;
+  registryId: string | null;
+  registeredAt: string | null;
+  request: Record<string, unknown> | null;
+  requestReconstructed?: boolean;
+  response: Record<string, unknown> | null;
+}
+
+/** Un evento dello storico di un DPP (modifica reale o simulata). */
+export interface DppEvent {
+  id: string;
+  at: string;
+  scenario: string;
+  simulated: boolean;
+  title: string;
+  summary: string;
+  changes: Record<string, { before: string | null; after: string | null }>;
+}
+
+export type SimulationScenario = 'repair' | 'recycled-content' | 'carbon-recalc' | 'certificate-renewal' | 'software-update' | 'end-of-life' | 'custom';
+
+export interface SimulateChangeInput {
+  scenario: SimulationScenario;
+  monthsLater?: number;
+  patch?: Record<string, string | null>;
+}
+
+export interface SimulateChangeResult {
+  record: DppRecord;
+  event: DppEvent;
+  mergePatch: { attributes: Record<string, string | null> };
+}
+
 const BASE = '/registry-api';
 
 /** Il piano gratuito di Render addormenta ogni servizio dopo un periodo di inattività e lo
@@ -129,6 +166,20 @@ export class RegistryApiService {
     return this.withColdStartRetry(
       this.http.post<DppRecord & { technical?: PublishTechnicalTrace }>(`${BASE}/dpp/${id}/publish`, {}, { withCredentials: true }).pipe(timeout(PUBLISH_HTTP_TIMEOUT_MS))
     );
+  }
+
+  /** Simula una modifica nel tempo di un DPP pubblicato (non statico): vedi
+   * registry-api/src/routes/dpp.ts#simulate-change. */
+  simulateChange(id: string, input: SimulateChangeInput): Observable<SimulateChangeResult> {
+    return this.withColdStartRetry(this.http.post<SimulateChangeResult>(`${BASE}/dpp/${id}/simulate-change`, input, { withCredentials: true }));
+  }
+
+  getRegistryEntry(gtin: string): Observable<RegistryEntry> {
+    return this.withColdStartRetry(this.http.get<RegistryEntry>(`${BASE}/public/dpp/${gtin}/registry-entry`));
+  }
+
+  getHistory(gtin: string): Observable<{ dppId: string; events: DppEvent[] }> {
+    return this.withColdStartRetry(this.http.get<{ dppId: string; events: DppEvent[] }>(`${BASE}/public/dpp/${gtin}/history`));
   }
 
   /** Lettura pubblica (nessun cookie, nessuna password) usata dalla pagina prodotto `/01/:gtin`

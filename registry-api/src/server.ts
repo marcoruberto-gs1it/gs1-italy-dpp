@@ -8,6 +8,7 @@ import { publicRouter } from './routes/public.ts';
 import { v1Router } from './routes/v1.ts';
 import { resyncAllToResolver } from './resyncResolver.ts';
 import { siteUrl } from './publicUrls.ts';
+import { getTrace, traceMiddleware } from './trace.ts';
 import { refreshStaticSeeds } from './refreshSeeds.ts';
 
 const app = express();
@@ -28,6 +29,17 @@ app.use(express.json({ type: ['application/json', 'application/merge-patch+json'
 // sia in produzione (dietro Traefik) sia in sviluppo (proxy.conf.json inoltra il percorso
 // così com'è, senza riscriverlo).
 const base = express.Router();
+// Traccia delle chiamate uscenti di ogni richiesta (Auth0, registro UE, resolver): header
+// X-Trace-Id sulla risposta, contenuto recuperabile da GET /trace/:id — vedi trace.ts.
+base.use(traceMiddleware);
+base.get('/trace/:id', (req, res) => {
+  const trace = getTrace(req.params.id);
+  if (!trace) {
+    res.status(404).json({ error: 'traccia non trovata (le tracce restano in memoria solo per le ultime richieste)' });
+    return;
+  }
+  res.json(trace);
+});
 base.get('/health', (_req, res) => res.json({ status: 'ok' }));
 // Chiamato dal frontend all'apertura della sezione admin (vedi admin.ts) per risvegliare in
 // anticipo mock-eu-registry — pubblico apposta (nessun requireAuth): serve solo a scaldare un

@@ -18,6 +18,7 @@
  */
 import type { DppRecord, GranularityLevel } from './db.ts';
 import { attributeLinkTypes, type SectionLinkTypeId } from './linkTypes.ts';
+import { tracedFetch } from './trace.ts';
 
 /** Stessa funzione di jsonld.ts/mockRegistryClient.ts, duplicata qui per lo stesso motivo già
  * documentato in quei due file: nessuna dipendenza incrociata tra moduli che parlano con
@@ -162,7 +163,7 @@ export async function syncResolverEntry(record: DppRecord, siteUrl: string): Pro
   };
 
   try {
-    const putResponse = await fetch(`${config.apiUrl}${anchor}`, {
+    const putResponse = await tracedFetch('Resolver GS1 · aggiornamento linkset (PUT)', `${config.apiUrl}${anchor}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify(document),
@@ -175,7 +176,7 @@ export async function syncResolverEntry(record: DppRecord, siteUrl: string): Pro
     }
     // 404 (anchor non esistente) o 405 (anchor con qualificatore AI, PUT non supportato lì) —
     // in entrambi i casi POST /new fa comunque l'upsert corretto.
-    const postResponse = await fetch(`${config.apiUrl}/new`, {
+    const postResponse = await tracedFetch('Resolver GS1 · creazione entry (POST /new)', `${config.apiUrl}/new`, {
       method: 'POST',
       headers,
       body: JSON.stringify(document),

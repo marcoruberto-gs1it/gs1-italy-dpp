@@ -9,7 +9,8 @@ import { tap } from 'rxjs';
 import { IconComponent, IconName } from '../../components/icon/icon';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
-import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryApiService } from '../../services/registry-api.service';
+import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryApiService, SimulateChangeResult, SimulationScenario } from '../../services/registry-api.service';
+import { ApiInspectorService } from '../../services/api-inspector.service';
 import { LanguageService } from '../../services/language.service';
 import { SiteOriginService } from '../../services/site-origin.service';
 import { ThemeService } from '../../services/theme.service';
@@ -49,6 +50,7 @@ const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
 })
 export class Admin {
   private api = inject(RegistryApiService);
+  protected inspector = inject(ApiInspectorService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private fb = inject(FormBuilder);
@@ -752,6 +754,67 @@ export class Admin {
 
   protected sectorBrandColor(sectorId: string): string {
     return this.sectors.find((s) => s.id === sectorId)?.brandColor ?? 'var(--brand)';
+  }
+
+  // ---- Simulazione di una modifica nel tempo (POST /registry-api/dpp/:id/simulate-change) ----
+  protected readonly simulationScenarios: { id: SimulationScenario; label: string; hint: string }[] = [
+    { id: 'repair', label: 'Riparazione', hint: 'Registra un intervento di riparazione e aggiorna il contatore.' },
+    { id: 'recycled-content', label: 'Più contenuto riciclato', hint: 'Una nuova formulazione aumenta la quota di materiale riciclato.' },
+    { id: 'carbon-recalc', label: 'Ricalcolo del carbonio', hint: "Un mix energetico più pulito riduce l'impronta di carbonio del 6%." },
+    { id: 'certificate-renewal', label: 'Rinnovo certificazione', hint: 'La certificazione del prodotto viene rinnovata.' },
+    { id: 'software-update', label: 'Aggiornamento software', hint: 'Sale la versione software del prodotto.' },
+    { id: 'end-of-life', label: 'Fine vita', hint: 'Il prodotto viene ritirato e avviato al riciclo.' },
+    { id: 'custom', label: 'Modifica personalizzata', hint: 'Scrivi tu la merge patch sugli attributi (JSON).' },
+  ];
+  protected simulateTarget = signal<DppRecord | null>(null);
+  protected simScenario = signal<SimulationScenario>('repair');
+  protected simMonths = signal(12);
+  protected simCustom = signal('{\n  "note di manutenzione": "Controllo periodico eseguito"\n}');
+  protected simBusy = signal(false);
+  protected simError = signal<string | null>(null);
+  protected simResult = signal<SimulateChangeResult | null>(null);
+
+  protected openSimulate(record: DppRecord): void {
+    this.simulateTarget.set(record);
+    this.simResult.set(null);
+    this.simError.set(null);
+  }
+
+  protected closeSimulate(): void {
+    this.simulateTarget.set(null);
+  }
+
+  protected runSimulation(): void {
+    const target = this.simulateTarget();
+    if (!target || this.simBusy()) return;
+    let patch: Record<string, string | null> | undefined;
+    if (this.simScenario() === 'custom') {
+      try {
+        patch = JSON.parse(this.simCustom());
+      } catch {
+        this.simError.set('La patch non è un JSON valido.');
+        return;
+      }
+    }
+    this.simBusy.set(true);
+    this.simError.set(null);
+    this.api.simulateChange(target.id, { scenario: this.simScenario(), monthsLater: this.simMonths(), patch }).subscribe({
+      next: (result) => {
+        this.simBusy.set(false);
+        this.simResult.set(result);
+        this.simulateTarget.set(result.record);
+        this.loadRecords().subscribe();
+      },
+      error: (err) => {
+        this.simBusy.set(false);
+        this.simError.set(err?.error?.error ?? 'Simulazione non riuscita.');
+      },
+    });
+  }
+
+  protected simChanges(): { key: string; before: string | null; after: string | null }[] {
+    const ev = this.simResult()?.event;
+    return ev ? Object.entries(ev.changes).map(([key, c]) => ({ key, before: c.before, after: c.after })) : [];
   }
 
   /** URI GS1 Digital Link pubblico di una scheda già registrata — la pagina che l'admin apre per

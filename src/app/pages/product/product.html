@@ -498,6 +498,17 @@
                     <time>{{ event.future ? t('product.eventFuture') : event.when }}</time>
                   </div>
                   <p>{{ event.text }}</p>
+                  @if (event.simulated) { <span class="gs-badge gs-badge--neutral">{{ t('product.eventSimulated') }}</span> }
+                  @if (event.changes?.length) {
+                    <table class="passport-changes">
+                      <thead><tr><th>{{ t('product.changeAttribute') }}</th><th>{{ t('product.changeBefore') }}</th><th>{{ t('product.changeAfter') }}</th></tr></thead>
+                      <tbody>
+                        @for (c of event.changes; track c.key) {
+                          <tr><td>{{ c.key }}</td><td>{{ c.before ?? '—' }}</td><td><strong>{{ c.after ?? '—' }}</strong></td></tr>
+                        }
+                      </tbody>
+                    </table>
+                  }
                   @if (event.meta) { <span class="passport-event-meta">{{ event.meta }}</span> }
                 </div>
               </li>
@@ -517,6 +528,43 @@
               <div class="fact-tile fact-tile--wide"><span class="fact-label">{{ t('linkType.registryEntry.proof') }}</span><span class="fact-value fact-value--mono">{{ dpp.proofJwt.slice(0, 64) }}…</span></div>
             }
           </div>
+
+          <!-- I JSON REALI scambiati con il DPP Registry UE alla registrazione: la richiesta con i soli
+               puntatori (UPI, liveURL…) e la risposta con gli identificativi assegnati (registryId…). -->
+          @if (registryEntryLoading()) {
+            <p class="lt-empty">{{ t('linkType.registryEntry.loading') }}</p>
+          } @else if (registryEntry(); as entry) {
+            <div class="registry-json">
+              <div class="registry-json-block">
+                <div class="registry-json-head">
+                  <span>{{ t('linkType.registryEntry.requestTitle') }} <code>POST /metadata/v1</code></span>
+                  @if (entry.request) {
+                    <button type="button" class="passport-copy-btn" (click)="copy('reg-req', registryText(entry.request))">{{ copiedKey() === 'reg-req' ? t('product.copiedLabel') : t('product.copyJson') }}</button>
+                  }
+                </div>
+                @if (entry.request) {
+                  <pre class="registry-json-body"><code [innerHTML]="registryJson(entry.request)"></code></pre>
+                  @if (entry.requestReconstructed) { <p class="lt-empty">{{ t('linkType.registryEntry.reconstructed') }}</p> }
+                } @else {
+                  <p class="lt-empty">{{ t('linkType.registryEntry.notStored') }}</p>
+                }
+              </div>
+              <div class="registry-json-block">
+                <div class="registry-json-head">
+                  <span>{{ t('linkType.registryEntry.responseTitle') }}</span>
+                  @if (entry.response) {
+                    <button type="button" class="passport-copy-btn" (click)="copy('reg-res', registryText(entry.response))">{{ copiedKey() === 'reg-res' ? t('product.copiedLabel') : t('product.copyJson') }}</button>
+                  }
+                </div>
+                @if (entry.response) {
+                  <pre class="registry-json-body"><code [innerHTML]="registryJson(entry.response)"></code></pre>
+                } @else {
+                  <p class="lt-empty">{{ t('linkType.registryEntry.responseNotStored') }}</p>
+                  <pre class="registry-json-body"><code [innerHTML]="registryJson({ registryId: entry.registryId, registeredAt: entry.registeredAt })"></code></pre>
+                }
+              </div>
+            </div>
+          }
             }
           }
         </section>

@@ -1,0 +1,118 @@
+@if (inspector.count() > 0) {
+  <button type="button" class="api-fab" (click)="inspector.show(true)" aria-label="Apri il pannello delle chiamate API">
+    <app-icon name="braces" [size]="16"></app-icon>
+    <span>API</span>
+    <span class="api-fab-count">{{ inspector.count() }}</span>
+  </button>
+}
+
+@if (inspector.open()) {
+  <div class="api-backdrop" (click)="inspector.open.set(false)"></div>
+  <aside class="api-panel" role="dialog" aria-modal="true" aria-label="Chiamate API e JSON">
+    <header class="api-head">
+      <div>
+        <strong>Chiamate API</strong>
+        <span class="api-head-sub">Ogni richiesta e risposta JSON, comprese quelle del server verso registro UE e resolver</span>
+      </div>
+      <div class="api-head-actions">
+        <button type="button" class="api-btn" (click)="inspector.clear()">Svuota</button>
+        <button type="button" class="api-btn api-btn--icon" (click)="inspector.open.set(false)" aria-label="Chiudi">✕</button>
+      </div>
+    </header>
+
+    <div class="api-body">
+      <ul class="api-list" role="listbox" aria-label="Chiamate">
+        @for (call of inspector.calls(); track call.id) {
+          <li>
+            <button type="button" class="api-row" [class.is-active]="call.id === inspector.selectedId()" (click)="select(call)">
+              <span class="api-method" [attr.data-method]="call.method">{{ call.method }}</span>
+              <span class="api-url">{{ shortUrl(call.url) }}</span>
+              <span class="api-status" [class]="statusClass(call.status)">{{ call.status ?? '—' }}</span>
+              <span class="api-time">{{ call.durationMs === null ? '…' : call.durationMs + ' ms' }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="api-empty">Nessuna chiamata ancora.</li>
+        }
+      </ul>
+
+      <section class="api-detail">
+        @if (selected(); as call) {
+          <div class="api-detail-head">
+            <span class="api-method" [attr.data-method]="call.method">{{ call.method }}</span>
+            <code>{{ call.url }}</code>
+            <span class="api-status" [class]="statusClass(call.status)">{{ call.status ?? '—' }}</span>
+          </div>
+
+          <div class="api-block">
+            <div class="api-block-head">
+              <span>Richiesta</span>
+              @if (text(call.requestBody)) {
+                <button type="button" class="api-btn" (click)="copy('req' + call.id, call.requestBody)">{{ copiedKey() === 'req' + call.id ? 'Copiato' : 'Copia' }}</button>
+              }
+            </div>
+            @if (text(call.requestBody)) {
+              <pre class="api-json"><code [innerHTML]="json(call.requestBody)"></code></pre>
+            } @else {
+              <p class="api-none">Nessun corpo (richiesta {{ call.method }}).</p>
+            }
+          </div>
+
+          <div class="api-block">
+            <div class="api-block-head">
+              <span>Risposta {{ call.status ?? '' }}</span>
+              @if (text(call.responseBody)) {
+                <button type="button" class="api-btn" (click)="copy('res' + call.id, call.responseBody)">{{ copiedKey() === 'res' + call.id ? 'Copiato' : 'Copia' }}</button>
+              }
+            </div>
+            @if (call.error) {
+              <p class="api-none">{{ call.error }}</p>
+            } @else if (text(call.responseBody)) {
+              <pre class="api-json"><code [innerHTML]="json(call.responseBody)"></code></pre>
+            } @else {
+              <p class="api-none">Nessun corpo nella risposta.</p>
+            }
+          </div>
+
+          @if (call.traceId) {
+            <div class="api-block">
+              <div class="api-block-head">
+                <span>Chiamate del server verso i servizi esterni</span>
+                <button type="button" class="api-btn" (click)="reloadOutbound(call)">Aggiorna</button>
+              </div>
+              @if (call.outbound === 'loading') {
+                <p class="api-none">Caricamento…</p>
+              } @else if (call.outbound === 'missing') {
+                <p class="api-none">Traccia non più disponibile (il server ne conserva solo le ultime).</p>
+              } @else if (outboundList(call).length === 0) {
+                <p class="api-none">Questa richiesta non ha chiamato servizi esterni.</p>
+              } @else {
+                @for (out of outboundList(call); track out.seq) {
+                  <details class="api-out">
+                    <summary>
+                      <span class="api-out-n">{{ out.seq }}</span>
+                      <strong>{{ out.label }}</strong>
+                      <span class="api-method" [attr.data-method]="out.method">{{ out.method }}</span>
+                      <span class="api-status" [class]="statusClass(out.status)">{{ out.status ?? '—' }}</span>
+                      <span class="api-time">{{ out.durationMs }} ms</span>
+                    </summary>
+                    <code class="api-out-url">{{ out.url }}</code>
+                    @if (out.error) {
+                      <p class="api-none">{{ out.error }}</p>
+                    }
+                    <div class="api-block-head"><span>Richiesta</span></div>
+                    <pre class="api-json"><code [innerHTML]="json({ headers: out.requestHeaders, body: out.requestBody })"></code></pre>
+                    <div class="api-block-head"><span>Risposta</span></div>
+                    <pre class="api-json"><code [innerHTML]="json(out.responseBody)"></code></pre>
+                  </details>
+                }
+              }
+            </div>
+          }
+        } @else {
+          <p class="api-none api-none--center">Seleziona una chiamata per vedere richiesta e risposta.</p>
+        }
+      </section>
+    </div>
+  </aside>
+}

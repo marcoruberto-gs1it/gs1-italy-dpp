@@ -97,6 +97,27 @@ await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS economic_
 await pool.query("ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS facility_id TEXT NOT NULL DEFAULT 'https://id.gs1.org/414/9521234000112'");
 await pool.query('ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS is_static BOOLEAN NOT NULL DEFAULT false');
 await pool.query('CREATE INDEX IF NOT EXISTS gs1_dpp_records_gtin_idx ON gs1_dpp_records (gtin)');
+// Richiesta e risposta REALI scambiate con il DPP Registry UE alla registrazione (con gli
+// identificativi assegnati): salvate per poterle rimostrare in qualunque momento, non solo
+// nell'istante della pubblicazione. NULL per le schede registrate prima di questa colonna.
+await pool.query('ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS registry_request JSONB');
+await pool.query('ALTER TABLE gs1_dpp_records ADD COLUMN IF NOT EXISTS registry_response JSONB');
+// Storico delle modifiche nel tempo (reali o simulate): un evento per modifica, con cosa è
+// cambiato (prima/dopo) — alimenta la pagina gs1:traceability.
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS gs1_dpp_events (
+    id UUID PRIMARY KEY,
+    dpp_id UUID NOT NULL,
+    at TIMESTAMPTZ NOT NULL,
+    scenario TEXT NOT NULL,
+    simulated BOOLEAN NOT NULL DEFAULT true,
+    title TEXT NOT NULL,
+    summary TEXT NOT NULL DEFAULT '',
+    changes JSONB NOT NULL DEFAULT '{}',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )
+`);
+await pool.query('CREATE INDEX IF NOT EXISTS gs1_dpp_events_dpp_idx ON gs1_dpp_events (dpp_id, at)');
 
 function fromRow(row: DppRow): DppRecord {
   return {
@@ -265,4 +286,73 @@ export async function markPublished(id: string, registryId: string, proofJwt: st
     [id, registryId, proofJwt]
   );
   return rows[0] ? fromRow(rows[0]) : undefined;
+}
+
+
+/** Richiesta/risposta scambiate con il registro UE alla registrazione — vedi le colonne sopra. */
+export async function saveRegistryTrace(id: string, request: unknown, response: unknown): Promise<void> {
+  await pool.query('UPDATE gs1_dpp_records SET registry_request = $2, registry_response = $3 WHERE id = $1', [id, JSON.stringify(request), JSON.stringify(response)]);
+}
+
+export async function getRegistryTrace(id: string): Promise<{ request: unknown; response: unknown } | null> {
+  const { rows } = await pool.query<{ registry_request: unknown; registry_response: unknown }>('SELECT registry_request, registry_response FROM gs1_dpp_records WHERE id = $1', [id]);
+  const row = rows[0];
+  return row && row.registry_response ? { request: row.registry_request, response: row.registry_response } : null;
+}
+
+/** Modifica di UNA scheda nel tempo: `changes` è { chiave: { before, after } } (null = assente). */
+export interface DppEvent {
+  id: string;
+  dppId: string;
+  at: string;
+  scenario: string;
+  simulated: boolean;
+  title: string;
+  summary: string;
+  changes: Record<string, { before: string | null; after: string | null }>;
+}
+
+interface EventRow {
+  id: string;
+  dpp_id: string;
+  at: Date;
+  scenario: string;
+  simulated: boolean;
+  title: string;
+  summary: string;
+  changes: DppEvent['changes'];
+}
+
+function eventFromRow(row: EventRow): DppEvent {
+  return { id: row.id, dppId: row.dpp_id, at: row.at.toISOString(), scenario: row.scenario, simulated: row.simulated, title: row.title, summary: row.summary, changes: row.changes };
+}
+
+export async function listEvents(dppId: string): Promise<DppEvent[]> {
+  const { rows } = await pool.query<EventRow>('SELECT * FROM gs1_dpp_events WHERE dpp_id = $1 ORDER BY at ASC, created_at ASC', [dppId]);
+  return rows.map(eventFromRow);
+}
+
+/** Applica una modifica ad una scheda e ne registra l'evento, in una sola transazione: gli
+ * attributi cambiano, `updated_at` diventa l'istante (simulato) della modifica. */
+export async function applyChange(
+  record: DppRecord,
+  attributes: Record<string, string>,
+  event: Omit<DppEvent, 'id' | 'dppId'>
+): Promise<{ record: DppRecord; event: DppEvent }> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query<DppRow>('UPDATE gs1_dpp_records SET attributes = $2, updated_at = $3 WHERE id = $1 RETURNING *', [record.id, JSON.stringify(attributes), event.at]);
+    const inserted = await client.query<EventRow>(
+      'INSERT INTO gs1_dpp_events (id, dpp_id, at, scenario, simulated, title, summary, changes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [randomUUID(), record.id, event.at, event.scenario, event.simulated, event.title, event.summary, JSON.stringify(event.changes)]
+    );
+    await client.query('COMMIT');
+    return { record: fromRow(updated.rows[0]), event: eventFromRow(inserted.rows[0]) };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
