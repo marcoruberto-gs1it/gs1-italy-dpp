@@ -4,6 +4,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../components/icon/icon';
+import { LottiePlayerComponent } from '../../components/lottie-player/lottie-player';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { Sector, SECTORS, localizeSector } from '../../data/sectors';
 import { I18nService } from '../../services/i18n.service';
@@ -94,7 +95,7 @@ function buildSpine<T>(items: T[], valueOf: (item: T) => number, todayYear: numb
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterLink, IconComponent, QRCodeComponent, ScrollRevealDirective],
+  imports: [CommonModule, RouterLink, IconComponent, QRCodeComponent, ScrollRevealDirective, LottiePlayerComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -114,12 +115,6 @@ export class Home implements OnDestroy {
   /** I settori target del progetto DPP, nella lingua corrente — anche fonte delle card del
    * carosello di anteprima nella hero (un settore = una card), niente dati duplicati. */
   sectors = computed<Sector[]>(() => SECTORS.map((s) => localizeSector(s, this.languageService.lang())));
-
-  /** Esempio reale di GS1 Digital Link mostrato nella card "risoluzione" di Come funziona: lo
-   * stesso URL del primo esempio del carosello, senza protocollo (come lo mostra un browser). */
-  protected exampleDigitalLink = computed(() =>
-    this.resolverOrigin.digitalLink(SECTORS[0].exampleGtin).replace(/^https?:\/\//, '')
-  );
 
   private static readonly STATUS_KEY: Record<MilestoneStatus, string> = { done: 'Done', soon: 'Soon', later: 'Later' };
 

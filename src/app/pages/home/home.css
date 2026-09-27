@@ -660,7 +660,15 @@
 
 
 
+/* Design system a 4 colori coordinati (indaco/ambra/verde/viola — vedi il commento su
+   --violet-tint in tokens.css), un colore per passo: distingue le 4 fasi a colpo d'occhio
+   invece del grigio uniforme di prima, senza tornare a un arcobaleno casuale — sempre le stesse
+   4 tinte, nello stesso ordine, ovunque compaiano 4 card in fila su questa pagina (vedi anche
+   .benefit-icon più sotto). */
 .dpp-flow-step {
+  --step-accent: var(--brand);
+  --step-tint: var(--blue-tint);
+  --step-ink: var(--blue-ink);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -668,47 +676,42 @@
   padding: 22px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
+  border-top: 3px solid var(--step-accent);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 
+.dpp-flow-step:nth-child(2) { --step-accent: var(--brand-accent); --step-tint: var(--orange-tint); --step-ink: var(--orange-ink); }
+.dpp-flow-step:nth-child(3) { --step-accent: var(--success); --step-tint: var(--green-tint); --step-ink: var(--green-ink); }
+.dpp-flow-step:nth-child(4) { --step-accent: #7c3aed; --step-tint: var(--violet-tint); --step-ink: var(--violet-ink); }
 
 
+
+/* Tessera dell'icona: tinta pastello dell'accento del passo (non più grigio neutro) — l'icona
+   vera e propria è l'animazione Lottie dentro (app-lottie-player), qui resta solo il fondo
+   colorato che la fa risaltare sulla card bianca. */
 .dpp-flow-icon {
   position: absolute;
   top: 20px;
   right: 20px;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-surface-sunken);
-  color: var(--text-secondary);
+  background: var(--step-tint);
+  color: var(--step-ink);
 }
-
-/* Un solo accento, riservato all'ultimo passo (il DPP verificato): gli altri tre restano
-   monocromi, non sono quattro fasi di pari peso da colorare a rotazione. */
-.dpp-flow-step--highlight .dpp-flow-icon { background: var(--brand-accent); color: #fff; }
-
-
 
 .dpp-flow-index {
   display: block;
   font-size: 1.7rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--text-primary);
+  color: var(--step-accent);
   margin-bottom: 10px;
 }
-
-
-
-.dpp-flow-step:nth-child(2) .dpp-flow-index { color: var(--brand-accent); }
-
-
-.dpp-flow-step:nth-child(3) .dpp-flow-index { color: var(--green-ink); }
 
 
 
@@ -720,18 +723,6 @@
 }
 
 
-
-.dpp-flow-code {
-  display: block;
-  margin-top: 12px;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-surface-sunken);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-primary);
-  word-break: break-all;
-}
 
 
 
@@ -764,17 +755,18 @@
   align-items: flex-start;
 }
 
-
+/* Stesse 4 tinte coordinate di .dpp-flow-step (vedi il commento lì): un colore per vantaggio,
+   sempre le stesse 4 nello stesso ordine. */
+.benefit-card:nth-child(1) { --step-tint: var(--blue-tint); --step-ink: var(--blue-ink); }
+.benefit-card:nth-child(2) { --step-tint: var(--orange-tint); --step-ink: var(--orange-ink); }
+.benefit-card:nth-child(3) { --step-tint: var(--green-tint); --step-ink: var(--green-ink); }
+.benefit-card:nth-child(4) { --step-tint: var(--violet-tint); --step-ink: var(--violet-ink); }
 
 .benefit-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
-
-
-/* Monocrome: quattro vantaggi di pari peso, non un arcobaleno decorativo — il colore qui non
-   distingue nulla (a differenza del colore di settore altrove nel sito). */
 .benefit-icon {
   width: 40px;
   height: 40px;
@@ -783,8 +775,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-surface-sunken);
-  color: var(--text-secondary);
+  background: var(--step-tint);
+  color: var(--step-ink);
 }
 
 
@@ -1902,10 +1894,6 @@
     padding: 16px;
   }
 
-
-  .dpp-flow-code {
-    display: none;
-  }
 
 
   .benefit-grid {

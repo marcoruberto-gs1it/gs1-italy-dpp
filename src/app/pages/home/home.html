@@ -2,10 +2,6 @@
   <div class="hero-inner">
     <div class="hero-grid">
       <div class="hero-copy" appScrollReveal="stagger" [revealStagger]="0.12">
-        <span class="hero-badge">
-          <app-icon name="shield-check" [size]="14"></app-icon>
-          {{ t('hero.badge') }}
-        </span>
         <h1>{{ t('hero.titleLine1') }}<br><span class="hero-highlight">{{ t('hero.titleHighlight') }}</span></h1>
         <p>{{ t('hero.subtitle') }}</p>
 
@@ -131,16 +127,27 @@
 
     <ol class="dpp-flow" appScrollReveal="stagger">
       <li class="dpp-flow-step">
-        <span class="dpp-flow-icon icon-flat"><app-icon name="hash" [size]="22"></app-icon></span>
+        <span class="dpp-flow-icon">
+          @if (isBrowser) {
+            <app-lottie-player path="/animations/dpp-step-identifier.json" [size]="30"></app-lottie-player>
+          } @else {
+            <app-icon name="hash" [size]="20"></app-icon>
+          }
+        </span>
         <div class="dpp-flow-body">
           <span class="dpp-flow-index">01</span>
           <h3>{{ t('dpp.step1Title') }}</h3>
           <p>{{ t('dpp.step1Text') }}</p>
-          <code class="dpp-flow-code">(01) {{ sectors()[0].exampleGtin }}</code>
         </div>
       </li>
       <li class="dpp-flow-step">
-        <span class="dpp-flow-icon icon-flat"><app-icon name="qr-code" [size]="22"></app-icon></span>
+        <span class="dpp-flow-icon">
+          @if (isBrowser) {
+            <app-lottie-player path="/animations/dpp-step-carrier.json" [size]="30"></app-lottie-player>
+          } @else {
+            <app-icon name="qr-code" [size]="20"></app-icon>
+          }
+        </span>
         <div class="dpp-flow-body">
           <span class="dpp-flow-index">02</span>
           <h3>{{ t('dpp.step2Title') }}</h3>
@@ -148,16 +155,27 @@
         </div>
       </li>
       <li class="dpp-flow-step">
-        <span class="dpp-flow-icon icon-flat"><app-icon name="link" [size]="22"></app-icon></span>
+        <span class="dpp-flow-icon">
+          @if (isBrowser) {
+            <app-lottie-player path="/animations/dpp-step-resolve.json" [size]="30"></app-lottie-player>
+          } @else {
+            <app-icon name="link" [size]="20"></app-icon>
+          }
+        </span>
         <div class="dpp-flow-body">
           <span class="dpp-flow-index">03</span>
           <h3>{{ t('dpp.step3Title') }}</h3>
           <p>{{ t('dpp.step3Text') }}</p>
-          <code class="dpp-flow-code">{{ exampleDigitalLink() }}</code>
         </div>
       </li>
-      <li class="dpp-flow-step dpp-flow-step--highlight">
-        <span class="dpp-flow-icon icon-flat"><app-icon name="shield-check" [size]="22"></app-icon></span>
+      <li class="dpp-flow-step">
+        <span class="dpp-flow-icon">
+          @if (isBrowser) {
+            <app-lottie-player path="/animations/dpp-step-access.json" [size]="30"></app-lottie-player>
+          } @else {
+            <app-icon name="shield-check" [size]="20"></app-icon>
+          }
+        </span>
         <div class="dpp-flow-body">
           <span class="dpp-flow-index">04</span>
           <h3>{{ t('dpp.step4Title') }}</h3>
