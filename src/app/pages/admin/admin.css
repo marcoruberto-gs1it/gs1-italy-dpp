@@ -196,7 +196,9 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--brand-accent);
+  /* Monocromo come il resto della sezione (vedi il commento in cima al file): un'etichetta di
+     intestazione non è un'azione, non merita l'unico colore d'accento della sezione. */
+  color: var(--text-tertiary);
 }
 
 .admin-kpis {
@@ -212,11 +214,15 @@
   gap: 4px;
   padding: 18px 20px;
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
+/* Icona di supporto, monocroma: non identifica nulla (a differenza del colore di settore in
+   .record-icon), quindi non ha un colore proprio — l'unico accento della sezione resta il
+   bottone primario. Il significato del numero (in regola / in attesa) resta affidato al testo
+   sotto, non a un colore diverso per ogni tessera. */
 .admin-kpi-icon {
   width: 32px;
   height: 32px;
@@ -225,11 +231,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
 }
-
-.admin-kpi-icon--blue { background: var(--blue-tint); color: var(--blue-ink); }
-.admin-kpi-icon--green { background: var(--green-tint); color: var(--green-ink); }
-.admin-kpi-icon--orange { background: var(--orange-tint); color: var(--orange-ink); }
 
 .admin-kpi-value {
   font-size: 1.9rem;
@@ -239,9 +243,6 @@
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
-
-.admin-kpi-value--green { color: var(--green-ink); }
-.admin-kpi-value--orange { color: var(--brand-accent); }
 
 .admin-kpi-label {
   font-size: 0.84rem;
@@ -661,7 +662,7 @@
   padding: 3px;
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 24, 67, 0.18);
+  border: 1px solid var(--border-default);
   flex-shrink: 0;
 }
 
@@ -695,8 +696,9 @@
   justify-content: space-between;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -704,11 +706,25 @@
 }
 
 .console-registry-pill {
-  padding: 3px 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
   border-radius: var(--radius-full);
-  background: var(--green-tint);
-  color: var(--green-ink);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.66rem;
+  letter-spacing: 0.04em;
+}
+
+.console-registry-pill::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--success);
+  flex-shrink: 0;
 }
 
 .console-nav {
@@ -773,14 +789,15 @@
   gap: 10px;
   padding: 12px;
   border-radius: var(--radius-md);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.74rem;
   line-height: 1.45;
 }
 
 .console-note app-icon {
-  color: var(--brand-accent);
+  color: var(--text-tertiary);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -798,7 +815,7 @@
   padding: 10px;
   border-radius: var(--radius-md);
   background: var(--bg-surface);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-default);
 }
 
 .console-user-avatar {
@@ -860,10 +877,8 @@
   align-items: center;
   gap: 14px;
   padding: 12px 28px;
-  background: var(--bg-glass-strong);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .console-search {
@@ -1118,8 +1133,10 @@
 }
 
 .sim-scenario.is-active {
-  border-color: var(--brand);
-  background: var(--blue-tint);
+  border-color: var(--text-primary);
+  border-width: 2px;
+  padding: 9px 11px;
+  background: var(--bg-surface-sunken);
 }
 
 .sim-scenario small {
@@ -1180,8 +1197,9 @@
 .sim-result {
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  background: var(--green-tint);
-  color: var(--green-ink);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
 }
 
 .sim-result h3 {
@@ -1204,6 +1222,6 @@
 .sim-changes td {
   padding: 5px 8px;
   text-align: left;
-  border-top: 1px solid rgba(0, 56, 17, 0.2);
+  border-top: 1px solid var(--border-subtle);
   overflow-wrap: anywhere;
 }

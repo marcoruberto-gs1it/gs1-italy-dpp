@@ -38,17 +38,6 @@
      su tela usa sopra la variante "accessibile" più scura, non questo valore). */
   --brand-accent-vivid: #f26334;
   --brand-ink: #001843;
-  /* Oro GS1 — prima solo il secondo stop del gradiente CTA, ora anche un token a sé: una terza
-     nota di colore (non un nuovo brand color, la stessa tinta già in uso) per badge/eyebrow/
-     dettagli decorativi, così la palette non resta un semplice bicromatismo blu/arancione su
-     ogni pagina. Stessa verifica di contrasto di --brand-accent-vivid: 5.7:1+ con --brand-ink
-     sopra, mai testo bianco. */
-  --brand-gold: #fbb034;
-  --brand-gold-soft: rgba(251, 176, 52, 0.16);
-  /* Gradiente per CTA principali (hero, Wizard) — arancione → oro GS1, entrambi gli stop
-     verificati 5.7:1+ con --brand-ink sopra, stessa regola di --brand-accent-vivid qui
-     accanto: mai testo bianco. */
-  --gradient-cta: linear-gradient(120deg, var(--brand-accent-vivid), var(--brand-gold));
 
   /* --- Verde e tinte pastello del design Figma ---
      Verde: solo per gli accenti "positivi/circolari" (parola evidenziata del titolo, badge
@@ -90,13 +79,15 @@
      Ombre più morbide e diffuse (blur maggiore, meno opacità, tinta calda invece che
      blu-grigia) per lo stesso motivo della scala radii sopra — carte che "galleggiano"
      leggere, non un'ombra dura che le stacca dallo sfondo. */
-  --shadow-xs: 0 1px 1px rgba(0, 24, 67, 0.05);
-  --shadow-sm: 0 1px 8px rgba(0, 44, 108, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 24, 67, 0.08), 0 2px 4px -2px rgba(0, 24, 67, 0.06);
-  --shadow-lg: 0 12px 20px -6px rgba(0, 24, 67, 0.1), 0 4px 8px -4px rgba(0, 24, 67, 0.06);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 24, 67, 0.12), 0 8px 10px -6px rgba(0, 24, 67, 0.08);
-  --shadow-glow-blue: 0 4px 12px -4px rgba(0, 44, 108, 0.4);
-  --shadow-glow-orange: 0 4px 12px -4px rgba(173, 51, 2, 0.4);
+  /* Stile minimal/Swiss (vedi il riferimento del 2026-09-27): le card si distinguono dalla tela
+     con un bordo netto, non con un'ombra — --shadow-sm/md restano solo per elementi che
+     galleggiano DAVVERO sopra il contenuto (drawer, modali, il pannello API), mai per le card a
+     riposo. Niente più token "glow" colorato: un bordo/riempimento piatto basta ai bottoni. */
+  --shadow-xs: 0 1px 2px rgba(0, 24, 67, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 24, 67, 0.06);
+  --shadow-md: 0 4px 12px -4px rgba(0, 24, 67, 0.1);
+  --shadow-lg: 0 12px 24px -8px rgba(0, 24, 67, 0.14);
+  --shadow-xl: 0 20px 40px -12px rgba(0, 24, 67, 0.18);
 
   /* --- Semantic surface tokens (LIGHT) ---
      Tela azzurrina fredda (#f9f9ff) con fondi alternati #f0f3ff, come nel design Figma di
@@ -211,13 +202,11 @@
   --warning: #fbbf24;
   --warning-soft: rgba(251, 191, 36, 0.14);
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 20px 48px -12px rgba(0, 0, 0, 0.55);
-  --shadow-xl: 0 30px 70px -16px rgba(0, 0, 0, 0.6);
-  --shadow-glow-blue: 0 0 40px -6px rgba(58, 112, 191, 0.45);
-  --shadow-glow-orange: 0 0 40px -6px rgba(242, 99, 52, 0.4);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 20px -6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 32px -10px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 24px 48px -14px rgba(0, 0, 0, 0.5);
 
   --mesh-1: rgba(58, 112, 191, 0.35);
   --mesh-2: rgba(242, 99, 52, 0.28);
@@ -303,10 +292,12 @@ img.img-fallback {
 
 .gs-card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  /* Bordo netto (non "subtle": deve leggersi da solo, senza l'ombra che prima lo affiancava)
+     invece di un'ombra diffusa — vedi il commento su --shadow-sm più sopra. */
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+  box-shadow: none;
+  transition: border-color var(--dur-base) var(--ease-out);
 }
 
 .gs-badge {
@@ -323,12 +314,6 @@ img.img-fallback {
   flex-shrink: 0;
 }
 
-.gs-badge--ai {
-  background: var(--brand-accent-vivid);
-  color: var(--brand-ink);
-  box-shadow: 0 4px 14px -4px rgba(242, 99, 52, 0.5);
-}
-
 .gs-badge--verified {
   background: var(--success-soft);
   color: var(--success);
@@ -337,11 +322,6 @@ img.img-fallback {
 .gs-badge--vocab {
   background: rgba(0, 44, 108, 0.1);
   color: var(--brand-strong);
-}
-
-.gs-badge--schema {
-  background: rgba(153, 0, 0, 0.14);
-  color: #990000;
 }
 
 /* Bottoni sole/luna del selettore tema (vedi .theme-toggle in app.css): quale dei due si vede
@@ -366,11 +346,6 @@ img.img-fallback {
   color: #89aadb;
 }
 
-:root[data-theme='dark'] .gs-badge--schema {
-  background: rgba(255, 107, 107, 0.16);
-  color: #ff8f8f;
-}
-
 .gs-badge--green {
   background: var(--green-tint);
   color: var(--green-ink);
@@ -391,6 +366,32 @@ img.img-fallback {
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
 }
+
+/* ----- Badge "a pallino" (stile minimal: bordo sottile + pallino colorato + testo scuro,
+   invece di una pillola a riempimento pieno) — stato di uno scheda/riga (Attivo/Bozza/In
+   attesa…). Il colore vive SOLO nel pallino, mai nello sfondo: un solo accento per volta. ----- */
+.gs-badge--dot {
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.gs-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--dot-color, var(--text-tertiary));
+}
+
+.gs-badge--dot.gs-badge--success { color: var(--text-primary); }
+.gs-badge--dot.gs-badge--success .gs-badge-dot { background: var(--success); }
+.gs-badge--dot.gs-badge--warning .gs-badge-dot { background: var(--warning); }
+.gs-badge--dot.gs-badge--neutral-dot .gs-badge-dot { background: var(--text-tertiary); }
 
 /* Pillola piccola per filtri/tag attivi — variante di .gs-badge con affordance di filtro
    (bordo più marcato, dimensione touch-friendly) invece del badge puramente informativo. */
@@ -492,6 +493,14 @@ img.img-fallback {
   color: #ffffff;
 }
 
+/* Variante monocroma di .icon-badge/.icon-flat: stesso ingombro, nessun colore — per le icone
+   di supporto (KPI di dashboard, azioni di riga) dove il colore non identifica nulla. */
+.icon-flat--neutral {
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
 /* Tessera "etichetta + valore" per gli attributi liberi di una scheda DPP — usata sia
    dall'anteprima infografica di /admin sia dalla scheda pubblica su /01/:gtin. */
 .fact-tile {
@@ -589,7 +598,6 @@ img.img-fallback {
 .gs-btn--primary {
   background: var(--brand);
   color: #fff;
-  box-shadow: var(--shadow-glow-blue);
 }
 .gs-btn--primary:hover {
   background: var(--accent-strong);
@@ -598,7 +606,6 @@ img.img-fallback {
 .gs-btn--accent {
   background: var(--brand-accent);
   color: #fff;
-  box-shadow: var(--shadow-glow-orange);
 }
 .gs-btn--accent:hover {
   background: var(--brand-accent-strong);

@@ -17,8 +17,11 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-md);
-  background: var(--green-tint);
-  color: var(--green-ink);
+  /* Monocroma: l'icona non distingue davvero le sezioni (era sempre verde a prescindere dal
+     link type), quindi non merita un colore proprio — vedi lo stesso principio in home.css. */
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 .lt-head-text {
@@ -51,8 +54,9 @@
 .lt-head-curie {
   padding: 4px 10px;
   border-radius: var(--radius-full);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 0.74rem;
   font-weight: 600;

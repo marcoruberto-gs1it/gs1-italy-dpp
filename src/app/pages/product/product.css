@@ -605,9 +605,9 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  background:
-    radial-gradient(ellipse 80% 70% at 30% 20%, rgba(255, 255, 255, 0.28), transparent 60%),
-    var(--sector-color, var(--brand));
+  /* Riempimento piatto: niente sfumatura lucida decorativa, il colore del settore basta da
+     solo a identificare la scheda (stile minimal). */
+  background: var(--sector-color, var(--brand));
 }
 
 .passport-visual-icon {
@@ -781,7 +781,8 @@
   padding: 3px;
   gap: 2px;
   border-radius: var(--radius-sm);
-  background: var(--blue-tint);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
 }
 
 .passport-seg-item {
@@ -1025,6 +1026,8 @@
   word-break: break-all;
 }
 
+/* Monocrome: NFC e RAIN RFID sono due supporti di pari livello, non un semaforo — vedi lo
+   stesso principio in home.css/benefit-icon. */
 .passport-carrier-icon {
   display: flex;
   align-items: center;
@@ -1033,13 +1036,8 @@
   height: 38px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
-}
-
-.passport-carrier-icon--orange {
-  background: var(--orange-tint);
-  color: var(--orange-ink);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
 }
 
 .passport-carrier strong {
@@ -1113,7 +1111,7 @@
 .passport-bar-track {
   height: 8px;
   border-radius: var(--radius-full);
-  background: var(--blue-tint);
+  background: var(--bg-surface-sunken);
   overflow: hidden;
 }
 
@@ -1388,8 +1386,9 @@
   margin-left: auto;
   padding: 3px 9px;
   border-radius: var(--radius-full);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
@@ -1490,8 +1489,9 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-sm);
-  background: var(--green-tint);
-  color: var(--green-ink);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 .lt-nav-body {

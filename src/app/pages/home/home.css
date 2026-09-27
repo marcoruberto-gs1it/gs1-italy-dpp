@@ -47,8 +47,9 @@
   padding: 6px 12px;
   margin-bottom: 20px;
   border-radius: var(--radius-full);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -58,7 +59,7 @@
 
 
 .hero-badge app-icon {
-  color: var(--green-ink);
+  color: var(--success);
 }
 
 
@@ -106,9 +107,9 @@
   gap: 4px;
   padding: 20px;
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 
@@ -125,13 +126,14 @@
 
 
 
-.kpi-icon--blue { background: var(--blue-tint); color: var(--blue-ink); }
-
-
-.kpi-icon--green { background: var(--green-tint); color: var(--green-ink); }
-
-
-.kpi-icon--orange { background: var(--orange-tint); color: var(--orange-ink); }
+/* Monocromo: sono icone di supporto (non identificano un settore), un solo colore d'accento
+   resta per gli elementi davvero interattivi — vedi lo stesso principio in admin.css. */
+.kpi-icon--blue,
+.kpi-icon--green,
+.kpi-icon--orange {
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
+}
 
 
 
@@ -146,10 +148,10 @@
 
 
 
-.kpi-value--green { color: var(--green-ink); }
+.kpi-value--green { color: var(--text-primary); }
 
 
-.kpi-value--orange { color: var(--brand-accent); }
+.kpi-value--orange { color: var(--text-primary); }
 
 
 
@@ -375,19 +377,21 @@
   gap: 5px;
   padding: 6px 12px;
   border-radius: var(--radius-full);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.74rem;
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
-  transition: background var(--dur-fast), color var(--dur-fast);
+  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
 }
 
 
 
 .preview-open-link:hover {
   background: var(--brand-ink);
+  border-color: var(--brand-ink);
   color: #fff;
 }
 
@@ -621,18 +625,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
 }
 
-
-
-.dpp-flow-step:nth-child(2) .dpp-flow-icon { background: var(--orange-tint); color: var(--orange-ink); }
-
-
-.dpp-flow-step:nth-child(3) .dpp-flow-icon { background: var(--green-tint); color: var(--green-ink); }
-
-
+/* Un solo accento, riservato all'ultimo passo (il DPP verificato): gli altri tre restano
+   monocromi, non sono quattro fasi di pari peso da colorare a rotazione. */
 .dpp-flow-step--highlight .dpp-flow-icon { background: var(--brand-accent); color: #fff; }
 
 
@@ -716,6 +714,8 @@
 
 
 
+/* Monocrome: quattro vantaggi di pari peso, non un arcobaleno decorativo — il colore qui non
+   distingue nulla (a differenza del colore di settore altrove nel sito). */
 .benefit-icon {
   width: 40px;
   height: 40px;
@@ -724,19 +724,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--green-tint);
-  color: var(--green-ink);
+  background: var(--bg-surface-sunken);
+  color: var(--text-secondary);
 }
-
-
-
-.benefit-card:nth-child(2) .benefit-icon { background: var(--blue-tint); color: var(--blue-ink); }
-
-
-.benefit-card:nth-child(3) .benefit-icon { background: var(--orange-tint); color: var(--orange-ink); }
-
-
-.benefit-card:nth-child(4) .benefit-icon { background: var(--blue-tint); color: var(--blue-ink); }
 
 
 

@@ -58,9 +58,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  background:
-    radial-gradient(ellipse 70% 80% at 25% 15%, rgba(255, 255, 255, 0.28), transparent 60%),
-    var(--sector-color, var(--brand));
+  background: var(--sector-color, var(--brand));
 }
 
 .pip-view-icon {
@@ -179,16 +177,19 @@
   gap: 7px;
   padding: 7px 13px;
   border-radius: var(--radius-full);
-  background: var(--green-tint);
-  color: var(--green-ink);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
-  transition: transform var(--dur-fast);
+  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
 }
 
 .pip-view-more-item:hover {
-  transform: translateY(-1px);
+  background: var(--brand-ink);
+  border-color: var(--brand-ink);
+  color: #fff;
 }
 
 /* ----- Desktop: pannello colore a sinistra e contenuto a destra, invece di una colonna stretta

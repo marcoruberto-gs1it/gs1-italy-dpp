@@ -91,19 +91,26 @@
   letter-spacing: 0.01em;
 }
 
-/* Pillola "ESPR 2024/1781" accanto al logo (design Figma): solo desktop, puramente informativa. */
+/* Pillola "ESPR 2024/1781" accanto al logo: solo desktop, puramente informativa — contorno
+   sottile + pallino, non un riempimento colorato (stesso linguaggio minimal della console admin,
+   vedi .console-registry-pill in admin.css). */
 .espr-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
   border-radius: var(--radius-full);
-  background: var(--green-tint);
-  color: var(--green-ink);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
+}
+
+.espr-badge app-icon {
+  color: var(--success);
 }
 
 .header-cta {

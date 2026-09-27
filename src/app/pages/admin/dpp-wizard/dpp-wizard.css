@@ -1018,8 +1018,9 @@
   margin-top: 24px;
   padding: 18px 20px;
   border-radius: var(--radius-md);
-  background: var(--blue-tint);
-  color: var(--blue-ink);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
 }
 
 .wizard-principle-icon {

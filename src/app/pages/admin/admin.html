@@ -156,18 +156,18 @@
 
       <div class="admin-kpis">
         <div class="admin-kpi">
-          <span class="admin-kpi-icon admin-kpi-icon--blue"><app-icon name="layers" [size]="16"></app-icon></span>
+          <span class="admin-kpi-icon"><app-icon name="layers" [size]="16"></app-icon></span>
           <span class="admin-kpi-value">{{ records().length }}</span>
           <span class="admin-kpi-label">DPP totali</span>
         </div>
         <div class="admin-kpi">
-          <span class="admin-kpi-icon admin-kpi-icon--green"><app-icon name="shield-check" [size]="16"></app-icon></span>
-          <span class="admin-kpi-value admin-kpi-value--green">{{ filterCount('published') }}</span>
+          <span class="admin-kpi-icon"><app-icon name="shield-check" [size]="16"></app-icon></span>
+          <span class="admin-kpi-value">{{ filterCount('published') }}</span>
           <span class="admin-kpi-label">Registrati sul Registro UE</span>
         </div>
         <div class="admin-kpi">
-          <span class="admin-kpi-icon admin-kpi-icon--orange"><app-icon name="save" [size]="16"></app-icon></span>
-          <span class="admin-kpi-value admin-kpi-value--orange">{{ filterCount('draft') }}</span>
+          <span class="admin-kpi-icon"><app-icon name="save" [size]="16"></app-icon></span>
+          <span class="admin-kpi-value">{{ filterCount('draft') }}</span>
           <span class="admin-kpi-label">Salvati in azienda</span>
         </div>
       </div>
