@@ -9,7 +9,7 @@ La presente guida definisce le specifiche tecniche, gli endpoint API, i formati 
 
 ### 1.1 Standard Tecnici di Riferimento
 L'architettura software deve implementare in modo stringente le seguenti 8 norme europee armonizzate:
-1. **FprEN 18219:2026** – *Unique Identifiers*: Gestione di identificativi univoci di prodotto (UPI: GS1 Digital Link, SGTIN), operatore (UOI: GLN, EORI) e stabilimento (UFI: GLN).
+1. **EN 18219:2026** – *Unique Identifiers*: identificativi univoci di prodotto (UPI), operatore economico (UOI) e stabilimento (UFI). La norma ammette più schemi (anche non-GS1: W3C DID, ISO 26324 DOI, EN IEC 61406 Identification Link, ISO/IEC 6523 con altri registri come LEI/DUNS/EORI/VAT); questo progetto usa **solo** gli schemi GS1-compatibili che la norma elenca: per l'UPI, GS1 Digital Link (ISO/IEC 15459 + ISO/IEC 15418, AI `01`/`10`/`21` — Cl. 5, scheme 1); per UOI e UFI, il GLN GS1 via Application Identifier `417`/`414` (ISO/IEC 15418 — Cl. 6, scheme 7).
 2. **FprEN 18220:2026** – *Data Carriers*: Codifica vettori fisici AIDC (QR code con GS1 Digital Link, RFID/NFC con EPC TDS 2.3).
 3. **FprEN 18216:2026** – *Data Exchange Protocols*: Protocolli di rete sicuri (HTTPS / TLS 1.2+ / HTTP/2+) e Content Negotiation (JSON, JSON-LD, HTML).
 4. **FprEN 18222:2026** – *APIs for Lifecycle Management*: Interfacce RESTful per lettura, creazione, aggiornamento, cancellazione e notifica dei passaporti.
@@ -18,9 +18,11 @@ L'architettura software deve implementare in modo stringente le seguenti 8 norme
 7. **prEN 18239:2025** – *Access Rights Management and Security*: Profilazione RBAC dei diritti d'accesso sui dati controllati e riservatezza commerciale.
 8. **prEN 18246:2025** – *Data Authentication and Integrity*: Firme digitali al livello del dato (ESDC, W3C Verifiable Credentials, QSeal eIDAS).
 
-Nota sui prefissi: **FprEN** ("Final Draft") per le prime 6, ancora in **prEN** (draft precedente) per le
-ultime 2 — non un refuso, è lo stato di avanzamento reale di ciascuna dichiarato nell'introduzione di
-entrambi i Final Draft FprEN 18222/18223 (texts di riferimento di questa sezione).
+Nota sui prefissi: **EN 18219:2026** (la n. 1) è ormai testo definitivo pubblicato, da cui la sezione
+sull'identificazione qui sotto e nel resto del progetto è allineata direttamente; **FprEN** ("Final
+Draft") per le altre 5 tra le prime 6, ancora in **prEN** (draft precedente) per le ultime 2 — non un
+refuso, è lo stato di avanzamento reale di ciascuna dichiarato nell'introduzione di entrambi i Final
+Draft FprEN 18222/18223 (testi di riferimento di questa sezione).
 
 ---
 
@@ -64,8 +66,8 @@ Restituisce il passaporto completo o filtrato in base ai diritti d'accesso dell'
   "dppSchemaVersion": "EN18223:v1.0",
   "dppStatus": "active",
   "lastUpdate": "2026-09-23T10:30:00Z",
-  "economicOperatorId": "urn:gs1:gln:8012345000008",
-  "facilityId": "urn:gs1:gln:8012345000015",
+  "economicOperatorId": "https://id.gs1.org/417/8012345000008",
+  "facilityId": "https://id.gs1.org/414/8012345000015",
   "contentSpecificationIds": [
     "EU_BATTERY_REGULATION_2023_1542"
   ],
@@ -200,8 +202,8 @@ Endpoint esposto dal server del Registro Centrale della Commissione Europea (`ht
 {
   "uniqueProductIdentifier": "https://id.company.com/01/08012345678901/21/SN-2026-XYZ987",
   "digitalProductPassportId": "https://dpp.company.com/dpp/EV-BATT-2026-987654",
-  "uniqueEconomicOperatorIdentifier": "urn:gs1:gln:8012345000008",
-  "uniqueEconomicOperatorIdentifierBackup": "urn:gs1:gln:8099999000001",
+  "uniqueEconomicOperatorIdentifier": "https://id.gs1.org/417/8012345000008",
+  "uniqueEconomicOperatorIdentifierBackup": "https://id.gs1.org/417/8099999000001",
   "dppApiEndpoint": "https://dpp.company.com/v1/dpps/EV-BATT-2026-987654"
 }
 ```
@@ -277,7 +279,7 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
     "uniqueProductIdentifier": {
       "type": "string",
       "format": "uri",
-      "description": "Identificativo univoco di prodotto conforme alla norma FprEN 18219 (es. GS1 Digital Link)."
+      "description": "Identificativo univoco di prodotto conforme a EN 18219:2026 — GS1 Digital Link (GTIN via AI 01, con AI 10/21 per lotto/articolo)."
     },
     "granularity": {
       "type": "string",
@@ -301,11 +303,11 @@ Consentono l'accesso e l'aggiornamento "chirurgico" di singoli campi dati senza 
     },
     "economicOperatorId": {
       "type": "string",
-      "description": "Identificativo dell'operatore economico conforme a FprEN 18219 (es. GLN GS1)."
+      "description": "Identificativo dell'operatore economico conforme a EN 18219:2026 — GLN GS1 come URI GS1 Digital Link, Application Identifier 417 (ISO/IEC 15418)."
     },
     "facilityId": {
       "type": "string",
-      "description": "Identificativo dello stabilimento produttivo (opzionale)."
+      "description": "Identificativo dello stabilimento produttivo (opzionale), conforme a EN 18219:2026 — GLN GS1 come URI GS1 Digital Link, Application Identifier 414 (ISO/IEC 15418)."
     },
     "contentSpecificationIds": {
       "type": "array",
@@ -425,8 +427,9 @@ ha documenti reali da collegare, e il campo è facoltativo).
 
 `economicOperatorId`/`facilityId` sono compilabili nel form admin (colonne `economic_operator_id`/
 `facility_id` in `db.ts`, con un default demo se lasciati vuoti) — non più costanti fisse:
-l'utente può inserire un GLN GS1 vero, coerente con la descrizione del campo nello schema §6.1
-("conforme a FprEN 18219, es. GLN GS1"). Gli altri campi obbligatori/opzionali che lo standard
+l'utente può inserire un GLN GS1 vero, come URI GS1 Digital Link (`https://id.gs1.org/417/{gln}` /
+`https://id.gs1.org/414/{gln}`), coerente con la descrizione del campo nello schema §6.1 ("conforme
+a EN 18219:2026 — GLN GS1, AI 417/414"). Gli altri campi obbligatori/opzionali che lo standard
 assegna al sistema (`digitalProductPassportId`, `granularity`, `dppSchemaVersion`, `dppStatus`,
 `lastUpdate`, `contentSpecificationIds`) restano non editabili per costruzione — modificarli a
 mano romperebbe un vincolo che lo standard stesso pone (es. `dppSchemaVersion` è la dichiarazione
@@ -455,10 +458,22 @@ verificati e corretti direttamente contro le Tabelle normative:
   stesso (§4.1.1: "If there are discrepancies between the UML diagrams, text and JSON
   representations the prose text of Clause 4, including the tables, is authoritative"), vince
   `lastUpdate` — corretto qui e nel codice (era `lastUpdated` in entrambi).
-- **`economicOperatorId`/`facilityId` come URN GLN** (`"urn:gs1:gln:8012345000008"`, non URL GS1
-  Digital Link con AI 417/414): il testo ufficiale non impone un formato URI specifico per questi
-  due campi oltre "identificativo conforme a FprEN 18219" — l'URN resta una scelta valida, non
-  corretta né invalidata da questa revisione.
+- **`economicOperatorId`/`facilityId` come URI GS1 Digital Link con AI 417/414**
+  (`"https://id.gs1.org/417/8012345000008"`), non più come URN GLN nudo (`"urn:gs1:gln:..."`): il
+  testo ufficiale di **EN 18219:2026**, ora disponibile, Cl. 6 elenca per l'operatore economico e
+  per lo stabilimento due schemi GS1-compatibili — ISO/IEC 6523 (scheme 6, GLN come registered ID
+  scheme ICD `0088`) e **ISO/IEC 15418 con GS1 Application Identifier** (scheme 7, AI `417`/`414`),
+  quest'ultimo esattamente la sintassi GS1 Digital Link già usata in tutto il resto del progetto per
+  l'UPI di prodotto. FprEN 18222/18223 non impongono un formato URI specifico su questi due campi
+  oltre "identificativo conforme a EN 18219" — restava tecnicamente ammissibile anche l'URN — ma
+  usare qui la stessa sintassi GS1 Digital Link (invece di un URN a sé) evita di introdurre un
+  secondo formato per lo stesso tipo di chiave e resta coerente con l'indicazione del progetto di
+  fare riferimento solo agli schemi di identificazione GS1-compatibili previsti dalla norma, non a
+  quelli non-GS1 che la stessa norma ammette in alternativa (W3C DID, ISO 26324 DOI, EN IEC 61406
+  Identification Link, o ISO/IEC 6523 con altri registri come LEI/DUNS/EORI/VAT). Corretto di
+  conseguenza sia nell'esempio §5.2.4 sia nello schema §6.1 qui sopra, e già così nel codice
+  (`registry-api/src/db.ts`, `src/app/utils/dpp-jsonld.ts`) prima ancora di questa revisione della
+  guida.
 - **`DppRegistryEntry` (§6.2) senza `granularity` né `productGroup`**: una versione precedente di
   questa guida (basata su OpenEPCIS) elencava questi due campi come parte del payload di
   registrazione al Registro UE. **Table 11 di FprEN 18222** (il tipo `DppRegistryEntry`, referenziato
