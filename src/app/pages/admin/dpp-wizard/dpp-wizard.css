@@ -521,6 +521,62 @@
   border-color: var(--brand-accent);
 }
 
+/* Tab per categoria semantica (Generali/Sostenibilità/Sicurezza e conformità/Istruzioni) — stile
+   "sottolineatura", volutamente diverso dalla pillola piena di .wizard-attr-mode qui sopra: sono
+   due selettori annidati (prima modalità, poi categoria) e devono leggersi come due livelli
+   distinti, non come varianti dello stesso controllo. */
+.wizard-attr-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 14px;
+}
+
+.wizard-attr-tabs button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 4px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.wizard-attr-tabs button + button {
+  margin-left: 14px;
+}
+
+.wizard-attr-tabs button.is-active {
+  color: var(--brand);
+  border-bottom-color: var(--brand);
+}
+
+.wizard-attr-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-sunken);
+  color: var(--text-tertiary);
+  font-size: 0.68rem;
+}
+
+.wizard-attr-tabs button.is-active .wizard-attr-tab-count {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
 .wizard-attributes {
   display: flex;
   flex-direction: column;
@@ -530,12 +586,23 @@
 
 .wizard-attribute-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr auto auto;
   gap: 8px;
 }
 
 .wizard-attribute-row input {
   margin: 0;
+}
+
+.wizard-attribute-category {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 0 8px;
 }
 
 .wizard-attribute-remove {
@@ -908,6 +975,33 @@
   .wizard-actions--top {
     flex-wrap: wrap;
   }
+
+  /* 4 colonne (chiave, valore, categoria, rimuovi) non ci stanno più su una riga sola qui sotto
+     gli 880px di .wizard-step--narrow — due righe, chiave sempre a piena larghezza. */
+  .wizard-attribute-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'key key'
+      'value category'
+      'remove remove';
+  }
+
+  .wizard-attribute-key {
+    grid-area: key;
+  }
+
+  .wizard-attribute-value {
+    grid-area: value;
+  }
+
+  .wizard-attribute-category {
+    grid-area: category;
+  }
+
+  .wizard-attribute-remove {
+    grid-area: remove;
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1050,125 +1144,11 @@
   color: #93c5fd;
 }
 
-.wizard-mapping {
-  margin-top: 28px;
-}
-
 .wizard-mapping-intro {
   margin: 10px 0 0;
   font-size: 0.85rem;
   line-height: 1.6;
   color: var(--text-secondary);
-}
-
-/* Le due classi del diagramma UML (vedi FprEN 18223) messe a confronto diretto: a sinistra i
-   campi fissi già compilati nei passi precedenti (DigitalProductPassport), a destra la forma
-   di ogni riga di questo passo (DataElement) — stesso linguaggio di .wizard-mapping-card qui
-   sotto ma affiancate apposta, non un'altra card della stessa griglia. */
-.wizard-uml-contrast {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.wizard-uml-card {
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-sunken);
-  border: 1px solid var(--border-subtle);
-}
-
-.wizard-uml-card strong {
-  font-size: 0.86rem;
-  color: var(--text-primary);
-}
-
-.wizard-uml-card strong em {
-  font-style: normal;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  font-size: 0.78rem;
-}
-
-.wizard-uml-note {
-  display: block;
-  margin: 2px 0 10px;
-  font-size: 0.72rem;
-  color: var(--text-tertiary);
-}
-
-.wizard-uml-card ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.wizard-uml-card li {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.wizard-uml-card li code {
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-}
-
-.wizard-uml-card--accent {
-  background: var(--brand-soft);
-  border-color: rgba(0, 44, 108, 0.18);
-}
-
-.wizard-uml-tag {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  margin-top: 1px;
-}
-
-@media (max-width: 700px) {
-  .wizard-uml-contrast {
-    grid-template-columns: 1fr;
-  }
-}
-
-.wizard-mapping-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.wizard-mapping-card {
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-sunken);
-  border: 1px solid var(--border-subtle);
-}
-
-.wizard-mapping-card strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 0.84rem;
-  color: var(--text-primary);
-}
-
-.wizard-mapping-card p {
-  margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
-
-@media (max-width: 760px) {
-  .wizard-mapping-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .wizard-principle {

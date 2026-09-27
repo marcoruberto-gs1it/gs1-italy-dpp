@@ -268,7 +268,7 @@
         [journeyRegistryId]="journeyRegistryId"
         [journeyLongWait]="journeyLongWait"
         [journeyTechnical]="journeyTechnical"
-        (addAttribute)="addAttributeRow()"
+        (addAttribute)="addAttributeRow($event)"
         (removeAttribute)="removeAttributeRow($event)"
         (requestDemoFill)="fillDemoAttributes()"
         (applyAttributesJson)="applyAttributesJson($event)"

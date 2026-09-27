@@ -255,15 +255,9 @@
       <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[3].title }}</h2>
         <p class="wizard-step-help">
-          Dati liberi specifici del prodotto: impronta di carbonio, contenuto riciclato, composizione, garanzia,
-          tutto ciò che il tuo settore richiede e non rientra nei campi fissi dei passi precedenti. Il
-          <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gs1-web-vocabulary/" target="_blank" rel="noopener noreferrer">
-            <strong>GS1 Web Vocabulary</strong> <app-icon name="external-link" [size]="11"></app-icon>
-          </a>
-          è una delle ontologie riconosciute dallo standard per il riferimento esterno di un attributo, ma non ha
-          un termine dedicato per dati completamente liberi come questi: diventano quindi proprietà
-          <code>schema:additionalProperty</code>/<code>PropertyValue</code>, il meccanismo che schema.org prevede
-          apposta per dati arbitrari, nel JSON-LD del DPP pubblico.
+          È l'atto delegato specifico del settore scelto al passo 1 (batterie, tessile, elettronica…) a stabilire
+          quali dati di prodotto vanno effettivamente inseriti nel passaporto: qui li raggruppi per categoria,
+          nello stesso ordine in cui compariranno nella scheda pubblica.
         </p>
 
         <div class="wizard-attr-mode" role="tablist" aria-label="Modalità di inserimento attributi">
@@ -283,16 +277,47 @@
             </button>
           }
 
-          <div class="wizard-attributes" formArrayName="attributes">
-            @for (row of attributesArray.controls; track $index; let i = $index) {
-              <div class="wizard-attribute-row" [formGroupName]="i">
-                <input type="text" formControlName="key" placeholder="Nome campo (es. impronta di carbonio)" />
-                <input type="text" formControlName="value" placeholder="Valore" />
-                <button type="button" class="wizard-attribute-remove" (click)="removeAttribute.emit(i)" aria-label="Rimuovi attributo">✕</button>
-              </div>
+          <!-- Stessa idea della pagina prodotto di demo.epcis.cloud presa a riferimento: le
+               informazioni separate per categoria invece che in un'unica lista lunga. Un filtro
+               di vista sulla stessa attributesArray, non un secondo stato: l'indice [formGroupName]
+               resta quello vero nell'array intero, mai quello (filtrato) della sola tab aperta. -->
+          <div class="wizard-attr-tabs" role="tablist" aria-label="Categoria attributi">
+            @for (cat of attributeCategories; track cat.id) {
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="activeAttributeCategory() === cat.id"
+                [class.is-active]="activeAttributeCategory() === cat.id"
+                (click)="activeAttributeCategory.set(cat.id)"
+              >
+                {{ cat.label }}
+                @if (attributeCountByCategory(cat.id); as n) {
+                  <span class="wizard-attr-tab-count">{{ n }}</span>
+                }
+              </button>
             }
           </div>
-          <button type="button" class="wizard-add-attribute" (click)="addAttribute.emit()">+ Aggiungi attributo</button>
+
+          <div class="wizard-attributes" formArrayName="attributes">
+            @for (row of attributesArray.controls; track $index; let i = $index) {
+              @if (row.value.category === activeAttributeCategory()) {
+                <div class="wizard-attribute-row" [formGroupName]="i">
+                  <input type="text" class="wizard-attribute-key" formControlName="key" placeholder="Nome campo (es. impronta di carbonio)" />
+                  <input type="text" class="wizard-attribute-value" formControlName="value" placeholder="Valore" />
+                  <select formControlName="category" class="wizard-attribute-category" aria-label="Categoria">
+                    @for (cat of attributeCategories; track cat.id) {
+                      <option [value]="cat.id">{{ cat.label }}</option>
+                    }
+                  </select>
+                  <button type="button" class="wizard-attribute-remove" (click)="removeAttribute.emit(i)" aria-label="Rimuovi attributo">✕</button>
+                </div>
+              }
+            }
+          </div>
+          @if (attributeCountByCategory(activeAttributeCategory()) === 0) {
+            <p class="wizard-field-hint">Nessun attributo in questa categoria: aggiungine uno con il bottone qui sotto.</p>
+          }
+          <button type="button" class="wizard-add-attribute" (click)="onAddAttribute()">+ Aggiungi attributo in «{{ activeCategoryLabel() }}»</button>
         } @else {
           <textarea
             class="wizard-attr-json"
@@ -308,53 +333,12 @@
           } @else {
             <p class="wizard-field-hint">
               Un oggetto JSON piatto, chiave/valore: applicato subito, sostituisce le righe della modalità
-              Chiave/valore. Numeri e booleani sono ammessi in ingresso ma diventano comunque testo, come ogni
-              valore digitato a mano nell'altra modalità.
+              Chiave/valore. Numeri e booleani diventano comunque testo, come ogni valore digitato a mano
+              nell'altra modalità, e la categoria di ciascuna riga riparte da "Generali" (il JSON è piatto, senza
+              categoria: riassegnala nell'altra modalità se serve).
             </p>
           }
         }
-
-        <div class="wizard-mapping">
-          <span class="form-section-eyebrow">Mappatura attributi e semantica</span>
-          <p class="wizard-mapping-intro">
-            I campi dei passi precedenti appartengono alla classe <code>DigitalProductPassport</code>: fissi, uno
-            per ciascuno. Ogni riga qui sopra è invece un'istanza della classe astratta <code>DataElement</code>,
-            un elenco aperto anziché un campo fisso:
-          </p>
-          <div class="wizard-uml-contrast">
-            <div class="wizard-uml-card">
-              <strong>DigitalProductPassport</strong>
-              <span class="wizard-uml-note">già compilata nei passi precedenti</span>
-              <ul>
-                <li>digitalProductPassportId</li>
-                <li>uniqueProductIdentifier</li>
-                <li>granularity</li>
-                <li>economicOperatorId</li>
-                <li>facilityId</li>
-                <li>…</li>
-              </ul>
-            </div>
-            <div class="wizard-uml-card wizard-uml-card--accent">
-              <strong>DataElement <em>(abstract)</em></strong>
-              <span class="wizard-uml-note">quello che compili qui</span>
-              <ul>
-                <li><code>elementId</code> <span class="wizard-uml-tag">il nome del campo</span></li>
-                <li><code>dictionaryReference</code> <span class="wizard-uml-tag">opzionale, es. un termine GS1 Web Vocabulary: assente qui, sono attributi liberi</span></li>
-                <li><code>value</code> <span class="wizard-uml-tag">SingleValuedDataElement</span></li>
-              </ul>
-            </div>
-          </div>
-          <div class="wizard-mapping-grid">
-            <div class="wizard-mapping-card">
-              <strong>Tipi di valore</strong>
-              <p>Un numero resta un numero, un testo un testo: usa un punto per i decimali. Il tipo dichiarato (es. <code>xsd:float</code>) appartiene al dizionario esterno, non al payload.</p>
-            </div>
-            <div class="wizard-mapping-card">
-              <strong>Nome del campo</strong>
-              <p>Il nome scelto diventa l'<code>elementId</code> del dato: deve essere unico nel passaporto e non coincidere con i campi fissi dell'intestazione.</p>
-            </div>
-          </div>
-        </div>
       </div>
     }
 
@@ -457,6 +441,39 @@
                 </dd>
               </div>
             </dl>
+
+            <!-- Mappatura dati: le due classi del diagramma UML (FprEN 18223) messe a confronto
+                 coi valori REALI di questa scheda, non un elenco astratto di nomi di campo — i
+                 campi qui sopra sono la classe DigitalProductPassport (fissi, un valore
+                 ciascuno), ogni attributo del passo precedente è invece un'istanza della classe
+                 astratta DataElement (elementId + value), qui col suo valore esatto e la
+                 categoria scelta. -->
+            <div class="wizard-auto-fields-head">
+              <span class="form-section-eyebrow">Mappatura dati (DataElement)</span>
+            </div>
+            @if (attributesArray.controls.length) {
+              <p class="wizard-mapping-intro">
+                I campi qui sopra appartengono alla classe <code>DigitalProductPassport</code>: fissi, uno per
+                ciascuno. Ogni attributo del passo precedente è invece un'istanza della classe astratta
+                <code>DataElement</code> — un <code>elementId</code> (il nome) e un <code>value</code>, qui col
+                suo valore esatto:
+              </p>
+              <dl class="auto-fields">
+                @for (row of attributesArray.controls; track $index) {
+                  @if (row.value.key?.trim()) {
+                    <div>
+                      <dt>{{ row.value.key }}</dt>
+                      <dd>
+                        <code>{{ row.value.value || '—' }}</code>
+                        <span class="auto-field-note">elementId · categoria «{{ categoryLabel(row.value.category) }}»</span>
+                      </dd>
+                    </div>
+                  }
+                }
+              </dl>
+            } @else {
+              <p class="wizard-field-hint">Nessun attributo di prodotto aggiunto al passo precedente.</p>
+            }
           </div>
 
           <div class="wizard-split-right">

@@ -16,7 +16,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { ThemeService } from '../../services/theme.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase } from './publish-journey/publish-journey';
-import { DppWizardComponent } from './dpp-wizard/dpp-wizard';
+import { AttributeCategory, DppWizardComponent } from './dpp-wizard/dpp-wizard';
 import { hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
 import { buildDigitalLinkUpi, parseDigitalLink, parseGlnDigitalLink } from '../../utils/gs1-digital-link';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
@@ -31,6 +31,23 @@ export type ToastSeverity = 'error' | 'warning';
  * durata tipica di un avvio a freddo osservata in questa integrazione. L'utente vede solo
  * l'animazione proseguire, mai un errore intermedio: vedi publish()/attemptPublish() sotto. */
 const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
+
+/** Euristica SOLO per il riempimento demo/il caricamento di un record esistente (vedi
+ * fillDemoAttributes()/loadRecordIntoForm() sotto): demo-data.ts resta un semplice
+ * Record<string,string> senza categoria — è già incrociato con tracepass-dpp-schemas
+ * (github.com/malinoto/tracepass-dpp-schemas), non vogliamo un secondo campo da tenere
+ * sincronizzato lì solo per questo. Deduce una categoria plausibile dal NOME dell'attributo, così
+ * le tab del passo Attributi (dpp-wizard.html) partono già popolate in modo sensato invece di
+ * buttare tutto in "Generali". Un attributo aggiunto a mano dall'utente non passa da qui: prende
+ * semplicemente la categoria della tab aperta al momento del click su "+ Aggiungi attributo"
+ * (vedi DppWizardComponent.onAddAttribute()). */
+function categorizeAttributeKey(key: string): AttributeCategory {
+  const k = key.toLowerCase();
+  if (/carbonio|co2|co₂|ricicl|circolar|sosteni|biodegrad/.test(k)) return 'sustainability';
+  if (/certificaz|marcatura|sicurezza|reazione al fuoco|conformit|ecolabel/.test(k)) return 'safety';
+  if (/istruzion|\bcura\b|manutenzione|smaltimento|dosaggio/.test(k)) return 'instructions';
+  return 'general';
+}
 
 /**
  * Sezione admin per creare/modificare DPP e pubblicarli su mock-eu-registry (il registro
@@ -536,7 +553,7 @@ export class Admin {
     });
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(record.attributes)) {
-      this.attributesArray.push(this.attributeGroup(key, value));
+      this.attributesArray.push(this.attributeGroup(key, value, categorizeAttributeKey(key)));
     }
     this.toast.set(null);
     this.resetJourney();
@@ -574,7 +591,7 @@ export class Admin {
     if (!demo) return;
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(demo.attributes)) {
-      this.attributesArray.push(this.attributeGroup(key, value));
+      this.attributesArray.push(this.attributeGroup(key, value, categorizeAttributeKey(key)));
     }
   }
 
@@ -604,12 +621,15 @@ export class Admin {
     return this.dppForm.controls.attributes;
   }
 
-  private attributeGroup(key = '', value = ''): FormGroup {
-    return this.fb.nonNullable.group({ key: [key], value: [value] });
+  private attributeGroup(key = '', value = '', category: AttributeCategory = 'general'): FormGroup {
+    return this.fb.nonNullable.group({ key: [key], value: [value], category: [category] });
   }
 
-  protected addAttributeRow(): void {
-    this.attributesArray.push(this.attributeGroup());
+  /** La categoria è quella della tab aperta nel Wizard al momento del click (vedi
+   * DppWizardComponent.onAddAttribute()) — una riga aggiunta a mano finisce così nella tab da cui
+   * è stata creata, non sempre in "Generali" a prescindere da dove si trovava l'utente. */
+  protected addAttributeRow(category: AttributeCategory = 'general'): void {
+    this.attributesArray.push(this.attributeGroup('', '', category));
   }
 
   protected removeAttributeRow(index: number): void {
@@ -618,7 +638,10 @@ export class Admin {
 
   /** Applica al form l'oggetto già validato dal Wizard (modalità JSON del passo Attributi,
    * vedi DppWizardComponent.parseFlatJsonObject()) — stessa forma finale di fillDemoAttributes()
-   * qui sotto: sostituisce del tutto le righe esistenti, non le unisce. */
+   * qui sotto: sostituisce del tutto le righe esistenti, non le unisce. Il JSON grezzo non porta
+   * alcuna informazione di categoria (è volutamente un oggetto piatto chiave/valore, vedi il
+   * suggerimento nel Wizard): ogni riga così applicata riparte da "Generali", da riassegnare a
+   * mano nella tab giusta se serve. */
   protected applyAttributesJson(values: Record<string, string>): void {
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(values)) {
