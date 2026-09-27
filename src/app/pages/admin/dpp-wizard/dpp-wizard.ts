@@ -120,6 +120,12 @@ export class DppWizardComponent {
   @Output() addAttribute = new EventEmitter<void>();
   @Output() removeAttribute = new EventEmitter<number>();
   @Output() requestDemoFill = new EventEmitter<void>();
+  /** Emesso ogni volta che il testo della modalità JSON (vedi attributeInputMode sotto) è un
+   * oggetto piatto valido — Admin sostituisce con questo l'intero attributesArray, stessa forma
+   * di fillDemoAttributes(). Un @Output invece di mutare attributesArray direttamente qui: ogni
+   * altra scrittura sul FormArray degli attributi passa già da un metodo di Admin (add/remove/
+   * demo-fill), coerente con quello. */
+  @Output() applyAttributesJson = new EventEmitter<Record<string, string>>();
   @Output() requestFullDemo = new EventEmitter<void>();
   @Output() resetForm = new EventEmitter<void>();
   @Output() requestFieldDemo = new EventEmitter<'name' | 'upi' | 'economicOperatorId' | 'facilityId'>();
@@ -166,6 +172,10 @@ export class DppWizardComponent {
   }
 
   protected fullDemo(): void {
+    // Riempie anche gli attributi (vedi Admin.fillDemoData()): stessa guardia di selectSector()
+    // sopra, così non si resta a guardare un JSON ormai scollegato dall'attributesArray appena
+    // sovrascritto.
+    this.attributeInputMode.set('fields');
     this.requestFullDemo.emit();
   }
 
@@ -175,6 +185,7 @@ export class DppWizardComponent {
     this.lastReachedStep.set(0);
     this.slideDirection.set('back');
     this.currentStep.set(0);
+    this.attributeInputMode.set('fields');
   }
 
   protected steps = STEPS;
@@ -309,12 +320,84 @@ export class DppWizardComponent {
     const changed = this.form.controls.sectorId.value !== sectorId;
     if (changed && this.attributesArray.length > 0) {
       this.attributesArray.clear();
+      // Torna alla vista a righe: restare in modalità JSON mostrerebbe ancora il testo di prima,
+      // ormai scollegato dall'attributesArray appena svuotato qui sopra.
+      this.attributeInputMode.set('fields');
       this.showToast.emit({
         message: 'Cambiando settore, gli attributi già inseriti per il settore precedente sono stati rimossi: non sarebbero più validi per questo settore.',
         severity: 'warning',
       });
     }
     this.form.controls.sectorId.setValue(sectorId);
+  }
+
+  /** Passo Attributi: chiave/valore (righe, l'unica modalità finché non è stato aggiunto questo
+   * toggle) o JSON grezzo — due viste sullo stesso attributesArray, mai due stati separati da
+   * tenere sincronizzati a mano. Passare a 'json' serializza le righe correnti nel textarea;
+   * passare a 'fields' è bloccato se il JSON in corso non è valido (altrimenti l'utente lo
+   * vedrebbe sparire senza preavviso). */
+  protected attributeInputMode = signal<'fields' | 'json'>('fields');
+  protected attributeJsonDraft = signal('');
+  protected attributeJsonError = signal<string | null>(null);
+
+  private serializeAttributesToJson(): string {
+    const rows = this.attributesArray.getRawValue() as { key: string; value: string }[];
+    const obj: Record<string, string> = {};
+    for (const row of rows) {
+      if (row.key?.trim()) obj[row.key.trim()] = row.value ?? '';
+    }
+    return JSON.stringify(obj, null, 2);
+  }
+
+  protected setAttributeInputMode(mode: 'fields' | 'json'): void {
+    if (mode === this.attributeInputMode()) return;
+    if (mode === 'json') {
+      this.attributeJsonDraft.set(this.serializeAttributesToJson());
+      this.attributeJsonError.set(null);
+    } else if (this.attributeJsonError()) {
+      return;
+    }
+    this.attributeInputMode.set(mode);
+  }
+
+  protected onAttributeJsonInput(event: Event): void {
+    const text = (event.target as HTMLTextAreaElement).value;
+    this.attributeJsonDraft.set(text);
+    const parsed = this.parseFlatJsonObject(text);
+    if (typeof parsed === 'string') {
+      this.attributeJsonError.set(parsed);
+      return;
+    }
+    this.attributeJsonError.set(null);
+    this.applyAttributesJson.emit(parsed);
+  }
+
+  /** Valida che il testo sia un oggetto JSON piatto — niente array, niente oggetti/valori
+   * annidati: esattamente la forma che questo modello di attributi liberi supporta (un solo
+   * valore per riga, come SingleValuedDataElement nel diagramma UML dello standard). Un numero o
+   * un booleano JSON sono ammessi in ingresso (comodo da scrivere) ma diventano comunque
+   * `FormControl<string>` una volta applicati, come ogni altro valore digitato a mano nelle
+   * righe qui sopra. Restituisce il messaggio d'errore (stringa) o l'oggetto convertito. */
+  private parseFlatJsonObject(text: string): Record<string, string> | string {
+    const trimmed = text.trim();
+    if (!trimmed) return {};
+    let value: unknown;
+    try {
+      value = JSON.parse(trimmed);
+    } catch {
+      return 'JSON non valido: controlla virgole e parentesi.';
+    }
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+      return 'Deve essere un oggetto JSON, es. { "chiave": "valore" }.';
+    }
+    const result: Record<string, string> = {};
+    for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+      if (v !== null && typeof v === 'object') {
+        return `Il valore di "${key}" è un oggetto o un array: qui sono supportati solo valori singoli (testo, numero, booleano).`;
+      }
+      result[key] = v === null || v === undefined ? '' : String(v);
+    }
+    return result;
   }
 
   /** Messaggio di errore leggibile per un campo — stessa logica di Admin.fieldError(), qui

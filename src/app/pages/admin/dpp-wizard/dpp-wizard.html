@@ -1,15 +1,13 @@
 <div class="wizard" [formGroup]="form">
-  <!-- Architettura decentralizzata (FprEN 18222, design Figma): cosa resta qui e cosa arriva al
-       registro. Testo puramente descrittivo — i due endpoint sono quelli reali dell'integrazione
-       (registry-api/src/routes/v1.ts e mockRegistryClient.ts). -->
+  <!-- Cosa resta in azienda e cosa arriva al registro — solo il concetto, senza esporre gli
+       endpoint reali dell'integrazione (quelli vivono in registry-api/src/routes/v1.ts e
+       mockRegistryClient.ts, non in questa schermata). -->
   <section class="wizard-arch gs-navy-panel" aria-label="Architettura decentralizzata">
-    <span class="wizard-arch-title">Architettura decentralizzata (FprEN 18222)</span>
     <div class="wizard-arch-flow">
       <div class="wizard-arch-node">
         <span class="wizard-arch-icon"><app-icon name="building" [size]="20"></app-icon></span>
         <div>
-          <strong>Sistema aziendale — questo sito</strong>
-          <span>Endpoint <code>/registry-api/v1/dpps</code></span>
+          <strong>Sistema aziendale</strong>
           <em>Qui restano tutti i dati di prodotto</em>
         </div>
       </div>
@@ -20,8 +18,7 @@
       <div class="wizard-arch-node">
         <span class="wizard-arch-icon wizard-arch-icon--accent"><app-icon name="shield-check" [size]="20"></app-icon></span>
         <div>
-          <strong>DPP Registry UE — mock-eu-registry</strong>
-          <span>Endpoint <code>POST /metadata/v1</code> (CIRPASS-2)</span>
+          <strong>DPP Registry UE</strong>
           <em>Riceve solo puntatori, non i dati</em>
         </div>
       </div>
@@ -95,7 +92,10 @@
     </div>
     <div class="wizard-hero-actions">
       @if (currentStep() <= 3) {
-        <button type="button" class="gs-btn gs-btn--primary" (click)="fullDemo()">
+        <!-- Volutamente NON gs-btn--primary: è un riempimento rapido con dati finti, non l'azione
+             di avanzamento vera (quella sta nella barra sopra, sempre blu piena) — stesso blu su
+             entrambe le confonderebbe le due, visibili insieme in questi stessi passi. -->
+        <button type="button" class="wizard-hero-demo" (click)="fullDemo()">
           <app-icon name="refresh" [size]="15"></app-icon>
           Popola dati demo
         </button>
@@ -145,10 +145,16 @@
       <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[1].title }}</h2>
         <p class="wizard-step-help">
-          L'<strong>UPI</strong> (Unique Product Identifier) è l'URI GS1 Digital Link che identifica il prodotto —
-          lo stesso link che finirà nel QR code e nel Registro UE. Incollalo per intero: GTIN e livello del
-          passaporto (modello, lotto o articolo) si deducono da soli dalla sua sintassi, verificati con il GS1
-          Barcode Syntax Engine.
+          L'<strong>UPI</strong> (Unique Product Identifier) è l'URI
+          <a class="field-standard-link" href="https://gs1it.org/migliorare-processi/migliorare-servizio-consumatore/gs1-digital-link/" target="_blank" rel="noopener noreferrer">
+            <strong>GS1 Digital Link</strong> <app-icon name="external-link" [size]="11"></app-icon>
+          </a>
+          che identifica il prodotto: lo stesso link che finirà nel QR code e nel
+          <a class="field-standard-link" href="https://single-market-economy.ec.europa.eu/single-market/digital-product-passport/dpp-registry_en" target="_blank" rel="noopener noreferrer">
+            <strong>Registro UE</strong> <app-icon name="external-link" [size]="11"></app-icon>
+          </a>.
+          Incollalo per intero: GTIN e livello del passaporto (modello, lotto o articolo) si deducono da soli
+          dalla sua sintassi, verificati con il <strong>GS1 Barcode Syntax Engine</strong>.
         </p>
 
         <div class="wizard-field-label-row">
@@ -250,37 +256,96 @@
       <div class="wizard-step wizard-step--narrow" [class]="'slide-' + slideDirection()">
         <h2>{{ steps[3].title }}</h2>
         <p class="wizard-step-help">
-          Dati liberi specifici del prodotto — impronta di carbonio, contenuto riciclato, composizione, garanzia:
-          tutto ciò che il tuo settore richiede e non rientra nei campi fissi qui sopra. Non hanno un campo o un
-          vocabolario GS1 dedicato: diventano proprietà <code>schema:additionalProperty</code>/<code>PropertyValue</code>,
-          il meccanismo che schema.org prevede apposta per dati arbitrari, nel JSON-LD del DPP pubblico.
+          Dati liberi specifici del prodotto: impronta di carbonio, contenuto riciclato, composizione, garanzia,
+          tutto ciò che il tuo settore richiede e non rientra nei campi fissi dei passi precedenti. Il
+          <a class="field-standard-link" href="https://gs1it.org/assistenza/standard-specifiche/gs1-web-vocabulary/" target="_blank" rel="noopener noreferrer">
+            <strong>GS1 Web Vocabulary</strong> <app-icon name="external-link" [size]="11"></app-icon>
+          </a>
+          è una delle ontologie riconosciute dallo standard per il riferimento esterno di un attributo, ma non ha
+          un termine dedicato per dati completamente liberi come questi: diventano quindi proprietà
+          <code>schema:additionalProperty</code>/<code>PropertyValue</code>, il meccanismo che schema.org prevede
+          apposta per dati arbitrari, nel JSON-LD del DPP pubblico.
         </p>
 
-        @if (attributesArray.controls.length === 0) {
-          <button type="button" class="gs-btn gs-btn--ghost" (click)="requestDemoFill.emit()">
-            <app-icon name="refresh" [size]="16"></app-icon>
-            Popola con dati demo per questo settore
+        <div class="wizard-attr-mode" role="tablist" aria-label="Modalità di inserimento attributi">
+          <button type="button" role="tab" [attr.aria-selected]="attributeInputMode() === 'fields'" [class.is-active]="attributeInputMode() === 'fields'" (click)="setAttributeInputMode('fields')">
+            Chiave/valore
           </button>
+          <button type="button" role="tab" [attr.aria-selected]="attributeInputMode() === 'json'" [class.is-active]="attributeInputMode() === 'json'" (click)="setAttributeInputMode('json')">
+            JSON
+          </button>
+        </div>
+
+        @if (attributeInputMode() === 'fields') {
+          @if (attributesArray.controls.length === 0) {
+            <button type="button" class="gs-btn wizard-demo-btn" (click)="requestDemoFill.emit()">
+              <app-icon name="refresh" [size]="16"></app-icon>
+              Popola con dati demo per questo settore
+            </button>
+          }
+
+          <div class="wizard-attributes" formArrayName="attributes">
+            @for (row of attributesArray.controls; track $index; let i = $index) {
+              <div class="wizard-attribute-row" [formGroupName]="i">
+                <input type="text" formControlName="key" placeholder="Nome campo (es. impronta di carbonio)" />
+                <input type="text" formControlName="value" placeholder="Valore" />
+                <button type="button" class="wizard-attribute-remove" (click)="removeAttribute.emit(i)" aria-label="Rimuovi attributo">✕</button>
+              </div>
+            }
+          </div>
+          <button type="button" class="wizard-add-attribute" (click)="addAttribute.emit()">+ Aggiungi attributo</button>
+        } @else {
+          <textarea
+            class="wizard-attr-json"
+            [class.wizard-attr-json--error]="attributeJsonError()"
+            [value]="attributeJsonDraft()"
+            (input)="onAttributeJsonInput($event)"
+            spellcheck="false"
+            rows="8"
+            aria-label="Attributi come oggetto JSON"
+          ></textarea>
+          @if (attributeJsonError(); as err) {
+            <p class="wizard-field-error">{{ err }}</p>
+          } @else {
+            <p class="wizard-field-hint">
+              Un oggetto JSON piatto, chiave/valore: applicato subito, sostituisce le righe della modalità
+              Chiave/valore. Numeri e booleani sono ammessi in ingresso ma diventano comunque testo, come ogni
+              valore digitato a mano nell'altra modalità.
+            </p>
+          }
         }
 
-        <div class="wizard-attributes" formArrayName="attributes">
-          @for (row of attributesArray.controls; track $index; let i = $index) {
-            <div class="wizard-attribute-row" [formGroupName]="i">
-              <input type="text" formControlName="key" placeholder="Nome campo (es. impronta di carbonio)" />
-              <input type="text" formControlName="value" placeholder="Valore" />
-              <button type="button" class="wizard-attribute-remove" (click)="removeAttribute.emit(i)" aria-label="Rimuovi attributo">✕</button>
-            </div>
-          }
-        </div>
-        <button type="button" class="wizard-add-attribute" (click)="addAttribute.emit()">+ Aggiungi attributo</button>
-
         <div class="wizard-mapping">
-          <span class="form-section-eyebrow">Mappatura attributi e semantica (FprEN 18223)</span>
-          <div class="wizard-mapping-grid">
-            <div class="wizard-mapping-card">
-              <strong>SingleValuedDataElement</strong>
-              <p>Ogni riga è un dato con un solo valore: nel JSON-LD diventa una coppia chiave/valore di primo livello, come nell'esempio dello standard (§5.2.6).</p>
+          <span class="form-section-eyebrow">Mappatura attributi e semantica</span>
+          <p class="wizard-mapping-intro">
+            I campi dei passi precedenti appartengono alla classe <code>DigitalProductPassport</code>: fissi, uno
+            per ciascuno. Ogni riga qui sopra è invece un'istanza della classe astratta <code>DataElement</code>,
+            un elenco aperto anziché un campo fisso:
+          </p>
+          <div class="wizard-uml-contrast">
+            <div class="wizard-uml-card">
+              <strong>DigitalProductPassport</strong>
+              <span class="wizard-uml-note">già compilata nei passi precedenti</span>
+              <ul>
+                <li>digitalProductPassportId</li>
+                <li>uniqueProductIdentifier</li>
+                <li>granularity</li>
+                <li>economicOperatorId</li>
+                <li>facilityId</li>
+                <li>…</li>
+              </ul>
             </div>
+            <div class="wizard-uml-card wizard-uml-card--accent">
+              <strong>DataElement <em>(abstract)</em></strong>
+              <span class="wizard-uml-note">quello che compili qui</span>
+              <ul>
+                <li><code>elementId</code> <span class="wizard-uml-tag">il nome del campo</span></li>
+                <li><code>dictionaryReference</code> <span class="wizard-uml-tag">opzionale, es. un termine GS1 Web Vocabulary: assente qui, sono attributi liberi</span></li>
+                <li><code>value</code> <span class="wizard-uml-tag">SingleValuedDataElement</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="wizard-mapping-grid">
             <div class="wizard-mapping-card">
               <strong>Tipi di valore</strong>
               <p>Un numero resta un numero, un testo un testo: usa un punto per i decimali. Il tipo dichiarato (es. <code>xsd:float</code>) appartiene al dizionario esterno, non al payload.</p>

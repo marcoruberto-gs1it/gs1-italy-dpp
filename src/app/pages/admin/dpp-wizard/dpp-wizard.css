@@ -212,6 +212,30 @@
   background: rgba(255, 255, 255, 0.16);
 }
 
+/* Stessa forma di .wizard-hero-reset (pillola sul pannello navy), ma tinta d'ambra invece che
+   neutra: un solo linguaggio visivo per "azione demo/scorciatoia" in tutto il wizard (vedi anche
+   .wizard-demo-btn più sotto, la stessa idea per i passi con sfondo chiaro) — mai lo stesso blu
+   pieno del pulsante "Avanti", con cui altrimenti si confonderebbe qui sopra nella stessa vista. */
+.wizard-hero-demo {
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.16);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.wizard-hero-demo:hover {
+  background: rgba(251, 191, 36, 0.26);
+}
+
 .wizard-hero-eyebrow {
   align-self: flex-start;
   padding: 4px 10px;
@@ -442,6 +466,61 @@
 }
 
 /* --- Passo Attributi --- */
+/* Toggle Chiave/valore ⇄ JSON — stessa pillola a due stati del selettore lingua nella console
+   admin (vedi .console-lang in admin.css), qui perché è un componente diverso e non condivide
+   foglio di stile con quello. */
+.wizard-attr-mode {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-sunken);
+  margin-bottom: 14px;
+}
+
+.wizard-attr-mode button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.wizard-attr-mode button.is-active {
+  background: var(--brand);
+  color: #fff;
+}
+
+.wizard-attr-json {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  resize: vertical;
+}
+
+.wizard-attr-json:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.wizard-attr-json--error {
+  border-color: var(--brand-accent);
+}
+
 .wizard-attributes {
   display: flex;
   flex-direction: column;
@@ -470,6 +549,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Stessa idea di .wizard-hero-demo (vedi il commento lì) per un passo a sfondo chiaro: tinta
+   d'ambra invece del bordo neutro di .gs-btn--ghost, così "azione demo" resta lo stesso
+   linguaggio visivo in ogni passo del wizard, mai lo stesso blu di "Avanti"/"Conferma". */
+.wizard-demo-btn {
+  background: var(--orange-tint);
+  color: var(--orange-ink);
+  border: 1px solid rgba(180, 83, 9, 0.35);
+}
+
+.wizard-demo-btn:hover {
+  border-color: rgba(180, 83, 9, 0.55);
 }
 
 .wizard-add-attribute {
@@ -848,14 +940,6 @@
   color: #fff;
 }
 
-.wizard-arch-title {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #93c5fd;
-}
-
 .wizard-arch-flow {
   display: flex;
   align-items: center;
@@ -885,11 +969,6 @@
 
 .wizard-arch-node strong {
   font-size: 0.92rem;
-  color: #fff;
-}
-
-.wizard-arch-node code {
-  font-family: var(--font-mono);
   color: #fff;
 }
 
@@ -978,9 +1057,92 @@
   margin-top: 28px;
 }
 
+.wizard-mapping-intro {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Le due classi del diagramma UML (vedi FprEN 18223) messe a confronto diretto: a sinistra i
+   campi fissi già compilati nei passi precedenti (DigitalProductPassport), a destra la forma
+   di ogni riga di questo passo (DataElement) — stesso linguaggio di .wizard-mapping-card qui
+   sotto ma affiancate apposta, non un'altra card della stessa griglia. */
+.wizard-uml-contrast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.wizard-uml-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+}
+
+.wizard-uml-card strong {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+}
+
+.wizard-uml-card strong em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
+}
+
+.wizard-uml-note {
+  display: block;
+  margin: 2px 0 10px;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.wizard-uml-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.wizard-uml-card li {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.wizard-uml-card li code {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.wizard-uml-card--accent {
+  background: var(--brand-soft);
+  border-color: rgba(0, 44, 108, 0.18);
+}
+
+.wizard-uml-tag {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+@media (max-width: 700px) {
+  .wizard-uml-contrast {
+    grid-template-columns: 1fr;
+  }
+}
+
 .wizard-mapping-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-top: 12px;
 }

@@ -616,6 +616,16 @@ export class Admin {
     this.attributesArray.removeAt(index);
   }
 
+  /** Applica al form l'oggetto già validato dal Wizard (modalità JSON del passo Attributi,
+   * vedi DppWizardComponent.parseFlatJsonObject()) — stessa forma finale di fillDemoAttributes()
+   * qui sotto: sostituisce del tutto le righe esistenti, non le unisce. */
+  protected applyAttributesJson(values: Record<string, string>): void {
+    this.attributesArray.clear();
+    for (const [key, value] of Object.entries(values)) {
+      this.attributesArray.push(this.attributeGroup(key, value));
+    }
+  }
+
   private buildInput(): DppInput {
     const f = this.dppForm.getRawValue();
     const attributes: Record<string, string> = {};
