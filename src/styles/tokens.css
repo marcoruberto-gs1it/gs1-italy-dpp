@@ -1,10 +1,15 @@
 /* ==========================================================================
    Catalogo Smart — Design System Tokens
-   Palette istituzionale GS1 Italy: blu #002c6c (brand) + arancione #f26334
-   (accent) — rebrand 2026, sostituisce la precedente coppia indaco/smeraldo
-   con i colori ufficiali gs1it.org. Ogni valore sotto è stato verificato con
-   un contrast-checker WCAG 2.x prima di essere scelto (vedi commenti puntuali
-   dove un colore ha richiesto un aggiustamento).
+   Redesign 2026-09-27: identità nuova, non un ennesimo aggiustamento della
+   precedente — indaco #4338ca (brand) + ambra #b45309 (accent) al posto del
+   blu/arancione istituzionale GS1 usato finora (questo resta un progetto
+   dimostrativo, non il sito ufficiale gs1it.org: vedi il footer). Stile
+   "minimal/Swiss" (bordi netti, un solo colore d'accento per elemento,
+   niente gradienti decorativi) introdotto nella stessa sessione, qui esteso
+   a tutta la palette. Manrope per i titoli al posto di Inter, per dare ai
+   titoli una personalità distinta dal corpo del testo. Ogni valore sotto è
+   stato verificato con un contrast-checker WCAG 2.x prima di essere scelto
+   (vedi commenti puntuali dove un colore ha richiesto un aggiustamento).
    ========================================================================== */
 
 :root {
@@ -14,7 +19,7 @@
   --container-max: 1400px;
   --gutter: 24px;
 
-  /* --- Brand palette ---
+  /* --- Brand palette: indaco (Tailwind indigo-700/800) + ambra (amber-700/800) ---
      --brand/--brand-strong: ruolo "riempimento" — sfondo di bottoni, badge
      pieni, skip-link, icona di settore di default: qui sopra ci va sempre
      testo/icona BIANCA, quindi il colore deve reggere almeno 4.5:1 con il
@@ -23,39 +28,38 @@
      invece contrasto con lo sfondo pagina, non con il bianco: una tinta
      più scura del brand va bene qui ma fallirebbe come riempimento.
      --brand-accent-vivid: caso a parte — usato SOLO per elementi con testo
-     scuro sopra (pillola CTA dell'hero, badge "AI", selezione testo), fisso
+     scuro sopra (pillola CTA dell'hero, selezione testo), fisso
      indipendente dal tema come --brand-ink, con cui va sempre in coppia. */
-  --brand: #002c6c;
-  --brand-strong: #001a4d;
-  --brand-soft: rgba(0, 44, 108, 0.08);
-  /* Arancione "accessibile" GS1 (non il #f26334 pieno, che regge solo 3.18:1
-     con il bianco): 4.94:1 su bianco, 4.51:1 sul nuovo --bg-canvas. */
-  --brand-accent: #ad3302;
-  --brand-accent-strong: #8f2900;
-  --brand-accent-soft: rgba(173, 51, 2, 0.1);
-  /* Arancione GS1 pieno: 5.77:1 con testo --brand-ink sopra, MAI con testo bianco
-     (il #f26334 ufficiale non regge il bianco — per questo il riempimento/testo
-     su tela usa sopra la variante "accessibile" più scura, non questo valore). */
-  --brand-accent-vivid: #f26334;
-  --brand-ink: #001843;
+  --brand: #4338ca;
+  --brand-strong: #3730a3;
+  --brand-soft: rgba(67, 56, 202, 0.08);
+  /* Ambra (amber-700 Tailwind): 5.02:1 su bianco, 4.70:1 sul nuovo --bg-canvas. */
+  --brand-accent: #b45309;
+  --brand-accent-strong: #92400e;
+  --brand-accent-soft: rgba(180, 83, 9, 0.1);
+  /* Ambra piena (amber-500): 7.44:1 con testo --brand-ink sopra, MAI con testo bianco
+     (3.19:1, sotto soglia — per questo il riempimento/testo su tela usa sopra la
+     variante più scura, non questo valore). */
+  --brand-accent-vivid: #f59e0b;
+  --brand-ink: #1e1b4b;
 
-  /* --- Verde e tinte pastello del design Figma ---
-     Verde: solo per gli accenti "positivi/circolari" (parola evidenziata del titolo, badge
-     "attivo"). Le tinte sono i fondi delle tessere-icona e delle pillole tematiche; su ognuna il
+  /* --- Verde (successo/attivo, non toccato dal redesign colore) e tinte pastello, ora
+     nell'orbita indaco/ambra invece del blu/arancione GS1 precedente. Su ognuna il
      testo/icona usa il proprio inchiostro scuro (verificato ≥ 4.5:1: #003811 su #9ef7a4 11:1,
-     #001843 su #d9e2ff 13:1, #8f2900 su #ffdbd0 6.7:1). */
+     #3730a3 su #e0e7ff 8.06:1, #92400e su #fef3c7 6.37:1). */
   --green-ink: #003811;
   --green-tint: #9ef7a4;
-  --blue-tint: #d9e2ff;
-  --blue-ink: #001843;
-  --orange-tint: #ffdbd0;
-  --orange-ink: #8f2900;
+  --blue-tint: #e0e7ff;
+  --blue-ink: #3730a3;
+  --orange-tint: #fef3c7;
+  --orange-ink: #92400e;
 
   /* --- Typography ---
-     Inter ovunque, titoli compresi (peso 700-800, tracking stretto): è il carattere del design
-     Figma di riferimento (file "DPP PIM & EPCIS 2.0 Traceability Engine"). --font-display resta
-     un token separato per poter distinguere titoli e corpo senza toccare i fogli di stile. */
-  --font-display: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+     Manrope per i titoli (geometrico, tracking stretto) — una personalità distinta da Inter,
+     che resta il carattere del corpo del testo: due caratteri diversi con lo stesso ruolo di
+     prima danno subito un'identità diversa senza dover ridisegnare ogni layout. --font-display
+     resta un token separato per poter cambiare titoli e corpo senza toccare i fogli di stile. */
+  --font-display: 'Manrope', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
 
@@ -83,11 +87,11 @@
      con un bordo netto, non con un'ombra — --shadow-sm/md restano solo per elementi che
      galleggiano DAVVERO sopra il contenuto (drawer, modali, il pannello API), mai per le card a
      riposo. Niente più token "glow" colorato: un bordo/riempimento piatto basta ai bottoni. */
-  --shadow-xs: 0 1px 2px rgba(0, 24, 67, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 24, 67, 0.06);
-  --shadow-md: 0 4px 12px -4px rgba(0, 24, 67, 0.1);
-  --shadow-lg: 0 12px 24px -8px rgba(0, 24, 67, 0.14);
-  --shadow-xl: 0 20px 40px -12px rgba(0, 24, 67, 0.18);
+  --shadow-xs: 0 1px 2px rgba(30, 27, 75, 0.04);
+  --shadow-sm: 0 1px 3px rgba(30, 27, 75, 0.06);
+  --shadow-md: 0 4px 12px -4px rgba(30, 27, 75, 0.1);
+  --shadow-lg: 0 12px 24px -8px rgba(30, 27, 75, 0.14);
+  --shadow-xl: 0 20px 40px -12px rgba(30, 27, 75, 0.18);
 
   /* --- Semantic surface tokens (LIGHT) ---
      Tela azzurrina fredda (#f9f9ff) con fondi alternati #f0f3ff, come nel design Figma di
@@ -102,24 +106,24 @@
   --bg-glass: rgba(249, 249, 255, 0.82);
   --bg-glass-strong: rgba(249, 249, 255, 0.94);
   --bg-overlay: rgba(20, 16, 8, 0.5);
-  --bg-inverse: #001843;
+  --bg-inverse: var(--brand-ink);
 
-  /* Stessa tinta calda di --bg-canvas invece del navy precedente (0,19,53) — stessi valori
-     alpha, quindi lo stesso contrasto relativo contro le superfici chiare, solo intonati alla
-     nuova tela invece di stonare col blu freddo. */
-  --border-subtle: rgba(0, 24, 67, 0.08);
-  --border-default: rgba(0, 24, 67, 0.14);
-  --border-strong: rgba(0, 24, 67, 0.24);
+  /* Stessa tinta calda di --bg-canvas, ora intonata al nuovo --brand-ink (30,27,75) invece
+     del vecchio navy (0,24,67) — stessi valori alpha, quindi lo stesso contrasto relativo
+     contro le superfici chiare. */
+  --border-subtle: rgba(30, 27, 75, 0.08);
+  --border-default: rgba(30, 27, 75, 0.14);
+  --border-strong: rgba(30, 27, 75, 0.24);
   --border-glass: rgba(255, 255, 255, 0.5);
 
-  --text-primary: #001843;
+  --text-primary: #1e1b4b;
   --text-secondary: #444650;
   --text-tertiary: #5b5f6e;
   --text-muted: #5b5f6e;
   --text-on-accent: #ffffff;
-  /* --brand (12.14:1 sul canvas, 13.32:1 su superficie bianca) regge sia da
-     link-su-tela sia da riempimento — solo il tema scuro ha bisogno di un
-     valore separato (vedi sotto), perché lì le due esigenze divergono. */
+  /* --brand (7.90:1 su bianco/tela) regge sia da link-su-tela sia da riempimento — solo il
+     tema scuro ha bisogno di un valore separato (vedi sotto), perché lì le due esigenze
+     divergono. */
   --text-link: var(--brand);
 
   --accent: var(--brand);
@@ -129,19 +133,16 @@
   --accent-2-soft: var(--brand-accent-soft);
 
   /* Verificati sulla nuova --bg-canvas: 4.87:1 e 5.00:1, sopra la soglia AA
-     — non toccati dal rebrand, sono indipendenti dall'identità di brand. */
+     — indipendenti dall'identità di brand, non toccati dal redesign colore. */
   --success: #147a51;
   --success-soft: rgba(20, 122, 81, 0.12);
   --warning: #aa4f09;
   --warning-soft: rgba(170, 79, 9, 0.12);
 
-  --mesh-1: rgba(0, 44, 108, 0.4);
-  --mesh-2: rgba(242, 99, 52, 0.3);
-  --mesh-3: rgba(0, 182, 222, 0.22);
-  --scrollbar-thumb: rgba(0, 24, 67, 0.2);
+  --scrollbar-thumb: rgba(30, 27, 75, 0.2);
 
   /* Superficie "terminale" sempre scura, indipendente dal tema (blocchi codice, URL bar) */
-  --surface-code: #001843;
+  --surface-code: var(--brand-ink);
 
   color-scheme: light;
 }
@@ -170,32 +171,33 @@
   /* Qui NON può essere var(--accent): --accent scuro deve restare abbastanza
      scuro da reggere testo bianco sopra (riempimento bottoni/pillole), ma
      quello stesso scuro è troppo poco luminoso da leggersi come link sul
-     canvas quasi nero. Due esigenze opposte → due valori distinti, come
-     già faceva l'impianto precedente (stesso pattern, nuova tinta "slate"
-     GS1: 8.29:1). */
-  --text-link: #89aadb;
+     canvas quasi nero. Due esigenze opposte → due valori distinti (indigo-300
+     Tailwind, 9.88:1 sul canvas scuro). */
+  --text-link: #a5b4fc;
 
-  /* Riempimento (bottoni/pillole con testo bianco sopra) — "slate accessible" GS1,
-     il blu istituzionale #002c6c qui sarebbe illeggibile (1.48:1 sul canvas scuro): 4.94:1. */
-  --accent: #3a70bf;
-  /* Hover/pressed — si scurisce, stessa direzione del tema chiaro: 6.43:1. */
-  --accent-strong: #2f5fa0;
-  --accent-soft: rgba(58, 112, 191, 0.22);
+  /* Riempimento (bottoni/pillole con testo bianco sopra) — indigo-600 Tailwind, il
+     brand pieno (#4338ca, indigo-700) sarebbe troppo scuro qui: 6.29:1. */
+  --accent: #4f46e5;
+  /* Hover/pressed — si scurisce, stessa direzione del tema chiaro: 7.90:1 (indigo-700,
+     lo stesso --brand del tema chiaro). */
+  --accent-strong: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.22);
   /* --brand-accent/--brand-accent-strong (testo/icona su tela — star rating, capolettera
-     timeline, bordo decorativo): l'arancione GS1 pieno regge qui benissimo (6.20:1), la
-     variante "oro" GS1 dà il massimo risalto per lo stato più enfatico (10.66:1). */
-  --brand-accent: #f26334;
-  --brand-accent-strong: #fbb034;
-  --brand-accent-soft: rgba(242, 99, 52, 0.18);
+     timeline, bordo decorativo): ambra piena (amber-400) regge qui benissimo (11.80:1 sul
+     canvas scuro), la variante più chiara (amber-300) dà il massimo risalto per lo stato più
+     enfatico (13.66:1). */
+  --brand-accent: #fbbf24;
+  --brand-accent-strong: #fcd34d;
+  --brand-accent-soft: rgba(251, 191, 36, 0.18);
   --accent-2: var(--brand-accent);
-  --accent-2-soft: rgba(242, 99, 52, 0.16);
+  --accent-2-soft: rgba(251, 191, 36, 0.16);
 
   --green-ink: #9ef7a4;
   --green-tint: rgba(158, 247, 164, 0.16);
-  --blue-tint: rgba(137, 170, 219, 0.2);
-  --blue-ink: #d9e2ff;
-  --orange-tint: rgba(255, 158, 122, 0.18);
-  --orange-ink: #ffb59c;
+  --blue-tint: rgba(129, 140, 248, 0.2);
+  --blue-ink: #c7d2fe;
+  --orange-tint: rgba(251, 191, 36, 0.18);
+  --orange-ink: #fde68a;
 
   --success: #34d399;
   --success-soft: rgba(52, 211, 153, 0.14);
@@ -208,9 +210,6 @@
   --shadow-lg: 0 16px 32px -10px rgba(0, 0, 0, 0.45);
   --shadow-xl: 0 24px 48px -14px rgba(0, 0, 0, 0.5);
 
-  --mesh-1: rgba(58, 112, 191, 0.35);
-  --mesh-2: rgba(242, 99, 52, 0.28);
-  --mesh-3: rgba(137, 170, 219, 0.22);
   --scrollbar-thumb: rgba(255, 255, 255, 0.14);
 
   color-scheme: dark;
@@ -320,7 +319,7 @@ img.img-fallback {
 }
 
 .gs-badge--vocab {
-  background: rgba(0, 44, 108, 0.1);
+  background: var(--brand-soft);
   color: var(--brand-strong);
 }
 
@@ -342,8 +341,8 @@ img.img-fallback {
 }
 
 :root[data-theme='dark'] .gs-badge--vocab {
-  background: rgba(137, 170, 219, 0.18);
-  color: #89aadb;
+  background: rgba(165, 180, 252, 0.18);
+  color: var(--text-link);
 }
 
 .gs-badge--green {
@@ -415,14 +414,14 @@ img.img-fallback {
   border-color: var(--brand);
 }
 
-/* Pannello navy pieno, sempre scuro e indipendente dal tema (come nel design Figma: banner
-   "scadenzario", pannello standard, fascia CTA). Un gradiente diagonale appena percettibile
-   evita il blocco piatto senza introdurre pattern decorativi; il testo sopra resta
-   bianco/rgba(255,255,255,*), invariato. */
+/* Pannello scuro pieno, sempre scuro e indipendente dal tema (banner "scadenzario", pannello
+   standard, fascia CTA) — il nome è storico (--brand-ink era blu navy), il colore ora è indaco
+   molto scuro. Un gradiente diagonale appena percettibile evita il blocco piatto senza
+   introdurre pattern decorativi; il testo sopra resta bianco/rgba(255,255,255,*), invariato. */
 .gs-navy-panel {
   position: relative;
   background-color: var(--brand-ink);
-  background-image: linear-gradient(135deg, #001843 0%, #002c6c 100%);
+  background-image: linear-gradient(135deg, var(--brand-ink) 0%, var(--brand) 100%);
 }
 
 /* Griglia con divisori sottili INTERNI (stile "tabella statistiche") invece di card separate —

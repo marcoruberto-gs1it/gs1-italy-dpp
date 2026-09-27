@@ -76,7 +76,7 @@
 
 
 .hero-highlight {
-  color: var(--brand-accent);
+  color: var(--brand);
 }
 
 
@@ -574,7 +574,7 @@
    seconda del tema) — usa il ruolo "testo su tela" di --brand-accent, non
    --brand-accent-vivid: quest'ultimo è pensato solo per l'ink dell'hero, sempre scuro. */
 .text-highlight {
-  color: var(--brand-accent);
+  color: var(--brand);
 }
 
 

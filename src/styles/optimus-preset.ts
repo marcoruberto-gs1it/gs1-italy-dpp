@@ -8,11 +8,10 @@ import Aura from '@openng/optimus-ui-themes/aura';
  * (selettori `p-*`, direttiva `pButton`, ecc.) e stessa struttura di theming, compatibile con
  * Angular 22 già in uso in questo progetto (nessun downgrade Angular necessario).
  *
- * Il colore "primary" diventa il nostro blu istituzionale GS1 (--brand in tokens.css), non
- * l'emerald di default di Aura. A differenza della vecchia palette indaco, il blu #002c6c di
- * gs1it.org non coincide con nessuno scalino della scala Tailwind integrata di Aura — la scala
- * sotto è quindi costruita a mano con gli hex ufficiali GS1 (blu + "slate", la variante chiara
- * usata per il riempimento in tema scuro), non con riferimenti nominali `{indigo.X}`.
+ * Il colore "primary" diventa il nostro indaco (--brand in tokens.css, redesign 2026-09-27),
+ * non l'emerald di default di Aura. A differenza del blu istituzionale GS1 usato prima, questo
+ * indaco COINCIDE esattamente con la scala Tailwind `indigo` integrata di Aura — la scala sotto
+ * è quindi quella ufficiale Tailwind, non hex costruiti a mano come nella versione precedente.
  *
  * `colorScheme.light`/`.dark` invece di un'unica CSS `light-dark(...)` inline: provato prima
  * con `color: 'light-dark({primary.700}, {primary.600})'` in un solo blocco `primary`, ma
@@ -24,26 +23,25 @@ import Aura from '@openng/optimus-ui-themes/aura';
  * sbagliato in scuro). La struttura `colorScheme` sotto è quella che il generatore si aspetta
  * davvero per personalizzare entrambi i temi esplicitamente.
  *
- * Valori verificati contro tokens.css: light primary.color = primary.700 = #002c6c = --brand
- * esatto (13.32:1 con testo bianco); light hoverColor = primary.800 = #001a4d = --brand-strong
- * esatto. Dark primary.color = #3a70bf = --accent (tema scuro) esatto (4.94:1 con testo
- * bianco, il blu #002c6c pieno sarebbe illeggibile su sfondo quasi nero); dark hoverColor =
- * #2f5fa0 = --accent-strong (tema scuro) esatto (6.43:1) — stessi hex già verificati WCAG in
- * questa sessione, nessuna nuova verifica di contrasto necessaria sul riempimento dei bottoni
- * primary.
+ * Valori verificati contro tokens.css: light primary.color = primary.700 = #4338ca = --brand
+ * esatto (7.90:1 con testo bianco); light hoverColor = primary.800 = #3730a3 = --brand-strong
+ * esatto (9.93:1). Dark primary.color = primary.600 = #4f46e5 = --accent (tema scuro) esatto
+ * (6.29:1 con testo bianco, il --brand pieno sarebbe troppo scuro sul canvas quasi nero); dark
+ * hoverColor = primary.700 = #4338ca = --accent-strong (tema scuro) esatto (7.90:1) — stessi hex
+ * già verificati WCAG in tokens.css, nessuna nuova verifica di contrasto necessaria qui.
  */
 const primaryScale = {
-  50: '#f0f5fa',
-  100: '#e5f0fc',
-  200: '#c4d7ed',
-  300: '#89aadb',
-  400: '#5f8ad1',
-  500: '#3a70bf',
-  600: '#235696',
-  700: '#002c6c',
-  800: '#001a4d',
-  900: '#001335',
-  950: '#000a20',
+  50: '#eef2ff',
+  100: '#e0e7ff',
+  200: '#c7d2fe',
+  300: '#a5b4fc',
+  400: '#818cf8',
+  500: '#6366f1',
+  600: '#4f46e5',
+  700: '#4338ca',
+  800: '#3730a3',
+  900: '#312e81',
+  950: '#1e1b4b',
 };
 
 // A questa posizione (semantic.colorScheme.light/dark.primary) il tipo si aspetta SOLO i 4
@@ -62,7 +60,7 @@ export const GS1OptimusPreset = definePreset(Aura, {
         primary: primarySemantics('{primary.700}', '#ffffff', '{primary.800}', '{primary.900}'),
       },
       dark: {
-        primary: primarySemantics('{primary.500}', '#ffffff', '#2f5fa0', '{primary.600}'),
+        primary: primarySemantics('{primary.600}', '#ffffff', '{primary.700}', '{primary.800}'),
       },
     },
   },

@@ -648,7 +648,7 @@
           <div class="passport-qr">
             <div class="passport-qr-box">
               @if (isBrowser) {
-                <qrcode [qrdata]="dppUpi()" [width]="104" [margin]="1" elementType="svg" colorDark="#001843" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
+                <qrcode [qrdata]="dppUpi()" [width]="104" [margin]="1" elementType="svg" colorDark="#1e1b4b" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
               } @else {
                 <app-icon name="qr-code" [size]="44"></app-icon>
               }
@@ -763,7 +763,7 @@
           <div class="passport-carrier passport-carrier--qr">
             <div class="passport-carrier-qr">
               @if (isBrowser) {
-                <qrcode [qrdata]="dppUpi()" [width]="150" [margin]="1" elementType="svg" colorDark="#001843" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
+                <qrcode [qrdata]="dppUpi()" [width]="150" [margin]="1" elementType="svg" colorDark="#1e1b4b" colorLight="#ffffff" errorCorrectionLevel="M"></qrcode>
               } @else {
                 <app-icon name="qr-code" [size]="56"></app-icon>
               }

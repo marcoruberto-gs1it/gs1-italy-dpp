@@ -700,7 +700,7 @@
 .wizard-json {
   margin: 0;
   border-radius: 0 0 var(--radius-md) var(--radius-md);
-  background: #001843;
+  background: var(--brand-ink);
   max-height: 520px;
   overflow-y: auto;
   overflow-x: hidden;
