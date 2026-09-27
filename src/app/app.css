@@ -92,8 +92,7 @@
 }
 
 /* Pillola "ESPR 2024/1781" accanto al logo: solo desktop, puramente informativa — contorno
-   sottile + pallino, non un riempimento colorato (stesso linguaggio minimal della console admin,
-   vedi .console-registry-pill in admin.css). */
+   sottile + pallino, non un riempimento colorato. */
 .espr-badge {
   display: inline-flex;
   align-items: center;

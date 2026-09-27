@@ -3,7 +3,7 @@ import { Component, PLATFORM_ID, computed, effect, inject, signal } from '@angul
 import { Meta, Title } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { IconComponent, IconName } from '../../components/icon/icon';
@@ -56,7 +56,6 @@ export class Admin {
   private fb = inject(FormBuilder);
   private siteOrigin = inject(SiteOriginService);
   private platformId = inject(PLATFORM_ID);
-  private router = inject(Router);
   protected languageService = inject(LanguageService);
   protected themeService = inject(ThemeService);
   /** angularx-qrcode manipola direttamente il DOM: non è compatibile con SSR/prerender — non
@@ -67,27 +66,6 @@ export class Admin {
 
   protected view = signal<View>('checking');
   protected records = signal<DppRecord[]>([]);
-
-  /** Ricerca nella topbar della console: porta alla pagina pubblica /01/:gtin (stessa
-   * convalida GTIN del campo "Verifica" della home). */
-  protected topSearch = signal('');
-  protected topSearchError = signal(false);
-
-  protected onTopSearchInput(event: Event): void {
-    this.topSearch.set((event.target as HTMLInputElement).value);
-    this.topSearchError.set(false);
-  }
-
-  protected submitTopSearch(event: Event): void {
-    event.preventDefault();
-    const gtin = this.topSearch().replace(/\s+/g, '');
-    if (!gtin) return;
-    if (!isValidGtin(gtin)) {
-      this.topSearchError.set(true);
-      return;
-    }
-    void this.router.navigate(['/01', gtin]);
-  }
 
   protected searchQuery = signal('');
   protected statusFilter = signal<'all' | 'draft' | 'published'>('all');

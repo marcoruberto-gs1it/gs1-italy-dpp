@@ -1,11 +1,3 @@
-@if (inspector.count() > 0) {
-  <button type="button" class="api-fab" (click)="inspector.show(true)" aria-label="Apri il pannello delle chiamate API">
-    <app-icon name="braces" [size]="16"></app-icon>
-    <span>API</span>
-    <span class="api-fab-count">{{ inspector.count() }}</span>
-  </button>
-}
-
 @if (inspector.open()) {
   <div class="api-backdrop" (click)="inspector.open.set(false)"></div>
   <aside class="api-panel" role="dialog" aria-modal="true" aria-label="Chiamate API e JSON">

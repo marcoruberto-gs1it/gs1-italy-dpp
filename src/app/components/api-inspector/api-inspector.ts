@@ -2,7 +2,6 @@ import { Component, HostListener, computed, inject, signal } from '@angular/core
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ApiCall, ApiInspectorService, OutboundCall } from '../../services/api-inspector.service';
-import { IconComponent } from '../icon/icon';
 import { highlightJson } from '../../utils/json-highlight';
 
 /**
@@ -14,7 +13,7 @@ import { highlightJson } from '../../utils/json-highlight';
 @Component({
   selector: 'app-api-inspector',
   standalone: true,
-  imports: [IconComponent],
+  imports: [],
   templateUrl: './api-inspector.html',
   styleUrl: './api-inspector.css',
 })
