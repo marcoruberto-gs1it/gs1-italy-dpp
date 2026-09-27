@@ -853,7 +853,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9db8ff;
+  color: #93c5fd;
 }
 
 .wizard-arch-flow {
@@ -895,7 +895,7 @@
 
 .wizard-arch-node em {
   font-style: normal;
-  color: #9ef7a4;
+  color: #6ee7b7;
   font-weight: 600;
 }
 
@@ -971,7 +971,7 @@
   white-space: nowrap;
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: #9db8ff;
+  color: #93c5fd;
 }
 
 .wizard-mapping {

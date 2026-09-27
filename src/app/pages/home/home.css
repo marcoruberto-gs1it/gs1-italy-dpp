@@ -21,7 +21,7 @@
   overflow-y: hidden;
 }
 
-/* Trama a puntini + due aloni di colore molto tenui (indaco in alto, ambra in basso): profondità
+/* Trama a puntini + due aloni di colore molto tenui (blu in alto, verde in basso): profondità
    decorativa, mai un elemento informativo — per questo vive in un ::before dietro tutto il resto
    (.hero-inner ha z-index:1 più sotto) e sparisce del tutto sotto prefers-reduced-motion solo
    nella sua parte animata (il resto è statico, niente da annullare). */
@@ -31,8 +31,8 @@
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 55% 50% at 88% -6%, rgba(67, 56, 202, 0.1), transparent 70%),
-    radial-gradient(ellipse 45% 45% at 6% 105%, rgba(180, 83, 9, 0.07), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 88% -6%, rgba(0, 44, 108, 0.1), transparent 70%),
+    radial-gradient(ellipse 45% 45% at 6% 105%, rgba(4, 120, 87, 0.07), transparent 70%),
     radial-gradient(circle, var(--border-default) 1px, transparent 1px);
   background-size: auto, auto, 28px 28px;
   mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 45%, transparent 92%);
@@ -96,10 +96,11 @@
 
 
 
-/* Testo con riempimento sfumato (indaco → ambra, gli stessi due accenti della palette) invece di
-   un colore piatto — un tocco "da prodotto" senza uscire dalla palette. Fallback a colore piatto
-   se background-clip:text non è supportato o se l'utente ha chiesto più contrasto: mai testo
-   invisibile. */
+/* Testo con riempimento sfumato (blu → verde, gli stessi due accenti della palette) invece di
+   un colore piatto — un tocco "da prodotto" senza uscire dalla palette. Tappa intermedia
+   #0d9488 (teal-600 Tailwind): un ponte cromatico tra i due hue (blu ≈216°, verde ≈142°), non
+   un terzo accento a sé. Fallback a colore piatto se background-clip:text non è supportato o se
+   l'utente ha chiesto più contrasto: mai testo invisibile. */
 .hero-highlight {
   color: var(--brand);
 }
@@ -107,7 +108,7 @@
 @supports (background-clip: text) or (-webkit-background-clip: text) {
   @media (prefers-contrast: no-preference) {
     .hero-highlight {
-      background: linear-gradient(100deg, var(--brand) 15%, #6366f1 55%, var(--brand-accent-vivid) 100%);
+      background: linear-gradient(100deg, var(--brand) 15%, #0d9488 55%, var(--brand-accent-vivid) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -213,13 +214,13 @@
    SETTORE attivo (--card-accent, la stessa variabile del bordo della card): mentre il carosello
    avanza il bagliore cambia tinta insieme alla card, invece di restare un blu fisso indifferente
    al contenuto. color-mix ha un fallback automatico: i browser che non lo supportano ignorano la
-   riga e restano sul primo colore dichiarato (indaco fisso), mai senza bagliore. */
+   riga e restano sul primo colore dichiarato (blu fisso), mai senza bagliore. */
 .hero-preview::before {
   content: '';
   position: absolute;
   inset: -10%;
   z-index: -1;
-  background: radial-gradient(ellipse 60% 55% at 60% 35%, rgba(67, 56, 202, 0.16), transparent 70%);
+  background: radial-gradient(ellipse 60% 55% at 60% 35%, rgba(0, 44, 108, 0.16), transparent 70%);
   background: radial-gradient(ellipse 60% 55% at 60% 35%, color-mix(in srgb, var(--card-accent, var(--brand)) 32%, transparent), transparent 70%);
   filter: blur(40px);
   pointer-events: none;
@@ -286,10 +287,10 @@
   position: relative;
   background: var(--bg-surface);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-  /* Ombra più ricca (due strati, una tinta d'indaco) solo qui: è la vetrina del prodotto, vedi
+  /* Ombra più ricca (due strati, una tinta di blu) solo qui: è la vetrina del prodotto, vedi
      il commento su .hero-float qui sopra sul perché è l'unica card del sistema con un'elevazione
      vera invece del solo bordo. */
-  box-shadow: 0 30px 50px -20px rgba(30, 27, 75, 0.25), 0 10px 24px -10px rgba(67, 56, 202, 0.18);
+  box-shadow: 0 30px 50px -20px rgba(0, 26, 51, 0.25), 0 10px 24px -10px rgba(0, 44, 108, 0.18);
   padding: 28px;
   display: flex;
   flex-direction: column;
@@ -660,7 +661,7 @@
 
 
 
-/* Design system a 4 colori coordinati (indaco/ambra/verde/viola — vedi il commento su
+/* Design system a 4 colori coordinati (blu/arancio/verde/viola — vedi il commento su
    --violet-tint in tokens.css), un colore per passo: distingue le 4 fasi a colpo d'occhio
    invece del grigio uniforme di prima, senza tornare a un arcobaleno casuale — sempre le stesse
    4 tinte, nello stesso ordine, ovunque compaiano 4 card in fila su questa pagina (vedi anche
@@ -681,7 +682,12 @@
   box-shadow: var(--shadow-sm);
 }
 
-.dpp-flow-step:nth-child(2) { --step-accent: var(--brand-accent); --step-tint: var(--orange-tint); --step-ink: var(--orange-ink); }
+/* --step-accent qui è un hex fisso (come nth-child(4) più sotto), non var(--brand-accent): da
+   quando --brand-accent è diventato verde (ESPR) non varrebbe più "arancio" — l'arancio di
+   questo terzo colore del set a 4 tinte è ora indipendente dal brand, stesso valore in entrambi
+   i temi (una barra sottile 3px, non testo: non serve un ink che si schiarisca/scurisca per
+   contrasto come --orange-ink). */
+.dpp-flow-step:nth-child(2) { --step-accent: #b45309; --step-tint: var(--orange-tint); --step-ink: var(--orange-ink); }
 .dpp-flow-step:nth-child(3) { --step-accent: var(--success); --step-tint: var(--green-tint); --step-ink: var(--green-ink); }
 .dpp-flow-step:nth-child(4) { --step-accent: #7c3aed; --step-tint: var(--violet-tint); --step-ink: var(--violet-ink); }
 
@@ -1043,8 +1049,8 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--brand-accent-vivid);
-  background: rgba(245, 158, 11, 0.14);
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.35);
   border-radius: var(--radius-full);
   padding: 6px 14px;
   margin-bottom: 16px;
@@ -2081,7 +2087,7 @@
 /* Bagliore SOLO in hover, mai a riposo: la card a riposo resta piatta (coerente col resto del
    sistema), l'accento in più arriva come feedback dell'interazione, non come decorazione fissa. */
 .gs-btn--primary.hero-cta:hover {
-  box-shadow: 0 10px 24px -8px rgba(67, 56, 202, 0.45);
+  box-shadow: 0 10px 24px -8px rgba(0, 44, 108, 0.45);
   transform: translateY(-1px);
 }
 
