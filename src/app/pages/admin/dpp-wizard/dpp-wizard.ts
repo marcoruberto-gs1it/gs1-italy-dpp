@@ -112,10 +112,9 @@ export class DppWizardComponent {
   @Input({ required: true }) attributesArray!: FormArray<FormGroup>;
   @Input({ required: true }) editingId!: Signal<string | null>;
   @Input({ required: true }) publishedRecord!: Signal<DppRecord | null>;
-  /** Payload ESATTO che una pubblicazione invierebbe a mock-eu-registry adesso — null finché la
-   * scheda non è stata salvata almeno una volta (vedi Admin.refreshRegistrationPreview()).
-   * Mostrato al passo Registrazione al posto di un JSON-LD che darebbe un'idea sbagliata di cosa
-   * viaggia davvero verso il registro (vedi il commento in dpp-wizard.html). */
+  /** Payload esatto che una pubblicazione invierebbe a mock-eu-registry adesso — null finché la
+   * scheda non è stata salvata almeno una volta (vedi Admin.refreshRegistrationPreview()). Mostrato
+   * al passo Registrazione al posto del JSON-LD pubblico (vedi il commento in dpp-wizard.html). */
   @Input({ required: true }) registrationPreview!: Signal<Record<string, unknown> | null>;
   @Input({ required: true }) formPhase!: Signal<1 | 2 | 3>;
   @Input({ required: true }) qrValue!: Signal<string | null>;

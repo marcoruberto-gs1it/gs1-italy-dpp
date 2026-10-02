@@ -560,7 +560,7 @@
         } @else {
           <div class="wizard-split">
             <div class="wizard-split-left">
-              <span class="form-section-eyebrow">Cosa arriva davvero al registro</span>
+              <span class="form-section-eyebrow">Cosa arriva al registro</span>
               <dl class="publish-confirm-facts">
                 <div>
                   <dt>Prodotto</dt>
@@ -579,21 +579,15 @@
                   <dd><code>{{ form.controls.facilityId.value || '—' }}</code></dd>
                 </div>
               </dl>
-              <p class="wizard-field-hint">
-                Il riepilogo qui sopra, in forma leggibile: il JSON esatto che il server invierebbe è qui a destra,
-                non un'approssimazione.
-              </p>
             </div>
             <div class="wizard-split-right">
               <div class="wizard-split-right-head">
-                <!-- Il payload VERO, non il JSON-LD pubblico (quello il registro lo scarica a
-                     parte dal liveURL per calcolarne l'hash, non lo riceve come corpo della
-                     richiesta — due cose diverse). Richiesto al server con lo stesso
-                     buildRegistrationRequest() usato dalla pubblicazione reale (vedi
-                     Admin.refreshRegistrationPreview()): non una ricostruzione approssimata qui
-                     nel Wizard, la stessa funzione, zero rischio che mostri qualcosa di diverso
-                     da quello che poi viaggia davvero. -->
-                <span class="wizard-split-right-label">Payload di registrazione (quello che viaggia davvero)</span>
+                <!-- Non il JSON-LD pubblico (quello il registro lo scarica a parte dal liveURL
+                     per calcolarne l'hash, non lo riceve come corpo della richiesta). Richiesto
+                     al server con lo stesso buildRegistrationRequest() usato dalla pubblicazione
+                     reale (vedi Admin.refreshRegistrationPreview()), non una ricostruzione
+                     approssimata qui nel Wizard. -->
+                <span class="wizard-split-right-label">Payload di registrazione</span>
                 <span class="wizard-split-right-tools">
                   <span class="wizard-split-right-meta">{{ registrationPreviewBytes() }} byte</span>
                   <button type="button" class="wizard-json-expand wizard-json-copy" [disabled]="!registrationPreview()" (click)="copyRegistrationPayload()" [title]="registrationPayloadCopied() ? 'Copiato!' : 'Copia JSON'">

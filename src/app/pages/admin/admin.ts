@@ -145,12 +145,11 @@ export class Admin {
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
 
-  /** Payload ESATTO che una pubblicazione invierebbe a mock-eu-registry in questo momento —
-   * null finché la scheda non è stata salvata almeno una volta (serve un id). Richiesta
-   * all'endpoint di sola lettura dedicato (registration-preview), che richiama la STESSA funzione
-   * usata dalla pubblicazione vera (vedi registry-api.service.ts#previewRegistration): mostrato
-   * nel passo Registrazione del Wizard al posto di un JSON-LD che darebbe un'idea sbagliata di
-   * cosa viaggia davvero (vedi .wizard-split-right lì). */
+  /** Payload esatto che una pubblicazione invierebbe a mock-eu-registry in questo momento — null
+   * finché la scheda non è stata salvata almeno una volta (serve un id). Richiesta all'endpoint di
+   * sola lettura dedicato (registration-preview), che richiama la stessa funzione usata dalla
+   * pubblicazione vera (vedi registry-api.service.ts#previewRegistration) — mostrato nel passo
+   * Registrazione del Wizard al posto del JSON-LD pubblico (vedi .wizard-split-right lì). */
   protected registrationPreview = signal<Record<string, unknown> | null>(null);
 
   private refreshRegistrationPreview(id: string): void {

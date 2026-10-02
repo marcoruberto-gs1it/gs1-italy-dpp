@@ -58,13 +58,12 @@ dppRouter.get('/:id', async (req, res) => {
   res.json(record);
 });
 
-/** Anteprima di sola lettura — nessuna chiamata vera a mock-eu-registry — del payload ESATTO che
+/** Anteprima di sola lettura — nessuna chiamata vera a mock-eu-registry — del payload che
  * registerDpp() invierebbe se si pubblicasse adesso: la stessa funzione buildRegistrationRequest()
  * usata dalla pubblicazione vera (routes/dpp.ts#publish) e dalla ricostruzione per le schede già
- * registrate (routes/public.ts), non una sua reimplementazione lato frontend — zero rischio che le
- * due divergano. Usata dal Wizard admin nel passo "Registrazione" per mostrare cosa viaggia
- * davvero verso il registro, invece del solo JSON-LD pubblico (che è un'altra cosa: quello il
- * registro lo scarica a parte per l'hash, non lo riceve come corpo della richiesta). */
+ * registrate (routes/public.ts), non una sua reimplementazione lato frontend. Usata dal Wizard
+ * admin nel passo "Registrazione" al posto del JSON-LD pubblico (che il registro scarica a parte
+ * per l'hash, non riceve come corpo della richiesta). */
 dppRouter.get('/:id/registration-preview', async (req, res) => {
   const record = await getDpp(req.params.id);
   if (!record) {
