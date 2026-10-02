@@ -932,7 +932,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px 16px;
-  margin: 0;
+  margin: 10px 0 0;
   padding: 0 0 20px;
 }
 

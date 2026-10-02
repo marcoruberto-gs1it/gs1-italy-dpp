@@ -173,6 +173,15 @@ export class RegistryApiService {
     return this.withColdStartRetry(this.http.delete<void>(`${BASE}/dpp/${id}`, { withCredentials: true }));
   }
 
+  /** Anteprima di sola lettura del payload ESATTO che una pubblicazione invierebbe a
+   * mock-eu-registry — la stessa funzione del server (buildRegistrationRequest, vedi
+   * registry-api/src/mockRegistryClient.ts), non una sua reimplementazione qui: nessun rischio di
+   * divergenza tra "cosa mostriamo" e "cosa viaggia davvero". Usata dal Wizard al passo
+   * "Registrazione". */
+  previewRegistration(id: string): Observable<Record<string, unknown>> {
+    return this.withColdStartRetry(this.http.get<Record<string, unknown>>(`${BASE}/dpp/${id}/registration-preview`, { withCredentials: true }));
+  }
+
   publish(id: string): Observable<DppRecord & { technical?: PublishTechnicalTrace }> {
     return this.withColdStartRetry(
       this.http.post<DppRecord & { technical?: PublishTechnicalTrace }>(`${BASE}/dpp/${id}/publish`, {}, { withCredentials: true }).pipe(timeout(PUBLISH_HTTP_TIMEOUT_MS))

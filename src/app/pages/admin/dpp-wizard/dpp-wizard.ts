@@ -112,6 +112,11 @@ export class DppWizardComponent {
   @Input({ required: true }) attributesArray!: FormArray<FormGroup>;
   @Input({ required: true }) editingId!: Signal<string | null>;
   @Input({ required: true }) publishedRecord!: Signal<DppRecord | null>;
+  /** Payload ESATTO che una pubblicazione invierebbe a mock-eu-registry adesso — null finché la
+   * scheda non è stata salvata almeno una volta (vedi Admin.refreshRegistrationPreview()).
+   * Mostrato al passo Registrazione al posto di un JSON-LD che darebbe un'idea sbagliata di cosa
+   * viaggia davvero verso il registro (vedi il commento in dpp-wizard.html). */
+  @Input({ required: true }) registrationPreview!: Signal<Record<string, unknown> | null>;
   @Input({ required: true }) formPhase!: Signal<1 | 2 | 3>;
   @Input({ required: true }) qrValue!: Signal<string | null>;
   /** Incrementato da Admin a ogni salvataggio riuscito (mai a un fallimento) — un solo pulsante
@@ -178,6 +183,19 @@ export class DppWizardComponent {
     return doc ? new TextEncoder().encode(JSON.stringify(doc, null, 2)).length : 0;
   });
 
+  /** Stesso trattamento (evidenziazione sintattica) di previewJsonLdHighlighted qui sopra, per il
+   * payload REALE di registrazione (passo Registrazione) invece del JSON-LD pubblico. */
+  protected registrationPreviewHighlighted = computed<SafeHtml | null>(() => {
+    const doc = this.registrationPreview();
+    if (!doc) return null;
+    return this.sanitizer.bypassSecurityTrustHtml(highlightJson(JSON.stringify(doc, null, 2)));
+  });
+
+  protected registrationPreviewBytes = computed(() => {
+    const doc = this.registrationPreview();
+    return doc ? new TextEncoder().encode(JSON.stringify(doc, null, 2)).length : 0;
+  });
+
   protected payloadCopied = signal(false);
 
   protected async copyPayload(): Promise<void> {
@@ -187,6 +205,20 @@ export class DppWizardComponent {
       await navigator.clipboard.writeText(JSON.stringify(doc, null, 2));
       this.payloadCopied.set(true);
       setTimeout(() => this.payloadCopied.set(false), 1800);
+    } catch {
+      /* clipboard non disponibile — ignora */
+    }
+  }
+
+  protected registrationPayloadCopied = signal(false);
+
+  protected async copyRegistrationPayload(): Promise<void> {
+    const doc = this.registrationPreview();
+    if (!doc) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(doc, null, 2));
+      this.registrationPayloadCopied.set(true);
+      setTimeout(() => this.registrationPayloadCopied.set(false), 1800);
     } catch {
       /* clipboard non disponibile — ignora */
     }

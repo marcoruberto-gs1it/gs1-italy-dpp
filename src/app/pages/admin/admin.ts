@@ -145,6 +145,23 @@ export class Admin {
   protected publishPending = signal(false);
   protected publishedRecord = computed(() => this.records().find((r) => r.id === this.editingId() && r.status === 'published') ?? null);
 
+  /** Payload ESATTO che una pubblicazione invierebbe a mock-eu-registry in questo momento —
+   * null finché la scheda non è stata salvata almeno una volta (serve un id). Richiesta
+   * all'endpoint di sola lettura dedicato (registration-preview), che richiama la STESSA funzione
+   * usata dalla pubblicazione vera (vedi registry-api.service.ts#previewRegistration): mostrato
+   * nel passo Registrazione del Wizard al posto di un JSON-LD che darebbe un'idea sbagliata di
+   * cosa viaggia davvero (vedi .wizard-split-right lì). */
+  protected registrationPreview = signal<Record<string, unknown> | null>(null);
+
+  private refreshRegistrationPreview(id: string): void {
+    this.api.previewRegistration(id).subscribe({
+      next: (preview) => this.registrationPreview.set(preview),
+      // Non bloccante: è solo un'anteprima di sola lettura, un suo fallimento non deve impedire
+      // di continuare a compilare o pubblicare la scheda.
+      error: () => this.registrationPreview.set(null),
+    });
+  }
+
   /** I tre momenti del percorso, nell'ordine in cui accadono davvero: si salva il DPP nei propri
    * sistemi (può restare così indefinitamente, passo 5 del Wizard), solo in un secondo momento si
    * conferma l'invio al Registro UE (passo 6, vedi journeyOpen sotto), e solo dopo arriva la
@@ -514,6 +531,8 @@ export class Admin {
     this.attributesArray.clear();
     this.toast.set(null);
     this.resetJourney();
+    // Niente scheda salvata ancora: nessun id da passare a previewRegistration().
+    this.registrationPreview.set(null);
     this.view.set('wizard');
   }
 
@@ -557,6 +576,7 @@ export class Admin {
     }
     this.toast.set(null);
     this.resetJourney();
+    this.refreshRegistrationPreview(record.id);
     this.view.set('wizard');
   }
 
@@ -695,6 +715,7 @@ export class Admin {
         this.view.set('wizard');
         this.saveVersion.update((v) => v + 1);
         this.loadRecords().subscribe();
+        this.refreshRegistrationPreview(record.id);
       },
       error: (err: HttpErrorResponse) => {
         this.savePending.set(false);

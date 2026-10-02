@@ -560,6 +560,7 @@
         } @else {
           <div class="wizard-split">
             <div class="wizard-split-left">
+              <span class="form-section-eyebrow">Cosa arriva davvero al registro</span>
               <dl class="publish-confirm-facts">
                 <div>
                   <dt>Prodotto</dt>
@@ -578,22 +579,32 @@
                   <dd><code>{{ form.controls.facilityId.value || '—' }}</code></dd>
                 </div>
               </dl>
+              <p class="wizard-field-hint">
+                Il riepilogo qui sopra, in forma leggibile: il JSON esatto che il server invierebbe è qui a destra,
+                non un'approssimazione.
+              </p>
             </div>
             <div class="wizard-split-right">
               <div class="wizard-split-right-head">
-                <span class="wizard-split-right-label">JSON-LD che il registro verificherà</span>
+                <!-- Il payload VERO, non il JSON-LD pubblico (quello il registro lo scarica a
+                     parte dal liveURL per calcolarne l'hash, non lo riceve come corpo della
+                     richiesta — due cose diverse). Richiesto al server con lo stesso
+                     buildRegistrationRequest() usato dalla pubblicazione reale (vedi
+                     Admin.refreshRegistrationPreview()): non una ricostruzione approssimata qui
+                     nel Wizard, la stessa funzione, zero rischio che mostri qualcosa di diverso
+                     da quello che poi viaggia davvero. -->
+                <span class="wizard-split-right-label">Payload di registrazione (quello che viaggia davvero)</span>
                 <span class="wizard-split-right-tools">
-                  <span class="wizard-split-right-meta">{{ previewBytes() }} byte</span>
-                  <button type="button" class="wizard-json-expand wizard-json-copy" [disabled]="!previewJsonLd()" (click)="copyPayload()" [title]="payloadCopied() ? 'Copiato!' : 'Copia JSON'">
-                    <app-icon [name]="payloadCopied() ? 'check-circle' : 'link'" [size]="14"></app-icon>
+                  <span class="wizard-split-right-meta">{{ registrationPreviewBytes() }} byte</span>
+                  <button type="button" class="wizard-json-expand wizard-json-copy" [disabled]="!registrationPreview()" (click)="copyRegistrationPayload()" [title]="registrationPayloadCopied() ? 'Copiato!' : 'Copia JSON'">
+                    <app-icon [name]="registrationPayloadCopied() ? 'check-circle' : 'link'" [size]="14"></app-icon>
                   </button>
-                  <button type="button" class="wizard-json-expand" (click)="viewJsonLd.emit()" title="Espandi e copia">
-                  <app-icon name="braces" [size]="14"></app-icon>
-                </button>
                 </span>
               </div>
-              @if (previewJsonLdHighlighted(); as json) {
+              @if (registrationPreviewHighlighted(); as json) {
                 <pre class="wizard-json gs-code-block"><code [innerHTML]="json"></code></pre>
+              } @else {
+                <div class="wizard-json-placeholder">Anteprima non ancora pronta — salva la scheda per generarla.</div>
               }
             </div>
           </div>

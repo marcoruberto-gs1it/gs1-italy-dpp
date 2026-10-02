@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { applyChange, createDpp, deleteDpp, getDpp, listDpp, listEvents, markPublished, saveRegistryTrace, updateDpp } from '../db.ts';
 import { SCENARIOS, addMonths, applyPatch, isScenario, planChange } from '../simulate.ts';
-import { registerDpp, TransientRegistryError } from '../mockRegistryClient.ts';
+import { buildRegistrationRequest, registerDpp, TransientRegistryError } from '../mockRegistryClient.ts';
 import { syncResolverEntry } from '../resolverClient.ts';
 import { siteUrl } from '../publicUrls.ts';
 import { isValidSectorId } from '../sectors.ts';
@@ -56,6 +56,22 @@ dppRouter.get('/:id', async (req, res) => {
     return;
   }
   res.json(record);
+});
+
+/** Anteprima di sola lettura — nessuna chiamata vera a mock-eu-registry — del payload ESATTO che
+ * registerDpp() invierebbe se si pubblicasse adesso: la stessa funzione buildRegistrationRequest()
+ * usata dalla pubblicazione vera (routes/dpp.ts#publish) e dalla ricostruzione per le schede già
+ * registrate (routes/public.ts), non una sua reimplementazione lato frontend — zero rischio che le
+ * due divergano. Usata dal Wizard admin nel passo "Registrazione" per mostrare cosa viaggia
+ * davvero verso il registro, invece del solo JSON-LD pubblico (che è un'altra cosa: quello il
+ * registro lo scarica a parte per l'hash, non lo riceve come corpo della richiesta). */
+dppRouter.get('/:id/registration-preview', async (req, res) => {
+  const record = await getDpp(req.params.id);
+  if (!record) {
+    res.status(404).json({ error: 'scheda non trovata' });
+    return;
+  }
+  res.json(buildRegistrationRequest(record));
 });
 
 dppRouter.post('/', async (req, res) => {
