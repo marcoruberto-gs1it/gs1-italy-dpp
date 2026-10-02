@@ -490,13 +490,21 @@ Vedi `toStandardGranularity()`/`toStandardDppStatus()` in `registry-api/src/json
 `src/app/utils/dpp-jsonld.ts` per il dettaglio, con citazione di clausola/tabella esatta in
 ciascun commento.
 
-**Serializzazione degli attributi liberi di settore**: non più avvolti in un array
-`schema:additionalProperty`/`PropertyValue` (scelta di questo progetto, non richiesta dallo
-standard) — FprEN 18223 §5.2.6 EXAMPLE 1 mostra i Data Element liberi come chiavi piatte di primo
-livello sull'oggetto DPP stesso (es. `"manufacturerName": "ExampleCorp"`), ed è quello che
-`dppToJsonLd()` produce ora, con un controllo di collisione contro i 9 campi di Table 1 (un
-attributo che si chiamasse per esempio `"granularity"` viene scartato con un avviso, invece di
-sovrascrivere silenziosamente l'intestazione del DPP).
+**Serializzazione degli attributi liberi di settore**: raggruppati per categoria dentro una
+`DataElementCollection` nominata (es. `sustainabilityInfo`, `certificationInfo`) — una proprietà a
+sé di `DigitalProductPassport`, non più chiavi piatte di primo livello sull'oggetto DPP come una
+versione precedente di questa guida riportava, leggendo isolatamente l'esempio abbreviato di
+FprEN 18223 §5.2.6 EXAMPLE 1 (`"manufacturerName": "ExampleCorp"` senza il contesto di
+raggruppamento) invece dell'esempio completo del documento stesso, §4.1 qui sopra —
+`productGeneralInfo`/`batteryTechnicalSpecs`, entrambi oggetti annidati, mai chiavi piatte. I nomi
+delle collezioni (`productGeneralInfo`/`batteryTechnicalSpecs` nell'esempio ufficiale,
+`sustainabilityInfo`/`certificationInfo`/`safetyInfo`/`instructions`/`masterData` in questo
+progetto) sono una scelta dell'implementazione — lo standard non ne impone di fissi — qui allineati
+ai veri link type del GS1 Web Vocabulary già usati per il resolver e le pagine `/01/:gtin?linkType=`
+(`src/app/data/dpp-link-types.ts`/`registry-api/src/linkTypes.ts`), non un sistema a parte. È
+quello che `dppToJsonLd()` produce ora, con un controllo di collisione contro i 9 campi di Table 1
+a livello di nome di collezione (una categoria che si chiamasse per esempio `"granularity"`
+verrebbe scartata con un avviso, invece di sovrascrivere silenziosamente l'intestazione del DPP).
 
 Le rotte REST del §3 sono implementate in `registry-api/src/routes/v1.ts`, sotto
 `/registry-api/v1/dpps*` — path, verbi (inclusa la PATCH con semantica JSON Merge Patch, RFC 7396,
