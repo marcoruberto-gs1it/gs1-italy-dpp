@@ -20,7 +20,7 @@ import { StructuredDataService } from '../../services/structured-data.service';
 import { DppEvent, DppRecord, RegistryApiService, RegistryEntry } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
-import { AttributeLinkTypeId, DPP_LINK_TYPES, DppLinkTypeId, classifyAttribute, linkTypeFromParam, linkTypeRoute } from '../../data/dpp-link-types';
+import { AttributeLinkTypeId, DPP_LINK_TYPES, DppLinkTypeId, classifyAttribute, linkTypeFromParam } from '../../data/dpp-link-types';
 import { LinkTypeHeadComponent } from '../../components/link-type-head/link-type-head';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
 
@@ -140,11 +140,10 @@ export class ProductComponent implements OnDestroy {
 
   private queryParams = toSignal(this.route.queryParamMap);
 
-  /** Pagina dedicata di un link type: `/01/:gtin?linkType=gs1:xxx`, la stessa sintassi del
-   * resolver GS1 (vedi linkTypeRoute). Null sul passaporto (`/01/:gtin` nudo, `gs1:dpp`, `all`):
-   * un solo componente per entrambe, stessi dati e stesso JSON-LD. */
+  /** Tab iniziale da `?linkType=gs1:xxx` — la stessa sintassi del resolver GS1: un link diretto o
+   * una scansione del QR arrivano già sulla sezione giusta (vedi l'effect nel costruttore che
+   * sincronizza activeTab). Null sul passaporto nudo (`/01/:gtin`, `gs1:dpp`, `all`). */
   protected section = computed(() => linkTypeFromParam(this.queryParams()?.get('linkType')));
-  protected routeOf = linkTypeRoute;
 
   activeImageIndex = signal(0);
 
@@ -311,9 +310,6 @@ export class ProductComponent implements OnDestroy {
     return groups;
   });
 
-  /** Host del resolver mostrato nel navigatore delle sezioni. */
-  protected resolverHost = this.resolverOrigin.value.replace(/^https?:\/\//, '');
-
   /** Link type le cui pagine hanno davvero contenuto per questa scheda: quelli strutturali (dpp,
    * pip, masterData, traceability) sempre, gli altri solo se c'è almeno un dato. */
   protected presentSections = computed(() => {
@@ -339,24 +335,27 @@ export class ProductComponent implements OnDestroy {
     }));
   });
 
-  /** Stesso elenco di sectionNav, filtrato ai soli link type "da attributi" (quelli con un
-   * attributeGroups() a sé, vedi sopra) — le tab della pagina principale che mostrano i dati
-   * inline senza navigare: dpp/pip/traceability/registryEntry non hanno un gruppo di attributi
-   * proprio, restano solo nel navigatore a schede separate più sotto. */
-  protected attrTabSections = computed(() => this.sectionNav().filter((item): item is typeof item & { lt: { id: AttributeLinkTypeId } } => item.lt.id in this.attributeGroups()));
+  /** Stesso elenco di sectionNav, meno dpp/pip: dpp è l'identità già mostrata nell'intestazione
+   * del passaporto qui sopra, pip ha una sua pagina a sé per scelta esplicita (la scheda
+   * consumer-facing, destinazione di default del resolver) — tutti gli altri link type con
+   * contenuto diventano una tab di questa stessa pagina, invece di una pagina separata a testa
+   * propria più un navigatore a parte per saltare dall'una all'altra: un solo posto, una sola
+   * lista di schede da scorrere. */
+  protected pageTabs = computed(() => this.sectionNav().filter((item) => item.lt.id !== 'dpp' && item.lt.id !== 'pip'));
 
-  /** Tab attiva nel passaporto principale (vedi .passport-attr-tabs in product.html) — mai
-   * nessuna sezione raggiunta finché l'utente non sceglie, anche se più di una ha dati: un
-   * default arbitrario sembrerebbe un'scelta editoriale che qui non c'è. */
-  protected activeAttrTab = signal<AttributeLinkTypeId | null>(null);
+  /** Tab attiva nel passaporto (vedi .passport-attr-tabs in product.html) — null finché non è
+   * stata scelta esplicitamente (clic, o l'arrivo da un link `?linkType=gs1:xxx`, vedi l'effect
+   * nel costruttore): effectiveTab sotto sceglie la prima disponibile in quel caso, un default
+   * arbitrario qui sembrerebbe una scelta editoriale che non c'è. */
+  protected activeTab = signal<DppLinkTypeId | null>(null);
 
-  /** La tab mostrata davvero: quella scelta se ha ancora dati, altrimenti la prima disponibile —
-   * così la vista non resta vuota se l'utente aveva scelto una sezione che un'altra scheda (dopo
-   * una navigazione client-side, stesso componente riusato) non ha più. */
-  protected effectiveAttrTab = computed<AttributeLinkTypeId | null>(() => {
-    const sections = this.attrTabSections();
+  /** La tab mostrata davvero: quella scelta se ha ancora contenuto, altrimenti la prima
+   * disponibile — così la vista non resta vuota se l'utente aveva scelto una sezione che
+   * un'altra scheda (dopo una navigazione client-side, stesso componente riusato) non ha più. */
+  protected effectiveTab = computed<DppLinkTypeId | null>(() => {
+    const sections = this.pageTabs();
     if (!sections.length) return null;
-    const chosen = this.activeAttrTab();
+    const chosen = this.activeTab();
     return chosen && sections.some((s) => s.lt.id === chosen) ? chosen : sections[0].lt.id;
   });
 
@@ -752,10 +751,20 @@ export class ProductComponent implements OnDestroy {
       });
     }
 
+    // Sincronizza la tab attiva con `?linkType=gs1:xxx` quando cambia per navigazione (link
+    // diretto, scansione del QR via resolver, o pulsante indietro/avanti del browser) — non ad
+    // ogni clic sulla tab stessa, che resta solo stato locale (vedi il commento su pageTabs): un
+    // arrivo da fuori deve aprirsi sulla sezione richiesta, un clic in pagina no deve riscrivere
+    // l'URL per restare semplice.
+    effect(() => {
+      const id = this.section()?.id;
+      this.activeTab.set(id && id !== 'dpp' && id !== 'pip' ? id : null);
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       effect(() => {
         const dpp = this.dppRecord();
-        const id = this.section()?.id;
+        const id = this.effectiveTab();
         if (!dpp) return;
         if (id === 'traceability') {
           this.registryApi.getHistory(dpp.gtin).subscribe({ next: (h) => this.history.set(h.events), error: () => this.history.set([]) });
