@@ -168,7 +168,6 @@ export class ProductComponent implements OnDestroy {
     return localizeSector(base, this.languageService.lang());
   });
 
-  dppAttributeEntries = computed(() => Object.entries(this.dppRecord()?.attributes ?? {}));
   protected economicOperatorId = computed(() => this.dppRecord()?.economicOperatorId || DEMO_ECONOMIC_OPERATOR_ID);
   protected facilityId = computed(() => this.dppRecord()?.facilityId || DEMO_FACILITY_ID);
 
@@ -287,8 +286,13 @@ export class ProductComponent implements OnDestroy {
     }
   }
 
-  /** Attributi della scheda raggruppati per link type del GS1 Web Vocabulary che li descrive
-   * (vedi classifyAttribute) — ogni gruppo è una sezione della pagina e un link sul resolver. */
+  /** Attributi della scheda raggruppati per link type del GS1 Web Vocabulary — ogni gruppo è una
+   * sezione della pagina e un link sul resolver. `attributes` è nidificato per categoria fin
+   * dalla sorgente (ogni DataElementCollection, vedi registry-api.service.ts#DppRecord.attributes):
+   * qui si legge direttamente quella categoria, rispettando la scelta fatta nel Wizard admin,
+   * invece di ri-classificare ogni chiave da zero. classifyAttribute() resta il ripiego solo per
+   * una collezione con un nome che non è uno dei 5 noti (es. un payload esterno con un proprio
+   * nome di categoria). */
   protected attributeGroups = computed(() => {
     const groups: Record<AttributeLinkTypeId, [string, string][]> = {
       sustainabilityInfo: [],
@@ -297,7 +301,13 @@ export class ProductComponent implements OnDestroy {
       instructions: [],
       masterData: [],
     };
-    for (const entry of this.dppAttributeEntries()) groups[classifyAttribute(entry[0])].push(entry);
+    const attrs = this.dppRecord()?.attributes ?? {};
+    for (const [category, fields] of Object.entries(attrs)) {
+      for (const entry of Object.entries(fields ?? {})) {
+        const bucket = category in groups ? groups[category as AttributeLinkTypeId] : groups[classifyAttribute(entry[0])];
+        bucket.push(entry);
+      }
+    }
     return groups;
   });
 
@@ -327,6 +337,27 @@ export class ProductComponent implements OnDestroy {
       lt,
       count: lt.id in groups ? groups[lt.id as AttributeLinkTypeId].length : null,
     }));
+  });
+
+  /** Stesso elenco di sectionNav, filtrato ai soli link type "da attributi" (quelli con un
+   * attributeGroups() a sé, vedi sopra) — le tab della pagina principale che mostrano i dati
+   * inline senza navigare: dpp/pip/traceability/registryEntry non hanno un gruppo di attributi
+   * proprio, restano solo nel navigatore a schede separate più sotto. */
+  protected attrTabSections = computed(() => this.sectionNav().filter((item): item is typeof item & { lt: { id: AttributeLinkTypeId } } => item.lt.id in this.attributeGroups()));
+
+  /** Tab attiva nel passaporto principale (vedi .passport-attr-tabs in product.html) — mai
+   * nessuna sezione raggiunta finché l'utente non sceglie, anche se più di una ha dati: un
+   * default arbitrario sembrerebbe un'scelta editoriale che qui non c'è. */
+  protected activeAttrTab = signal<AttributeLinkTypeId | null>(null);
+
+  /** La tab mostrata davvero: quella scelta se ha ancora dati, altrimenti la prima disponibile —
+   * così la vista non resta vuota se l'utente aveva scelto una sezione che un'altra scheda (dopo
+   * una navigazione client-side, stesso componente riusato) non ha più. */
+  protected effectiveAttrTab = computed<AttributeLinkTypeId | null>(() => {
+    const sections = this.attrTabSections();
+    if (!sections.length) return null;
+    const chosen = this.activeAttrTab();
+    return chosen && sections.some((s) => s.lt.id === chosen) ? chosen : sections[0].lt.id;
   });
 
   protected registeredAtLabel = computed(() => {

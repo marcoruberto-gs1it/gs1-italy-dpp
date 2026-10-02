@@ -736,6 +736,61 @@
   gap: 12px;
 }
 
+/* Tab semantiche della pagina prodotto (sostenibilità/certificazioni/sicurezza/istruzioni/dati
+   anagrafici) — stile "sottolineatura", stessa idea di .wizard-attr-tabs nel passo Attributi del
+   Wizard admin, qui sul lato pubblico. */
+.passport-attr-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 18px;
+}
+
+.passport-attr-tabs button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 4px;
+  margin: 0 14px -1px 0;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.passport-attr-tabs button.is-active {
+  color: var(--brand);
+  border-bottom-color: var(--brand);
+}
+
+.passport-attr-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-sunken);
+  color: var(--text-tertiary);
+  font-size: 0.7rem;
+}
+
+.passport-attr-tabs button.is-active .passport-attr-tab-count {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.passport-attr-tab-link {
+  margin-top: 16px;
+}
+
 @media (max-width: 900px) {
   .passport-grid {
     grid-template-columns: 1fr;

@@ -1,4 +1,5 @@
 import type { DppEvent, DppRecord } from './db.ts';
+import { classifyAttribute } from './linkTypes.ts';
 
 /**
  * Simulazione di una modifica nel tempo di un DPP già pubblicato: ogni scenario descrive UNA
@@ -17,8 +18,13 @@ export type Scenario = (typeof SCENARIOS)[number];
 export interface PlannedChange {
   title: string;
   summary: string;
-  /** chiave → nuovo valore (null = rimuovi la chiave), semantica JSON Merge Patch (RFC 7396). */
-  patch: Record<string, string | null>;
+  /** categoria → chiave → nuovo valore (null = rimuovi la chiave), semantica JSON Merge Patch
+   * (RFC 7396) applicata a un livello in più rispetto a prima — gli attributi sono ora nidificati
+   * per DataElementCollection (vedi db.ts#DppRecord.attributes), quindi anche la patch deve
+   * esserlo per restare una merge patch valida contro quella forma: una patch piatta applicata a
+   * un documento nidificato, per RFC 7396, creerebbe una chiave piatta sorella invece di
+   * aggiornare quella nidificata. */
+  patch: Record<string, Record<string, string | null>>;
 }
 
 export function isScenario(value: unknown): value is Scenario {
@@ -41,9 +47,38 @@ const it = (d: Date) => d.toLocaleDateString('it-IT', { day: '2-digit', month: '
 
 const findKey = (attrs: Record<string, string>, re: RegExp) => Object.keys(attrs).find((k) => re.test(k));
 
-export function planChange(scenario: Scenario, record: DppRecord, at: Date, custom?: Record<string, string | null>): PlannedChange {
-  const a = record.attributes;
-  const when = it(at);
+/** Appiattisce gli attributi nidificati per categoria in un'unica mappa chiave → valore,
+ * ricordando a quale categoria apparteneva ciascuna chiave: permette a buildFlatChange() qui
+ * sotto (ricerca per regex, calcoli su un valore esistente) di restare identica a prima di
+ * questa nidificazione, quando gli attributi erano un'unica mappa piatta — solo l'involucro
+ * attorno cambia (vedi planChange/applyPatch più sotto). */
+function flattenAttributes(attrs: Record<string, Record<string, string>>): { flat: Record<string, string>; categoryOf: Record<string, string> } {
+  const flat: Record<string, string> = {};
+  const categoryOf: Record<string, string> = {};
+  for (const [category, fields] of Object.entries(attrs)) {
+    for (const [key, value] of Object.entries(fields ?? {})) {
+      flat[key] = value;
+      categoryOf[key] = category;
+    }
+  }
+  return { flat, categoryOf };
+}
+
+/** Rinidifica una patch piatta (chiave → nuovo valore) usando la categoria già nota di ogni
+ * chiave (vedi flattenAttributes sopra) — per una chiave che non esisteva ancora nel record (es.
+ * "ultima riparazione — intervento", introdotta dallo scenario 'repair' come sorella di
+ * "riparazioni effettuate"), la categoria si deduce con la stessa euristica usata per un
+ * attributo nuovo ovunque in questo progetto (vedi linkTypes.ts#classifyAttribute). */
+function nestPatch(flatPatch: Record<string, string | null>, categoryOf: Record<string, string>): Record<string, Record<string, string | null>> {
+  const nested: Record<string, Record<string, string | null>> = {};
+  for (const [key, value] of Object.entries(flatPatch)) {
+    const category = categoryOf[key] ?? classifyAttribute(key);
+    (nested[category] ??= {})[key] = value;
+  }
+  return nested;
+}
+
+function buildFlatChange(scenario: Scenario, a: Record<string, string>, when: string, custom?: Record<string, string | null>): { title: string; summary: string; patch: Record<string, string | null> } {
   switch (scenario) {
     case 'repair': {
       const n = num(a['riparazioni effettuate']) ?? 0;
@@ -100,17 +135,41 @@ export function planChange(scenario: Scenario, record: DppRecord, at: Date, cust
   }
 }
 
-/** Applica una merge patch agli attributi e restituisce cosa è cambiato davvero. */
-export function applyPatch(attributes: Record<string, string>, patch: Record<string, string | null>): { next: Record<string, string>; changes: DppEvent['changes'] } {
-  const next = { ...attributes };
+/** Pianifica UNA modifica nel tempo per uno scenario — vedi buildFlatChange() sopra per la logica
+ * di ciascuno scenario (identica a prima di questa nidificazione, qui solo appiattita in
+ * ingresso e rinidificata in uscita tramite flattenAttributes()/nestPatch() sopra). */
+export function planChange(scenario: Scenario, record: DppRecord, at: Date, custom?: Record<string, string | null>): PlannedChange {
+  const { flat, categoryOf } = flattenAttributes(record.attributes);
+  const when = it(at);
+  const built = buildFlatChange(scenario, flat, when, custom);
+  return { title: built.title, summary: built.summary, patch: nestPatch(built.patch, categoryOf) };
+}
+
+/** Applica una merge patch nidificata (categoria → chiave → nuovo valore, null = rimuovi) agli
+ * attributi e restituisce cosa è cambiato davvero — semantica JSON Merge Patch (RFC 7396) estesa
+ * di un livello: la categoria stessa segue la stessa regola della singola chiave (null = rimuove
+ * l'intera collezione), ogni chiave al suo interno si fonde con quelle già presenti nella stessa
+ * collezione. `changes` resta indicizzato per nome di campo semplice (non "categoria.chiave"):
+ * è un registro leggibile da un umano (vedi PublishJourneyComponent), non una seconda
+ * rappresentazione della struttura dati. */
+export function applyPatch(
+  attributes: Record<string, Record<string, string>>,
+  patch: Record<string, Record<string, string | null>>
+): { next: Record<string, Record<string, string>>; changes: DppEvent['changes'] } {
+  const next: Record<string, Record<string, string>> = Object.fromEntries(Object.entries(attributes).map(([category, fields]) => [category, { ...fields }]));
   const changes: DppEvent['changes'] = {};
-  for (const [key, value] of Object.entries(patch)) {
-    const before = key in attributes ? attributes[key] : null;
-    const after = value;
-    if (before === after) continue;
-    if (after === null) delete next[key];
-    else next[key] = after;
-    changes[key] = { before, after };
+  for (const [category, fields] of Object.entries(patch)) {
+    const existing = attributes[category] ?? {};
+    const nextFields = (next[category] ??= {});
+    for (const [key, value] of Object.entries(fields)) {
+      const before = key in existing ? existing[key] : null;
+      const after = value;
+      if (before === after) continue;
+      if (after === null) delete nextFields[key];
+      else nextFields[key] = after;
+      changes[key] = { before, after };
+    }
+    if (Object.keys(nextFields).length === 0) delete next[category];
   }
   return { next, changes };
 }

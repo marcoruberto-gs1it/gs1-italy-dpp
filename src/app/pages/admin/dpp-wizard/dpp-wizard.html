@@ -286,9 +286,9 @@
               <button
                 type="button"
                 role="tab"
-                [attr.aria-selected]="activeAttributeCategory() === cat.id"
-                [class.is-active]="activeAttributeCategory() === cat.id"
-                (click)="activeAttributeCategory.set(cat.id)"
+                [attr.aria-selected]="activeAttributeLinkTypeId() === cat.id"
+                [class.is-active]="activeAttributeLinkTypeId() === cat.id"
+                (click)="activeAttributeLinkTypeId.set(cat.id)"
               >
                 {{ cat.label }}
                 @if (attributeCountByCategory(cat.id); as n) {
@@ -300,7 +300,7 @@
 
           <div class="wizard-attributes" formArrayName="attributes">
             @for (row of attributesArray.controls; track $index; let i = $index) {
-              @if (row.value.category === activeAttributeCategory()) {
+              @if (row.value.category === activeAttributeLinkTypeId()) {
                 <div class="wizard-attribute-row" [formGroupName]="i">
                   <input type="text" class="wizard-attribute-key" formControlName="key" placeholder="Nome campo (es. impronta di carbonio)" />
                   <input type="text" class="wizard-attribute-value" formControlName="value" placeholder="Valore" />
@@ -314,7 +314,7 @@
               }
             }
           </div>
-          @if (attributeCountByCategory(activeAttributeCategory()) === 0) {
+          @if (attributeCountByCategory(activeAttributeLinkTypeId()) === 0) {
             <p class="wizard-field-hint">Nessun attributo in questa categoria: aggiungine uno con il bottone qui sotto.</p>
           }
           <button type="button" class="wizard-add-attribute" (click)="onAddAttribute()">+ Aggiungi attributo in «{{ activeCategoryLabel() }}»</button>
@@ -334,8 +334,8 @@
             <p class="wizard-field-hint">
               Un oggetto JSON piatto, chiave/valore: applicato subito, sostituisce le righe della modalità
               Chiave/valore. Numeri e booleani diventano comunque testo, come ogni valore digitato a mano
-              nell'altra modalità, e la categoria di ciascuna riga riparte da "Generali" (il JSON è piatto, senza
-              categoria: riassegnala nell'altra modalità se serve).
+              nell'altra modalità, e la categoria di ciascuna riga riparte da «Dati anagrafici» (il JSON è
+              piatto, senza categoria: riassegnala nell'altra modalità se serve).
             </p>
           }
         }
@@ -443,34 +443,44 @@
             </dl>
 
             <!-- Mappatura dati: le due classi del diagramma UML (FprEN 18223) messe a confronto
-                 coi valori REALI di questa scheda, non un elenco astratto di nomi di campo — i
-                 campi qui sopra sono la classe DigitalProductPassport (fissi, un valore
-                 ciascuno), ogni attributo del passo precedente è invece un'istanza della classe
-                 astratta DataElement (elementId + value), qui col suo valore esatto e la
-                 categoria scelta. -->
+                 coi valori REALI di questa scheda, non un elenco astratto di nomi di campo — e,
+                 soprattutto, con la nidificazione vera: i campi qui sopra sono la classe
+                 DigitalProductPassport (fissi, proprietà di primo livello), ogni categoria del
+                 passo precedente è invece una DataElementCollection — una SUA proprietà nel
+                 JSON-LD, nidificata — che contiene le istanze della classe astratta DataElement
+                 (elementId + value) di quella categoria. Così la classe astratta resta collegata
+                 alla classe principale tramite la collezione, non sparsa come chiavi piatte alla
+                 radice del documento (correzione rispetto a una versione precedente di questa
+                 schermata, che mostrava gli attributi come un unico elenco piatto). -->
             <div class="wizard-auto-fields-head">
               <span class="form-section-eyebrow">Mappatura dati (DataElement)</span>
             </div>
             @if (attributesArray.controls.length) {
               <p class="wizard-mapping-intro">
-                I campi qui sopra appartengono alla classe <code>DigitalProductPassport</code>: fissi, uno per
-                ciascuno. Ogni attributo del passo precedente è invece un'istanza della classe astratta
-                <code>DataElement</code> — un <code>elementId</code> (il nome) e un <code>value</code>, qui col
-                suo valore esatto:
+                I campi qui sopra appartengono alla classe <code>DigitalProductPassport</code>: fissi, proprietà
+                di primo livello. Ogni categoria del passo precedente è invece una
+                <code>DataElementCollection</code> — una SUA proprietà nel JSON-LD (es.
+                <code>sustainabilityInfo</code>), nidificata, non una chiave piatta alla radice — che contiene le
+                istanze della classe astratta <code>DataElement</code> di quella categoria, ciascuna col proprio
+                <code>elementId</code> (il nome) e <code>value</code>, qui col valore esatto:
               </p>
-              <dl class="auto-fields">
-                @for (row of attributesArray.controls; track $index) {
-                  @if (row.value.key?.trim()) {
-                    <div>
-                      <dt>{{ row.value.key }}</dt>
-                      <dd>
-                        <code>{{ row.value.value || '—' }}</code>
-                        <span class="auto-field-note">elementId · categoria «{{ categoryLabel(row.value.category) }}»</span>
-                      </dd>
-                    </div>
-                  }
+              @for (cat of attributeCategories; track cat.id) {
+                @if (attributeCountByCategory(cat.id); as n) {
+                  <div class="wizard-mapping-collection">
+                    <span class="wizard-mapping-collection-label">{{ cat.label }} <code>{{ cat.id }}</code></span>
+                    <dl class="auto-fields">
+                      @for (row of attributesArray.controls; track $index) {
+                        @if (row.value.category === cat.id && row.value.key?.trim()) {
+                          <div>
+                            <dt>{{ row.value.key }}</dt>
+                            <dd><code>{{ row.value.value || '—' }}</code></dd>
+                          </div>
+                        }
+                      }
+                    </dl>
+                  </div>
                 }
-              </dl>
+              }
             } @else {
               <p class="wizard-field-hint">Nessun attributo di prodotto aggiunto al passo precedente.</p>
             }

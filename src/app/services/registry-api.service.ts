@@ -13,7 +13,14 @@ export interface DppRecord {
   name: string;
   granularityLevel: GranularityLevel;
   batchOrSerial: string | null;
-  attributes: Record<string, string>;
+  /** Attributi liberi di prodotto, nidificati per categoria (DataElementCollection → chiave →
+   * valore) — la classe astratta DataElement collegata alla classe principale
+   * DigitalProductPassport tramite una collezione nominata (diagramma UML, FprEN 18223), non più
+   * chiavi piatte alla radice del documento. Le 5 categorie sono gli stessi AttributeLinkTypeId
+   * di data/dpp-link-types.ts (sustainabilityInfo/certificationInfo/safetyInfo/instructions/
+   * masterData): la stessa classificazione usata per le sezioni della pagina prodotto pubblica e
+   * per il resolver, non un sistema a parte per questo campo. */
+  attributes: Record<string, Record<string, string>>;
   status: DppStatus;
   createdAt: string;
   updatedAt: string;
@@ -40,7 +47,7 @@ export interface DppInput {
   name: string;
   granularityLevel: GranularityLevel;
   batchOrSerial?: string | null;
-  attributes?: Record<string, string>;
+  attributes?: Record<string, Record<string, string>>;
   economicOperatorId?: string;
   facilityId?: string;
 }
@@ -79,7 +86,11 @@ export interface SimulateChangeInput {
 export interface SimulateChangeResult {
   record: DppRecord;
   event: DppEvent;
-  mergePatch: { attributes: Record<string, string | null> };
+  /** Patch come JSON Merge Patch (RFC 7396) equivalente a `PATCH /registry-api/v1/dpps/{id}` —
+   * nidificata di un livello in più di quanto ci si aspetterebbe da una singola chiave/valore:
+   * attributes stesso è nidificato per categoria (vedi DppRecord.attributes sopra), quindi anche
+   * la sua merge patch deve esserlo per restare valida contro quella forma. */
+  mergePatch: { attributes: Record<string, Record<string, string | null>> };
 }
 
 const BASE = '/registry-api';

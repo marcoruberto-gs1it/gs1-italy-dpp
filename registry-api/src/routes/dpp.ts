@@ -22,10 +22,15 @@ function validateInput(body: unknown): string | null {
   }
   if (b.attributes !== undefined) {
     if (typeof b.attributes !== 'object' || b.attributes === null || Array.isArray(b.attributes)) {
-      return 'attributes deve essere un oggetto chiave/valore';
+      return 'attributes deve essere un oggetto categoria → chiave/valore';
     }
-    for (const value of Object.values(b.attributes as Record<string, unknown>)) {
-      if (typeof value !== 'string') return 'ogni valore di attributes deve essere una stringa';
+    for (const group of Object.values(b.attributes as Record<string, unknown>)) {
+      if (typeof group !== 'object' || group === null || Array.isArray(group)) {
+        return 'ogni categoria di attributes deve essere un oggetto chiave/valore';
+      }
+      for (const value of Object.values(group as Record<string, unknown>)) {
+        if (typeof value !== 'string') return 'ogni valore di attributes deve essere una stringa';
+      }
     }
   }
   // economicOperatorId/facilityId: opzionali qui (db.ts ha un default demo se omessi, vedi

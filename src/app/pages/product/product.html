@@ -723,6 +723,59 @@
         </section>
       </article>
 
+      <!-- Anteprima a tab delle sezioni semantiche (sostenibilità, certificazioni, sicurezza,
+           istruzioni, dati anagrafici) senza lasciare questa pagina — stessa idea delle tab del
+           passo Attributi nel Wizard admin, qui sul lato pubblico. Resta comunque disponibile la
+           pagina dedicata di ciascuna sezione (navigatore qui sotto, e "Vedi la pagina completa"):
+           è quella la risorsa singolarmente indirizzabile/condivisibile via resolver, queste tab
+           sono solo una scorciatoia di lettura sulla stessa pagina. -->
+      @if (attrTabSections().length) {
+        <section class="passport-section gs-card" appScrollReveal [revealDuration]="0.4">
+          <div class="passport-section-head">
+            <div>
+              <span class="passport-eyebrow-accent">{{ t('linkType.navEyebrow') }}</span>
+              <h2>{{ t('linkType.navTitle') }}</h2>
+            </div>
+          </div>
+          <div class="passport-attr-tabs" role="tablist" [attr.aria-label]="t('linkType.navTitle')">
+            @for (item of attrTabSections(); track item.lt.id) {
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="effectiveAttrTab() === item.lt.id"
+                [class.is-active]="effectiveAttrTab() === item.lt.id"
+                (click)="activeAttrTab.set(item.lt.id)"
+              >
+                <app-icon [name]="item.lt.icon" [size]="15"></app-icon>
+                {{ t('linkType.' + item.lt.id + '.title') }}
+                @if (item.count) {
+                  <span class="passport-attr-tab-count">{{ item.count }}</span>
+                }
+              </button>
+            }
+          </div>
+          @if (effectiveAttrTab(); as tab) {
+            <div class="passport-attrs-grid">
+              @for (entry of attributeGroups()[tab]; track entry[0]) {
+                <div class="fact-tile" [class.fact-tile--cert]="tab === 'certificationInfo'">
+                  <span class="fact-label">
+                    @if (tab === 'certificationInfo') { <app-icon name="award" [size]="13"></app-icon> }
+                    {{ entry[0] }}
+                  </span>
+                  <span class="fact-value">{{ entry[1] }}</span>
+                </div>
+              } @empty {
+                <p class="lt-empty">{{ t('linkType.' + tab + '.empty') }}</p>
+              }
+            </div>
+            <a class="gs-btn gs-btn--ghost gs-btn--sm passport-attr-tab-link" [routerLink]="routeOf(tab, dpp.gtin).commands" [queryParams]="routeOf(tab, dpp.gtin).queryParams">
+              {{ t('linkType.viewFullPage') }}
+              <app-icon name="external-link" [size]="13"></app-icon>
+            </a>
+          }
+        </section>
+      }
+
       <nav class="lt-nav gs-card" appScrollReveal [revealDuration]="0.4" [attr.aria-label]="t('linkType.navTitle')">
         <div class="lt-nav-head">
           <div>

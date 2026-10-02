@@ -11,7 +11,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { DppRecord, RegistryApiService } from '../../services/registry-api.service';
 import { ScrollRevealDirective } from '../../directives/scroll-reveal';
 import { SECTORS, localizeSector } from '../../data/sectors';
-import { DPP_LINK_TYPES, classifyAttribute, linkTypeRoute } from '../../data/dpp-link-types';
+import { DPP_LINK_TYPES, linkTypeRoute } from '../../data/dpp-link-types';
 
 /**
  * Pagina "informazioni prodotto" (gs1:pip, https://ref.gs1.org/voc/pip) — distinta dalla pagina
@@ -65,7 +65,10 @@ export class ProductInfoComponent {
   moreSections = computed(() => {
     const record = this.record();
     if (!record) return [];
-    const present = new Set(Object.keys(record.attributes ?? {}).map(classifyAttribute));
+    // attributes è nidificato per categoria (vedi registry-api.service.ts#DppRecord.attributes):
+    // le sue chiavi di primo livello SONO già gli AttributeLinkTypeId presenti, niente da
+    // ri-classificare qui.
+    const present = new Set(Object.keys(record.attributes ?? {}));
     const wanted = ['sustainabilityInfo', 'certificationInfo', 'safetyInfo', 'instructions', 'masterData', 'traceability'];
     return DPP_LINK_TYPES.filter((lt) => wanted.includes(lt.id) && (['masterData', 'traceability'].includes(lt.id) || present.has(lt.id as never)));
   });

@@ -76,11 +76,16 @@ const CONTENT_SPECIFICATION_IDS: Record<SectorId, string> = {
  *         prodotto GS1 in JSON-LD viste online: "@vocab" punta a schema.org, così i termini senza
  *         prefisso (name, description…) si risolvono lì da soli, e solo i concetti specifici GS1
  *         (gtin, hasBatchLotNumber…) restano prefissati "gs1:".
- *      b) gli Attributi liberi di settore (chimica, capacità…): ogni attributo diventa una
- *         chiave di primo livello, valore diretto — non avvolti in un array
- *         schema:additionalProperty/PropertyValue come in una versione precedente di questo
- *         progetto (nostra invenzione, non richiesta dallo standard e non coerente col suo
- *         esempio di serializzazione).
+ *      b) gli Attributi liberi di settore (chimica, capacità…): la classe astratta DataElement
+ *         del diagramma UML (FprEN 18223), raggruppata per DataElementCollection — una proprietà
+ *         dell'oggetto DPP il cui nome è la collezione (es. "sustainabilityInfo") e il cui valore
+ *         è un oggetto piatto elementId→value al suo interno (vedi linkTypes.ts). Non
+ *         più chiavi piatte alla radice del documento come in una versione precedente di questo
+ *         progetto: quella forma non collegava in alcun modo la classe astratta alla classe
+ *         principale, solo co-locazione nello stesso oggetto. Coerente con l'esempio reale del
+ *         §4.1 (productGeneralInfo/batteryTechnicalSpecs, vedi docs/dpp-api-specification.md),
+ *         anch'esso una proprietà nominata contenente più Data Element — non più, come anche
+ *         quella versione precedente pensava, l'esempio di una forma piatta.
  */
 export function dppToJsonLd(record: DppRecord, identifierBase: string): Record<string, unknown> {
   // identifierBase = origine del RESOLVER (vedi publicUrls.ts): @id e UPI sono l'URI GS1 Digital
@@ -132,18 +137,23 @@ export function dppToJsonLd(record: DppRecord, identifierBase: string): Record<s
     }
   }
 
-  // Ogni attributo libero come chiave di primo livello sull'oggetto DPP, valore diretto — non
-  // più avvolti in un array schema:additionalProperty/PropertyValue (vedi il commento sopra la
-  // funzione per il perché). Un attributo il cui nome coincide con un campo dell'intestazione DPP
-  // (es. l'utente scrive "granularity" come chiave) andrebbe altrimenti a sovrascrivere in
-  // silenzio quel campo, dato che qui sono tutte chiavi dello stesso oggetto piatto: ignorato con
-  // un avviso in log invece che corrompere l'intestazione.
-  for (const [propName, value] of Object.entries(record.attributes)) {
-    if (propName in doc) {
-      console.warn(`dppToJsonLd: attributo "${propName}" ignorato — coincide con un campo dell'intestazione DPP (record ${record.id}).`);
+  // Ogni categoria di attributi liberi come una DataElementCollection a sé — una proprietà
+  // nominata dell'oggetto DPP (es. "sustainabilityInfo") il cui valore è l'oggetto piatto
+  // elementId→value al suo interno: la classe astratta DataElement è così collegata alla classe
+  // principale tramite questa collezione, non sparsa come chiavi piatte alla radice del
+  // documento (vedi il commento sopra la funzione). record.attributes è già in questa stessa
+  // forma (normalizeAttributes() in db.ts garantisce la nidificazione anche per righe scritte
+  // prima di questa correzione): qui basta unirla a doc, con la stessa guardia anti-collisione di
+  // prima ma a livello di collezione invece che di singolo campo.
+  for (const [groupKey, fields] of Object.entries(record.attributes)) {
+    if (!fields || typeof fields !== 'object') continue;
+    const entries = Object.entries(fields);
+    if (!entries.length) continue;
+    if (groupKey in doc) {
+      console.warn(`dppToJsonLd: categoria attributi "${groupKey}" ignorata — coincide con un campo dell'intestazione DPP (record ${record.id}).`);
       continue;
     }
-    doc[propName] = value;
+    doc[groupKey] = Object.fromEntries(entries);
   }
 
   if (record.registryId) {

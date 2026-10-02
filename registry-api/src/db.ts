@@ -12,8 +12,14 @@ export interface DppRecord {
   name: string;
   granularityLevel: GranularityLevel;
   batchOrSerial: string | null;
-  /** Coppie chiave/valore libere — i settori non hanno ancora uno schema dati proprio. */
-  attributes: Record<string, string>;
+  /** Attributi liberi di prodotto, nidificati per categoria (collezione → chiave → valore) — i
+   * settori non hanno ancora uno schema dati proprio. La categoria è una DataElementCollection
+   * (diagramma UML, FprEN 18223) che collega la classe astratta DataElement alla classe
+   * principale DigitalProductPassport: non più chiavi piatte alla radice del documento (vedi
+   * jsonld.ts#dppToJsonLd). Chiavi tipiche: vedi linkTypes.ts#AttributeLinkTypeId
+   * (sustainabilityInfo/certificationInfo/safetyInfo/instructions/masterData), ma qualunque
+   * stringa è accettata — un chiamante esterno può usare un proprio nome di collezione. */
+  attributes: Record<string, Record<string, string>>;
   status: DppStatus;
   createdAt: string;
   updatedAt: string;
@@ -46,7 +52,7 @@ interface DppRow {
   name: string;
   granularity_level: string;
   batch_or_serial: string | null;
-  attributes: Record<string, string>;
+  attributes: Record<string, unknown>;
   status: string;
   created_at: Date;
   updated_at: Date;
@@ -119,6 +125,22 @@ await pool.query(`
 `);
 await pool.query('CREATE INDEX IF NOT EXISTS gs1_dpp_events_dpp_idx ON gs1_dpp_events (dpp_id, at)');
 
+/** Upgrade in lettura per righe scritte prima che gli attributi diventassero nidificati per
+ * categoria (vedi DppRecord.attributes qui sopra): se il valore sotto la prima chiave è una
+ * stringa invece che un oggetto, l'intero blob è ancora nella forma piatta precedente
+ * (chiave → valore diretto) — avvolto qui in un'unica collezione "masterData" (lo stesso
+ * ripiego di default di classifyAttribute() in linkTypes.ts) così il resto del
+ * sistema vede sempre e solo la forma nidificata, senza dover distinguere le due in ogni punto
+ * che legge attributes. Nessuna migrazione SQL necessaria: la colonna è JSONB, la forma del
+ * contenuto non è vincolata dallo schema della tabella. */
+function normalizeAttributes(raw: Record<string, unknown>): Record<string, Record<string, string>> {
+  const firstValue = Object.values(raw)[0];
+  if (firstValue !== undefined && typeof firstValue !== 'object') {
+    return { masterData: raw as Record<string, string> };
+  }
+  return raw as Record<string, Record<string, string>>;
+}
+
 function fromRow(row: DppRow): DppRecord {
   return {
     id: row.id,
@@ -127,7 +149,7 @@ function fromRow(row: DppRow): DppRecord {
     name: row.name,
     granularityLevel: row.granularity_level as GranularityLevel,
     batchOrSerial: row.batch_or_serial,
-    attributes: row.attributes,
+    attributes: normalizeAttributes(row.attributes),
     status: row.status as DppStatus,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
@@ -194,7 +216,7 @@ export interface CreateDppInput {
   name: string;
   granularityLevel: GranularityLevel;
   batchOrSerial?: string | null;
-  attributes?: Record<string, string>;
+  attributes?: Record<string, Record<string, string>>;
   /** Obbligatorio per lo standard, facoltativo qui (default demo se omesso) per non rompere i
    * chiamanti esistenti (routes/v1.ts) scritti prima di questa colonna. */
   economicOperatorId?: string;
@@ -336,7 +358,7 @@ export async function listEvents(dppId: string): Promise<DppEvent[]> {
  * attributi cambiano, `updated_at` diventa l'istante (simulato) della modifica. */
 export async function applyChange(
   record: DppRecord,
-  attributes: Record<string, string>,
+  attributes: Record<string, Record<string, string>>,
   event: Omit<DppEvent, 'id' | 'dppId'>
 ): Promise<{ record: DppRecord; event: DppEvent }> {
   const client = await pool.connect();

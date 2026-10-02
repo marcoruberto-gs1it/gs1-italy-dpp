@@ -334,6 +334,7 @@ export const TRANSLATIONS = {
       navTitle: 'Le pagine del passaporto, una per link type',
       navText: 'Ogni link type del GS1 Web Vocabulary ha la sua pagina dedicata, registrata sul resolver: un client GS1 la ottiene con ?linkType=gs1:… e un utente la apre da qui.',
       navResolverLabel: 'Risolto da',
+      viewFullPage: 'Vedi la pagina completa',
       dpp: {
         title: 'Passaporto digitale di prodotto',
         text: 'Identità del passaporto: identificativi, granularità, operatore economico e stabilimento.',
@@ -747,6 +748,7 @@ export const TRANSLATIONS = {
       navTitle: 'The passport pages, one per link type',
       navText: 'Each GS1 Web Vocabulary link type has its own dedicated page, registered on the resolver: a GS1 client gets it with ?linkType=gs1:… and a user opens it from here.',
       navResolverLabel: 'Resolved by',
+      viewFullPage: 'View the full page',
       dpp: {
         title: 'Digital Product Passport',
         text: 'Passport identity: identifiers, granularity, economic operator and facility.',

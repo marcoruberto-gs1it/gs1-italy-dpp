@@ -1,5 +1,6 @@
 import { getAnyByGtin, updateDpp } from './db.ts';
 import { SEED_DATA } from './seedData.ts';
+import { groupFlatAttributes } from './linkTypes.ts';
 
 /**
  * Riallinea gli attributi dei record STATICI già presenti (i 10 esempi della home) ai dati di
@@ -17,8 +18,9 @@ export async function refreshStaticSeeds(): Promise<number> {
   for (const entry of SEED_DATA) {
     const existing = await getAnyByGtin(entry.gtin);
     if (!existing || !existing.isStatic) continue;
-    if (JSON.stringify(existing.attributes) === JSON.stringify(entry.attributes)) continue;
-    await updateDpp(existing.id, { attributes: entry.attributes });
+    const nextAttributes = groupFlatAttributes(entry.attributes);
+    if (JSON.stringify(existing.attributes) === JSON.stringify(nextAttributes)) continue;
+    await updateDpp(existing.id, { attributes: nextAttributes });
     updated++;
     console.log(`refresh seed: ✓ ${entry.gtin} (${entry.name}) — attributi aggiornati`);
   }

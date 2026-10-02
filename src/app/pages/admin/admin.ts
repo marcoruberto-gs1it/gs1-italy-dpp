@@ -9,6 +9,7 @@ import { tap } from 'rxjs';
 import { IconComponent, IconName } from '../../components/icon/icon';
 import { JsonLdDrawerComponent } from '../../components/json-ld-drawer/json-ld-drawer';
 import { SECTORS, Sector } from '../../data/sectors';
+import { AttributeLinkTypeId, classifyAttribute } from '../../data/dpp-link-types';
 import { DppInput, DppRecord, GranularityLevel, PublishTechnicalTrace, RegistryApiService, SimulateChangeResult, SimulationScenario } from '../../services/registry-api.service';
 import { ApiInspectorService } from '../../services/api-inspector.service';
 import { LanguageService } from '../../services/language.service';
@@ -16,7 +17,7 @@ import { SiteOriginService } from '../../services/site-origin.service';
 import { ThemeService } from '../../services/theme.service';
 import { DEMO_DATA } from './demo-data';
 import { JourneyPhase } from './publish-journey/publish-journey';
-import { AttributeCategory, DppWizardComponent } from './dpp-wizard/dpp-wizard';
+import { ATTRIBUTE_CATEGORIES, DppWizardComponent } from './dpp-wizard/dpp-wizard';
 import { hasIncompleteAttributeRow, isValidGtin } from '../../utils/gs1-validators';
 import { buildDigitalLinkUpi, parseDigitalLink, parseGlnDigitalLink } from '../../utils/gs1-digital-link';
 import { DEMO_ECONOMIC_OPERATOR_ID, DEMO_FACILITY_ID, DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../utils/dpp-jsonld';
@@ -32,22 +33,6 @@ export type ToastSeverity = 'error' | 'warning';
  * l'animazione proseguire, mai un errore intermedio: vedi publish()/attemptPublish() sotto. */
 const PUBLISH_RETRY_DELAYS_MS = [4000, 8000, 15000, 25000];
 
-/** Euristica SOLO per il riempimento demo/il caricamento di un record esistente (vedi
- * fillDemoAttributes()/loadRecordIntoForm() sotto): demo-data.ts resta un semplice
- * Record<string,string> senza categoria — è già incrociato con tracepass-dpp-schemas
- * (github.com/malinoto/tracepass-dpp-schemas), non vogliamo un secondo campo da tenere
- * sincronizzato lì solo per questo. Deduce una categoria plausibile dal NOME dell'attributo, così
- * le tab del passo Attributi (dpp-wizard.html) partono già popolate in modo sensato invece di
- * buttare tutto in "Generali". Un attributo aggiunto a mano dall'utente non passa da qui: prende
- * semplicemente la categoria della tab aperta al momento del click su "+ Aggiungi attributo"
- * (vedi DppWizardComponent.onAddAttribute()). */
-function categorizeAttributeKey(key: string): AttributeCategory {
-  const k = key.toLowerCase();
-  if (/carbonio|co2|co₂|ricicl|circolar|sosteni|biodegrad/.test(k)) return 'sustainability';
-  if (/certificaz|marcatura|sicurezza|reazione al fuoco|conformit|ecolabel/.test(k)) return 'safety';
-  if (/istruzion|\bcura\b|manutenzione|smaltimento|dosaggio/.test(k)) return 'instructions';
-  return 'general';
-}
 
 /**
  * Sezione admin per creare/modificare DPP e pubblicarli su mock-eu-registry (il registro
@@ -286,15 +271,20 @@ export class Admin {
       }
     }
 
-    // Ogni attributo come chiave di primo livello, non più avvolti in
-    // schema:additionalProperty/PropertyValue — vedi jsonld.ts#dppToJsonLd. Stessa guardia
-    // anti-collisione: un attributo che si chiama come un campo dell'intestazione (es.
-    // "granularity") viene ignorato invece di sovrascriverlo in silenzio.
-    const attrs = (f.attributes as { key: string; value: string }[]).filter((row) => row.key?.trim());
-    for (const row of attrs) {
-      const key = row.key.trim();
-      if (key in doc) continue;
-      doc[key] = row.value;
+    // Ogni categoria di attributi come una DataElementCollection a sé — una proprietà nominata
+    // (es. "sustainabilityInfo") il cui valore è l'oggetto piatto elementId→value al suo interno,
+    // non più chiavi piatte alla radice del documento: stessa logica di
+    // registry-api/src/jsonld.ts#dppToJsonLd, duplicata qui per l'anteprima dal vivo. Stessa
+    // guardia anti-collisione di prima ma a livello di collezione invece che di singolo campo.
+    const grouped: Record<string, Record<string, string>> = {};
+    for (const row of f.attributes as { key: string; value: string; category: AttributeLinkTypeId }[]) {
+      const key = row.key?.trim();
+      if (!key) continue;
+      (grouped[row.category] ??= {})[key] = row.value;
+    }
+    for (const [groupKey, fields] of Object.entries(grouped)) {
+      if (groupKey in doc) continue;
+      doc[groupKey] = fields;
     }
 
     if (existing?.registryId) {
@@ -551,9 +541,19 @@ export class Admin {
       economicOperatorId: record.economicOperatorId,
       facilityId: record.facilityId,
     });
+    // La categoria di ogni riga è quella REALMENTE salvata (la chiave della DataElementCollection
+    // che la contiene), non ri-dedotta dal nome: un attributo che l'utente ha spostato a mano in
+    // un'altra tab deve restare lì quando si riapre la scheda, non tornare dove lo metterebbe
+    // l'euristica. Un nome di collezione che un chiamante esterno ha scritto diverso dai 5 noti
+    // (vedi ATTRIBUTE_CATEGORIES in dpp-wizard.ts) ricade su "masterData": nessuna delle tab lo
+    // riconoscerebbe altrimenti, e la riga sparirebbe silenziosamente da ogni vista.
+    const knownCategories = new Set(ATTRIBUTE_CATEGORIES.map((c) => c.id));
     this.attributesArray.clear();
-    for (const [key, value] of Object.entries(record.attributes)) {
-      this.attributesArray.push(this.attributeGroup(key, value, categorizeAttributeKey(key)));
+    for (const [category, fields] of Object.entries(record.attributes)) {
+      const resolvedCategory = knownCategories.has(category as AttributeLinkTypeId) ? (category as AttributeLinkTypeId) : 'masterData';
+      for (const [key, value] of Object.entries(fields)) {
+        this.attributesArray.push(this.attributeGroup(key, value, resolvedCategory));
+      }
     }
     this.toast.set(null);
     this.resetJourney();
@@ -591,7 +591,7 @@ export class Admin {
     if (!demo) return;
     this.attributesArray.clear();
     for (const [key, value] of Object.entries(demo.attributes)) {
-      this.attributesArray.push(this.attributeGroup(key, value, categorizeAttributeKey(key)));
+      this.attributesArray.push(this.attributeGroup(key, value, classifyAttribute(key)));
     }
   }
 
@@ -621,14 +621,14 @@ export class Admin {
     return this.dppForm.controls.attributes;
   }
 
-  private attributeGroup(key = '', value = '', category: AttributeCategory = 'general'): FormGroup {
+  private attributeGroup(key = '', value = '', category: AttributeLinkTypeId = 'masterData'): FormGroup {
     return this.fb.nonNullable.group({ key: [key], value: [value], category: [category] });
   }
 
   /** La categoria è quella della tab aperta nel Wizard al momento del click (vedi
    * DppWizardComponent.onAddAttribute()) — una riga aggiunta a mano finisce così nella tab da cui
-   * è stata creata, non sempre in "Generali" a prescindere da dove si trovava l'utente. */
-  protected addAttributeRow(category: AttributeCategory = 'general'): void {
+   * è stata creata, non sempre in «Dati anagrafici» a prescindere da dove si trovava l'utente. */
+  protected addAttributeRow(category: AttributeLinkTypeId = 'masterData'): void {
     this.attributesArray.push(this.attributeGroup('', '', category));
   }
 
@@ -640,7 +640,7 @@ export class Admin {
    * vedi DppWizardComponent.parseFlatJsonObject()) — stessa forma finale di fillDemoAttributes()
    * qui sotto: sostituisce del tutto le righe esistenti, non le unisce. Il JSON grezzo non porta
    * alcuna informazione di categoria (è volutamente un oggetto piatto chiave/valore, vedi il
-   * suggerimento nel Wizard): ogni riga così applicata riparte da "Generali", da riassegnare a
+   * suggerimento nel Wizard): ogni riga così applicata riparte da «Dati anagrafici», da riassegnare a
    * mano nella tab giusta se serve. */
   protected applyAttributesJson(values: Record<string, string>): void {
     this.attributesArray.clear();
@@ -651,9 +651,15 @@ export class Admin {
 
   private buildInput(): DppInput {
     const f = this.dppForm.getRawValue();
-    const attributes: Record<string, string> = {};
-    for (const row of f.attributes as { key: string; value: string }[]) {
-      if (row.key.trim()) attributes[row.key.trim()] = row.value;
+    // Nidificati per categoria (la DataElementCollection scelta riga per riga nel Wizard, vedi
+    // dpp-wizard.html) invece che chiavi piatte: la classe astratta DataElement va collegata
+    // alla classe principale tramite questa collezione nominata, non sparsa alla radice del
+    // documento (vedi registry-api/src/jsonld.ts#dppToJsonLd).
+    const attributes: Record<string, Record<string, string>> = {};
+    for (const row of f.attributes as { key: string; value: string; category: AttributeLinkTypeId }[]) {
+      const key = row.key.trim();
+      if (!key) continue;
+      (attributes[row.category] ??= {})[key] = row.value;
     }
     return {
       sectorId: f.sectorId,

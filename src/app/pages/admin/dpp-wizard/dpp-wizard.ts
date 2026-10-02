@@ -5,6 +5,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { IconComponent } from '../../../components/icon/icon';
 import { Sector } from '../../../data/sectors';
+import { AttributeLinkTypeId } from '../../../data/dpp-link-types';
 import { DppRecord, DppStatus, GranularityLevel, PublishTechnicalTrace } from '../../../services/registry-api.service';
 import { DPP_SCHEMA_VERSION, toStandardDppStatus, toStandardGranularity } from '../../../utils/dpp-jsonld';
 import { hasIncompleteAttributeRow, isValidGtin } from '../../../utils/gs1-validators';
@@ -17,16 +18,20 @@ import { JourneyPhase, PublishJourneyComponent } from '../publish-journey/publis
  * dpp-jsonld.ts invece è un modulo condiviso senza questo problema: importato direttamente. */
 export type ToastSeverity = 'error' | 'warning';
 
-/** Categoria semantica di un attributo di prodotto (passo Attributi) — puramente organizzativa
- * lato UI, mai inviata al JSON-LD/Registro UE (che non ha alcun concetto di categoria, solo
- * chiave/valore piatti): serve solo a raggruppare in tab la stessa lista di attributi, come nella
- * pagina prodotto di demo.epcis.cloud presa a riferimento. */
-export type AttributeCategory = 'general' | 'sustainability' | 'safety' | 'instructions';
-
-export const ATTRIBUTE_CATEGORIES: { id: AttributeCategory; label: string }[] = [
-  { id: 'general', label: 'Generali' },
-  { id: 'sustainability', label: 'Sostenibilità' },
-  { id: 'safety', label: 'Sicurezza e conformità' },
+/** Etichette italiane delle 5 DataElementCollection in cui questo passo raggruppa gli attributi
+ * di prodotto (passo Attributi) — gli stessi 5 `AttributeLinkTypeId` del GS1 Web Vocabulary già
+ * usati per classificarli sulla pagina prodotto pubblica (src/app/data/dpp-link-types.ts) e per
+ * registrare le sezioni sul resolver (registry-api/src/linkTypes.ts): non un sistema di
+ * categorie inventato per il solo Wizard, ma la STESSA classificazione usata ovunque nel
+ * progetto, così la tab in cui un attributo viene compilato qui è esattamente la sezione in cui
+ * comparirà nella scheda pubblica e nel JSON-LD (la categoria è la DataElementCollection che
+ * collega la classe astratta DataElement alla classe principale DigitalProductPassport, vedi
+ * jsonld.ts#dppToJsonLd lato registry-api). */
+export const ATTRIBUTE_CATEGORIES: { id: AttributeLinkTypeId; label: string }[] = [
+  { id: 'masterData', label: 'Dati anagrafici' },
+  { id: 'sustainabilityInfo', label: 'Sostenibilità' },
+  { id: 'certificationInfo', label: 'Certificazioni' },
+  { id: 'safetyInfo', label: 'Sicurezza' },
   { id: 'instructions', label: 'Istruzioni' },
 ];
 
@@ -44,7 +49,7 @@ export type DppFormGroup = FormGroup<{
   batchOrSerial: FormControl<string>;
   economicOperatorId: FormControl<string>;
   facilityId: FormControl<string>;
-  attributes: FormArray<FormGroup<{ key: FormControl<string>; value: FormControl<string>; category: FormControl<AttributeCategory> }>>;
+  attributes: FormArray<FormGroup<{ key: FormControl<string>; value: FormControl<string>; category: FormControl<AttributeLinkTypeId> }>>;
 }>;
 
 interface WizardStep {
@@ -130,10 +135,10 @@ export class DppWizardComponent {
    * guardia di admin.ts, qui passata per riferimento invece di duplicare isPlatformBrowser(). */
   @Input() isBrowser = false;
 
-  /** Emette la categoria della tab aperta al momento del click (vedi activeAttributeCategory
+  /** Emette la categoria della tab aperta al momento del click (vedi activeAttributeLinkTypeId
    * sotto): la nuova riga nasce già assegnata a quella tab, invece di finire sempre in
-   * "Generali" a prescindere da dove l'utente si trovava. */
-  @Output() addAttribute = new EventEmitter<AttributeCategory>();
+   * «Dati anagrafici» a prescindere da dove l'utente si trovava. */
+  @Output() addAttribute = new EventEmitter<AttributeLinkTypeId>();
   @Output() removeAttribute = new EventEmitter<number>();
   @Output() requestDemoFill = new EventEmitter<void>();
   /** Emesso ogni volta che il testo della modalità JSON (vedi attributeInputMode sotto) è un
@@ -192,7 +197,7 @@ export class DppWizardComponent {
     // sopra, così non si resta a guardare un JSON ormai scollegato dall'attributesArray appena
     // sovrascritto.
     this.attributeInputMode.set('fields');
-    this.activeAttributeCategory.set('general');
+    this.activeAttributeLinkTypeId.set('masterData');
     this.requestFullDemo.emit();
   }
 
@@ -203,7 +208,7 @@ export class DppWizardComponent {
     this.slideDirection.set('back');
     this.currentStep.set(0);
     this.attributeInputMode.set('fields');
-    this.activeAttributeCategory.set('general');
+    this.activeAttributeLinkTypeId.set('masterData');
   }
 
   protected steps = STEPS;
@@ -341,7 +346,7 @@ export class DppWizardComponent {
       // Torna alla vista a righe: restare in modalità JSON mostrerebbe ancora il testo di prima,
       // ormai scollegato dall'attributesArray appena svuotato qui sopra.
       this.attributeInputMode.set('fields');
-      this.activeAttributeCategory.set('general');
+      this.activeAttributeLinkTypeId.set('masterData');
       this.showToast.emit({
         message: 'Cambiando settore, gli attributi già inseriti per il settore precedente sono stati rimossi: non sarebbero più validi per questo settore.',
         severity: 'warning',
@@ -360,28 +365,28 @@ export class DppWizardComponent {
   protected attributeJsonError = signal<string | null>(null);
 
   /** Tab aperta nella modalità Chiave/valore — raggruppa la stessa lista per categoria semantica
-   * (Generali/Sostenibilità/Sicurezza e conformità/Istruzioni), come nella pagina prodotto di
+   * (Dati anagrafici/Sostenibilità/Certificazioni/Sicurezza/Istruzioni), come nella pagina prodotto di
    * demo.epcis.cloud presa a riferimento. Solo un filtro di vista: attributesArray resta un'unica
    * lista piatta, ogni riga porta semplicemente il proprio campo `category`. */
   protected attributeCategories = ATTRIBUTE_CATEGORIES;
-  protected activeAttributeCategory = signal<AttributeCategory>('general');
+  protected activeAttributeLinkTypeId = signal<AttributeLinkTypeId>('masterData');
 
-  protected attributeCountByCategory(category: AttributeCategory): number {
-    return (this.attributesArray.getRawValue() as { key: string; category: AttributeCategory }[]).filter(
+  protected attributeCountByCategory(category: AttributeLinkTypeId): number {
+    return (this.attributesArray.getRawValue() as { key: string; category: AttributeLinkTypeId }[]).filter(
       (row) => row.category === category && row.key?.trim(),
     ).length;
   }
 
-  protected categoryLabel(id: AttributeCategory): string {
+  protected categoryLabel(id: AttributeLinkTypeId): string {
     return this.attributeCategories.find((c) => c.id === id)?.label ?? '';
   }
 
   protected activeCategoryLabel(): string {
-    return this.categoryLabel(this.activeAttributeCategory());
+    return this.categoryLabel(this.activeAttributeLinkTypeId());
   }
 
   protected onAddAttribute(): void {
-    this.addAttribute.emit(this.activeAttributeCategory());
+    this.addAttribute.emit(this.activeAttributeLinkTypeId());
   }
 
   private serializeAttributesToJson(): string {

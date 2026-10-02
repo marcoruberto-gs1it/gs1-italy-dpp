@@ -4,6 +4,7 @@ import { dppToJsonLd } from '../jsonld.ts';
 import { requireAuth } from '../auth.ts';
 import { resolverPublicUrl } from '../publicUrls.ts';
 import { isValidSectorId, type SectorId } from '../sectors.ts';
+import { groupFlatAttributes } from '../linkTypes.ts';
 
 /**
  * Superficie REST conforme al metodo di gestione del ciclo di vita del passaporto descritto dallo
@@ -162,26 +163,43 @@ interface DppPayloadBody {
   facilityId?: unknown;
 }
 
-/** In uscita (dppToJsonLd, jsonld.ts) ogni attributo libero è ormai una chiave piatta di primo
- * livello — non più avvolto in schema:additionalProperty/PropertyValue, che era una nostra
- * invenzione, non richiesta dallo standard. In INGRESSO qui accettiamo ancora entrambe le forme
- * (l'oggetto piatto `attributes`, più comodo, o il vecchio array schema:additionalProperty, per
- * compatibilità con chi lo mandava già): lo schema non vieta nessuna delle due, ma solo
- * `attributes` rispecchia davvero come i dati vengono poi serializzati. */
-function extractAttributes(body: DppPayloadBody): Record<string, string> {
+/** In uscita (dppToJsonLd, jsonld.ts) ogni attributo libero è raggruppato per DataElementCollection
+ * (la classe astratta DataElement collegata alla classe principale, vedi il commento lì) — non più
+ * avvolto in schema:additionalProperty/PropertyValue, né sparso come chiavi piatte alla radice,
+ * entrambe forme non richieste dallo standard e la seconda priva di qualunque collegamento
+ * esplicito alla classe principale. In INGRESSO qui accettiamo tre forme: `attributes` già
+ * nidificato per categoria (la forma canonica, quella che rispecchia davvero come i dati vengono
+ * poi serializzati), `attributes` come comodo oggetto piatto chiave/valore (un chiamante esterno
+ * che non vuole occuparsi di categorie: raggruppato qui con la stessa euristica del Wizard admin,
+ * vedi linkTypes.ts), o il vecchio array schema:additionalProperty (compatibilità con
+ * chi lo mandava già). */
+function extractAttributes(body: DppPayloadBody): Record<string, Record<string, string>> {
   if (body.attributes && typeof body.attributes === 'object' && !Array.isArray(body.attributes)) {
-    return body.attributes as Record<string, string>;
+    return normalizeAttributesInput(body.attributes as Record<string, unknown>);
   }
   const prop = body['schema:additionalProperty'];
   if (Array.isArray(prop)) {
-    const out: Record<string, string> = {};
+    const flat: Record<string, string> = {};
     for (const entry of prop) {
-      if (entry && typeof entry === 'object' && typeof entry.name === 'string') out[entry.name] = String(entry.value ?? '');
+      if (entry && typeof entry === 'object' && typeof entry.name === 'string') flat[entry.name] = String(entry.value ?? '');
     }
-    return out;
+    return groupFlatAttributes(flat);
   }
   return {};
 }
+
+/** Distingue le due forme accettate per `attributes` in ingresso controllando il tipo del primo
+ * valore: un oggetto per la forma nidificata canonica (categoria → chiave → valore), una stringa
+ * per quella piatta di comodo — stessa euristica di normalizeAttributes() in db.ts per le righe
+ * scritte prima di questa nidificazione. */
+function normalizeAttributesInput(raw: Record<string, unknown>): Record<string, Record<string, string>> {
+  const firstValue = Object.values(raw)[0];
+  if (firstValue === undefined || typeof firstValue === 'object') {
+    return raw as Record<string, Record<string, string>>;
+  }
+  return groupFlatAttributes(raw as Record<string, string>);
+}
+
 
 v1Router.post('/dpps', requireAuth, async (req, res) => {
   const body = req.body as DppPayloadBody;

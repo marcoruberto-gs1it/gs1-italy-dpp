@@ -4,6 +4,7 @@ import { registerDpp } from './mockRegistryClient.ts';
 import { syncResolverEntry } from './resolverClient.ts';
 import { siteUrl } from './publicUrls.ts';
 import { SEED_DATA } from './seedData.ts';
+import { groupFlatAttributes } from './linkTypes.ts';
 
 /**
  * Registra sul DPP Registry UE (vero, tramite mockRegistryClient.ts — non finto) i 10 prodotti
@@ -46,7 +47,10 @@ async function main(): Promise<void> {
       name: entry.name,
       granularityLevel: entry.granularityLevel,
       batchOrSerial: entry.batchOrSerial,
-      attributes: entry.attributes,
+      // seedData.ts resta un semplice Record<string,string> per settore (come demo-data.ts lato
+      // frontend, mai stato il caso di nidificarlo a mano): raggruppato qui per categoria con la
+      // stessa euristica usata ovunque in questo progetto per dati senza una categoria propria.
+      attributes: groupFlatAttributes(entry.attributes),
       // Questi 10 DPP sono gli esempi "scansionabili" della home: non modificabili né
       // eliminabili da /admin, vedi il commento su DppRecord.isStatic in db.ts.
       isStatic: true,
